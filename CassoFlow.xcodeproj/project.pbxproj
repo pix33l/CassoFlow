@@ -7,13 +7,26 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		6276D7682DD1E6F900ACA539 /* tapemusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tapemusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6276D7682DD1E6F900ACA539 /* CassoFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CassoFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6249C1762DD4915600117512 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6276D7672DD1E6F900ACA539 /* CassoFlow */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6276D76A2DD1E6F900ACA539 /* tapemusic */ = {
+		6276D76A2DD1E6F900ACA539 /* CassoFlow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = tapemusic;
+			exceptions = (
+				6249C1762DD4915600117512 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */,
+			);
+			path = CassoFlow;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +45,7 @@
 		6276D75F2DD1E6F900ACA539 = {
 			isa = PBXGroup;
 			children = (
-				6276D76A2DD1E6F900ACA539 /* tapemusic */,
+				6276D76A2DD1E6F900ACA539 /* CassoFlow */,
 				6276D7692DD1E6F900ACA539 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +53,7 @@
 		6276D7692DD1E6F900ACA539 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6276D7682DD1E6F900ACA539 /* tapemusic.app */,
+				6276D7682DD1E6F900ACA539 /* CassoFlow.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +61,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6276D7672DD1E6F900ACA539 /* tapemusic */ = {
+		6276D7672DD1E6F900ACA539 /* CassoFlow */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6276D7752DD1E6FD00ACA539 /* Build configuration list for PBXNativeTarget "tapemusic" */;
+			buildConfigurationList = 6276D7752DD1E6FD00ACA539 /* Build configuration list for PBXNativeTarget "CassoFlow" */;
 			buildPhases = (
 				6276D7642DD1E6F900ACA539 /* Sources */,
 				6276D7652DD1E6F900ACA539 /* Frameworks */,
@@ -61,13 +74,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6276D76A2DD1E6F900ACA539 /* tapemusic */,
+				6276D76A2DD1E6F900ACA539 /* CassoFlow */,
 			);
-			name = tapemusic;
+			name = CassoFlow;
 			packageProductDependencies = (
 			);
 			productName = tapemusic;
-			productReference = 6276D7682DD1E6F900ACA539 /* tapemusic.app */;
+			productReference = 6276D7682DD1E6F900ACA539 /* CassoFlow.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -82,10 +95,11 @@
 				TargetAttributes = {
 					6276D7672DD1E6F900ACA539 = {
 						CreatedOnToolsVersion = 16.3;
+						LastSwiftMigration = 1630;
 					};
 				};
 			};
-			buildConfigurationList = 6276D7632DD1E6F900ACA539 /* Build configuration list for PBXProject "tapemusic" */;
+			buildConfigurationList = 6276D7632DD1E6F900ACA539 /* Build configuration list for PBXProject "CassoFlow" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +113,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6276D7672DD1E6F900ACA539 /* tapemusic */,
+				6276D7672DD1E6F900ACA539 /* CassoFlow */,
 			);
 		};
 /* End PBXProject section */
@@ -251,11 +265,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4U3CXVZX7T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CassoFlow/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CassoFlow;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -270,6 +288,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.pix3l.CassoFlow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -280,11 +299,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4U3CXVZX7T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CassoFlow/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CassoFlow;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -307,7 +330,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6276D7632DD1E6F900ACA539 /* Build configuration list for PBXProject "tapemusic" */ = {
+		6276D7632DD1E6F900ACA539 /* Build configuration list for PBXProject "CassoFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6276D7732DD1E6FD00ACA539 /* Debug */,
@@ -316,7 +339,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6276D7752DD1E6FD00ACA539 /* Build configuration list for PBXNativeTarget "tapemusic" */ = {
+		6276D7752DD1E6FD00ACA539 /* Build configuration list for PBXNativeTarget "CassoFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6276D7762DD1E6FD00ACA539 /* Debug */,
