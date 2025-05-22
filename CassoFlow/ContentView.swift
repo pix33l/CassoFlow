@@ -9,10 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        PlayerView()
     }
 }
 
 #Preview {
-    ContentView()
+    // 直接使用 MusicService 进行预览
+    let musicService = MusicService.shared
+    
+    return ContentView()
+        .environmentObject(musicService)
 }

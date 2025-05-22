@@ -2,10 +2,16 @@ import SwiftUI
 import MusicKit
 
 struct LibraryView: View {
+    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var musicService: MusicService
     // 选中的分段
     @State private var selectedSegment = 0
-    // 专辑列表数据
-    @State private var albums: [Album] = []
+    // 用户专辑列表数据
+    @State private var userAlbums: MusicItemCollection<Album> = []
+    // 用户歌单列表数据
+    @State private var userPlaylists: MusicItemCollection<Playlist> = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
     
     var body: some View {
         NavigationView {
@@ -17,7 +23,7 @@ struct LibraryView: View {
                         .bold()
                     Spacer()
                     Button(action: {
-                        // 关闭按钮动作
+                        presentationMode.wrappedValue.dismiss()
                     }) {
                         Image(systemName: "xmark")
                             .foregroundColor(.gray)
@@ -33,41 +39,75 @@ struct LibraryView: View {
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
                 
-                // 专辑网格
-                ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.adaptive(minimum: 150), spacing: 20)
-                    ], spacing: 20) {
-                        ForEach(albums) { album in
-                            AlbumCell(album: album)
-                        }
-                    }
-                    .padding()
+                if isLoading {
+                    ProgressView()
+                } else if let error = errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                } else {
+                    contentView
                 }
             }
             .navigationBarHidden(true)
             .task {
-                // 加载专辑数据
-                await loadAlbums()
+                await loadUserLibrary()
             }
         }
     }
-    
-    // 加载专辑数据
-    private func loadAlbums() async {
-        do {
-            let status = await MusicAuthorization.request()
-            guard status == .authorized else { return }
-            
-            // 这里暂时使用搜索接口获取一些专辑数据
-            // 实际应用中应该从用户的音乐库中获取
-            var request = MusicCatalogSearchRequest(term: "Jay Chou", types: [Album.self])
-            request.limit = 25
-            let response = try await request.response()
-            self.albums = response.albums.compactMap { $0 }
-        } catch {
-            print("Failed to load albums: \(error)")
+
+    @ViewBuilder
+    private var contentView: some View {
+        ScrollView {
+            LazyVGrid(columns: [
+                GridItem(.adaptive(minimum: 150), spacing: 20)
+            ], spacing: 20) {
+                if selectedSegment == 0 {
+                    ForEach(userAlbums) { album in
+                        AlbumCell(album: album)
+                            .onTapGesture {
+                                Task {
+                                    try await musicService.playAlbum(album)
+                                }
+                            }
+                    }
+                } else {
+                    ForEach(userPlaylists) { playlist in
+                        PlaylistCell(playlist: playlist)
+                    }
+                }
+            }
+            .padding()
         }
+    }
+
+    private func loadUserLibrary() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let status = await musicService.requestAuthorization()
+            guard status == .authorized else {
+                errorMessage = "请授权访问您的音乐库"
+                return
+            }
+
+            // 同时加载专辑和歌单
+            async let albums = musicService.fetchUserLibraryAlbums()
+            async let playlists = musicService.fetchUserLibraryPlaylists()
+            
+            let (albumsResult, playlistsResult) = await (try? albums, try? playlists)
+            
+            userAlbums = albumsResult ?? []
+            userPlaylists = playlistsResult ?? []
+            
+            if userAlbums.isEmpty && userPlaylists.isEmpty {
+                errorMessage = "您的媒体库是空的"
+            }
+        } catch {
+            errorMessage = "加载媒体库失败: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
     }
 }
 
@@ -104,6 +144,43 @@ struct AlbumCell: View {
     }
 }
 
+// 歌单单元格视图
+struct PlaylistCell: View {
+    let playlist: Playlist
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            // 歌单封面
+            AsyncImage(url: playlist.artwork?.url(width: 300, height: 300)) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Color.gray
+            }
+            .frame(width: 150, height: 150)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            
+            // 歌单信息
+            VStack(alignment: .leading, spacing: 4) {
+                Text(playlist.name)
+                    .font(.system(size: 14))
+                    .lineLimit(1)
+                
+                Text(playlist.description)
+                    .font(.system(size: 12))
+                    .foregroundColor(.gray)
+                    .lineLimit(1)
+            }
+            .padding(.top, 4)
+        }
+    }
+}
+
 #Preview {
-    LibraryView()
+    // 直接使用 MusicService 进行预览
+    let musicService = MusicService.shared
+    
+    return LibraryView()
+        .environmentObject(musicService)
 }
