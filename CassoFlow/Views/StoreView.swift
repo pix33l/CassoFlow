@@ -117,18 +117,18 @@ struct Skin: Identifiable {
         Skin(
             name: "未来科技",
             description: "炫酷科技感设计，带来未来音乐体验",
-            imageName: "CF-002",
-            price: 18,
+            imageName: "CF-003",
+            price: 12,
             isOwned: false,
-            backgroundColor: Color(red: 10/255, green: 20/255, blue: 30/255)
+            backgroundColor: Color("bg-CF-001")
         ),
         Skin(
-            name: "暗黑模式",
-            description: "深色主题，保护眼睛",
-            imageName: "CF-003",
-            price: 15,
+            name: "CF-101",
+            description: "1972",
+            imageName: "CF-101",
+            price: 12,
             isOwned: false,
-            backgroundColor: Color(red: 30/255, green: 30/255, blue: 30/255)
+            backgroundColor: Color("bg-CF-101")
         )
     ]
     

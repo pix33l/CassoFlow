@@ -12,6 +12,7 @@ final class MusicService: ObservableObject {
     @Published var currentPlaybackTime: TimeInterval = 0
     @Published var songDuration: TimeInterval = 0
     @Published var currentSkin: Skin = .defaultSkin
+    @Published var isPlaying: Bool = false
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -61,10 +62,16 @@ final class MusicService: ObservableObject {
     /// 播放控制
     func play() async throws {
         try await player.play()
+        await MainActor.run {
+            isPlaying = true
+        }
     }
     
     func pause() async throws {
         try await player.pause()
+        await MainActor.run {
+            isPlaying = false
+        }
     }
     
     func skipToNext() async throws {

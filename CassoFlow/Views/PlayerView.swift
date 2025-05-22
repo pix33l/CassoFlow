@@ -10,6 +10,8 @@ struct PlayerView: View {
     @State private var repeatMode: MusicPlayer.RepeatMode = .none
     @State private var isShuffled = false
     @State private var isPlaying = false
+    @State private var rotationAngle: Double = 0
+    @State private var rotationTimer: Timer?
     
     // 计算属性：当前播放进度
     private var progress: CGFloat {
@@ -27,11 +29,58 @@ struct PlayerView: View {
     var body: some View {
         VStack(spacing: 20) {
             // 1. 磁带播放器图片
-            Image("CF-001")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(height: 600)
-                .padding(.top, 20)
+            ZStack {
+                Image("cassette")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 550)
+
+                VStack(spacing: 30) {
+                    // 旋转的磁带孔
+                    ZStack {
+                        Circle()
+                            .foregroundColor(Color("cassetteLight"))
+                            .frame(width: 160, height: 160)
+                        Circle()
+                            .foregroundColor(Color("cassetteDark"))
+                            .frame(width: 90, height: 90)
+                        Image("hole")
+                            .resizable()
+                            .overlay {
+                                Circle()
+                                    .strokeBorder(Color("cassetteDark"), lineWidth: 3)
+                            }
+                            .frame(width: 80, height: 80)
+                            .rotationEffect(.degrees(rotationAngle))
+                            .onChange(of: musicService.isPlaying) { isPlaying in
+                                if isPlaying {
+                                    startRotation()
+                                } else {
+                                    stopRotation()
+                                }
+                            }
+                    }
+                    
+                    // 第二个旋转的磁带孔
+                    ZStack {
+                        Circle()
+                            .foregroundColor(Color("cassetteLight"))
+                            .frame(width: 160, height: 160)
+                        Circle()
+                            .foregroundColor(Color("cassetteDark"))
+                            .frame(width: 150, height: 150)
+                        Image("hole")
+                            .resizable()
+                            .overlay {
+                                Circle()
+                                    .strokeBorder(Color("cassetteDark"), lineWidth: 3)
+                            }
+                            .frame(width: 80, height: 80)
+                            .rotationEffect(.degrees(rotationAngle))
+                    }
+                }
+            }
+            .padding(.top, 20.0)
             
             Spacer()
             
@@ -154,11 +203,17 @@ struct PlayerView: View {
         }
         .background(musicService.currentSkin.backgroundColor)
         .onAppear {
+            if musicService.isPlaying {
+                startRotation()
+            }
             Task {
                 await MainActor.run {
                     musicService.updateCurrentSong()
                 }
             }
+        }
+        .onDisappear {
+            stopRotation()
         }
         .sheet(isPresented: $showLibraryView) {
             LibraryView()
@@ -169,6 +224,26 @@ struct PlayerView: View {
         .sheet(isPresented: $showStoreView) {
             StoreView()
         }
+        .background(musicService.currentSkin.backgroundColor)
+    }
+    
+    // 开始旋转
+    private func startRotation() {
+        stopRotation() // 先停止现有的计时器
+        rotationTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+            withAnimation(.linear(duration: 0.05)) {
+                rotationAngle += 5 // 每次旋转5度
+                if rotationAngle >= 360 {
+                    rotationAngle = 0
+                }
+            }
+        }
+    }
+    
+    // 停止旋转
+    private func stopRotation() {
+        rotationTimer?.invalidate()
+        rotationTimer = nil
     }
 }
 
@@ -194,7 +269,7 @@ struct ControlButton: View {
                     // 内描边 - 使用inset实现向内偏移效果
                     RoundedRectangle(cornerRadius: 4)
                         .inset(by: 6)  // 向内偏移6pt
-                        .strokeBorder(Color("cassetteDark").opacity(0.2), lineWidth: 1)
+                        .strokeBorder(Color("cassetteDark").opacity(0.5), lineWidth: 1)
                 )
         }
     }
