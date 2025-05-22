@@ -112,7 +112,7 @@ struct Skin: Identifiable {
             imageName: "CF-001",
             price: 12,
             isOwned: false,
-            backgroundColor: Color(red: 232/255, green: 240/255, blue: 247/255)
+            backgroundColor: Color("cassetteLight")
         ),
         Skin(
             name: "未来科技",

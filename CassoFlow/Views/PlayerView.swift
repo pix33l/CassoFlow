@@ -48,6 +48,7 @@ struct PlayerView: View {
                                 .font(.title3)
                         }
                     }
+                    .foregroundColor(Color("cassetteDark"))
 
                     Spacer()
                     Button {
@@ -55,6 +56,7 @@ struct PlayerView: View {
                     } label: {
                         Image(systemName: "gearshape.fill")
                     }
+                    .foregroundColor(Color("cassetteDark"))
                 }
 
                 
@@ -71,20 +73,22 @@ struct PlayerView: View {
                     } label: {
                         Image(systemName: repeatMode == .none ? "repeat" : "repeat.1")
                             .font(.system(size: 18))
-                            .foregroundColor(repeatMode == .none ? .primary : .blue)
+                            .foregroundColor(repeatMode == .none ? Color("cassetteDark").opacity(0.5) : Color("cassetteDark"))
                     }
                     
                     // 当前时间
                     Text(formatTime(musicService.currentPlaybackTime))
                         .font(.caption.monospacedDigit())
+                        .foregroundColor(Color("cassetteDark"))
                     
                     // 进度条
                     ProgressView(value: progress)
-                        .tint(.primary)
+                        .tint(Color("cassetteDark"))
                     
                     // 总时间
                     Text(formatTime(musicService.songDuration))
                         .font(.caption.monospacedDigit())
+                        .foregroundColor(Color("cassetteDark"))
                     
                     // 随机播放图标
                     Button {
@@ -93,25 +97,26 @@ struct PlayerView: View {
                     } label: {
                         Image(systemName: "shuffle")
                             .font(.system(size: 18))
-                            .foregroundColor(isShuffled ? .blue : .primary)
+                            .foregroundColor(isShuffled ? Color("cassetteDark").opacity(0.5) : Color("cassetteDark"))
                     }
                 }
+                .frame(width: 300.0)
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(red: 92/255, green: 107/255, blue: 104/255))
+                    .fill(Color("cassetteLight"))
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
-                            .strokeBorder(Color(red: 76/255, green: 88/255, blue: 86/255), lineWidth: 4))
+                            .strokeBorder(Color("cassetteDark").opacity(0.2), lineWidth: 5))
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
-                            .stroke(Color.black, lineWidth: 4))
+                            .strokeBorder(Color("cassetteDark"), lineWidth: 3))
             )
             .padding(.horizontal, 30)
             
             // 3. 底部控制按钮
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 // 媒体库
                 ControlButton(systemName: "music.note.list") {
                     showLibraryView = true
@@ -144,7 +149,7 @@ struct PlayerView: View {
                     showStoreView = true
                 }
             }
-            .padding(.bottom, 60)
+            .padding(.bottom, 100)
             .foregroundColor(.primary)
         }
         .background(musicService.currentSkin.backgroundColor)
@@ -177,9 +182,20 @@ struct ControlButton: View {
             Image(systemName: systemName)
                 .font(.title2)
                 .frame(width: 60, height: 60)
-                .background(Color.black)
-                .foregroundColor(.white)
+                .background(Color("cassetteLight"))
+                .foregroundColor(Color("cassetteDark"))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
+                .overlay(
+                    // 外描边
+                    RoundedRectangle(cornerRadius: 6)
+                        .strokeBorder(Color("cassetteDark"), lineWidth: 3)
+                )
+                .overlay(
+                    // 内描边 - 使用inset实现向内偏移效果
+                    RoundedRectangle(cornerRadius: 4)
+                        .inset(by: 6)  // 向内偏移6pt
+                        .strokeBorder(Color("cassetteDark").opacity(0.2), lineWidth: 1)
+                )
         }
     }
 }
