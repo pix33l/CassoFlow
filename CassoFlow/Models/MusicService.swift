@@ -1,11 +1,17 @@
 import MusicKit
 import Combine
+import Foundation
 
 /// 音乐服务类
 final class MusicService: ObservableObject {
     static let shared = MusicService()
     
     private let player = SystemMusicPlayer.shared
+    
+    @Published var currentSong: Song? = nil
+    @Published var currentPlaybackTime: TimeInterval = 0
+    @Published var songDuration: TimeInterval = 0
+    @Published var currentSkin: Skin = .defaultSkin
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -17,7 +23,21 @@ final class MusicService: ObservableObject {
         set { player.state.shuffleMode = newValue }
     }
     
-    private init() {}
+    private init() {
+        Task {
+            for await _ in player.state.objectWillChange.values {
+                let newSong = player.queue.currentEntry?.item as? Song
+                let newTime = player.playbackTime
+                let newDuration = (player.queue.currentEntry?.item as? Song)?.duration ?? 0
+                
+                await MainActor.run {
+                    currentSong = newSong
+                    currentPlaybackTime = newTime
+                    songDuration = newDuration
+                }
+            }
+        }
+    }
     
     /// 请求音乐授权
     func requestAuthorization() async -> MusicAuthorization.Status {
@@ -69,5 +89,17 @@ final class MusicService: ObservableObject {
         request.sort(by: \.libraryAddedDate, ascending: false)
         request.limit = 100
         return try await request.response().items
+    }
+    
+    func updateCurrentSong() {
+        let newSong = player.queue.currentEntry?.item as? Song
+        let newTime = player.playbackTime
+        let newDuration = (player.queue.currentEntry?.item as? Song)?.duration ?? 0
+        
+        DispatchQueue.main.async {
+            self.currentSong = newSong
+            self.currentPlaybackTime = newTime
+            self.songDuration = newDuration
+        }
     }
 }
