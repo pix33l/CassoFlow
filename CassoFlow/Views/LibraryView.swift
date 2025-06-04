@@ -14,61 +14,49 @@ struct LibraryView: View {
     @State private var errorMessage: String?
     
     var body: some View {
-        NavigationView {
+        NavigationStack {  // 改为 NavigationStack 避免嵌套导航问题
             VStack(spacing: 0) {
-                // 顶部标题
-                HStack {
-                    Text("媒体库")
-                        .font(.title)
-                        .bold()
-                    Spacer()
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.gray)
-                    }
-                }
-                .padding()
-                
-                // 分段控制器
-                Picker("媒体类型", selection: $selectedSegment) {
-                    Text("专辑").tag(0)
-                    Text("歌单").tag(1)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                
+
+                // 内容视图
                 if isLoading {
                     ProgressView()
                 } else if let error = errorMessage {
+                    Image(systemName: "play.house")
                     Text(error)
-                        .foregroundColor(.red)
                 } else {
                     contentView
                 }
             }
-            .navigationBarHidden(true)
+            .navigationTitle("媒体库")
+            .navigationBarTitleDisplayMode(.inline)
             .task {
                 await loadUserLibrary()
             }
         }
     }
 
-    @ViewBuilder
     private var contentView: some View {
         ScrollView {
+            
+            // 分段控制器
+            Picker("媒体类型", selection: $selectedSegment) {
+                Text("专辑").tag(0)
+                Text("歌单").tag(1)
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            
             LazyVGrid(columns: [
-                GridItem(.adaptive(minimum: 150), spacing: 20)
+                GridItem(.adaptive(minimum: 110), spacing: 5)
             ], spacing: 20) {
                 if selectedSegment == 0 {
                     ForEach(userAlbums) { album in
-                        AlbumCell(album: album)
-                            .onTapGesture {
-                                Task {
-                                    try await musicService.playAlbum(album)
-                                }
-                            }
+                        NavigationLink {
+                            AlbumDetailView(album: album)
+                                .environmentObject(musicService)
+                        } label: {
+                            AlbumCell(album: album)
+                        }
                     }
                 } else {
                     ForEach(userPlaylists) { playlist in
@@ -125,18 +113,19 @@ struct AlbumCell: View {
             } placeholder: {
                 Color.gray
             }
-            .frame(width: 150, height: 150)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .frame(width: 110, height: 170)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
             
             // 专辑信息
             VStack(alignment: .leading, spacing: 4) {
                 Text(album.title)
-                    .font(.system(size: 14))
+                    .font(.footnote)
+                    .foregroundColor(.primary)
                     .lineLimit(1)
                 
                 Text(album.artistName)
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
                     .lineLimit(1)
             }
             .padding(.top, 4)
@@ -158,18 +147,14 @@ struct PlaylistCell: View {
             } placeholder: {
                 Color.gray
             }
-            .frame(width: 150, height: 150)
+            .frame(width: 110, height: 170)
             .clipShape(RoundedRectangle(cornerRadius: 8))
             
             // 歌单信息
             VStack(alignment: .leading, spacing: 4) {
                 Text(playlist.name)
-                    .font(.system(size: 14))
-                    .lineLimit(1)
-                
-                Text(playlist.description)
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.primary)
+                    .font(.footnote)
                     .lineLimit(1)
             }
             .padding(.top, 4)
@@ -178,9 +163,7 @@ struct PlaylistCell: View {
 }
 
 #Preview {
-    // 直接使用 MusicService 进行预览
     let musicService = MusicService.shared
-    
-    return LibraryView()
+    LibraryView()
         .environmentObject(musicService)
 }

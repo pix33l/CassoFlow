@@ -2,12 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- 其他现有键值 -->
-    
-    <!-- 添加MusicKit权限 -->
-    <key>NSAppleMusicUsageDescription</key>
-    <string>我们需要访问您的Apple Music来播放音乐</string>
-    
-    <!-- 其他现有键值 -->
+	<key>NSAppleMusicUsageDescription</key>
+	<string>我们需要访问您的Apple Music来播放音乐</string>
 </dict>
 </plist>
