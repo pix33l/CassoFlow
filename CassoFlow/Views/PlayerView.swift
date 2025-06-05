@@ -8,9 +8,10 @@ struct PlayerView: View {
     @State private var showSettingsView = false
     @State private var showStoreView = false
     @State private var repeatMode: MusicPlayer.RepeatMode = .none
-    @State private var isShuffled = false
+    @State private var isShuffled: MusicPlayer.ShuffleMode = .off
     @State private var rotationAngle: Double = 0
     @State private var rotationTimer: Timer?
+    @State private var isRotating = false
     
     // 计算属性：当前播放进度
     private var progress: CGFloat {
@@ -24,6 +25,14 @@ struct PlayerView: View {
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
+    
+    // 格式化剩余时间显示
+    private func formatRemainingTime(_ time: TimeInterval) -> String {
+        guard time > 0 else { return "-00:00" }
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return "-" + String(format: "%02d:%02d", minutes, seconds)
+    }
 
     var body: some View {
         
@@ -31,68 +40,31 @@ struct PlayerView: View {
                 // 播放器背景
                 ZStack {
                     
-                    ZStack {
-                        
-                        Image(musicService.currentSkin.cassetteImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                        
-                        VStack(spacing: 30) {
-                            // 旋转的磁带孔
-                            ZStack {
-                                // 磁带占位
-                                Circle()
-                                    .foregroundColor(Color("cassetteLight"))
-                                    .frame(width: 160, height: 160)
-                                // 当前磁带进度
-                                Circle()
-                                    .foregroundColor(Color("cassetteDark"))
-                                    .frame(width: 90, height: 90)
-                                // 磁带孔
-                                Image("holeDark")
-                                    .resizable()
-                                    .overlay {
-                                        Circle()
-                                            .strokeBorder(Color("cassetteDark"), lineWidth: 3)
-                                    }
-                                    .frame(width: 80, height: 80)
-                                    .rotationEffect(.degrees(rotationAngle))
-                                    .onChange(of: musicService.isPlaying) { isPlaying in
-                                        if isPlaying {
-                                            startRotation()
-                                        } else {
-                                            stopRotation()
-                                        }
-                                    }
-                            }
-                            
-                            // 第二个旋转的磁带孔
-                            ZStack {
-                                Circle()
-                                    .foregroundColor(Color("cassetteLight"))
-                                    .frame(width: 160, height: 160)
-                                Circle()
-                                    .foregroundColor(Color("cassetteDark"))
-                                    .frame(width: 150, height: 150)
-                                Image("holeDark")
-                                    .resizable()
-                                    .overlay {
-                                        Circle()
-                                            .strokeBorder(Color("cassetteDark"), lineWidth: 3)
-                                    }
-                                    .frame(width: 80, height: 80)
-                                    .rotationEffect(.degrees(rotationAngle))
-                            }
-                        }
-                        .padding(.leading, 20.0)
-                    }
-                    .padding(.bottom, 240.0)
-                    
-/*                    Image(musicService.currentSkin.playerImage)
+                    Image("bg-cassette")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
- */
+                        .scaledToFill()
+                        .edgesIgnoringSafeArea(.all)
                     
+                    if musicService.currentTrackID != nil {
+                        
+                        ZStack {
+                            
+                            Image(musicService.currentSkin.cassetteImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                            
+                            VStack(spacing: 30) {
+                                // 旋转的磁带孔
+                                CassetteHole(isRotating: true, rotationAngle: $rotationAngle)
+                                
+                                // 第二个旋转的磁带孔
+                                CassetteHole(isRotating: musicService.isPlaying, rotationAngle: $rotationAngle)
+                            }
+                            .padding(.leading, 20.0)
+                        }
+                        .padding(.bottom, 240.0)
+                    }
+            
                     // 0. 播放器背景
                     Image(musicService.currentSkin.playerImage)
                         .resizable()
@@ -147,8 +119,18 @@ struct PlayerView: View {
                     VStack(spacing: 5) {
                         // 演唱者 - 歌曲名
                         HStack {
-                            Text("PGM NO. 01/12")
+                            Group {
+                                if musicService.currentTrackIndex != nil &&
+                                    musicService.totalTracksInQueue > 0 {
+                                    Text("PGM NO. \(musicService.currentTrackIndex!)/\(musicService.totalTracksInQueue)")
+                                } else {
+                                    Text("PGM NO.")
+                                }
+                            }
+                            .padding(.leading, 4)
+                            
                             Spacer()
+                            
                             Button {
                                 showSettingsView = true
                             } label: {
@@ -163,15 +145,30 @@ struct PlayerView: View {
                             // 循环播放图标
                             Button {
                                 switch repeatMode {
-                                case .none: repeatMode = .one
-                                case .one: repeatMode = .all
-                                case .all: repeatMode = .none
+                                case .none:
+                                    repeatMode = .all
+                                case .all:
+                                    repeatMode = .one
+                                case .one:
+                                    repeatMode = .none
+                                @unknown default:
+                                    repeatMode = .none
                                 }
                                 musicService.repeatMode = repeatMode
                             } label: {
-                                Image(systemName: repeatMode == .none ? "repeat" : "repeat.1")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(repeatMode == .none ? Color(musicService.currentSkin.screenTextColor).opacity(0.5) : Color(musicService.currentSkin.screenTextColor))
+                                Group {
+                                    if repeatMode == .one {
+                                        Image(systemName: "repeat.1")
+                                    } else {
+                                        Image(systemName: "repeat")
+                                    }
+                                }
+                                .font(.system(size: 18))
+                                .foregroundColor(
+                                    repeatMode == .none ?
+                                    Color(musicService.currentSkin.screenTextColor).opacity(0.3) :
+                                    Color(musicService.currentSkin.screenTextColor)
+                                )
                             }
                             
                             Spacer()
@@ -196,7 +193,11 @@ struct PlayerView: View {
                             } label: {
                                 Image(systemName: "shuffle")
                                     .font(.system(size: 18))
-                                    .foregroundColor(isShuffled ? Color(musicService.currentSkin.screenTextColor).opacity(0.5) : Color(musicService.currentSkin.screenTextColor))
+                                    .foregroundColor(
+                                        isShuffled ?
+                                        Color(musicService.currentSkin.screenTextColor) :
+                                        Color(musicService.currentSkin.screenTextColor).opacity(0.3)
+                                    )
                             }
                         }
                         
@@ -211,10 +212,15 @@ struct PlayerView: View {
                             
                             // 进度条
                             ProgressView(value: progress)
-                                .tint(Color(musicService.currentSkin.screenTextColor))
+                                .progressViewStyle(
+                                    CustomProgressViewStyle(
+                                        tint: Color(musicService.currentSkin.screenTextColor),
+                                        background: Color(musicService.currentSkin.screenTextColor).opacity(0.2)
+                                    )
+                                )
                             
-                            // 总时间
-                            Text(formatTime(musicService.totalDuration))
+                            // 剩余时间
+                            Text(formatRemainingTime(musicService.totalDuration - musicService.currentDuration))
                                 .font(.caption.monospacedDigit())
                                 .foregroundColor(Color(musicService.currentSkin.screenTextColor))
                         }
@@ -267,16 +273,12 @@ struct PlayerView: View {
         }
     }
     
-    // 开始旋转
+    // 开始旋转（优化后版本）
     private func startRotation() {
         stopRotation() // 先停止现有的计时器
-        rotationTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            withAnimation(.linear(duration: 0.05)) {
-                rotationAngle += 5 // 每次旋转5度
-//                if rotationAngle >= 360 {
-//                    rotationAngle = 0
-//                }
-            }
+        isRotating = true
+        rotationTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            self.rotationAngle += 10 // 增大每次旋转角度
         }
     }
     
@@ -284,6 +286,7 @@ struct PlayerView: View {
     private func stopRotation() {
         rotationTimer?.invalidate()
         rotationTimer = nil
+        isRotating = false
     }
 }
 
@@ -314,6 +317,53 @@ struct ControlButton: View {
                         .strokeBorder(Color(musicService.currentSkin.buttonOutlineColor).opacity(0.2), lineWidth: 1)
                 )
         }
+    }
+}
+
+// 自定义进度条样式结构
+struct CustomProgressViewStyle: ProgressViewStyle {
+    var tint: Color
+    var background: Color
+    
+    func makeBody(configuration: Configuration) -> some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                // 背景轨道
+                Capsule()
+                    .frame(width: geometry.size.width, height: 4)
+                    .foregroundColor(background)
+                
+                // 前景进度条
+                Capsule()
+                    .frame(
+                        width: CGFloat(configuration.fractionCompleted ?? 0) * geometry.size.width,
+                        height: 4
+                    )
+                    .foregroundColor(tint)
+            }
+        }
+        .frame(height: 4)
+    }
+}
+
+// 改为简单自定义视图
+struct CassetteHole: View {
+    var isRotating: Bool
+    @Binding var rotationAngle: Double
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color("cassetteLight"))
+            Circle()
+                .fill(Color("cassetteDark"))
+                .frame(width: 60, height: 60)
+            Image("holeDark")
+                .resizable()
+                .frame(width: 50, height: 50)
+                .rotationEffect(isRotating ? .degrees(rotationAngle) : .zero)
+        }
+        .frame(width: 100, height: 100)
     }
 }
 
