@@ -8,14 +8,17 @@ class MusicService: ObservableObject {
     
     
     
-    private let player = SystemMusicPlayer.shared
+    private let player = ApplicationMusicPlayer.shared
     
-    @Published var currentDuration: TimeInterval = 0
-    @Published var totalDuration: TimeInterval = 0
-    @Published var currentSkin: Skin = .CFDT1
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
+    @Published var currentDuration: TimeInterval = 0
+    @Published var totalDuration: TimeInterval = 0
     @Published var isPlaying: Bool = false
+    @Published var currentTrackID: MusicItemID?
+    @Published var currentSkin: Skin = .CFDT1
+    @Published var currentTrackIndex: Int? = nil
+    @Published var totalTracksInQueue: Int = 0
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -70,45 +73,47 @@ class MusicService: ObservableObject {
 
         private func updateCurrentSongInfo() {
             
-
-             
-            // Do something with the `duration`.
-            
             guard let entry = player.queue.currentEntry else {
                 DispatchQueue.main.async {
-                    self.currentTitle = ""
+                    self.currentTitle = "未播放歌曲"
                     self.currentArtist = ""
                     self.currentDuration = 0
                     self.totalDuration = 0
                     self.isPlaying = false  // 添加播放状态重置
+                    self.currentTrackID = nil
+                    self.currentTrackIndex = nil
+                    self.totalTracksInQueue = 0
                 }
                 return
             }
             
-/*            switch entry.item {
-                case .song(let song):
-                    // 获取歌曲信息
-                    let title = song.title
-                    let duration = song.duration // 这里应该有 duration 属性
-                    
-                case .musicVideo(let musicVideo):
-                    let title = musicVideo.title
-                    let duration = musicVideo.duration
-                    // 音乐视频的处理
-                    
-            case .none: break
-
-                @unknown default:
-                    break
-                }
- */
+            let duration: TimeInterval
+            var trackID: MusicItemID? = nil
+            
+            switch entry.item {
+            case .song(let song):
+                duration = song.duration ?? 0
+                trackID = song.id
+            case .musicVideo(let musicVideo):
+                duration = musicVideo.duration ?? 0
+                trackID = musicVideo.id
+            default:
+                duration = 0
+                trackID = nil
+            }
+            
+            let entries = player.queue.entries
+            let trackIndex = entries.firstIndex(where: { $0.id == entry.id })
             
             DispatchQueue.main.async {
                 self.currentTitle = entry.title
                 self.currentArtist = entry.subtitle ?? ""
                 self.currentDuration = self.player.playbackTime
-//                self.totalDuration =
+                self.totalDuration = duration
                 self.isPlaying = self.player.state.playbackStatus == .playing  // 同步播放状态
+                self.currentTrackID = trackID
+                self.currentTrackIndex = trackIndex.map { $0 + 1 } // 转换为1-based索引
+                self.totalTracksInQueue = entries.count
             }
         }
     
