@@ -10,8 +10,9 @@ struct AlbumDetailView: View {
     
     // 判断当前是否正在播放指定歌曲
     private func isPlaying(_ track: Track) -> Bool {
-        guard let currentSong = musicService.currentSong else { return false }
-        return currentSong.id == track.id && musicService.isPlaying
+        let isSameTitle = musicService.currentTitle == track.title
+        let isSameArtist = musicService.currentArtist == track.artistName
+        return isSameTitle && isSameArtist && musicService.isPlaying
     }
     
     var body: some View {
@@ -110,21 +111,27 @@ struct AlbumDetailView: View {
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(track.title)
-                                        .foregroundColor(isPlaying(track) ? .blue : .primary)
+                                        .foregroundColor(.primary)
                                     Text(track.artistName)
                                         .font(.caption)
-                                        .foregroundColor(isPlaying(track) ? .blue.opacity(0.8) : .secondary)
+                                        .foregroundColor(.secondary)
                                 }
                                 
                                 Spacer()
                                 
                                 Text(formattedDuration(track.duration ?? 0))
                                     .font(.caption)
-                                    .foregroundColor(isPlaying(track) ? .blue : .secondary)
+                                    .foregroundColor(.secondary)
                             }
                             .padding(.horizontal)
                             .padding(.vertical, 8)
                             .contentShape(Rectangle())
+                            .background(
+                                isPlaying(track) ? Color.white.opacity(0.1) :Color.clear
+                                    .contentShape(Rectangle())
+                            )
+                            .buttonStyle(.plain)
+                            .animation(.easeInOut(duration: 0.2), value: isPlaying(track))
                             .onTapGesture {
                                 Task {
                                     try await musicService.playTrack(track, in: album)
@@ -201,9 +208,9 @@ struct AudioWaveView: View {
     var body: some View {
         HStack(spacing: 2) {
             ForEach(0..<5, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.blue)
-                    .frame(width: 3, height: animationAmounts[index] * 20)
+                Rectangle()
+                    .fill(.primary)
+                    .frame(width: 2, height: animationAmounts[index] * 20)
                     .animation(
                         Animation.easeInOut(duration: 0.5)
                             .repeatForever()

@@ -14,8 +14,8 @@ struct PlayerView: View {
     
     // 计算属性：当前播放进度
     private var progress: CGFloat {
-        guard musicService.songDuration > 0 else { return 0 }
-        return CGFloat(musicService.currentPlaybackTime / musicService.songDuration)
+        guard musicService.totalDuration > 0 else { return 0 }
+        return CGFloat(musicService.currentDuration / musicService.totalDuration)
     }
     
     // 格式化时间显示
@@ -177,11 +177,13 @@ struct PlayerView: View {
                             Spacer()
                             
                             VStack {
-                                Text("Hey Jude (Remastered)")
+                                Text(musicService.currentTitle)
                                     .font(.title3)
                                     .fontWeight(.bold)
-                                Text("The Beatles")
+                                    .lineLimit(1)
+                                Text(musicService.currentArtist)
                                     .font(.body)
+                                    .lineLimit(1)
                             }
                             .foregroundColor(Color(musicService.currentSkin.screenTextColor))
                             
@@ -203,7 +205,7 @@ struct PlayerView: View {
                         HStack {
                             
                             // 当前时间
-                            Text(formatTime(musicService.currentPlaybackTime))
+                            Text(formatTime(musicService.currentDuration))
                                 .font(.caption.monospacedDigit())
                                 .foregroundColor(Color(musicService.currentSkin.screenTextColor))
                             
@@ -212,7 +214,7 @@ struct PlayerView: View {
                                 .tint(Color(musicService.currentSkin.screenTextColor))
                             
                             // 总时间
-                            Text(formatTime(musicService.songDuration))
+                            Text(formatTime(musicService.totalDuration))
                                 .font(.caption.monospacedDigit())
                                 .foregroundColor(Color(musicService.currentSkin.screenTextColor))
                         }

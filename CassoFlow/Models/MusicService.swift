@@ -6,11 +6,15 @@ import Foundation
 class MusicService: ObservableObject {
     static let shared = MusicService()
     
+    
+    
     private let player = SystemMusicPlayer.shared
     
-    @Published var currentPlaybackTime: TimeInterval = 0
-    @Published var songDuration: TimeInterval = 0
+    @Published var currentDuration: TimeInterval = 0
+    @Published var totalDuration: TimeInterval = 0
     @Published var currentSkin: Skin = .CFDT1
+    @Published var currentTitle: String = ""
+    @Published var currentArtist: String = ""
     @Published var isPlaying: Bool = false
     
     var repeatMode: MusicPlayer.RepeatMode {
@@ -56,6 +60,57 @@ class MusicService: ObservableObject {
         player.queue = .init(for: songs, startingAt: nil)
         try await player.play()
     }
+    
+    init() {
+            // 监听播放器队列变化
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                self?.updateCurrentSongInfo()
+            }
+        }
+
+        private func updateCurrentSongInfo() {
+            
+
+             
+            // Do something with the `duration`.
+            
+            guard let entry = player.queue.currentEntry else {
+                DispatchQueue.main.async {
+                    self.currentTitle = ""
+                    self.currentArtist = ""
+                    self.currentDuration = 0
+                    self.totalDuration = 0
+                    self.isPlaying = false  // 添加播放状态重置
+                }
+                return
+            }
+            
+/*            switch entry.item {
+                case .song(let song):
+                    // 获取歌曲信息
+                    let title = song.title
+                    let duration = song.duration // 这里应该有 duration 属性
+                    
+                case .musicVideo(let musicVideo):
+                    let title = musicVideo.title
+                    let duration = musicVideo.duration
+                    // 音乐视频的处理
+                    
+            case .none: break
+
+                @unknown default:
+                    break
+                }
+ */
+            
+            DispatchQueue.main.async {
+                self.currentTitle = entry.title
+                self.currentArtist = entry.subtitle ?? ""
+                self.currentDuration = self.player.playbackTime
+//                self.totalDuration =
+                self.isPlaying = self.player.state.playbackStatus == .playing  // 同步播放状态
+            }
+        }
     
     /// 播放控制
     func play() async throws {
