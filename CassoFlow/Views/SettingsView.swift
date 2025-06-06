@@ -1,5 +1,30 @@
 import SwiftUI
 
+enum WebLink: String {
+    case privacyPolicy = "https://pix3l.me/CF-privacy-policy"
+    case termsOfUse = "https://pix3l.me/CF-terms-of-use"
+}
+
+struct LinkRow: View {
+    let title: String
+    let destination: URL
+    
+    var body: some View {
+        Link(destination: destination) {
+            HStack {
+                Text(title)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.subheadline)
+                    .foregroundColor(.primary.opacity(0.3))
+            }
+            .foregroundColor(.primary)
+        }
+    }
+}
+
 struct SettingsView: View {
     // MARK: - Properties
     @State private var isSoundEnabled = true
@@ -74,12 +99,18 @@ struct SettingsView: View {
                     NavigationLink("关于作者") {
                         Text("关于页面")
                     }
-                    NavigationLink("隐私政策") {
-                        Text("隐私政策页面")
-                    }
-                    NavigationLink("使用条款") {
-                        Text("使用条款页面")
-                    }
+                    
+                    // 修改隐私政策链接
+                    LinkRow(
+                        title: String(localized:"隐私政策"),
+                        destination: URL(string: WebLink.privacyPolicy.rawValue)!
+                    )
+                    
+                    // 修改使用条款链接
+                    LinkRow(
+                        title: String(localized:"使用条款"),
+                        destination: URL(string: WebLink.termsOfUse.rawValue)!
+                    )
                 }
             }
             .navigationTitle("设置")

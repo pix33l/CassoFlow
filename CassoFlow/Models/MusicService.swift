@@ -16,7 +16,7 @@ class MusicService: ObservableObject {
     @Published var totalDuration: TimeInterval = 0
     @Published var isPlaying: Bool = false
     @Published var currentTrackID: MusicItemID?
-    @Published var currentSkin: Skin = .CFDT1
+    @Published var currentSkin: Skin = Skin.skin(named: "CF-DT1") ?? Skin.allSkins[0]
     @Published var currentTrackIndex: Int? = nil
     @Published var totalTracksInQueue: Int = 0
     

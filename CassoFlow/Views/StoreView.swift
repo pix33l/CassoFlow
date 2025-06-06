@@ -5,12 +5,13 @@ struct StoreView: View {
     @EnvironmentObject private var musicService: MusicService
     @Environment(\.dismiss) var dismiss
     @State private var selectedSegment = 0
-    @State private var selectedSkinIndex: Int
+    // 修改：使用皮肤名称作为标识符
+    @State private var selectedSkinName: String
     
-    // 初始化时设置当前皮肤索引
+    // 初始化时设置当前皮肤名称
     init() {
         let currentSkin = MusicService.shared.currentSkin
-        _selectedSkinIndex = State(initialValue: Skin.allSkins.firstIndex(where: { $0.id == currentSkin.id }) ?? 0)
+        _selectedSkinName = State(initialValue: currentSkin.name)
     }
     
     // 使用集中定义的皮肤
@@ -44,10 +45,11 @@ struct StoreView: View {
                 .pickerStyle(.segmented)
                 .padding()
                 
-                TabView(selection: $selectedSkinIndex) {
-                    ForEach(Array(skins.enumerated()), id: \.offset) { index, skin in
+                TabView(selection: $selectedSkinName) {
+                    // 修改：使用皮肤名称作为标识符
+                    ForEach(skins, id: \.name) { skin in
                         SkinCardView(skin: skin)
-                            .tag(index)
+                            .tag(skin.name)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
@@ -76,8 +78,9 @@ struct StoreView: View {
     
     // MARK: - 计算属性
     
+    // 修改：通过名称查找当前皮肤
     private var currentSkin: Skin {
-        skins[selectedSkinIndex]
+        skins.first(where: { $0.name == selectedSkinName }) ?? Skin.allSkins[0]
     }
     
     private var buttonTitle: String {
@@ -103,7 +106,8 @@ struct StoreView: View {
 // MARK: - 皮肤数据模型
 struct Skin: Identifiable {
     let id = UUID()
-    let name: String
+    let name: String  // 名称作为主要标识符
+    let year: String
     let description: String
     let imageName: String
     let price: Int
@@ -122,7 +126,8 @@ struct Skin: Identifiable {
     // 集中定义所有皮肤
     static let allSkins: [Skin] = [
         Skin(
-            name: "CF-0",
+            name: "CF-0",  // 名称作为唯一标识
+            year: "1988",
             description: "1988",
             imageName: "CF-001",
             price: 12,
@@ -139,7 +144,8 @@ struct Skin: Identifiable {
             cassetteHole: "hole"
         ),
         Skin(
-            name: "CF-L2",
+            name: "CF-L2",  // 名称作为唯一标识
+            year: "1985",
             description: "1985",
             imageName: "CF-L2",
             price: 12,
@@ -156,24 +162,44 @@ struct Skin: Identifiable {
             cassetteHole: "holeDark"
         ),
         Skin(
-            name: "CF-101",
-            description: "1972",
+            name: "CF-22",  // 名称作为唯一标识
+            year: "1984",
+            description: "1987",
             imageName: "CF-101",
             price: 12,
             isOwned: false,
             backgroundColor: .black,
-            buttonColor: .black,
+            buttonColor: .white.opacity(0.1),
             buttonTextColor: .white,
             buttonOutlineColor: .black,
             screenColor: Color("bg-screen-CF-11"),
             screenTextColor: Color("text-screen-CF-11"),
             screenOutlineColor: Color("outline-screen-CF-11"),
-            playerImage: "cover-CF-101",
+            playerImage: "cover-CF-22",
             cassetteImage: "cassetteDark",
             cassetteHole: "holeDark"
         ),
         Skin(
-            name: "CF-DT1",
+            name: "CF-504",  // 名称作为唯一标识
+            year: "1987",
+            description: "1987",
+            imageName: "CF-101",
+            price: 12,
+            isOwned: false,
+            backgroundColor: .black,
+            buttonColor: .white.opacity(0.1),
+            buttonTextColor: .white,
+            buttonOutlineColor: .black,
+            screenColor: Color("bg-screen-CF-11"),
+            screenTextColor: Color("text-screen-CF-11"),
+            screenOutlineColor: Color("outline-screen-CF-11"),
+            playerImage: "cover-CF-504",
+            cassetteImage: "cassetteDark",
+            cassetteHole: "holeDark"
+        ),
+        Skin(
+            name: "CF-DT1",  // 名称作为唯一标识
+            year: "1993",
             description: "1993",
             imageName: "CF-101",
             price: 12,
@@ -191,11 +217,10 @@ struct Skin: Identifiable {
         )
     ]
     
-    // 提供默认皮肤快捷访问
-    static let defaultSkin = allSkins[0]
-    static let CFL2 = allSkins[1]
-    static let darkSkin = allSkins[2]
-    static let CFDT1 = allSkins[3]
+    // 通过名称获取皮肤
+    static func skin(named name: String) -> Skin? {
+        return allSkins.first(where: { $0.name == name })
+    }
 }
 
 // MARK: - 皮肤卡片视图
