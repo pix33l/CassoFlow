@@ -6,10 +6,10 @@ struct PlayerSkin: Identifiable {
     let name: String
     let year: String
     let description: String
-    let imageName: String
+    let coverImage: String
     let price: Int
     var isOwned: Bool
-    let backgroundColor: Color
+    let panelColor: Color
     let buttonColor: Color
     let buttonTextColor: Color
     let buttonOutlineColor: Color
@@ -17,101 +17,112 @@ struct PlayerSkin: Identifiable {
     let screenTextColor: Color
     let screenOutlineColor: Color
     let playerImage: String
-    let cassetteImage: String
-    let cassetteHole: String
+    let cassetteBgImage: String
     
     // 播放器皮肤集合
     static let playerSkins: [PlayerSkin] = [
         
         PlayerSkin(
-            name: "CF-0",  // 名称作为唯一标识
-            year: "1988",
-            description: "1988",
-            imageName: "CF-001",
+            name: "CF-DEMO",  // 名称作为唯一标识
+            year: "2025",
+            description: "正在研发的播放器蓝图",
+            coverImage: "cover-CF-DEMO",
             price: 12,
             isOwned: true,
-            backgroundColor: Color("cassetteLight"),
+            panelColor: Color("cassetteLight"),
             buttonColor: Color("cassetteLight"),
             buttonTextColor: Color("cassetteDark"),
             buttonOutlineColor: Color("cassetteDark"),
             screenColor: Color("cassetteLight"),
             screenTextColor: Color("cassetteDark"),
             screenOutlineColor: Color("cassetteDark"),
-            playerImage: "cover-CF-001",
-            cassetteImage: "cassette",
-            cassetteHole: "hole"
+            playerImage: "player-CF-DEMO",
+            cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
             name: "CF-L2",  // 名称作为唯一标识
             year: "1985",
-            description: "1985",
-            imageName: "CF-L2",
+            description: "第一款 CF 便携式播放器",
+            coverImage: "cover-CF-L2",
             price: 12,
             isOwned: false,
-            backgroundColor: Color("bg-CF-11"),
-            buttonColor: Color("bg-button-CF-11"),
+            panelColor: Color("panel-CF-L2"),
+            buttonColor: Color("panel-CF-L2"),
             buttonTextColor: Color("text-screen-CF-11"),
-            buttonOutlineColor: Color("bg-button-CF-11"),
+            buttonOutlineColor: Color("text-screen-CF-11"),
             screenColor: Color("bg-screen-orange"),
             screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: Color("outline-screen-CF-11"),
-            playerImage: "cover-CF-L2",
-            cassetteImage: "cassetteDark",
-            cassetteHole: "holeDark"
+            playerImage: "player-CF-L2",
+            cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识
             year: "1984",
             description: "1987",
-            imageName: "CF-101",
+            coverImage: "cover-CF-22",
             price: 12,
             isOwned: false,
-            backgroundColor: .black,
+            panelColor: .black,
             buttonColor: .white.opacity(0.1),
             buttonTextColor: .white,
             buttonOutlineColor: .black,
             screenColor: Color("bg-screen-CF-11"),
             screenTextColor: Color("text-screen-CF-11"),
             screenOutlineColor: Color("outline-screen-CF-11"),
-            playerImage: "cover-CF-22",
-            cassetteImage: "cassetteDark",
-            cassetteHole: "holeDark"
+            playerImage: "player-CF-22",
+            cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
             name: "CF-504",  // 名称作为唯一标识
             year: "1987",
             description: "1987",
-            imageName: "CF-101",
+            coverImage: "CF-101",
             price: 12,
             isOwned: false,
-            backgroundColor: .black,
+            panelColor: .black,
             buttonColor: .white.opacity(0.1),
             buttonTextColor: .white,
             buttonOutlineColor: .black,
             screenColor: Color("bg-screen-CF-11"),
             screenTextColor: Color("text-screen-CF-11"),
             screenOutlineColor: Color("outline-screen-CF-11"),
-            playerImage: "cover-CF-504",
-            cassetteImage: "cassetteDark",
-            cassetteHole: "holeDark"
+            playerImage: "player-CF-504",
+            cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
-            name: "CF-DT1",  // 名称作为唯一标识
-            year: "1993",
-            description: "1993",
-            imageName: "CF-101",
+            name: "CF-D6C",  // 名称作为唯一标识
+            year: "1984",
+            description: "磁带播放器的老大哥，专为专业用户生产，拥有众多功能",
+            coverImage: "cover-CF-D6C",
             price: 12,
             isOwned: true,
-            backgroundColor: .black,
+            panelColor: .black,
             buttonColor: .white.opacity(0.1),
             buttonTextColor: .white,
             buttonOutlineColor: .clear,
             screenColor: Color("bg-screen-CF-11"),
             screenTextColor: Color("text-screen-CF-11"),
             screenOutlineColor: .black,
-            playerImage: "cover-CF-DT1",
-            cassetteImage: "cassetteDark",
-            cassetteHole: "holeDark"
+            playerImage: "player-CF-D6C",
+            cassetteBgImage: "bg-cassette"
+        ),
+        PlayerSkin(
+            name: "CF-DT1",  // 名称作为唯一标识
+            year: "1993",
+            description: "经典日本动漫中反复出现的播放器",
+            coverImage: "cover-CF-DT1",
+            price: 12,
+            isOwned: true,
+            panelColor: .black,
+            buttonColor: .white.opacity(0.1),
+            buttonTextColor: .white,
+            buttonOutlineColor: .clear,
+            screenColor: Color("bg-screen-CF-11"),
+            screenTextColor: Color("text-screen-CF-11"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-DT1",
+            cassetteBgImage: "bg-cassette"
         )
         // 添加更多播放器皮肤...
     ]
@@ -127,7 +138,7 @@ struct CassetteSkin: Identifiable {
     let name: String
     let year: String
     let description: String
-    let imageName: String
+    let coverImage: String
     let price: Int
     var isOwned: Bool
     let cassetteImage: String
@@ -138,15 +149,35 @@ struct CassetteSkin: Identifiable {
 static let cassetteSkins: [CassetteSkin] = [
     
     CassetteSkin(
-        name: "CFH-60",  // 名称作为唯一标识
-        year: "1988",
+        name: "CFT-DEMO",  // 名称作为唯一标识
+        year: "2025",
         description: "1988",
-        imageName: "CF-001",
+        coverImage: "CF-001",
         price: 12,
         isOwned: true,
-        cassetteImage: "cassette",
+        cassetteImage: "CFT-DEMO",
         cassetteHole: "hole"
     ),
+    CassetteSkin(
+        name: "CFT-TRA",  // 名称作为唯一标识
+        year: "1988",
+        description: "1988",
+        coverImage: "CF-001",
+        price: 12,
+        isOwned: true,
+        cassetteImage: "CFT-TRA",
+        cassetteHole: "holeDark"
+    ),
+    CassetteSkin(
+        name: "CFT-C60",  // 名称作为唯一标识
+        year: "1988",
+        description: "1988",
+        coverImage: "CF-001",
+        price: 12,
+        isOwned: true,
+        cassetteImage: "CFT-C60",
+        cassetteHole: "holeDark"
+    )
     
 ]
 

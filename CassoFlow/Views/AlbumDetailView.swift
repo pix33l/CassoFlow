@@ -21,6 +21,12 @@ struct AlbumDetailView: View {
             VStack(spacing: 20) {
                 // 顶部专辑信息
                 VStack(spacing: 16) {
+                    
+                    Image("artwork-cassette")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 350)
+/*
                     if let image = albumArtwork {
                         Image(uiImage: image)
                             .resizable()
@@ -32,7 +38,7 @@ struct AlbumDetailView: View {
                             .frame(width: 200, height: 200)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    
+*/
                     VStack(spacing: 4) {
                         Text(album.title)
                             .font(.title2.bold())
@@ -141,7 +147,7 @@ struct AlbumDetailView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle(album.title)
+//        .navigationTitle(album.title)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadAlbumTracks()

@@ -79,12 +79,7 @@ struct PlayerView: View {
         rotationTimer = nil
         isRotating = false
     }
-    
-    // 在可能需要更新皮肤的代码段
-    private func applySkinUpdate() {
-        // 确保使用基于名称的设置方法
-        musicService.currentSkin = Skin.skin(named: "NEW_SKIN_NAME") ?? Skin.allSkins[0]
-    }
+
 }
 
 // MARK: - 背景视图 (提取出来)
@@ -95,7 +90,7 @@ struct PlayerBackgroundView: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            Image("bg-cassette")
+            Image(musicService.currentPlayerSkin.cassetteBgImage)
                 .resizable()
                 .scaledToFill()
                 .edgesIgnoringSafeArea(.all)
@@ -105,7 +100,8 @@ struct PlayerBackgroundView: View {
                     .padding(.bottom, 280.0)
             }
             
-            Image(musicService.currentSkin.playerImage)
+            // 使用currentPlayerSkin中的播放器图片
+            Image(musicService.currentPlayerSkin.playerImage)
                 .resizable()
                 .scaledToFill()
                 .edgesIgnoringSafeArea(.all)
@@ -121,14 +117,14 @@ struct HolesView: View {
     
     var body: some View {
         ZStack {
-            
             VStack(spacing: 110) {
                 CassetteHole(isRotating: true, rotationAngle: $rotationAngle)
-                CassetteHole(isRotating: musicService.isPlaying, rotationAngle: $rotationAngle)
+                CassetteHole(isRotating: true, rotationAngle: $rotationAngle)
             }
             .padding(.leading, 25.0)
             
-            Image(musicService.currentSkin.cassetteImage)
+            // 使用currentCassetteSkin中的磁带图片
+            Image(musicService.currentCassetteSkin.cassetteImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
         }
@@ -160,26 +156,28 @@ struct PlayerControlsView: View {
                 isShuffled: $isShuffled,
                 progress: progress
             )
+            // 屏幕区域高度
+            .frame(height: 90.0)
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(musicService.currentSkin.screenColor))
+                    .fill(Color(musicService.currentPlayerSkin.screenColor))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .strokeBorder(.white.opacity(0.1), lineWidth: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(Color(musicService.currentSkin.screenOutlineColor), lineWidth: 2))
+                            .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
             )
             .padding(10)
         }
         .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color(musicService.currentSkin.screenOutlineColor))
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(musicService.currentPlayerSkin.panelColor))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color(musicService.currentSkin.screenOutlineColor), lineWidth: 2)
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 2)
         )
         .padding()
         .padding(.top, 550)
@@ -272,10 +270,10 @@ struct TrackInfoHeader: View {
             } label: {
                 Text("SETTINGS")
             }
-            .foregroundColor(Color(musicService.currentSkin.screenTextColor))
+            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
         }
         .fontWeight(.bold)
-        .foregroundColor(Color(musicService.currentSkin.screenTextColor))
+        .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
     }
 }
 
@@ -313,8 +311,11 @@ struct RepeatAndShuffleView: View {
                 .font(.system(size: 18))
                 .foregroundColor(
                     repeatMode == .none ?
-                    Color(musicService.currentSkin.screenTextColor).opacity(0.3) :
-                    Color(musicService.currentSkin.screenTextColor)
+                    Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3) :
+                    Color(musicService.currentPlayerSkin.screenTextColor)
+                )
+                .padding(4)
+                .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
                 )
             }
             
@@ -333,8 +334,11 @@ struct RepeatAndShuffleView: View {
                     .font(.system(size: 18))
                     .foregroundColor(
                         isShuffleEnabled ?
-                        Color(musicService.currentSkin.screenTextColor) :
-                        Color(musicService.currentSkin.screenTextColor).opacity(0.3)
+                        Color(musicService.currentPlayerSkin.screenTextColor) :
+                        Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3)
+                    )
+                    .padding(4)
+                    .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
                     )
             }
         }
@@ -356,7 +360,9 @@ struct SongTitleView: View {
                 .font(.body)
                 .lineLimit(1)
         }
-        .foregroundColor(Color(musicService.currentSkin.screenTextColor))
+        // 文字区域高度
+        .frame(height: 40.0)
+        .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
     }
 }
 
@@ -384,21 +390,21 @@ struct PlaybackProgressView: View {
             // 当前时间
             Text(formatTime(musicService.currentDuration))
                 .font(.caption.monospacedDigit())
-                .foregroundColor(Color(musicService.currentSkin.screenTextColor))
+                .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
             
             // 进度条
             ProgressView(value: progress)
                 .progressViewStyle(
                     CustomProgressViewStyle(
-                        tint: Color(musicService.currentSkin.screenTextColor),
-                        background: Color(musicService.currentSkin.screenTextColor).opacity(0.3)
+                        tint: Color(musicService.currentPlayerSkin.screenTextColor),
+                        background: Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)
                     )
                 )
             
             // 剩余时间
             Text(formatRemainingTime(musicService.totalDuration - musicService.currentDuration))
                 .font(.caption.monospacedDigit())
-                .foregroundColor(Color(musicService.currentSkin.screenTextColor))
+                .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
         }
     }
 }
@@ -415,20 +421,21 @@ struct ControlButton: View {
             Image(systemName: systemName)
                 .font(.title2)
                 .frame(width: 60, height: 60)
-                .background(musicService.currentSkin.buttonColor)
-                .foregroundColor(musicService.currentSkin.buttonTextColor)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .background(musicService.currentPlayerSkin.buttonColor)
+                .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay(
                     // 外描边
                     RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color(musicService.currentSkin.buttonOutlineColor), lineWidth: 2)
+                        .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
                 )
-                .overlay(
+/*                .overlay(
                     // 内描边 - 使用inset实现向内偏移效果
                     RoundedRectangle(cornerRadius: 2)
                         .inset(by: 6)  // 向内偏移6pt
-                        .strokeBorder(Color(musicService.currentSkin.buttonOutlineColor).opacity(0.2), lineWidth: 1)
+                        .strokeBorder(Color(musicService.currentPlayerSkin.buttonOutlineColor).opacity(0.2), lineWidth: 1)
                 )
+ */
         }
     }
 }
@@ -463,6 +470,7 @@ struct CustomProgressViewStyle: ProgressViewStyle {
 struct CassetteHole: View {
     var isRotating: Bool
     @Binding var rotationAngle: Double
+    @EnvironmentObject private var musicService: MusicService
     
     var body: some View {
         ZStack {
@@ -471,8 +479,8 @@ struct CassetteHole: View {
                 .frame(width: 160, height: 160)
             Circle()
                 .fill(Color("cassetteColor"))
-                .frame(width: 120, height: 120)
-            Image("holeDark")
+                .frame(width: 150, height: 150)
+            Image(musicService.currentCassetteSkin.cassetteHole)
                 .resizable()
                 .frame(width: 60, height: 60)
                 .rotationEffect(.degrees(isRotating ? rotationAngle : 0))

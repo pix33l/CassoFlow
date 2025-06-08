@@ -4,6 +4,7 @@ import MusicKit
 struct LibraryView: View {
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var musicService: MusicService
+    @Environment(\.dismiss) var dismiss
     // 选中的分段
     @State private var selectedSegment = 0
     // 用户专辑列表数据
@@ -29,6 +30,22 @@ struct LibraryView: View {
             }
             .navigationTitle("媒体库")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.footnote)
+                            .foregroundColor(.primary)
+                            .padding(8)           // 增加内边距以扩大背景圆形
+                            .background(
+                                Circle()           // 圆形背景
+                                    .fill(Color.gray.opacity(0.15))
+                            )
+                    }
+                }
+            }
             .task {
                 await loadUserLibrary()
             }
@@ -106,16 +123,22 @@ struct AlbumCell: View {
     var body: some View {
         VStack(alignment: .leading) {
             // 专辑封面
-            AsyncImage(url: album.artwork?.url(width: 300, height: 300)) { image in
-                image
+            ZStack {
+                AsyncImage(url: album.artwork?.url(width: 300, height: 300)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Color.gray
+                }
+                .frame(width: 100, height: 160)
+                .clipShape(Rectangle())
+                Image("cover-cassette")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Color.gray
+                    .frame(width: 110, height: 170)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
-            .frame(width: 110, height: 170)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            
             // 专辑信息
             VStack(alignment: .leading, spacing: 4) {
                 Text(album.title)
@@ -140,16 +163,22 @@ struct PlaylistCell: View {
     var body: some View {
         VStack(alignment: .leading) {
             // 歌单封面
-            AsyncImage(url: playlist.artwork?.url(width: 300, height: 300)) { image in
-                image
+            ZStack {
+                AsyncImage(url: playlist.artwork?.url(width: 300, height: 300)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Color.gray
+                }
+                .frame(width: 100, height: 160)
+                .clipShape(Rectangle())
+                Image("cover-cassette")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Color.gray
+                    .frame(width: 110, height: 170)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
-            .frame(width: 110, height: 170)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            
             // 歌单信息
             VStack(alignment: .leading, spacing: 4) {
                 Text(playlist.name)

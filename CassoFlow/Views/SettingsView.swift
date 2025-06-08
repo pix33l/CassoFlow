@@ -27,6 +27,7 @@ struct LinkRow: View {
 
 struct SettingsView: View {
     // MARK: - Properties
+    @Environment(\.dismiss) var dismiss
     @State private var isSoundEnabled = true
     @State private var isHapticEnabled = true
     @State private var isScreenAlwaysOn = true
@@ -115,6 +116,22 @@ struct SettingsView: View {
             }
             .navigationTitle("设置")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.footnote)
+                            .foregroundColor(.primary)
+                            .padding(8)           // 增加内边距以扩大背景圆形
+                            .background(
+                                Circle()           // 圆形背景
+                                    .fill(Color.gray.opacity(0.15))
+                            )
+                    }
+                }
+            }
         }
     }
 }

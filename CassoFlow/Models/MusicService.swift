@@ -16,7 +16,8 @@ class MusicService: ObservableObject {
     @Published var totalDuration: TimeInterval = 0
     @Published var isPlaying: Bool = false
     @Published var currentTrackID: MusicItemID?
-    @Published var currentSkin: Skin = Skin.skin(named: "CF-DT1") ?? Skin.allSkins[0]
+    @Published var currentPlayerSkin: PlayerSkin
+    @Published var currentCassetteSkin: CassetteSkin
     @Published var currentTrackIndex: Int? = nil
     @Published var totalTracksInQueue: Int = 0
     
@@ -65,57 +66,60 @@ class MusicService: ObservableObject {
     }
     
     init() {
-            // 监听播放器队列变化
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-                self?.updateCurrentSongInfo()
-            }
+        currentPlayerSkin = PlayerSkin.playerSkin(named: "CF-DT1") ?? PlayerSkin.playerSkins[0]
+        currentCassetteSkin = CassetteSkin.casetteSkin(named: "CFH-60") ?? CassetteSkin.cassetteSkins[0]
+        
+        // 监听播放器队列变化
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.updateCurrentSongInfo()
         }
+    }
 
-        private func updateCurrentSongInfo() {
-            
-            guard let entry = player.queue.currentEntry else {
-                DispatchQueue.main.async {
-                    self.currentTitle = "未播放歌曲"
-                    self.currentArtist = ""
-                    self.currentDuration = 0
-                    self.totalDuration = 0
-                    self.isPlaying = false  // 添加播放状态重置
-                    self.currentTrackID = nil
-                    self.currentTrackIndex = nil
-                    self.totalTracksInQueue = 0
-                }
-                return
-            }
-            
-            let duration: TimeInterval
-            var trackID: MusicItemID? = nil
-            
-            switch entry.item {
-            case .song(let song):
-                duration = song.duration ?? 0
-                trackID = song.id
-            case .musicVideo(let musicVideo):
-                duration = musicVideo.duration ?? 0
-                trackID = musicVideo.id
-            default:
-                duration = 0
-                trackID = nil
-            }
-            
-            let entries = player.queue.entries
-            let trackIndex = entries.firstIndex(where: { $0.id == entry.id })
-            
+    private func updateCurrentSongInfo() {
+        
+        guard let entry = player.queue.currentEntry else {
             DispatchQueue.main.async {
-                self.currentTitle = entry.title
-                self.currentArtist = entry.subtitle ?? ""
-                self.currentDuration = self.player.playbackTime
-                self.totalDuration = duration
-                self.isPlaying = self.player.state.playbackStatus == .playing  // 同步播放状态
-                self.currentTrackID = trackID
-                self.currentTrackIndex = trackIndex.map { $0 + 1 } // 转换为1-based索引
-                self.totalTracksInQueue = entries.count
+                self.currentTitle = "未播放歌曲"
+                self.currentArtist = "未知艺术家"
+                self.currentDuration = 0
+                self.totalDuration = 0
+                self.isPlaying = false  // 添加播放状态重置
+                self.currentTrackID = nil
+                self.currentTrackIndex = nil
+                self.totalTracksInQueue = 0
             }
+            return
         }
+        
+        let duration: TimeInterval
+        var trackID: MusicItemID? = nil
+        
+        switch entry.item {
+        case .song(let song):
+            duration = song.duration ?? 0
+            trackID = song.id
+        case .musicVideo(let musicVideo):
+            duration = musicVideo.duration ?? 0
+            trackID = musicVideo.id
+        default:
+            duration = 0
+            trackID = nil
+        }
+        
+        let entries = player.queue.entries
+        let trackIndex = entries.firstIndex(where: { $0.id == entry.id })
+        
+        DispatchQueue.main.async {
+            self.currentTitle = entry.title
+            self.currentArtist = entry.subtitle ?? ""
+            self.currentDuration = self.player.playbackTime
+            self.totalDuration = duration
+            self.isPlaying = self.player.state.playbackStatus == .playing  // 同步播放状态
+            self.currentTrackID = trackID
+            self.currentTrackIndex = trackIndex.map { $0 + 1 } // 转换为1-based索引
+            self.totalTracksInQueue = entries.count
+        }
+    }
     
     /// 播放控制
     func play() async throws {
