@@ -36,7 +36,7 @@ struct LibraryView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.footnote)
+                            .font(.caption)
                             .foregroundColor(.primary)
                             .padding(8)           // 增加内边距以扩大背景圆形
                             .background(

@@ -19,13 +19,6 @@ struct PlayerView: View {
         return CGFloat(musicService.currentDuration / musicService.totalDuration)
     }
     
-    // 格式化时间显示
-    private func formatTime(_ time: TimeInterval) -> String {
-        let minutes = Int(time) / 60
-        let seconds = Int(time) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
     // 格式化剩余时间显示
     private func formatRemainingTime(_ time: TimeInterval) -> String {
         guard time > 0 else { return "-00:00" }
@@ -58,22 +51,45 @@ struct PlayerView: View {
                 stopRotation()
             }
         }
+        .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
+            if musicService.isPlaying || newValue {
+                startRotation()
+            }
+        }
+        .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
+            if musicService.isPlaying || newValue {
+                startRotation()
+            }
+        }
         .onDisappear { stopRotation() }
         .sheet(isPresented: $showLibraryView) { LibraryView() }
         .sheet(isPresented: $showSettingsView) { SettingsView() }
         .sheet(isPresented: $showStoreView) { StoreView() }
     }
     
-    // 开始旋转（优化后版本）
     private func startRotation() {
-        stopRotation() // 先停止现有的计时器
+        stopRotation()
         isRotating = true
-        rotationTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            self.rotationAngle += 5 // 增大每次旋转角度
+        
+        let (interval, angleIncrement) = getRotationParameters()
+        
+        rotationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
+            self.rotationAngle += angleIncrement
         }
     }
     
-    // 停止旋转
+    private func getRotationParameters() -> (TimeInterval, Double) {
+        if musicService.isFastForwarding {
+            return (0.02, 15.0)
+        } else if musicService.isFastRewinding {
+            return (0.02, -15.0)
+        } else if musicService.isPlaying {
+            return (0.05, 5.0)
+        } else {
+            return (0.05, 5.0)
+        }
+    }
+    
     private func stopRotation() {
         rotationTimer?.invalidate()
         rotationTimer = nil
@@ -100,7 +116,6 @@ struct PlayerBackgroundView: View {
                     .padding(.bottom, 280.0)
             }
             
-            // 使用currentPlayerSkin中的播放器图片
             Image(musicService.currentPlayerSkin.playerImage)
                 .resizable()
                 .scaledToFill()
@@ -118,12 +133,11 @@ struct HolesView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 110) {
-                CassetteHole(isRotating: true, rotationAngle: $rotationAngle)
-                CassetteHole(isRotating: true, rotationAngle: $rotationAngle)
+                CassetteHole(isRotating: musicService.isPlaying, rotationAngle: $rotationAngle, shouldGrow: true)
+                CassetteHole(isRotating: musicService.isPlaying, rotationAngle: $rotationAngle, shouldGrow: false)
             }
             .padding(.leading, 25.0)
             
-            // 使用currentCassetteSkin中的磁带图片
             Image(musicService.currentCassetteSkin.cassetteImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -156,7 +170,6 @@ struct PlayerControlsView: View {
                 isShuffled: $isShuffled,
                 progress: progress
             )
-            // 屏幕区域高度
             .frame(height: 90.0)
             .padding()
             .background(
@@ -193,15 +206,21 @@ struct ControlButtonsView: View {
     
     var body: some View {
         HStack(spacing: 10) {
-            // 媒体库按钮
             ControlButton(systemName: "music.note.list", action: { showLibraryView = true })
             
-            // 上一首按钮
-            ControlButton(systemName: "backward.fill") {
-                Task { try await musicService.skipToPrevious() }
-            }
+            ControlButton(
+                systemName: "backward.fill",
+                action: {
+                    Task { try await musicService.skipToPrevious() }
+                },
+                longPressAction: {
+                    musicService.startFastRewind()
+                },
+                longPressEndAction: {
+                    musicService.stopSeek()
+                }
+            )
             
-            // 播放/暂停按钮
             ControlButton(
                 systemName: musicService.isPlaying ? "pause.fill" : "play.fill",
                 action: {
@@ -215,12 +234,19 @@ struct ControlButtonsView: View {
                 }
             )
             
-            // 下一首按钮
-            ControlButton(systemName: "forward.fill") {
-                Task { try await musicService.skipToNext() }
-            }
+            ControlButton(
+                systemName: "forward.fill",
+                action: {
+                    Task { try await musicService.skipToNext() }
+                },
+                longPressAction: {
+                    musicService.startFastForward()
+                },
+                longPressEndAction: {
+                    musicService.stopSeek()
+                }
+            )
             
-            // 设置按钮
             ControlButton(systemName: "recordingtape") {
                 showStoreView = true
             }
@@ -284,14 +310,12 @@ struct RepeatAndShuffleView: View {
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     
-    // 创建计算属性以简化随机播放布尔状态检查
     var isShuffleEnabled: Bool {
         return isShuffled != .off
     }
     
     var body: some View {
         HStack {
-            // 循环播放图标
             Button {
                 switch repeatMode {
                 case .none: repeatMode = .all
@@ -325,7 +349,6 @@ struct RepeatAndShuffleView: View {
             
             Spacer()
             
-            // 修复随机播放图标（使用自定义Boolean处理）
             Button {
                 musicService.shuffleMode = isShuffleEnabled ? .off : .songs
                 isShuffled = musicService.shuffleMode
@@ -360,7 +383,6 @@ struct SongTitleView: View {
                 .font(.body)
                 .lineLimit(1)
         }
-        // 文字区域高度
         .frame(height: 40.0)
         .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
     }
@@ -372,12 +394,6 @@ struct PlaybackProgressView: View {
     @EnvironmentObject private var musicService: MusicService
     let progress: CGFloat
     
-    private func formatTime(_ time: TimeInterval) -> String {
-        let minutes = Int(time) / 60
-        let seconds = Int(time) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
     private func formatRemainingTime(_ time: TimeInterval) -> String {
         guard time > 0 else { return "-00:00" }
         let minutes = Int(time) / 60
@@ -387,12 +403,10 @@ struct PlaybackProgressView: View {
     
     var body: some View {
         HStack {
-            // 当前时间
-            Text(formatTime(musicService.currentDuration))
+            Text(musicService.formatTime(musicService.currentDuration))
                 .font(.caption.monospacedDigit())
                 .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
             
-            // 进度条
             ProgressView(value: progress)
                 .progressViewStyle(
                     CustomProgressViewStyle(
@@ -401,7 +415,6 @@ struct PlaybackProgressView: View {
                     )
                 )
             
-            // 剩余时间
             Text(formatRemainingTime(musicService.totalDuration - musicService.currentDuration))
                 .font(.caption.monospacedDigit())
                 .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
@@ -415,27 +428,69 @@ struct ControlButton: View {
     @EnvironmentObject private var musicService: MusicService
     let systemName: String
     let action: () -> Void
+    let longPressAction: (() -> Void)?
+    let longPressEndAction: (() -> Void)?
+    
+    init(systemName: String, action: @escaping () -> Void) {
+        self.systemName = systemName
+        self.action = action
+        self.longPressAction = nil
+        self.longPressEndAction = nil
+    }
+    
+    init(systemName: String, action: @escaping () -> Void, longPressAction: @escaping () -> Void, longPressEndAction: @escaping () -> Void) {
+        self.systemName = systemName
+        self.action = action
+        self.longPressAction = longPressAction
+        self.longPressEndAction = longPressEndAction
+    }
     
     var body: some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.title2)
-                .frame(width: 60, height: 60)
-                .background(musicService.currentPlayerSkin.buttonColor)
-                .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    // 外描边
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
-                )
-/*                .overlay(
-                    // 内描边 - 使用inset实现向内偏移效果
-                    RoundedRectangle(cornerRadius: 2)
-                        .inset(by: 6)  // 向内偏移6pt
-                        .strokeBorder(Color(musicService.currentPlayerSkin.buttonOutlineColor).opacity(0.2), lineWidth: 1)
-                )
- */
+        Group {
+            if longPressAction != nil {
+                Image(systemName: systemName)
+                    .font(.title2)
+                    .frame(width: 60, height: 50)
+                    .background(musicService.currentPlayerSkin.buttonColor
+                        .shadow(.inner(color: .white.opacity(0.4), radius: 2, x: 0, y: 4))
+                        .shadow(.inner(color: .black.opacity(0.2), radius: 2 , x: 0, y: -4))
+                    )
+                    .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
+                    )
+                    .onTapGesture {
+                        print(" 点击按钮: \(systemName)")
+                        action()
+                    }
+                    .onLongPressGesture(minimumDuration: 0.5, maximumDistance: 50) {
+                        print(" 长按按钮: \(systemName)")
+                        longPressAction?()
+                    } onPressingChanged: { pressing in
+                        if !pressing {
+                            print(" 释放按钮: \(systemName)")
+                            longPressEndAction?()
+                        }
+                    }
+            } else {
+                Button(action: action) {
+                    Image(systemName: systemName)
+                        .font(.title2)
+                        .frame(width: 60, height: 50)
+                        .background(musicService.currentPlayerSkin.buttonColor
+                            .shadow(.inner(color: .white.opacity(0.4), radius: 2, x: 0, y: 4))
+                            .shadow(.inner(color: .black.opacity(0.2), radius: 2 , x: 0, y: -4))
+                        )
+                        .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
+                        )
+                }
+            }
         }
     }
 }
@@ -448,12 +503,10 @@ struct CustomProgressViewStyle: ProgressViewStyle {
     func makeBody(configuration: Configuration) -> some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                // 背景轨道
                 Capsule()
                     .frame(width: geometry.size.width, height: 4)
                     .foregroundColor(background)
                 
-                // 前景进度条
                 Capsule()
                     .frame(
                         width: CGFloat(configuration.fractionCompleted ?? 0) * geometry.size.width,
@@ -472,6 +525,51 @@ struct CassetteHole: View {
     @Binding var rotationAngle: Double
     @EnvironmentObject private var musicService: MusicService
     
+    var shouldGrow: Bool
+    
+    @State private var circleSize: CGFloat = 150
+    @State private var animationStarted = false
+    @State private var currentRotationAngle: Double = 0
+    
+    // 使用播放队列的总时长
+    private var queueTotalDuration: TimeInterval {
+        let duration = musicService.queueTotalDuration > 0 ? musicService.queueTotalDuration : 180.0
+        print("🎵 CassetteHole - shouldGrow: \(shouldGrow), queueTotalDuration: \(duration)秒")
+        return duration
+    }
+    
+    // 计算当前播放进度对应的Circle尺寸
+    private var currentProgressSize: CGFloat {
+        guard queueTotalDuration > 0 else { return shouldGrow ? 100 : 200 }
+        
+        // 使用队列累计播放时长计算整体进度
+        let progress = musicService.queueElapsedDuration / queueTotalDuration
+        let clampedProgress = min(max(progress, 0.0), 1.0) // 确保进度在0-1之间
+        
+        print("🎵 播放进度计算 - shouldGrow: \(shouldGrow), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
+        
+        if shouldGrow {
+            // 从100变到200
+            return 100 + CGFloat(clampedProgress) * 100
+        } else {
+            // 从200变到100
+            return 200 - CGFloat(clampedProgress) * 100
+        }
+    }
+    
+    // 计算当前旋转状态
+    private var rotationState: String {
+        if musicService.isFastForwarding {
+            return "快进"
+        } else if musicService.isFastRewinding {
+            return "快退"
+        } else if musicService.isPlaying {
+            return "播放"
+        } else {
+            return "暂停"
+        }
+    }
+    
     var body: some View {
         ZStack {
             Circle()
@@ -479,18 +577,102 @@ struct CassetteHole: View {
                 .frame(width: 160, height: 160)
             Circle()
                 .fill(Color("cassetteColor"))
-                .frame(width: 150, height: 150)
+                .frame(width: circleSize, height: circleSize)
             Image(musicService.currentCassetteSkin.cassetteHole)
                 .resizable()
                 .frame(width: 60, height: 60)
-                .rotationEffect(.degrees(isRotating ? rotationAngle : 0))
+                .rotationEffect(.degrees(currentRotationAngle))
         }
         .frame(width: 100, height: 100)
+        .onChange(of: rotationAngle) { oldValue, newValue in
+            // 根据当前状态决定是否更新旋转角度
+            if musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding {
+                currentRotationAngle = newValue
+                print("🎵 旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 角度: \(newValue)")
+            }
+        }
+        .onChange(of: isRotating) { oldValue, newValue in
+            print("🎵 isRotating变化: \(oldValue) -> \(newValue)")
+            if newValue && !animationStarted {
+                startSizeAnimation()
+            }
+        }
+        .onChange(of: musicService.queueTotalDuration) { oldValue, newValue in
+            print("🎵 queueTotalDuration变化: \(oldValue) -> \(newValue)")
+            if isRotating && oldValue != newValue {
+                animationStarted = false
+                startSizeAnimation()
+            }
+        }
+        // 监听队列累计播放时长变化
+        .onChange(of: musicService.queueElapsedDuration) { oldValue, newValue in
+            if animationStarted && (musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding) {
+                let newSize = currentProgressSize
+                print("🎵 队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
+                
+                // 使用较短的动画来平滑过渡到新尺寸
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    circleSize = newSize
+                }
+            }
+        }
+        // 监听快进/快退状态变化
+        .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
+            print("🎵 快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+        }
+        .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
+            print("🎵 快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+        }
+        .onAppear {
+            print("🎵 CassetteHole onAppear - shouldGrow: \(shouldGrow), isRotating: \(isRotating), isPlaying: \(musicService.isPlaying)")
+            setupInitialSize()
+            currentRotationAngle = rotationAngle
+            if isRotating && musicService.isPlaying && !animationStarted {
+                startSizeAnimation()
+            }
+        }
+    }
+    
+    // 设置初始尺寸的方法
+    private func setupInitialSize() {
+        // 使用当前播放进度来设置初始尺寸
+        circleSize = currentProgressSize
+        animationStarted = false
+        print("🎵 初始尺寸设置 - shouldGrow: \(shouldGrow), circleSize: \(circleSize)")
+    }
+    
+    // 修正尺寸动画逻辑
+    private func startSizeAnimation() {
+        guard !animationStarted else {
+            print("🎵 动画已经开始，跳过重复调用")
+            return
+        }
+        
+        animationStarted = true
+        print("🎵 开始尺寸动画 - shouldGrow: \(shouldGrow), 当前尺寸: \(circleSize), 队列总时长: \(queueTotalDuration)秒")
+        
+        // 从当前队列进度对应的尺寸开始，动画到最终尺寸
+        let startSize = currentProgressSize
+        let endSize: CGFloat = shouldGrow ? 200 : 100
+        let remainingDuration = queueTotalDuration - musicService.queueElapsedDuration
+        
+        print("🎵 动画参数 - 起始尺寸: \(startSize), 结束尺寸: \(endSize), 剩余时长: \(remainingDuration)秒")
+        
+        circleSize = startSize
+        
+        if remainingDuration > 0 {
+            withAnimation(.linear(duration: remainingDuration)) {
+                circleSize = endSize
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            print("🎵 动画开始2秒后 - shouldGrow: \(self.shouldGrow), 当前尺寸: \(self.circleSize)")
+        }
     }
 }
 
 #Preview {
-    // 直接使用 MusicService 进行预览
     let musicService = MusicService.shared
     
     return PlayerView()

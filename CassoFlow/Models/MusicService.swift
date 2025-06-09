@@ -21,6 +21,13 @@ class MusicService: ObservableObject {
     @Published var currentTrackIndex: Int? = nil
     @Published var totalTracksInQueue: Int = 0
     
+    @Published var queueTotalDuration: TimeInterval = 0
+    @Published var queueElapsedDuration: TimeInterval = 0
+    
+    @Published var isFastForwarding: Bool = false
+    @Published var isFastRewinding: Bool = false
+    private var seekTimer: Timer?
+    
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
         set { player.state.repeatMode = newValue }
@@ -87,6 +94,8 @@ class MusicService: ObservableObject {
                 self.currentTrackID = nil
                 self.currentTrackIndex = nil
                 self.totalTracksInQueue = 0
+                self.queueTotalDuration = 0
+                self.queueElapsedDuration = 0
             }
             return
         }
@@ -109,6 +118,9 @@ class MusicService: ObservableObject {
         let entries = player.queue.entries
         let trackIndex = entries.firstIndex(where: { $0.id == entry.id })
         
+        let totalQueueDuration = calculateQueueTotalDuration(entries: entries)
+        let elapsedQueueDuration = calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
+        
         DispatchQueue.main.async {
             self.currentTitle = entry.title
             self.currentArtist = entry.subtitle ?? ""
@@ -118,9 +130,61 @@ class MusicService: ObservableObject {
             self.currentTrackID = trackID
             self.currentTrackIndex = trackIndex.map { $0 + 1 } // 转换为1-based索引
             self.totalTracksInQueue = entries.count
+            self.queueTotalDuration = totalQueueDuration
+            self.queueElapsedDuration = elapsedQueueDuration
         }
     }
     
+    private func calculateQueueTotalDuration(entries: ApplicationMusicPlayer.Queue.Entries) -> TimeInterval {
+        var totalDuration: TimeInterval = 0
+        
+        for entry in entries {
+            switch entry.item {
+            case .song(let song):
+                totalDuration += song.duration ?? 0
+            case .musicVideo(let musicVideo):
+                totalDuration += musicVideo.duration ?? 0
+            default:
+                // 对于其他类型，使用默认时长3分钟
+                totalDuration += 180.0
+            }
+        }
+        
+        print("🎵 队列总时长计算: \(totalDuration)秒, 条目数量: \(entries.count)")
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : 180.0
+    }
+
+    private func calculateQueueElapsedDuration(entries: ApplicationMusicPlayer.Queue.Entries, currentEntryIndex: Int?) -> TimeInterval {
+        guard let currentIndex = currentEntryIndex else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for (index, entry) in entries.enumerated() {
+            if index < currentIndex {
+                switch entry.item {
+                case .song(let song):
+                    elapsedDuration += song.duration ?? 0
+                case .musicVideo(let musicVideo):
+                    elapsedDuration += musicVideo.duration ?? 0
+                default:
+                    elapsedDuration += 180.0 // 默认3分钟
+                }
+            } else {
+                break
+            }
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += player.playbackTime
+        
+        print("🎵 队列累计播放时长: \(elapsedDuration)秒, 当前歌曲索引: \(currentIndex)")
+        
+        return elapsedDuration
+    }
+
     /// 播放控制
     func play() async throws {
         try await player.play()
@@ -144,6 +208,40 @@ class MusicService: ObservableObject {
         try await player.skipToPreviousEntry()
     }
     
+    func startFastRewind() {
+        print("🎵 开始快退")
+        stopSeek() // 停止任何现有的快进/快退
+        isFastRewinding = true
+        
+        seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            let newTime = max(0, self.player.playbackTime - 5.0) // 每0.1秒后退5秒
+            self.player.playbackTime = newTime
+            print("🎵 快退中 - 当前时间: \(newTime)秒")
+        }
+    }
+    
+    func startFastForward() {
+        print("🎵 开始快进")
+        stopSeek() // 停止任何现有的快进/快退
+        isFastForwarding = true
+        
+        seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            let newTime = min(self.totalDuration, self.player.playbackTime + 5.0) // 每0.1秒前进5秒
+            self.player.playbackTime = newTime
+            print("🎵 快进中 - 当前时间: \(newTime)秒")
+        }
+    }
+    
+    func stopSeek() {
+        print("🎵 停止快进/快退")
+        seekTimer?.invalidate()
+        seekTimer = nil
+        isFastForwarding = false
+        isFastRewinding = false
+    }
+
     /// 获取用户媒体库专辑
     func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
         var request = MusicLibraryRequest<Album>()
@@ -158,5 +256,12 @@ class MusicService: ObservableObject {
         request.sort(by: \.libraryAddedDate, ascending: false)
         request.limit = 100
         return try await request.response().items
+    }
+    
+    // 格式化时间显示
+    func formatTime(_ time: TimeInterval) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

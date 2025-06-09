@@ -90,7 +90,7 @@ struct StoreView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.footnote)
+                            .font(.caption)
                             .foregroundColor(.primary)
                             .padding(8)           // 增加内边距以扩大背景圆形
                             .background(
@@ -158,8 +158,8 @@ struct SkinCardView: View {
                 Image(playerSkin.coverImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxHeight: 380)
-                    .padding(.bottom, 5.0)
+                    .frame(maxHeight: 400)
+                    .padding(.bottom)
                 
                 VStack(spacing: 5) {
                     Text(playerSkin.name)
@@ -172,7 +172,8 @@ struct SkinCardView: View {
                     Text(playerSkin.description)
                         .font(.body)
                         .foregroundColor(.primary)
-                        .padding(.top, 10.0)
+                        .multilineTextAlignment(.center)
+                        .padding()
                 }
                 .frame(maxWidth: .infinity)
             } else if let cassetteSkin = cassetteSkin {
