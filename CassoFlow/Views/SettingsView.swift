@@ -29,8 +29,9 @@ struct SettingsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject private var musicService: MusicService
-    @State private var isHapticEnabled = true
     @State private var isScreenAlwaysOn = true
+    
+    @State private var closeTapped = false
     
     var body: some View {
         NavigationView {
@@ -62,14 +63,6 @@ struct SettingsView: View {
                 
                 // 通用设置
                 Section(header: Text("通用")) {
-                    NavigationLink(destination: Text("音乐服务设置")) {
-                        HStack {
-                            Text("音乐提供商")
-                            Spacer()
-                            Text("Apple Music")
-                                .foregroundColor(.secondary)
-                        }
-                    }
                     
                     Toggle("磁带音效", isOn: Binding(
                         get: { musicService.isCassetteEffectEnabled },
@@ -81,7 +74,14 @@ struct SettingsView: View {
                         print("🎵 磁带音效开关切换: \(newValue)")
                     }
                     
-                    Toggle("触觉反馈", isOn: $isHapticEnabled)
+                    Toggle("触觉反馈", isOn: Binding(
+                        get: { musicService.isHapticFeedbackEnabled },
+                        set: { newValue in
+                            musicService.setHapticFeedback(enabled: newValue)
+                        }
+                    ))
+                    .sensoryFeedback(.selection, trigger: musicService.isHapticFeedbackEnabled)
+                    
                     Toggle("屏幕常亮", isOn: $isScreenAlwaysOn)
                 }
                 
@@ -128,6 +128,7 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
+                        closeTapped.toggle()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -139,6 +140,7 @@ struct SettingsView: View {
                                     .fill(Color.gray.opacity(0.15))
                             )
                     }
+                    .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
             }
         }

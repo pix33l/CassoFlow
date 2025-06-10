@@ -10,6 +10,10 @@ struct MusicDetailView: View {
     @State private var errorMessage: String?
     @State private var albumArtwork: UIImage? = nil
     
+    @State private var playTapped = false
+    @State private var shufflePlayTapped = false
+    @State private var trackTapped = false
+    
     private var container: MusicContainer {
         containerType.container
     }
@@ -64,6 +68,7 @@ struct MusicDetailView: View {
                     // 播放控制按钮
                     HStack(spacing: 20) {
                         Button {
+                            playTapped.toggle()
                             Task {
                                 try await playMusic(shuffled: false)
                             }
@@ -78,8 +83,10 @@ struct MusicDetailView: View {
                             .foregroundColor(.primary)
                             .cornerRadius(8)
                         }
+                        .sensoryFeedback(.impact(weight: .medium), trigger: playTapped)
                         
                         Button {
+                            shufflePlayTapped.toggle()
                             Task {
                                 try await playMusic(shuffled: true)
                             }
@@ -94,6 +101,7 @@ struct MusicDetailView: View {
                             .foregroundColor(.primary)
                             .cornerRadius(8)
                         }
+                        .sensoryFeedback(.impact(weight: .medium), trigger: shufflePlayTapped)
                     }
                 }
                 .padding(.horizontal)
@@ -121,10 +129,12 @@ struct MusicDetailView: View {
                             .equatable()
                             .contentShape(Rectangle())
                             .onTapGesture {
+                                trackTapped.toggle()
                                 Task {
                                     try await playTrack(track)
                                 }
                             }
+                            .sensoryFeedback(.impact(weight: .light), trigger: trackTapped)
                             .animation(nil, value: tracks)
                             
                             if index < tracks.count - 1 {

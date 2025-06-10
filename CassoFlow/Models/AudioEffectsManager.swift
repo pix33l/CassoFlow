@@ -127,7 +127,7 @@ class AudioEffectsManager: ObservableObject {
         audioEngine.connect(mixerNode, to: audioEngine.outputNode, format: outputFormat)
         
         // 设置音量
-        noisePlayer.volume = 0.5 // 进一步降低音量
+        noisePlayer.volume = 0.3 // 进一步降低音量
         
         // 准备音频引擎
         audioEngine.prepare()

@@ -8,6 +8,9 @@ struct StoreView: View {
     @State private var selectedPlayerName: String
     @State private var selectedCassetteName: String
     
+    @State private var closeTapped = false
+    @State private var applyTapped = false
+    
     // 数据集
     private var playerSkins: [PlayerSkin] { PlayerSkin.playerSkins }
     private var cassetteSkins: [CassetteSkin] { CassetteSkin.cassetteSkins }
@@ -38,6 +41,7 @@ struct StoreView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding()
+                .sensoryFeedback(.selection, trigger: selectedSegment)
                 
                 // TabView根据选项卡选择展示不同内容
                 TabView(selection: Binding<AnyHashable>(
@@ -65,10 +69,12 @@ struct StoreView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .frame(height: 580)
+                .sensoryFeedback(.selection, trigger: selectedSegment == 0 ? selectedPlayerName : selectedCassetteName)
                 
                 Spacer()
                 
                 Button {
+                    applyTapped.toggle()
                     applySelectedSkin()
                 } label: {
                     Text(buttonTitle)
@@ -81,12 +87,14 @@ struct StoreView: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 20)
+                .sensoryFeedback(.success, trigger: applyTapped)
             }
             .navigationTitle("商店")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
+                        closeTapped.toggle()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -98,6 +106,7 @@ struct StoreView: View {
                                     .fill(Color.gray.opacity(0.15))
                             )
                     }
+                    .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
             }
         }

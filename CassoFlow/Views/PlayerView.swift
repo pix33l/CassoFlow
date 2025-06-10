@@ -206,13 +206,24 @@ struct ControlButtonsView: View {
     @Binding var showLibraryView: Bool
     @Binding var showStoreView: Bool
     
+    @State private var libraryTapped = false
+    @State private var previousTapped = false
+    @State private var playPauseTapped = false
+    @State private var nextTapped = false
+    @State private var storeTapped = false
+    
     var body: some View {
         HStack(spacing: 10) {
-            ControlButton(systemName: "music.note.list", action: { showLibraryView = true })
+            ControlButton(systemName: "music.note.list", action: {
+                libraryTapped.toggle()
+                showLibraryView = true
+            })
+            .sensoryFeedback(.impact(weight: .medium), trigger: libraryTapped)
             
             ControlButton(
                 systemName: "backward.fill",
                 action: {
+                    previousTapped.toggle()
                     Task { try await musicService.skipToPrevious() }
                 },
                 longPressAction: {
@@ -222,10 +233,12 @@ struct ControlButtonsView: View {
                     musicService.stopSeek()
                 }
             )
+            .sensoryFeedback(.impact(weight: .heavy), trigger: previousTapped)
             
             ControlButton(
                 systemName: musicService.isPlaying ? "pause.fill" : "play.fill",
                 action: {
+                    playPauseTapped.toggle()
                     Task {
                         if musicService.isPlaying {
                             await musicService.pause()
@@ -235,10 +248,12 @@ struct ControlButtonsView: View {
                     }
                 }
             )
+            .sensoryFeedback(.impact(weight: .heavy), trigger: playPauseTapped)
             
             ControlButton(
                 systemName: "forward.fill",
                 action: {
+                    nextTapped.toggle()
                     Task { try await musicService.skipToNext() }
                 },
                 longPressAction: {
@@ -248,10 +263,13 @@ struct ControlButtonsView: View {
                     musicService.stopSeek()
                 }
             )
+            .sensoryFeedback(.impact(weight: .heavy), trigger: nextTapped)
             
             ControlButton(systemName: "recordingtape") {
+                storeTapped.toggle()
                 showStoreView = true
             }
+            .sensoryFeedback(.impact(weight: .medium), trigger: storeTapped)
         }
     }
 }
@@ -280,6 +298,8 @@ struct TrackInfoHeader: View {
     @EnvironmentObject private var musicService: MusicService
     @Binding var showSettingsView: Bool
     
+    @State private var settingsTapped = false
+    
     var body: some View {
         HStack {
             Group {
@@ -294,11 +314,13 @@ struct TrackInfoHeader: View {
             Spacer()
             
             Button {
+                settingsTapped.toggle()
                 showSettingsView = true
             } label: {
                 Text("SETTINGS")
             }
             .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+            .sensoryFeedback(.impact(weight: .light), trigger: settingsTapped)
         }
         .fontWeight(.bold)
         .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
@@ -312,6 +334,9 @@ struct RepeatAndShuffleView: View {
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     
+    @State private var repeatTapped = false
+    @State private var shuffleTapped = false
+    
     var isShuffleEnabled: Bool {
         return isShuffled != .off
     }
@@ -319,6 +344,7 @@ struct RepeatAndShuffleView: View {
     var body: some View {
         HStack {
             Button {
+                repeatTapped.toggle()
                 switch repeatMode {
                 case .none: repeatMode = .all
                 case .all: repeatMode = .one
@@ -344,6 +370,7 @@ struct RepeatAndShuffleView: View {
                 .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
                 )
             }
+            .sensoryFeedback(.selection, trigger: repeatTapped)
             
             Spacer()
             
@@ -352,6 +379,7 @@ struct RepeatAndShuffleView: View {
             Spacer()
             
             Button {
+                shuffleTapped.toggle()
                 musicService.shuffleMode = isShuffleEnabled ? .off : .songs
                 isShuffled = musicService.shuffleMode
             } label: {
@@ -366,6 +394,7 @@ struct RepeatAndShuffleView: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
                     )
             }
+            .sensoryFeedback(.selection, trigger: shuffleTapped)
         }
     }
 }

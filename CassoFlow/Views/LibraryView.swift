@@ -13,6 +13,7 @@ struct LibraryView: View {
     @State private var userPlaylists: MusicItemCollection<Playlist> = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var closeTapped = false
     
     var body: some View {
         NavigationStack {  // 改为 NavigationStack 避免嵌套导航问题
@@ -33,6 +34,7 @@ struct LibraryView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
+                        closeTapped.toggle()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -44,6 +46,7 @@ struct LibraryView: View {
                                     .fill(Color.gray.opacity(0.15))
                             )
                     }
+                    .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
             }
             .task {
@@ -62,7 +65,8 @@ struct LibraryView: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
-            
+            .sensoryFeedback(.selection, trigger: selectedSegment)
+
             LazyVGrid(columns: [
                 GridItem(.adaptive(minimum: 110), spacing: 5)
             ], spacing: 20) {

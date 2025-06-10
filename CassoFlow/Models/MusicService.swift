@@ -36,10 +36,13 @@ class MusicService: ObservableObject {
         }
     }
     
+    @Published var isHapticFeedbackEnabled: Bool = false
+    
     // MARK: - 皮肤存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
     private static let cassetteSkinKey = "SelectedCassetteSkin"
     private static let cassetteEffectKey = "CassetteEffectEnabled"
+    private static let hapticFeedbackKey = "HapticFeedbackEnabled"
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -122,6 +125,15 @@ class MusicService: ObservableObject {
         isCassetteEffectEnabled = UserDefaults.standard.bool(forKey: Self.cassetteEffectKey)
         print("🎵 加载磁带音效设置: \(isCassetteEffectEnabled)")
         
+        if UserDefaults.standard.object(forKey: Self.hapticFeedbackKey) == nil {
+            // 首次启动时设置默认值为true
+            isHapticFeedbackEnabled = true
+            UserDefaults.standard.set(true, forKey: Self.hapticFeedbackKey)
+        } else {
+            isHapticFeedbackEnabled = UserDefaults.standard.bool(forKey: Self.hapticFeedbackKey)
+        }
+        print("📳 加载触觉反馈设置: \(isHapticFeedbackEnabled)")
+        
         // 监听播放器队列变化
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateCurrentSongInfo()
@@ -149,6 +161,13 @@ class MusicService: ObservableObject {
         isCassetteEffectEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: Self.cassetteEffectKey)
         print("🎵 保存磁带音效设置: \(enabled)")
+    }
+    
+    /// 设置触觉反馈开关
+    func setHapticFeedback(enabled: Bool) {
+        isHapticFeedbackEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: Self.hapticFeedbackKey)
+        print("📳 保存触觉反馈设置: \(enabled)")
     }
 
     private func updateCurrentSongInfo() {
