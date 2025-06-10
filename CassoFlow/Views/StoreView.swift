@@ -138,9 +138,11 @@ struct StoreView: View {
     // MARK: - 方法
     private func applySelectedSkin() {
         if let playerSkin = currentSkinType.0 {
-            musicService.currentPlayerSkin = playerSkin
+            // 使用 setPlayerSkin 方法来保存皮肤选择
+            musicService.setPlayerSkin(playerSkin)
         } else if let cassetteSkin = currentSkinType.1 {
-            musicService.currentCassetteSkin = cassetteSkin
+            // 使用 setCassetteSkin 方法来保存皮肤选择
+            musicService.setCassetteSkin(cassetteSkin)
         }
         dismiss()
     }

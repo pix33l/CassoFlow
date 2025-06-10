@@ -28,6 +28,10 @@ class MusicService: ObservableObject {
     @Published var isFastRewinding: Bool = false
     private var seekTimer: Timer?
     
+    // MARK: - 皮肤存储键值
+    private static let playerSkinKey = "SelectedPlayerSkin"
+    private static let cassetteSkinKey = "SelectedCassetteSkin"
+    
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
         set { player.state.repeatMode = newValue }
@@ -82,13 +86,49 @@ class MusicService: ObservableObject {
     }
     
     init() {
-        currentPlayerSkin = PlayerSkin.playerSkin(named: "CF-DT1") ?? PlayerSkin.playerSkins[0]
-        currentCassetteSkin = CassetteSkin.casetteSkin(named: "CFH-60") ?? CassetteSkin.cassetteSkins[0]
+        // 直接初始化属性，而不是调用实例方法
+        let savedPlayerSkinName = UserDefaults.standard.string(forKey: Self.playerSkinKey)
+        if let skinName = savedPlayerSkinName,
+           let skin = PlayerSkin.playerSkin(named: skinName) {
+            print("🎨 加载已保存的播放器皮肤: \(skinName)")
+            currentPlayerSkin = skin
+        } else {
+            let defaultSkin = PlayerSkin.playerSkin(named: "CF-DEMO") ?? PlayerSkin.playerSkins[0]
+            print("🎨 使用默认播放器皮肤: \(defaultSkin.name)")
+            currentPlayerSkin = defaultSkin
+        }
+        
+        let savedCassetteSkinName = UserDefaults.standard.string(forKey: Self.cassetteSkinKey)
+        if let skinName = savedCassetteSkinName,
+           let skin = CassetteSkin.casetteSkin(named: skinName) {
+            print("🎨 加载已保存的磁带皮肤: \(skinName)")
+            currentCassetteSkin = skin
+        } else {
+            let defaultSkin = CassetteSkin.casetteSkin(named: "CFT-DEMO") ?? CassetteSkin.cassetteSkins[0]
+            print("🎨 使用默认磁带皮肤: \(defaultSkin.name)")
+            currentCassetteSkin = defaultSkin
+        }
         
         // 监听播放器队列变化
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateCurrentSongInfo()
         }
+    }
+    
+    // MARK: - 皮肤持久化方法
+    
+    /// 设置并保存播放器皮肤
+    func setPlayerSkin(_ skin: PlayerSkin) {
+        currentPlayerSkin = skin
+        UserDefaults.standard.set(skin.name, forKey: Self.playerSkinKey)
+        print("🎨 保存播放器皮肤: \(skin.name)")
+    }
+    
+    /// 设置并保存磁带皮肤
+    func setCassetteSkin(_ skin: CassetteSkin) {
+        currentCassetteSkin = skin
+        UserDefaults.standard.set(skin.name, forKey: Self.cassetteSkinKey)
+        print("🎨 保存磁带皮肤: \(skin.name)")
     }
 
     private func updateCurrentSongInfo() {
