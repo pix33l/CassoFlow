@@ -75,6 +75,8 @@ struct PlayerView: View {
         
         rotationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
             self.rotationAngle += angleIncrement
+            // 完全移除角度限制，让SwiftUI自己处理
+            // SwiftUI的rotationEffect可以很好地处理大角度值
         }
     }
     
@@ -587,8 +589,13 @@ struct CassetteHole: View {
         .onChange(of: rotationAngle) { oldValue, newValue in
             // 根据当前状态决定是否更新旋转角度
             if musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding {
+                // 直接使用原始角度，不进行标准化
                 currentRotationAngle = newValue
-                print("🎵 旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 角度: \(newValue)")
+                
+                // 减少日志输出频率 - 每600度（3圈）输出一次
+                if Int(newValue) % 600 == 0 {
+                    print("🎵 旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 完整角度: \(newValue)")
+                }
             }
         }
         .onChange(of: isRotating) { oldValue, newValue in
@@ -606,22 +613,34 @@ struct CassetteHole: View {
         }
         // 监听队列累计播放时长变化
         .onChange(of: musicService.queueElapsedDuration) { oldValue, newValue in
-            if animationStarted && (musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding) {
+            let newSize = currentProgressSize
+            print("🎵 队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
+                circleSize = newSize
+            }
+        }
+        .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
+            print("🎵 快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+            if oldValue && !newValue {
+                // 快进结束，立即更新到当前进度对应的尺寸
                 let newSize = currentProgressSize
-                print("🎵 队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
-                
-                // 使用较短的动画来平滑过渡到新尺寸
-                withAnimation(.easeInOut(duration: 0.3)) {
+                print("🎵 快进结束，更新尺寸: \(newSize)")
+                withAnimation(.easeInOut(duration: 0.5)) {
                     circleSize = newSize
                 }
             }
         }
-        // 监听快进/快退状态变化
-        .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
-            print("🎵 快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
-        }
         .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
             print("🎵 快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+            if oldValue && !newValue {
+                // 快退结束，立即更新到当前进度对应的尺寸
+                let newSize = currentProgressSize
+                print("🎵 快退结束，更新尺寸: \(newSize)")
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    circleSize = newSize
+                }
+            }
         }
         .onAppear {
             print("🎵 CassetteHole onAppear - shouldGrow: \(shouldGrow), isRotating: \(isRotating), isPlaying: \(musicService.isPlaying)")

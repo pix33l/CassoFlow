@@ -240,6 +240,23 @@ class MusicService: ObservableObject {
         seekTimer = nil
         isFastForwarding = false
         isFastRewinding = false
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.updateQueueElapsedDuration()
+        }
+    }
+    
+    private func updateQueueElapsedDuration() {
+        let entries = player.queue.entries
+        let currentEntry = player.queue.currentEntry
+        let trackIndex = entries.firstIndex(where: { $0.id == currentEntry?.id })
+        let elapsedDuration = calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
+        
+        // 只有当值发生变化时才更新，避免不必要的更新
+        if abs(self.queueElapsedDuration - elapsedDuration) > 0.5 { // 0.5秒的阈值
+            self.queueElapsedDuration = elapsedDuration
+            print("🎵 延迟更新队列累计时长: \(elapsedDuration)秒")
+        }
     }
 
     /// 获取用户媒体库专辑
