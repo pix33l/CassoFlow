@@ -52,6 +52,15 @@ class MusicService: ObservableObject {
         try await player.play()
     }
     
+    /// 播放播放列表中的特定歌曲
+    func playTrack(_ track: Track, in playlist: Playlist) async throws {
+        let songs = try await playlist.with([.tracks]).tracks ?? []
+        guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
+        
+        player.queue = .init(for: songs, startingAt: songs[index])
+        try await player.play()
+    }
+    
     /// 播放专辑（可选择随机播放）
     func playAlbum(_ album: Album, shuffled: Bool = false) async throws {
         let songs = try await album.with([.tracks]).tracks ?? []
@@ -103,6 +112,7 @@ class MusicService: ObservableObject {
         let duration: TimeInterval
         var trackID: MusicItemID? = nil
         
+        // 更精确的类型处理
         switch entry.item {
         case .song(let song):
             duration = song.duration ?? 0
@@ -110,7 +120,10 @@ class MusicService: ObservableObject {
         case .musicVideo(let musicVideo):
             duration = musicVideo.duration ?? 0
             trackID = musicVideo.id
-        default:
+        case .none:
+            duration = 0
+            trackID = nil
+        @unknown default:
             duration = 0
             trackID = nil
         }

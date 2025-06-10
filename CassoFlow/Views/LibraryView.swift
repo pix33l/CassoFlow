@@ -77,7 +77,12 @@ struct LibraryView: View {
                     }
                 } else {
                     ForEach(userPlaylists) { playlist in
-                        PlaylistCell(playlist: playlist)
+                        NavigationLink {
+                            PlaylistDetailView(playlist: playlist)
+                                .environmentObject(musicService)
+                        } label: {
+                            PlaylistCell(playlist: playlist)
+                        }
                     }
                 }
             }

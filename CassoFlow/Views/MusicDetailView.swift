@@ -1,15 +1,20 @@
 import SwiftUI
 import MusicKit
 
-struct AlbumDetailView: View {
+/// 通用的音乐详情视图，支持专辑和播放列表
+struct MusicDetailView: View {
     @EnvironmentObject private var musicService: MusicService
-    let album: Album
+    let containerType: MusicContainerType
     @State private var tracks: MusicItemCollection<Track> = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var albumArtwork: UIImage? = nil
     
-    // 判断当前是否正在播放指定歌曲
+    private var container: MusicContainer {
+        containerType.container
+    }
+    
+    /// 判断当前是否正在播放指定歌曲
     private func isPlaying(_ track: Track) -> Bool {
         musicService.currentTitle == track.title &&
         musicService.currentArtist == track.artistName &&
@@ -19,7 +24,7 @@ struct AlbumDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // 顶部专辑信息
+                // 顶部音乐容器信息
                 VStack(spacing: 16) {
                     
                     Image("artwork-cassette")
@@ -40,15 +45,16 @@ struct AlbumDetailView: View {
                     }
 */
                     VStack(spacing: 4) {
-                        Text(album.title)
+                        Text(container.title)
                             .font(.title2.bold())
                         
-                        Text(album.artistName)
+                        Text(container.artistName)
                             .font(.title2)
                             .foregroundColor(.secondary)
                         
-                        if let releaseDate = album.releaseDate {
-                            Text("\(album.genreNames.first ?? "未知风格") • \(releaseDate.formatted(.dateTime.year()))")
+                        if let releaseDate = container.releaseDate {
+                            let genreText = container.genreNames.first ?? (isPlaylist() ? "播放列表" : "未知风格")
+                            Text("\(genreText) • \(releaseDate.formatted(.dateTime.year()))")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
                         }
@@ -59,7 +65,7 @@ struct AlbumDetailView: View {
                     HStack(spacing: 20) {
                         Button {
                             Task {
-                                try await musicService.playAlbum(album)
+                                try await playMusic(shuffled: false)
                             }
                         } label: {
                             HStack {
@@ -75,7 +81,7 @@ struct AlbumDetailView: View {
                         
                         Button {
                             Task {
-                                try await musicService.playAlbum(album, shuffled: true)
+                                try await playMusic(shuffled: true)
                             }
                         } label: {
                             HStack {
@@ -107,7 +113,7 @@ struct AlbumDetailView: View {
                             .padding(.trailing, 16)
                         
                         ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
-                            AlbumTrackRow(
+                            MusicTrackRow(
                                 index: index,
                                 track: track,
                                 isPlaying: isPlaying(track)
@@ -116,7 +122,7 @@ struct AlbumDetailView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 Task {
-                                    try await musicService.playTrack(track, in: album)
+                                    try await playTrack(track)
                                 }
                             }
                             .animation(nil, value: tracks)
@@ -135,66 +141,119 @@ struct AlbumDetailView: View {
                 }
                 
                 // 底部信息
-                if let releaseDate = album.releaseDate, !tracks.isEmpty {
+                if let releaseDate = container.releaseDate, !tracks.isEmpty {
                     let totalDuration = tracks.reduce(0) { $0 + ($1.duration ?? 0) }
                     
                     InfoFooter(
                         releaseDate: releaseDate,
                         trackCount: tracks.count,
-                        totalDuration: totalDuration
+                        totalDuration: totalDuration,
+                        isPlaylist: isPlaylist()
                     )
                 }
             }
             .padding(.vertical)
         }
-//        .navigationTitle(album.title)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await loadAlbumTracks()
+            await loadTracks()
         }
         .task {
-            await loadAlbumArtwork()
+            await loadArtwork()
         }
     }
     
-    private func loadAlbumArtwork() async {
-        guard let url = album.artwork?.url(width: 300, height: 300) else { return }
+    /// 检查是否为播放列表
+    private func isPlaylist() -> Bool {
+        switch containerType {
+        case .playlist:
+            return true
+        case .album:
+            return false
+        }
+    }
+    
+    /// 播放音乐（专辑或播放列表）
+    private func playMusic(shuffled: Bool) async throws {
+        switch containerType {
+        case .album(let album):
+            try await musicService.playAlbum(album, shuffled: shuffled)
+        case .playlist(let playlist):
+            try await musicService.playPlaylist(playlist, shuffled: shuffled)
+        }
+    }
+    
+    /// 播放指定歌曲
+    private func playTrack(_ track: Track) async throws {
+        switch containerType {
+        case .album(let album):
+            try await musicService.playTrack(track, in: album)
+        case .playlist(let playlist):
+            // 对于播放列表，我们需要设置整个播放列表然后跳转到指定歌曲
+            try await musicService.playPlaylist(playlist)
+            // 这里可能需要额外的逻辑来跳转到指定歌曲
+        }
+    }
+    
+    private func loadArtwork() async {
+        guard let url = container.artwork?.url(width: 300, height: 300) else { return }
         
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            albumArtwork = UIImage(data: data)
-        } catch {
-            print("专辑图片加载失败: \(error)")
-        }
-    }
-    
-    private func loadAlbumTracks() async {
-        isLoading = true
-        errorMessage = nil
-        
-        do {
-            let detailedAlbum = try await album.with([.tracks])
-            tracks = detailedAlbum.tracks ?? []
-            
-            if tracks.isEmpty {
-                errorMessage = "无法加载歌曲列表"
+            await MainActor.run {
+                albumArtwork = UIImage(data: data)
             }
         } catch {
-            errorMessage = "加载专辑详情失败: \(error.localizedDescription)"
+            print("图片加载失败: \(error)")
         }
-        
-        isLoading = false
     }
     
-    private func formattedDuration(_ duration: TimeInterval) -> String {
-        let minutes = Int(duration) / 60
-        let seconds = Int(duration) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+    private func loadTracks() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
+        
+        do {
+            let loadedTracks = try await container.withTracks()
+            
+            await MainActor.run {
+                tracks = loadedTracks
+                
+                if tracks.isEmpty {
+                    errorMessage = "无法加载歌曲列表"
+                }
+                isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = "加载详情失败: \(error.localizedDescription)"
+                isLoading = false
+            }
+        }
     }
 }
 
-// MARK: - 优化后的专辑曲目行视图
-struct AlbumTrackRow: View, Equatable {
+// MARK: - 为了保持向后兼容性，保留原始的 AlbumDetailView
+struct AlbumDetailView: View {
+    let album: Album
+    
+    var body: some View {
+        MusicDetailView(containerType: .album(album))
+    }
+}
+
+// MARK: - 新的播放列表详情视图
+struct PlaylistDetailView: View {
+    let playlist: Playlist
+    
+    var body: some View {
+        MusicDetailView(containerType: .playlist(playlist))
+    }
+}
+
+// MARK: - 优化后的通用曲目行视图
+struct MusicTrackRow: View, Equatable {
     let index: Int
     let track: Track
     let isPlaying: Bool
@@ -235,7 +294,7 @@ struct AlbumTrackRow: View, Equatable {
     }
     
     // Equatable实现 - 关键性能优化点
-    static func == (lhs: AlbumTrackRow, rhs: AlbumTrackRow) -> Bool {
+    static func == (lhs: MusicTrackRow, rhs: MusicTrackRow) -> Bool {
         lhs.index == rhs.index &&
         lhs.track.id == rhs.track.id &&
         lhs.isPlaying == rhs.isPlaying
@@ -253,13 +312,20 @@ struct InfoFooter: View {
     let releaseDate: Date
     let trackCount: Int
     let totalDuration: TimeInterval
+    let isPlaylist: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            // 使用当地日期格式
-            Text("发布于 \(releaseDate.formattedDateString())")
-                .font(.footnote)
-                .foregroundColor(.secondary)
+            // 根据类型显示不同的日期信息
+            if isPlaylist {
+                Text("最后更新于 \(releaseDate.formattedDateString())")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            } else {
+                Text("发布于 \(releaseDate.formattedDateString())")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
             
             // 显示分钟数（不带秒）
             Text(
