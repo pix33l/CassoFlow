@@ -9,6 +9,7 @@ class MusicService: ObservableObject {
     
     
     private let player = ApplicationMusicPlayer.shared
+    private let audioEffectsManager = AudioEffectsManager.shared
     
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
@@ -28,9 +29,17 @@ class MusicService: ObservableObject {
     @Published var isFastRewinding: Bool = false
     private var seekTimer: Timer?
     
+    // MARK: - 磁带音效属性
+    @Published var isCassetteEffectEnabled: Bool = false {
+        didSet {
+            audioEffectsManager.setCassetteEffect(enabled: isCassetteEffectEnabled)
+        }
+    }
+    
     // MARK: - 皮肤存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
     private static let cassetteSkinKey = "SelectedCassetteSkin"
+    private static let cassetteEffectKey = "CassetteEffectEnabled"
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -86,14 +95,14 @@ class MusicService: ObservableObject {
     }
     
     init() {
-        // 直接初始化属性，而不是调用实例方法
+        // 从 UserDefaults 加载保存的皮肤，如果没有则使用默认值
         let savedPlayerSkinName = UserDefaults.standard.string(forKey: Self.playerSkinKey)
         if let skinName = savedPlayerSkinName,
            let skin = PlayerSkin.playerSkin(named: skinName) {
             print("🎨 加载已保存的播放器皮肤: \(skinName)")
             currentPlayerSkin = skin
         } else {
-            let defaultSkin = PlayerSkin.playerSkin(named: "CF-DEMO") ?? PlayerSkin.playerSkins[0]
+            let defaultSkin = PlayerSkin.playerSkin(named: "CF-DT1") ?? PlayerSkin.playerSkins[0]
             print("🎨 使用默认播放器皮肤: \(defaultSkin.name)")
             currentPlayerSkin = defaultSkin
         }
@@ -104,10 +113,14 @@ class MusicService: ObservableObject {
             print("🎨 加载已保存的磁带皮肤: \(skinName)")
             currentCassetteSkin = skin
         } else {
-            let defaultSkin = CassetteSkin.casetteSkin(named: "CFT-DEMO") ?? CassetteSkin.cassetteSkins[0]
+            let defaultSkin = CassetteSkin.casetteSkin(named: "CFH-60") ?? CassetteSkin.cassetteSkins[0]
             print("🎨 使用默认磁带皮肤: \(defaultSkin.name)")
             currentCassetteSkin = defaultSkin
         }
+        
+        // 加载磁带音效设置
+        isCassetteEffectEnabled = UserDefaults.standard.bool(forKey: Self.cassetteEffectKey)
+        print("🎵 加载磁带音效设置: \(isCassetteEffectEnabled)")
         
         // 监听播放器队列变化
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -130,6 +143,13 @@ class MusicService: ObservableObject {
         UserDefaults.standard.set(skin.name, forKey: Self.cassetteSkinKey)
         print("🎨 保存磁带皮肤: \(skin.name)")
     }
+    
+    /// 设置磁带音效开关
+    func setCassetteEffect(enabled: Bool) {
+        isCassetteEffectEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: Self.cassetteEffectKey)
+        print("🎵 保存磁带音效设置: \(enabled)")
+    }
 
     private func updateCurrentSongInfo() {
         
@@ -145,6 +165,8 @@ class MusicService: ObservableObject {
                 self.totalTracksInQueue = 0
                 self.queueTotalDuration = 0
                 self.queueElapsedDuration = 0
+                // 同步播放状态到音频效果管理器
+                self.audioEffectsManager.setMusicPlayingState(false)
             }
             return
         }
@@ -174,17 +196,21 @@ class MusicService: ObservableObject {
         let totalQueueDuration = calculateQueueTotalDuration(entries: entries)
         let elapsedQueueDuration = calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
         
+        let playbackStatus = player.state.playbackStatus == .playing
+        
         DispatchQueue.main.async {
             self.currentTitle = entry.title
             self.currentArtist = entry.subtitle ?? ""
             self.currentDuration = self.player.playbackTime
             self.totalDuration = duration
-            self.isPlaying = self.player.state.playbackStatus == .playing  // 同步播放状态
+            self.isPlaying = playbackStatus  // 同步播放状态
             self.currentTrackID = trackID
             self.currentTrackIndex = trackIndex.map { $0 + 1 } // 转换为1-based索引
             self.totalTracksInQueue = entries.count
             self.queueTotalDuration = totalQueueDuration
             self.queueElapsedDuration = elapsedQueueDuration
+            // 同步播放状态到音频效果管理器
+            self.audioEffectsManager.setMusicPlayingState(playbackStatus)
         }
     }
     
@@ -243,6 +269,8 @@ class MusicService: ObservableObject {
         try await player.play()
         await MainActor.run {
             isPlaying = true
+            // 同步播放状态到音频效果管理器
+            audioEffectsManager.setMusicPlayingState(true)
         }
     }
     
@@ -250,6 +278,8 @@ class MusicService: ObservableObject {
         player.pause()
         await MainActor.run {
             isPlaying = false
+            // 同步播放状态到音频效果管理器
+            audioEffectsManager.setMusicPlayingState(false)
         }
     }
     

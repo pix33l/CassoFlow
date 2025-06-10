@@ -44,19 +44,19 @@ struct PlayerView: View {
                 startRotation()
             }
         }
-        .onChange(of: musicService.isPlaying) { isPlaying in
+        .onChange(of: musicService.isPlaying) { _, isPlaying in
             if isPlaying {
                 startRotation()
             } else {
                 stopRotation()
             }
         }
-        .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
+        .onChange(of: musicService.isFastForwarding) { _, newValue in
             if musicService.isPlaying || newValue {
                 startRotation()
             }
         }
-        .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
+        .onChange(of: musicService.isFastRewinding) { _, newValue in
             if musicService.isPlaying || newValue {
                 startRotation()
             }
@@ -586,7 +586,7 @@ struct CassetteHole: View {
                 .rotationEffect(.degrees(currentRotationAngle))
         }
         .frame(width: 100, height: 100)
-        .onChange(of: rotationAngle) { oldValue, newValue in
+        .onChange(of: rotationAngle) { _, newValue in
             // 根据当前状态决定是否更新旋转角度
             if musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding {
                 // 直接使用原始角度，不进行标准化
@@ -598,8 +598,8 @@ struct CassetteHole: View {
                 }
             }
         }
-        .onChange(of: isRotating) { oldValue, newValue in
-            print("🎵 isRotating变化: \(oldValue) -> \(newValue)")
+        .onChange(of: isRotating) { _, newValue in
+            print("🎵 isRotating变化: -> \(newValue)")
             if newValue && !animationStarted {
                 startSizeAnimation()
             }
@@ -612,7 +612,7 @@ struct CassetteHole: View {
             }
         }
         // 监听队列累计播放时长变化
-        .onChange(of: musicService.queueElapsedDuration) { oldValue, newValue in
+        .onChange(of: musicService.queueElapsedDuration) { _, newValue in
             let newSize = currentProgressSize
             print("🎵 队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
             

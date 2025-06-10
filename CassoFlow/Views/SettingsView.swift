@@ -28,7 +28,7 @@ struct LinkRow: View {
 struct SettingsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
-    @State private var isSoundEnabled = true
+    @EnvironmentObject private var musicService: MusicService
     @State private var isHapticEnabled = true
     @State private var isScreenAlwaysOn = true
     
@@ -66,12 +66,21 @@ struct SettingsView: View {
                         HStack {
                             Text("音乐提供商")
                             Spacer()
-                            Text("Spotify")
+                            Text("Apple Music")
                                 .foregroundColor(.secondary)
                         }
                     }
                     
-                    Toggle("音效", isOn: $isSoundEnabled)
+                    Toggle("磁带音效", isOn: Binding(
+                        get: { musicService.isCassetteEffectEnabled },
+                        set: { newValue in
+                            musicService.setCassetteEffect(enabled: newValue)
+                        }
+                    ))
+                    .onChange(of: musicService.isCassetteEffectEnabled) { _, newValue in
+                        print("🎵 磁带音效开关切换: \(newValue)")
+                    }
+                    
                     Toggle("触觉反馈", isOn: $isHapticEnabled)
                     Toggle("屏幕常亮", isOn: $isScreenAlwaysOn)
                 }
@@ -138,4 +147,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+        .environmentObject(MusicService.shared)
 }
