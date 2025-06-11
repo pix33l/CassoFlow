@@ -479,19 +479,31 @@ struct ControlButton: View {
     var body: some View {
         Group {
             if longPressAction != nil {
-                Image(systemName: systemName)
+/*                Image(systemName: systemName)
                     .font(.title2)
                     .frame(width: 60, height: 50)
+                    .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
                     .background(musicService.currentPlayerSkin.buttonColor
                         .shadow(.inner(color: .white.opacity(0.4), radius: 2, x: 0, y: 4))
                         .shadow(.inner(color: .black.opacity(0.2), radius: 2 , x: 0, y: -4))
                     )
-                    .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
+
+                
                     )
+ */
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: systemName)
+                            .font(.title2)
+                    }
+                    .frame(width: 60, height: 50)
+                    .buttonStyle(ThreeDButtonStyle())
+                
                     .onTapGesture {
                         print(" 点击按钮: \(systemName)")
                         action()
@@ -506,6 +518,7 @@ struct ControlButton: View {
                         }
                     }
             } else {
+
                 Button(action: action) {
                     Image(systemName: systemName)
                         .font(.title2)
@@ -523,30 +536,6 @@ struct ControlButton: View {
                 }
             }
         }
-    }
-}
-
-// 自定义进度条样式结构
-struct CustomProgressViewStyle: ProgressViewStyle {
-    var tint: Color
-    var background: Color
-    
-    func makeBody(configuration: Configuration) -> some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .frame(width: geometry.size.width, height: 4)
-                    .foregroundColor(background)
-                
-                Capsule()
-                    .frame(
-                        width: CGFloat(configuration.fractionCompleted ?? 0) * geometry.size.width,
-                        height: 4
-                    )
-                    .foregroundColor(tint)
-            }
-        }
-        .frame(height: 4)
     }
 }
 

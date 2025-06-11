@@ -93,7 +93,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-D6C",  // 名称作为唯一标识
             year: "1984",
-            description: "磁带播放器的老大哥，专为专业用户生产，拥有众多功能",
+            description: "磁带播放器的老大哥，专为专业用户生产",
             coverImage: "cover-CF-D6C",
             price: 12,
             isOwned: true,
@@ -110,7 +110,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-DT1",  // 名称作为唯一标识
             year: "1993",
-            description: "经典日本动漫中反复出现的播放器",
+            description: "经典动漫中反复出现的播放器",
             coverImage: "cover-CF-DT1",
             price: 12,
             isOwned: true,
