@@ -462,6 +462,8 @@ struct ControlButton: View {
     let longPressAction: (() -> Void)?
     let longPressEndAction: (() -> Void)?
     
+    @State private var isPressed = false
+    
     init(systemName: String, action: @escaping () -> Void) {
         self.systemName = systemName
         self.action = action
@@ -479,61 +481,61 @@ struct ControlButton: View {
     var body: some View {
         Group {
             if longPressAction != nil {
-/*                Image(systemName: systemName)
-                    .font(.title2)
-                    .frame(width: 60, height: 50)
-                    .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
-                    .background(musicService.currentPlayerSkin.buttonColor
-                        .shadow(.inner(color: .white.opacity(0.4), radius: 2, x: 0, y: 4))
-                        .shadow(.inner(color: .black.opacity(0.2), radius: 2 , x: 0, y: -4))
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
-
-                
-                    )
- */
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: systemName)
-                            .font(.title2)
-                    }
-                    .frame(width: 60, height: 50)
-                    .buttonStyle(ThreeDButtonStyle())
-                
-                    .onTapGesture {
-                        print(" 点击按钮: \(systemName)")
-                        action()
-                    }
-                    .onLongPressGesture(minimumDuration: 0.5, maximumDistance: 50) {
-                        print(" 长按按钮: \(systemName)")
-                        longPressAction?()
-                    } onPressingChanged: { pressing in
-                        if !pressing {
-                            print(" 释放按钮: \(systemName)")
-                            longPressEndAction?()
+                // 对于需要长按的按钮，使用支持外部按压状态的样式
+                Button(action: {}) {
+                    Image(systemName: systemName)
+                        .font(.title3)
+                        .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
+                }
+                .frame(width: 60, height: 50)
+                .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: isPressed))
+                .disabled(true)
+                .allowsHitTesting(false)
+                .overlay(
+                    // 在Button上叠加一个透明的手势接收区域
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle()) // 确保整个区域都能接收手势
+                        .onTapGesture {
+                            print("🎵 短按: \(systemName)")
+                            // 模拟按压动画
+                            withAnimation(.easeInOut(duration: 0.1)) {
+                                isPressed = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    isPressed = false
+                                }
+                            }
+                            action()
                         }
-                    }
+                        .onLongPressGesture(
+                            minimumDuration: 0.5,
+                            maximumDistance: 50,
+                            perform: {
+                                print("🎵 长按开始: \(systemName)")
+                                longPressAction?()
+                            },
+                            onPressingChanged: { pressing in
+                                withAnimation(.easeInOut(duration: 0.1)) {
+                                    isPressed = pressing
+                                }
+                                if !pressing {
+                                    print("🎵 松开按钮: \(systemName)")
+                                    longPressEndAction?()
+                                }
+                            }
+                        )
+                )
             } else {
-
+                // 普通按钮使用支持外部按压状态的样式，但externalIsPressed设为false
                 Button(action: action) {
                     Image(systemName: systemName)
-                        .font(.title2)
-                        .frame(width: 60, height: 50)
-                        .background(musicService.currentPlayerSkin.buttonColor
-                            .shadow(.inner(color: .white.opacity(0.4), radius: 2, x: 0, y: 4))
-                            .shadow(.inner(color: .black.opacity(0.2), radius: 2 , x: 0, y: -4))
-                        )
-                        .foregroundColor(musicService.currentPlayerSkin.buttonTextColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(musicService.currentPlayerSkin.buttonOutlineColor), lineWidth: 2)
-                        )
+                        .font(.title3)
+                        .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
                 }
+                .frame(width: 60, height: 50)
+                .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
             }
         }
     }
