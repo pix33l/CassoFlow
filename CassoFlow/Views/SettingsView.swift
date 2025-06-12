@@ -47,7 +47,8 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var musicService: MusicService
-    
+    @StateObject private var storeManager = StoreManager()
+
     @State private var closeTapped = false
     @State private var showingShareSheet = false
     
@@ -209,9 +210,34 @@ struct SettingsView: View {
                 
                 // 其他设置
                 Section(header: Text("其他")) {
-                    NavigationLink("恢复购买") {
-                        Text("恢复购买页面")
+                    Button {
+                        Task {
+                            await storeManager.restorePurchases()
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.body)
+                                .frame(width: 30)
+                            
+                            
+                            Text("恢复购买")
+                            
+                            Spacer()
+                            
+                            if storeManager.isLoading {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "chevron.right")
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary.opacity(0.3))
+                            }
+                        }
+                        .foregroundColor(.primary)
                     }
+                    .disabled(storeManager.isLoading)
+                    
                     NavigationLink("关于作者") {
                         Text("关于页面")
                     }
@@ -257,6 +283,11 @@ struct SettingsView: View {
                     }
                     .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
+            }
+            .alert("提示", isPresented: $storeManager.showAlert) {
+                Button("确定", role: .cancel) { }
+            } message: {
+                Text(storeManager.alertMessage)
             }
         }
     }

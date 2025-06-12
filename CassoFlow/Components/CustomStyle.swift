@@ -75,13 +75,13 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
             
             // 按钮的点击面的凹面效果
             RoundedRectangle(cornerRadius: 12)
-                .inset(by: 4)
-                .foregroundStyle(Gradient(colors: [Color.white.opacity(0.05),Color.white.opacity(0.15)]))
+                .inset(by: 5)
+                .foregroundStyle(Gradient(colors: [Color.black.opacity(0.15),Color.white.opacity(0.05)]))
                 .offset(y: isPressed ? offset : 0)
             
             // 按钮的点击面的高光效果
             RoundedRectangle(cornerRadius: 12)
-                .inset(by: 5)
+                .inset(by: 6)
                 .strokeBorder(Color.white.opacity(0.1), lineWidth: 2)
 //                .foregroundStyle(Gradient(colors: [Color.white.opacity(0.2),Color.white.opacity(0.1)]))
                 .shadow(color: .white.opacity(0.05), radius: 6, y: 3)

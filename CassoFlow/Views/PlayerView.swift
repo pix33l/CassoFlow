@@ -217,14 +217,21 @@ struct ControlButtonsView: View {
         HStack(spacing: 10) {
             ControlButton(systemName: "music.note.list", action: {
                 libraryTapped.toggle()
+                if musicService.isHapticFeedbackEnabled {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                    impactFeedback.impactOccurred()
+                }
                 showLibraryView = true
             })
-            .sensoryFeedback(.impact(weight: .medium), trigger: libraryTapped)
             
             ControlButton(
                 systemName: "backward.fill",
                 action: {
                     previousTapped.toggle()
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                        impactFeedback.impactOccurred()
+                    }
                     Task { try await musicService.skipToPrevious() }
                 },
                 longPressAction: {
@@ -234,12 +241,15 @@ struct ControlButtonsView: View {
                     musicService.stopSeek()
                 }
             )
-            .sensoryFeedback(.impact(weight: .heavy), trigger: previousTapped)
             
             ControlButton(
                 systemName: musicService.isPlaying ? "pause.fill" : "play.fill",
                 action: {
                     playPauseTapped.toggle()
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                        impactFeedback.impactOccurred()
+                    }
                     Task {
                         if musicService.isPlaying {
                             await musicService.pause()
@@ -249,12 +259,15 @@ struct ControlButtonsView: View {
                     }
                 }
             )
-            .sensoryFeedback(.impact(weight: .heavy), trigger: playPauseTapped)
             
             ControlButton(
                 systemName: "forward.fill",
                 action: {
                     nextTapped.toggle()
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                        impactFeedback.impactOccurred()
+                    }
                     Task { try await musicService.skipToNext() }
                 },
                 longPressAction: {
@@ -264,13 +277,15 @@ struct ControlButtonsView: View {
                     musicService.stopSeek()
                 }
             )
-            .sensoryFeedback(.impact(weight: .heavy), trigger: nextTapped)
             
             ControlButton(systemName: "recordingtape") {
                 storeTapped.toggle()
+                if musicService.isHapticFeedbackEnabled {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                    impactFeedback.impactOccurred()
+                }
                 showStoreView = true
             }
-            .sensoryFeedback(.impact(weight: .medium), trigger: storeTapped)
         }
     }
 }

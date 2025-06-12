@@ -3,6 +3,7 @@ import SwiftUI
 struct StoreView: View {
     // MARK: - 属性
     @EnvironmentObject private var musicService: MusicService
+    @StateObject private var storeManager = StoreManager()
     @Environment(\.dismiss) var dismiss
     @State private var selectedSegment = 0
     @State private var selectedPlayerName: String
@@ -10,6 +11,7 @@ struct StoreView: View {
     
     @State private var closeTapped = false
     @State private var applyTapped = false
+    @State private var purchaseInProgress = false
     
     // 数据集
     private var playerSkins: [PlayerSkin] { PlayerSkin.playerSkins }
@@ -41,7 +43,12 @@ struct StoreView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding()
-                .sensoryFeedback(.selection, trigger: selectedSegment)
+                .onChange(of: selectedSegment) { _, _ in
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                }
                 
                 // TabView根据选项卡选择展示不同内容
                 TabView(selection: Binding<AnyHashable>(
@@ -57,37 +64,64 @@ struct StoreView: View {
                 )) {
                     if selectedSegment == 0 {
                         ForEach(playerSkins, id: \.name) { skin in
-                            SkinCardView(playerSkin: skin, cassetteSkin: nil)
-                                .tag(skin.name as AnyHashable)
+                            SkinCardView(
+                                playerSkin: skin,
+                                cassetteSkin: nil,
+                                storeManager: storeManager
+                            )
+                            .tag(skin.name as AnyHashable)
                         }
                     } else {
                         ForEach(cassetteSkins, id: \.name) { skin in
-                            SkinCardView(playerSkin: nil, cassetteSkin: skin)
-                                .tag(skin.name as AnyHashable)
+                            SkinCardView(
+                                playerSkin: nil,
+                                cassetteSkin: skin,
+                                storeManager: storeManager
+                            )
+                            .tag(skin.name as AnyHashable)
                         }
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .frame(height: 580)
-                .sensoryFeedback(.selection, trigger: selectedSegment == 0 ? selectedPlayerName : selectedCassetteName)
+                .onChange(of: selectedSegment == 0 ? selectedPlayerName : selectedCassetteName) { _, _ in
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                }
                 
                 Spacer()
                 
+                // 主操作按钮
                 Button {
                     applyTapped.toggle()
-                    applySelectedSkin()
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                        impactFeedback.impactOccurred()
+                    }
+                    handleMainButtonAction()
                 } label: {
-                    Text(buttonTitle)
-                        .font(.title2.bold())
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(buttonBackgroundColor)
-                        .foregroundColor(buttonForegroundColor)
-                        .cornerRadius(10)
+                    HStack {
+                        if purchaseInProgress {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: buttonForegroundColor))
+                                .scaleEffect(0.8)
+                        }
+                        
+                        Text(buttonTitle)
+                            .font(.title2.bold())
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(buttonBackgroundColor)
+                    .foregroundColor(buttonForegroundColor)
+                    .cornerRadius(10)
+                    .opacity(purchaseInProgress ? 0.7 : 1.0)
                 }
+                .disabled(purchaseInProgress || storeManager.isLoading)
                 .padding(.horizontal)
                 .padding(.bottom, 20)
-                .sensoryFeedback(.success, trigger: applyTapped)
             }
             .navigationTitle("商店")
             .navigationBarTitleDisplayMode(.inline)
@@ -95,62 +129,141 @@ struct StoreView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         closeTapped.toggle()
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.caption)
                             .foregroundColor(.primary)
-                            .padding(8)           // 增加内边距以扩大背景圆形
+                            .padding(8)
                             .background(
-                                Circle()           // 圆形背景
+                                Circle()
                                     .fill(Color.gray.opacity(0.15))
                             )
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
+            }
+            .alert("提示", isPresented: $storeManager.showAlert) {
+                Button("确定", role: .cancel) { }
+            } message: {
+                Text(storeManager.alertMessage)
+            }
+            .task {
+                // 页面加载时获取产品信息
+                await storeManager.fetchProducts()
             }
         }
     }
     
     // MARK: - 计算属性
     private var buttonTitle: String {
-        if let playerSkin = currentSkinType.0, playerSkin.isOwned {
-            return "使用"
-        } else if let cassetteSkin = currentSkinType.1, cassetteSkin.isOwned {
-            return "使用"
-        } else if let playerSkin = currentSkinType.0 {
-            return "¥\(playerSkin.price)"
+        if let playerSkin = currentSkinType.0 {
+            if isCurrentSkinOwned() {
+                return "使用"
+            } else {
+                return SkinHelper.getPlayerSkinPrice(playerSkin.name, storeManager: storeManager)
+            }
         } else if let cassetteSkin = currentSkinType.1 {
-            return "¥\(cassetteSkin.price)"
+            if isCurrentSkinOwned() {
+                return "使用"
+            } else {
+                return SkinHelper.getCassetteSkinPrice(cassetteSkin.name, storeManager: storeManager)
+            }
         }
         return "获取皮肤"
     }
     
     private var buttonBackgroundColor: Color {
-        if let playerSkin = currentSkinType.0, playerSkin.isOwned {
-            return Color.blue
-        } else if let cassetteSkin = currentSkinType.1, cassetteSkin.isOwned {
+        if isCurrentSkinOwned() {
             return Color.blue
         }
         return Color.white
     }
     
     private var buttonForegroundColor: Color {
-        if let playerSkin = currentSkinType.0, playerSkin.isOwned {
-            return Color.white
-        } else if let cassetteSkin = currentSkinType.1, cassetteSkin.isOwned {
+        if isCurrentSkinOwned() {
             return Color.white
         }
         return Color.black
     }
     
-    // MARK: - 方法
+    // MARK: - 私有方法
+    
+    /// 检查当前选中的皮肤是否已拥有
+    private func isCurrentSkinOwned() -> Bool {
+        if let playerSkin = currentSkinType.0 {
+            return SkinHelper.isPlayerSkinOwned(playerSkin.name, storeManager: storeManager)
+        } else if let cassetteSkin = currentSkinType.1 {
+            return SkinHelper.isCassetteSkinOwned(cassetteSkin.name, storeManager: storeManager)
+        }
+        return false
+    }
+    
+    /// 处理主按钮操作（使用或购买）
+    private func handleMainButtonAction() {
+        if isCurrentSkinOwned() {
+            // 已拥有，直接使用
+            applySelectedSkin()
+        } else {
+            // 未拥有，进行购买
+            Task {
+                await purchaseCurrentSkin()
+            }
+        }
+    }
+    
+    /// 购买当前选中的皮肤
+    private func purchaseCurrentSkin() async {
+        purchaseInProgress = true
+        
+        var productID = ""
+        
+        if let playerSkin = currentSkinType.0 {
+            productID = SkinHelper.getPlayerSkinProductID(playerSkin.name)
+        } else if let cassetteSkin = currentSkinType.1 {
+            productID = SkinHelper.getCassetteSkinProductID(cassetteSkin.name)
+        }
+        
+        guard !productID.isEmpty,
+              let product = storeManager.getProduct(for: productID) else {
+            purchaseInProgress = false
+            storeManager.alertMessage = "无法找到该产品信息"
+            storeManager.showAlert = true
+            return
+        }
+        
+        let result = await storeManager.purchase(product)
+        
+        switch result {
+        case .success(let message):
+            storeManager.alertMessage = message
+            storeManager.showAlert = true
+            // 购买成功后自动应用皮肤
+            applySelectedSkin()
+            
+        case .cancelled:
+            break // 用户取消，不显示提示
+            
+        case .failed(let errorMessage):
+            storeManager.alertMessage = errorMessage
+            storeManager.showAlert = true
+            
+        case .pending:
+            storeManager.alertMessage = "购买正在处理中，请稍后查看。"
+            storeManager.showAlert = true
+        }
+        
+        purchaseInProgress = false
+    }
+    
+    /// 应用选中的皮肤
     private func applySelectedSkin() {
         if let playerSkin = currentSkinType.0 {
-            // 使用 setPlayerSkin 方法来保存皮肤选择
             musicService.setPlayerSkin(playerSkin)
         } else if let cassetteSkin = currentSkinType.1 {
-            // 使用 setCassetteSkin 方法来保存皮肤选择
             musicService.setCassetteSkin(cassetteSkin)
         }
         dismiss()
@@ -161,6 +274,7 @@ struct StoreView: View {
 struct SkinCardView: View {
     let playerSkin: PlayerSkin?
     let cassetteSkin: CassetteSkin?
+    let storeManager: StoreManager
     
     var body: some View {
         VStack(spacing: 10) {
@@ -187,6 +301,7 @@ struct SkinCardView: View {
                         .padding()
                 }
                 .frame(maxWidth: .infinity)
+                
             } else if let cassetteSkin = cassetteSkin {
                 // 显示磁带皮肤
                 Image(cassetteSkin.cassetteImage)
@@ -202,6 +317,12 @@ struct SkinCardView: View {
                     Text(cassetteSkin.year)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                    
+                    Text(cassetteSkin.description)
+                        .font(.body)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .padding()
                 }
                 .frame(maxWidth: .infinity)
             }

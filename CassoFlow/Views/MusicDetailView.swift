@@ -69,6 +69,10 @@ struct MusicDetailView: View {
                     HStack(spacing: 20) {
                         Button {
                             playTapped.toggle()
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
                             Task {
                                 try await playMusic(shuffled: false)
                             }
@@ -83,10 +87,13 @@ struct MusicDetailView: View {
                             .foregroundColor(.primary)
                             .cornerRadius(8)
                         }
-                        .sensoryFeedback(.impact(weight: .medium), trigger: playTapped)
                         
                         Button {
                             shufflePlayTapped.toggle()
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
                             Task {
                                 try await playMusic(shuffled: true)
                             }
@@ -101,7 +108,6 @@ struct MusicDetailView: View {
                             .foregroundColor(.primary)
                             .cornerRadius(8)
                         }
-                        .sensoryFeedback(.impact(weight: .medium), trigger: shufflePlayTapped)
                     }
                 }
                 .padding(.horizontal)
@@ -130,11 +136,14 @@ struct MusicDetailView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 trackTapped.toggle()
+                                if musicService.isHapticFeedbackEnabled {
+                                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                    impactFeedback.impactOccurred()
+                                }
                                 Task {
                                     try await playTrack(track)
                                 }
                             }
-                            .sensoryFeedback(.impact(weight: .light), trigger: trackTapped)
                             .animation(nil, value: tracks)
                             
                             if index < tracks.count - 1 {

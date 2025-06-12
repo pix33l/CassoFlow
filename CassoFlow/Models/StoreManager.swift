@@ -139,31 +139,25 @@ class StoreManager: ObservableObject {
         var restoredCount = 0
         var restoredItems: [String] = []
         
-        do {
-            // 遍历所有当前有效的交易
-            for await result in Transaction.currentEntitlements {
-                if case .verified(let transaction) = result {
-                    let productName = await handleSuccessfulPurchase(transaction)
-                    if let name = productName {
-                        restoredCount += 1
-                        restoredItems.append(name)
-                    }
+        // 遍历所有当前有效的交易
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result {
+                let productName = await handleSuccessfulPurchase(transaction)
+                if let name = productName {
+                    restoredCount += 1
+                    restoredItems.append(name)
                 }
             }
-            
-            // 显示恢复结果
-            if restoredCount > 0 {
-                let itemList = restoredItems.joined(separator: "、")
-                showSuccessAlert("成功恢复 \(restoredCount) 个购买项目：\(itemList)")
-                print("✅ 成功恢复 \(restoredCount) 个购买项目")
-            } else {
-                showInfoAlert("没有找到可恢复的购买项目。")
-                print("ℹ️ 没有找到可恢复的购买项目")
-            }
-            
-        } catch {
-            print("❌ 恢复购买失败: \(error)")
-            showErrorAlert("恢复购买失败: \(error.localizedDescription)")
+        }
+        
+        // 显示恢复结果
+        if restoredCount > 0 {
+            let itemList = restoredItems.joined(separator: "、")
+            showSuccessAlert("成功恢复 \(restoredCount) 个购买项目：\(itemList)")
+            print("✅ 成功恢复 \(restoredCount) 个购买项目")
+        } else {
+            showInfoAlert("没有找到可恢复的购买项目。")
+            print("ℹ️ 没有找到可恢复的购买项目")
         }
         
         isLoading = false

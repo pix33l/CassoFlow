@@ -124,11 +124,11 @@ class MusicService: ObservableObject {
         
         let savedCassetteSkinName = UserDefaults.standard.string(forKey: Self.cassetteSkinKey)
         if let skinName = savedCassetteSkinName,
-           let skin = CassetteSkin.casetteSkin(named: skinName) {
+           let skin = CassetteSkin.cassetteSkin(named: skinName) {
             print("🎨 加载已保存的磁带皮肤: \(skinName)")
             currentCassetteSkin = skin
         } else {
-            let defaultSkin = CassetteSkin.casetteSkin(named: "CFH-60") ?? CassetteSkin.cassetteSkins[0]
+            let defaultSkin = CassetteSkin.cassetteSkin(named: "CFT-DEMO") ?? CassetteSkin.cassetteSkins[0]
             print("🎨 使用默认磁带皮肤: \(defaultSkin.name)")
             currentCassetteSkin = defaultSkin
         }

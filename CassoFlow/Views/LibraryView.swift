@@ -35,6 +35,10 @@ struct LibraryView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         closeTapped.toggle()
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -46,7 +50,6 @@ struct LibraryView: View {
                                     .fill(Color.gray.opacity(0.15))
                             )
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
             }
             .task {
@@ -65,7 +68,12 @@ struct LibraryView: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
-            .sensoryFeedback(.selection, trigger: selectedSegment)
+            .onChange(of: selectedSegment) { _, _ in
+                if musicService.isHapticFeedbackEnabled {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                    impactFeedback.impactOccurred()
+                }
+            }
 
             LazyVGrid(columns: [
                 GridItem(.adaptive(minimum: 110), spacing: 5)
