@@ -164,7 +164,8 @@ struct PlayerControlsView: View {
                 showLibraryView: $showLibraryView,
                 showStoreView: $showStoreView
             )
-            .padding([.top, .leading, .trailing], 10.0)
+            .padding(.horizontal, 10.0)
+            .padding(.vertical, 5.0)
             
             SongInfoView(
                 showSettingsView: $showSettingsView,
@@ -182,7 +183,7 @@ struct PlayerControlsView: View {
                             .strokeBorder(.white.opacity(0.1), lineWidth: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
+                            .stroke(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
             )
             .padding(10)
         }

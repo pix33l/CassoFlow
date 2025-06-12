@@ -57,7 +57,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
             // 按钮的厚度
             RoundedRectangle(cornerRadius: 12)
                 .inset(by: 4)
-                .foregroundStyle(Color(musicService.currentPlayerSkin.buttonOutlineColor))
+                .foregroundStyle(Color(musicService.currentPlayerSkin.buttonShadowColor))
                 .offset(y: offset)
             
             // 按钮的点击面
@@ -84,7 +84,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
                 .inset(by: 5)
                 .strokeBorder(Color.white.opacity(0.1), lineWidth: 2)
 //                .foregroundStyle(Gradient(colors: [Color.white.opacity(0.2),Color.white.opacity(0.1)]))
-                .shadow(color: .white.opacity(0.1), radius: 4, y: 2)
+                .shadow(color: .white.opacity(0.05), radius: 6, y: 3)
                 .offset(y: isPressed ? offset : 0)
             
             configuration.label

@@ -1,6 +1,7 @@
 import MusicKit
 import Combine
 import Foundation
+import UIKit
 
 /// 音乐服务类
 class MusicService: ObservableObject {
@@ -37,12 +38,23 @@ class MusicService: ObservableObject {
     }
     
     @Published var isHapticFeedbackEnabled: Bool = false
+
+    // MARK: - 屏幕常亮属性
+    @Published var isScreenAlwaysOn: Bool = false {
+        didSet {
+            // 设置屏幕常亮状态
+            DispatchQueue.main.async {
+                UIApplication.shared.isIdleTimerDisabled = self.isScreenAlwaysOn
+            }
+        }
+    }
     
     // MARK: - 皮肤存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
     private static let cassetteSkinKey = "SelectedCassetteSkin"
     private static let cassetteEffectKey = "CassetteEffectEnabled"
     private static let hapticFeedbackKey = "HapticFeedbackEnabled"
+    private static let screenAlwaysOnKey = "ScreenAlwaysOnEnabled"
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -134,6 +146,12 @@ class MusicService: ObservableObject {
         }
         print("📳 加载触觉反馈设置: \(isHapticFeedbackEnabled)")
         
+        // 加载屏幕常亮设置
+        isScreenAlwaysOn = UserDefaults.standard.bool(forKey: Self.screenAlwaysOnKey)
+        print("🔆 加载屏幕常亮设置: \(isScreenAlwaysOn)")
+        // 应用屏幕常亮设置
+        UIApplication.shared.isIdleTimerDisabled = isScreenAlwaysOn
+        
         // 监听播放器队列变化
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateCurrentSongInfo()
@@ -168,6 +186,13 @@ class MusicService: ObservableObject {
         isHapticFeedbackEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: Self.hapticFeedbackKey)
         print("📳 保存触觉反馈设置: \(enabled)")
+    }
+    
+    /// 设置屏幕常亮开关
+    func setScreenAlwaysOn(enabled: Bool) {
+        isScreenAlwaysOn = enabled
+        UserDefaults.standard.set(enabled, forKey: Self.screenAlwaysOnKey)
+        print("📱 保存屏幕常亮设置: \(enabled)")
     }
 
     private func updateCurrentSongInfo() {

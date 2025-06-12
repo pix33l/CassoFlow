@@ -50,7 +50,6 @@ struct SettingsView: View {
     
     @State private var closeTapped = false
     @State private var showingShareSheet = false
-    @State private var isScreenAlwaysOn = false
     
     private var feedbackMailURL: URL? {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
@@ -147,7 +146,15 @@ struct SettingsView: View {
                             .font(.body)
                             .frame(width: 30)
                         
-                        Toggle("屏幕常亮", isOn: $isScreenAlwaysOn)
+                        Toggle("屏幕常亮", isOn: Binding(
+                            get: { musicService.isScreenAlwaysOn },
+                            set: { newValue in
+                                musicService.setScreenAlwaysOn(enabled: newValue)
+                            }
+                        ))
+                        .onChange(of: musicService.isScreenAlwaysOn) { _, newValue in
+                            print("🔆 屏幕常亮开关切换: \(newValue)")
+                        }
                     }
                 }
                 

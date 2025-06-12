@@ -12,7 +12,7 @@ struct PlayerSkin: Identifiable {
     let panelColor: Color
     let buttonColor: Color
     let buttonTextColor: Color
-    let buttonOutlineColor: Color
+    let buttonShadowColor: Color
     let screenColor: Color
     let screenTextColor: Color
     let screenOutlineColor: Color
@@ -32,7 +32,7 @@ struct PlayerSkin: Identifiable {
             panelColor: Color("cassetteLight"),
             buttonColor: Color("cassetteLight"),
             buttonTextColor: Color("cassetteDark"),
-            buttonOutlineColor: Color("cassetteDark"),
+            buttonShadowColor: Color("cassetteDark"),
             screenColor: Color("cassetteLight"),
             screenTextColor: Color("cassetteDark"),
             screenOutlineColor: Color("cassetteDark"),
@@ -46,10 +46,10 @@ struct PlayerSkin: Identifiable {
             coverImage: "cover-CF-L2",
             price: 12,
             isOwned: false,
-            panelColor: Color("panel-CF-L2"),
+            panelColor: Color("bg-panel-light"),
             buttonColor: Color("button-light"),
             buttonTextColor: .black,
-            buttonOutlineColor: Color("shadow-button-light"),
+            buttonShadowColor: Color("shadow-button-light"),
             screenColor: Color("bg-screen-orange"),
             screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: .black,
@@ -66,7 +66,7 @@ struct PlayerSkin: Identifiable {
             panelColor: .black,
             buttonColor: .white.opacity(0.1),
             buttonTextColor: .white,
-            buttonOutlineColor: .black,
+            buttonShadowColor: .black,
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: Color("outline-screen-CF-11"),
@@ -83,7 +83,7 @@ struct PlayerSkin: Identifiable {
             panelColor: .black,
             buttonColor: .white.opacity(0.1),
             buttonTextColor: .white,
-            buttonOutlineColor: .black,
+            buttonShadowColor: .black,
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: Color("outline-screen-CF-11"),
@@ -97,10 +97,10 @@ struct PlayerSkin: Identifiable {
             coverImage: "cover-CF-D6C",
             price: 12,
             isOwned: true,
-            panelColor: Color("shadow-button-dark"),
+            panelColor: Color("bg-panel-dark"),
             buttonColor: Color("button-dark"),
             buttonTextColor: .white,
-            buttonOutlineColor: Color("shadow-button-dark"),
+            buttonShadowColor: Color("shadow-button-dark"),
             screenColor: Color("bg-screen-blue"),
             screenTextColor: Color("text-screen-blue"),
             screenOutlineColor: .black,
@@ -114,10 +114,10 @@ struct PlayerSkin: Identifiable {
             coverImage: "cover-CF-DT1",
             price: 12,
             isOwned: true,
-            panelColor: Color("shadow-button-dark"),
+            panelColor: Color("bg-panel-dark"),
             buttonColor: Color("button-dark"),
             buttonTextColor: .white,
-            buttonOutlineColor: Color("shadow-button-dark"),
+            buttonShadowColor: Color("shadow-button-dark"),
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: .black,
