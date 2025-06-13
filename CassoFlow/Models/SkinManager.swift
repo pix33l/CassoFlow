@@ -8,6 +8,7 @@ struct PlayerSkin: Identifiable {
     let description: String
     let coverImage: String
     let panelColor: Color
+    let panelOutlineColor: Color
     let buttonColor: Color
     let buttonTextColor: Color
     let buttonShadowColor: Color
@@ -26,6 +27,7 @@ struct PlayerSkin: Identifiable {
             description: "正在研发的播放器蓝图",
             coverImage: "cover-CF-DEMO",
             panelColor: Color("cassetteLight"),
+            panelOutlineColor: Color("cassetteDark"),
             buttonColor: Color("cassetteLight"),
             buttonTextColor: Color("cassetteDark"),
             buttonShadowColor: Color("cassetteDark"),
@@ -36,11 +38,60 @@ struct PlayerSkin: Identifiable {
             cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
+            name: "CF-PC13",  // 名称作为唯一标识
+            year: "2024",
+            description: "国产便携式播放器",
+            coverImage: "cover-CF-PC13",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .gray,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-blue"),
+            screenTextColor: Color("text-screen-blue"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-PC13",
+            cassetteBgImage: "bg-cassette"
+        ),
+        PlayerSkin(
+            name: "CF-M10",  // 名称作为唯一标识
+            year: "2024",
+            description: "国产便携式播放器",
+            coverImage: "cover-CF-M10",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .gray,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-orange"),
+            screenTextColor: Color("text-screen-orange"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-M10",
+            cassetteBgImage: "bg-cassette"
+        ),
+        PlayerSkin(
+            name: "CF-WIND",  // 名称作为唯一标识
+            year: "2024",
+            description: "国外便携式播放器",
+            coverImage: "cover-CF-WIND",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .white,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-green"),
+            screenTextColor: Color("text-screen-green"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-WIND",
+            cassetteBgImage: "bg-cassette"
+        ),
+        PlayerSkin(
             name: "CF-L2",  // 名称作为唯一标识
-            year: "1985",
-            description: "第一款 CF 便携式播放器",
+            year: "1979",
+            description: "首款个人立体声磁带播放器",
             coverImage: "cover-CF-L2",
-            panelColor: Color("bg-panel-light"),
+            panelColor: .clear,
+            panelOutlineColor: .clear,
             buttonColor: Color("button-light"),
             buttonTextColor: .black,
             buttonShadowColor: Color("shadow-button-light"),
@@ -51,14 +102,31 @@ struct PlayerSkin: Identifiable {
             cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
+            name: "CF-2",  // 名称作为唯一标识
+            year: "1981",
+            description: "据说能穿越时间的磁带播放器",
+            coverImage: "cover-CF-2",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .white,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-blue"),
+            screenTextColor: Color("text-screen-blue"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-2",
+            cassetteBgImage: "bg-cassette"
+        ),
+        PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识
             year: "1984",
-            description: "经典的黑色播放器设计",
+            description: "首款廉价磁带播放器",
             coverImage: "cover-CF-22",
-            panelColor: .black,
-            buttonColor: .white.opacity(0.1),
+            panelColor: Color("bg-panel-dark"),
+            panelOutlineColor: .black,
+            buttonColor: Color("button-dark"),
             buttonTextColor: .white,
-            buttonShadowColor: .black,
+            buttonShadowColor:  Color("shadow-button-dark"),
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: Color("outline-screen-CF-11"),
@@ -68,12 +136,13 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-504",  // 名称作为唯一标识
             year: "1987",
-            description: "经典便携式播放器",
-            coverImage: "CF-101",
-            panelColor: .black,
-            buttonColor: .white.opacity(0.1),
-            buttonTextColor: .white,
-            buttonShadowColor: .black,
+            description: "首款全透明磁带播放器",
+            coverImage: "cover-CF-504",
+            panelColor: Color("bg-panel-dark"),
+            panelOutlineColor: .black,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .gray,
+            buttonShadowColor:  Color("shadow-button-dark"),
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: Color("outline-screen-CF-11"),
@@ -86,11 +155,12 @@ struct PlayerSkin: Identifiable {
             description: "磁带播放器的老大哥，专为专业用户生产",
             coverImage: "cover-CF-D6C",
             panelColor: Color("bg-panel-dark"),
+            panelOutlineColor: .black,
             buttonColor: Color("button-dark"),
             buttonTextColor: .white,
             buttonShadowColor: Color("shadow-button-dark"),
-            screenColor: Color("bg-screen-blue"),
-            screenTextColor: Color("text-screen-blue"),
+            screenColor: Color("bg-screen-orange"),
+            screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: .black,
             playerImage: "player-CF-D6C",
             cassetteBgImage: "bg-cassette"
@@ -101,6 +171,7 @@ struct PlayerSkin: Identifiable {
             description: "经典动漫中反复出现的播放器",
             coverImage: "cover-CF-DT1",
             panelColor: Color("bg-panel-dark"),
+            panelOutlineColor: .black,
             buttonColor: Color("button-dark"),
             buttonTextColor: .white,
             buttonShadowColor: Color("shadow-button-dark"),
@@ -119,7 +190,7 @@ struct PlayerSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CF-DEMO, CF-L2, CF-DT1"].contains(self.name)
+        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
     }
 }
 
@@ -146,7 +217,7 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-TRA",  // 名称作为唯一标识
             year: "1988",
-            description: "经典透明磁带皮肤",
+            description: "经典透明磁带",
             coverImage: "CF-001",
             cassetteImage: "CFT-TRA",
             cassetteHole: "holeDark"
@@ -154,7 +225,7 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-C60",  // 名称作为唯一标识
             year: "1988",
-            description: "C60录音磁带皮肤",
+            description: "彩色标签的录音磁带",
             coverImage: "CF-001",
             cassetteImage: "CFT-C60",
             cassetteHole: "holeDark"

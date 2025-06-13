@@ -183,7 +183,7 @@ struct PlayerControlsView: View {
                             .strokeBorder(.white.opacity(0.1), lineWidth: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
+                            .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
             )
             .padding(10)
         }
@@ -193,7 +193,7 @@ struct PlayerControlsView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 2)
+                .strokeBorder(Color(musicService.currentPlayerSkin.panelOutlineColor), lineWidth: 2)
         )
         .padding()
         .padding(.top, 550)
@@ -214,7 +214,7 @@ struct ControlButtonsView: View {
     @State private var storeTapped = false
     
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 5) {
             ControlButton(systemName: "music.note.list", action: {
                 libraryTapped.toggle()
                 if musicService.isHapticFeedbackEnabled {
@@ -331,12 +331,15 @@ struct TrackInfoHeader: View {
             
             Button {
                 settingsTapped.toggle()
+                if musicService.isHapticFeedbackEnabled {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                    impactFeedback.impactOccurred()
+                }
                 showSettingsView = true
             } label: {
                 Text("SETTINGS")
             }
             .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
-            .sensoryFeedback(.impact(weight: .light), trigger: settingsTapped)
         }
         .fontWeight(.bold)
         .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
@@ -361,6 +364,10 @@ struct RepeatAndShuffleView: View {
         HStack {
             Button {
                 repeatTapped.toggle()
+                if musicService.isHapticFeedbackEnabled {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
+                    impactFeedback.impactOccurred()
+                }
                 switch repeatMode {
                 case .none: repeatMode = .all
                 case .all: repeatMode = .one
@@ -386,7 +393,6 @@ struct RepeatAndShuffleView: View {
                 .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
                 )
             }
-            .sensoryFeedback(.selection, trigger: repeatTapped)
             
             Spacer()
             
@@ -396,6 +402,10 @@ struct RepeatAndShuffleView: View {
             
             Button {
                 shuffleTapped.toggle()
+                if musicService.isHapticFeedbackEnabled {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
+                    impactFeedback.impactOccurred()
+                }
                 musicService.shuffleMode = isShuffleEnabled ? .off : .songs
                 isShuffled = musicService.shuffleMode
             } label: {
@@ -410,7 +420,6 @@ struct RepeatAndShuffleView: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
                     )
             }
-            .sensoryFeedback(.selection, trigger: shuffleTapped)
         }
     }
 }
@@ -503,7 +512,7 @@ struct ControlButton: View {
                         .font(.title3)
                         .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
                 }
-                .frame(width: 60, height: 50)
+                .frame(height: 50)
                 .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: isPressed))
                 .disabled(true)
                 .allowsHitTesting(false)
@@ -550,7 +559,7 @@ struct ControlButton: View {
                         .font(.title3)
                         .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
                 }
-                .frame(width: 60, height: 50)
+                .frame(height: 50)
                 .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
             }
         }

@@ -139,7 +139,6 @@ struct SettingsView: View {
                                 musicService.setHapticFeedback(enabled: newValue)
                             }
                         ))
-                        .sensoryFeedback(.selection, trigger: musicService.isHapticFeedbackEnabled)
                     }
                     
                     HStack {
@@ -270,6 +269,10 @@ struct SettingsView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         closeTapped.toggle()
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -281,7 +284,6 @@ struct SettingsView: View {
                                     .fill(Color.gray.opacity(0.15))
                             )
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: closeTapped)
                 }
             }
             .alert("提示", isPresented: $storeManager.showAlert) {

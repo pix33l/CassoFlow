@@ -45,7 +45,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
             // 按钮的外框内凹
             RoundedRectangle(cornerRadius: 12)
                 .foregroundStyle(.black.opacity(0.2)
-                    .shadow(.inner(color: .black.opacity(0.6), radius: 4, x: 0, y: 2)))
+                    .shadow(.inner(color: .black.opacity(0.8), radius: 4, x: 0, y: 2)))
                 .offset(y: offset)
             
             // 按钮的外框描边
@@ -70,7 +70,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
                     .shadow(.inner(color: .black.opacity(0.1), radius: 2 , x: 0, y: -1))
                 )
                 
-                .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
                 .offset(y: isPressed ? offset : 0)
             
             // 按钮的点击面的凹面效果
@@ -81,10 +81,10 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
             
             // 按钮的点击面的高光效果
             RoundedRectangle(cornerRadius: 12)
-                .inset(by: 6)
-                .strokeBorder(Color.white.opacity(0.1), lineWidth: 2)
+                .inset(by: 5)
+                .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
 //                .foregroundStyle(Gradient(colors: [Color.white.opacity(0.2),Color.white.opacity(0.1)]))
-                .shadow(color: .white.opacity(0.05), radius: 6, y: 3)
+ //               .shadow(color: .white.opacity(0.05), radius: 6, y: 3)
                 .offset(y: isPressed ? offset : 0)
             
             configuration.label
@@ -92,7 +92,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
         }
         .animation(.easeOut(duration: 0.2), value: isPressed)
         .compositingGroup()
-        .shadow(color: .black.opacity(0.4), radius: 6, y: 3)
+        .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
         .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
     }
 }
