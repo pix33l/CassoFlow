@@ -45,12 +45,14 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct SettingsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var musicService: MusicService
     @StateObject private var storeManager = StoreManager()
 
     @State private var closeTapped = false
     @State private var showingShareSheet = false
+    @State private var showingPaywall = false
     
     private var feedbackMailURL: URL? {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
@@ -83,30 +85,40 @@ struct SettingsView: View {
             List {
                 // Pro版本升级卡片
                 Section {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("CASSOFLOW PRO")
-                                .font(.headline)
-                            Text("仅需¥48.00，获取全部功能")
+                    Button(action: {
+                        print("🔘 PRO升级按钮被点击")
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                            impactFeedback.impactOccurred()
+                        }
+                        showingPaywall = true
+                    }) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 30)
+                            
+                            Text("解锁 PRO 会员，获取全部高级功能")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                            Spacer()
-                            Button(action: {
-                                // 处理升级操作
-                            }) {
+                            
+                            HStack {
                                 Text("立即升级")
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(Color.black)
-                                    .foregroundColor(.white)
+                                    .background(colorScheme == .dark ? .white : .black)
+                                    .foregroundColor(colorScheme == .dark ? .black : .white)
                                     .cornerRadius(15)
+                                
+                                Spacer()
                             }
                         }
-                        Spacer()
-                        Image(systemName: "crown.fill")
-                            .font(.title)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.vertical, 8)
+                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 // 通用设置
@@ -267,6 +279,10 @@ struct SettingsView: View {
                     "快来试试 CassoFlow - 独特的磁带风格音乐播放器！",
                     URL(string: "https://apps.apple.com/app/id6746403175")!
                 ])
+            }
+            .sheet(isPresented: $showingPaywall) {
+                PaywallView()
+                    .environmentObject(storeManager)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
