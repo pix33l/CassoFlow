@@ -32,11 +32,15 @@ class StoreManager: ObservableObject {
         static let monthly = "me.pix3l.CassoFlow.monthly"
         
         // 播放器皮肤
-        static let cfDT1 = "me.pix3l.CassoFlow.CF_DT1"
-        static let cfD6C = "me.pix3l.CassoFlow.CF_D6C"
+        static let cfPC13 = "me.pix3l.CassoFlow.CF_PC13"
+        static let cfM10 = "me.pix3l.CassoFlow.CF_M10"
+        static let cfWIND = "me.pix3l.CassoFlow.CF_WIND"
         static let cfL2 = "me.pix3l.CassoFlow.CF_L2"
+        static let cf2 = "me.pix3l.CassoFlow.CF_2"
         static let cf22 = "me.pix3l.CassoFlow.CF_22"
         static let cf504 = "me.pix3l.CassoFlow.CF_504"
+        static let cfD6C = "me.pix3l.CassoFlow.CF_D6C"
+        static let cfDT1 = "me.pix3l.CassoFlow.CF_DT1"
         
         // 磁带皮肤
         static let cftC60 = "me.pix3l.CassoFlow.CFT_C60"
@@ -45,7 +49,7 @@ class StoreManager: ObservableObject {
         // 所有产品ID
         static let allProducts = [
             lifetime, yearly, monthly,
-            cfDT1, cfD6C, cfL2, cf22, cf504,
+            cfPC13, cfM10, cfWIND, cfL2, cf2, cf22, cf504, cfD6C, cfDT1,
             cftC60, cftTRA
         ]
     }
@@ -185,34 +189,50 @@ class StoreManager: ObservableObject {
             return "月度会员"
             
         // 播放器皮肤
-        case ProductIDs.cfDT1:
-            unlockPlayerSkin("CF-DT1")
-            return "CF-DT1 播放器皮肤"
+        case ProductIDs.cfPC13:
+            unlockPlayerSkin("CF-PC13")
+            return "CF-PC13 磁带播放器"
             
-        case ProductIDs.cfD6C:
-            unlockPlayerSkin("CF-D6C")
-            return "CF-D6C 播放器皮肤"
+        case ProductIDs.cfM10:
+            unlockPlayerSkin("CF-M10")
+            return "CF-M10 磁带播放器"
+            
+        case ProductIDs.cfWIND:
+            unlockPlayerSkin("CF-WIND")
+            return "CF-WIND 磁带播放器"
             
         case ProductIDs.cfL2:
             unlockPlayerSkin("CF-L2")
-            return "CF-L2 播放器皮肤"
+            return "CF-L2 磁带播放器"
+            
+        case ProductIDs.cf2:
+            unlockPlayerSkin("CF-2")
+            return "CF-2 磁带播放器"
             
         case ProductIDs.cf22:
             unlockPlayerSkin("CF-22")
-            return "CF-22 播放器皮肤"
+            return "CF-22 磁带播放器"
             
         case ProductIDs.cf504:
             unlockPlayerSkin("CF-504")
-            return "CF-504 播放器皮肤"
+            return "CF-504 磁带播放器"
+            
+        case ProductIDs.cfD6C:
+            unlockPlayerSkin("CF-D6C")
+            return "CF-D6C 磁带播放器"
+            
+        case ProductIDs.cfDT1:
+            unlockPlayerSkin("CF-DT1")
+            return "CF-DT1 磁带播放器"
             
         // 磁带皮肤
         case ProductIDs.cftC60:
             unlockCassetteSkin("CFT-C60")
-            return "CFT-C60 磁带皮肤"
+            return "CFT-C60 磁带"
             
         case ProductIDs.cftTRA:
             unlockCassetteSkin("CFT-TRA")
-            return "CFT-TRA 磁带皮肤"
+            return "CFT-TRA 磁带"
             
         default:
             print("⚠️ 未知产品ID: \(productID)")

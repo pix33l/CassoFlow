@@ -19,8 +19,9 @@ struct StoreView: View {
     
     // 初始化设置
     init() {
-        _selectedPlayerName = State(initialValue: MusicService.shared.currentPlayerSkin.name)
-        _selectedCassetteName = State(initialValue: MusicService.shared.currentCassetteSkin.name)
+        // 使用默认值初始化，实际值在onAppear中设置
+        _selectedPlayerName = State(initialValue: "CF-DEMO")
+        _selectedCassetteName = State(initialValue: "CFT-DEMO")
     }
     
     // 根据选项卡显示正确内容
@@ -154,6 +155,12 @@ struct StoreView: View {
             .task {
                 // 页面加载时获取产品信息
                 await storeManager.fetchProducts()
+            }
+            .onAppear {
+                // 每次显示时更新为当前选中的皮肤
+                selectedPlayerName = musicService.currentPlayerSkin.name
+                selectedCassetteName = musicService.currentCassetteSkin.name
+                print("🏪 StoreView onAppear - 播放器皮肤: \(selectedPlayerName), 磁带皮肤: \(selectedCassetteName)")
             }
         }
     }
@@ -304,7 +311,7 @@ struct SkinCardView: View {
                 
             } else if let cassetteSkin = cassetteSkin {
                 // 显示磁带皮肤
-                Image(cassetteSkin.cassetteImage)
+                Image(cassetteSkin.coverImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(maxHeight: 380)

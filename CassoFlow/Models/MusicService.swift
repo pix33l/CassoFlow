@@ -117,7 +117,7 @@ class MusicService: ObservableObject {
             print("🎨 加载已保存的播放器皮肤: \(skinName)")
             currentPlayerSkin = skin
         } else {
-            let defaultSkin = PlayerSkin.playerSkin(named: "CF-DT1") ?? PlayerSkin.playerSkins[0]
+            let defaultSkin = PlayerSkin.playerSkin(named: "CF-DEMO") ?? PlayerSkin.playerSkins[0]
             print("🎨 使用默认播放器皮肤: \(defaultSkin.name)")
             currentPlayerSkin = defaultSkin
         }

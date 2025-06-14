@@ -210,7 +210,7 @@ struct CassetteSkin: Identifiable {
             name: "CFT-DEMO",  // 名称作为唯一标识
             year: "2025",
             description: "演示磁带皮肤",
-            coverImage: "CF-001",
+            coverImage: "cover-CFT-DEMO",
             cassetteImage: "CFT-DEMO",
             cassetteHole: "hole"
         ),
@@ -218,7 +218,7 @@ struct CassetteSkin: Identifiable {
             name: "CFT-TRA",  // 名称作为唯一标识
             year: "1988",
             description: "经典透明磁带",
-            coverImage: "CF-001",
+            coverImage: "cover-CFT-TRA",
             cassetteImage: "CFT-TRA",
             cassetteHole: "holeDark"
         ),
@@ -226,7 +226,7 @@ struct CassetteSkin: Identifiable {
             name: "CFT-C60",  // 名称作为唯一标识
             year: "1988",
             description: "彩色标签的录音磁带",
-            coverImage: "CF-001",
+            coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
             cassetteHole: "holeDark"
         )
@@ -239,7 +239,7 @@ struct CassetteSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CFT-DEMO", "CFT-TRA"].contains(self.name)
+        return ["CFT-DEMO", "CFT-TRA", "CFT-C60"].contains(self.name)
     }
 }
 
@@ -284,11 +284,15 @@ class SkinHelper {
     /// 根据播放器皮肤名称获取产品ID
     static func getPlayerSkinProductID(_ skinName: String) -> String {
         switch skinName {
-        case "CF-DT1": return StoreManager.ProductIDs.cfDT1
-        case "CF-D6C": return StoreManager.ProductIDs.cfD6C
+        case "CF-PC13": return StoreManager.ProductIDs.cfPC13
+        case "CF-M10": return StoreManager.ProductIDs.cfM10
+        case "CF-WIND": return StoreManager.ProductIDs.cfWIND
         case "CF-L2": return StoreManager.ProductIDs.cfL2
+        case "CF-2": return StoreManager.ProductIDs.cf2
         case "CF-22": return StoreManager.ProductIDs.cf22
         case "CF-504": return StoreManager.ProductIDs.cf504
+        case "CF-D6C": return StoreManager.ProductIDs.cfD6C
+        case "CF-DT1": return StoreManager.ProductIDs.cfDT1
         default: return ""
         }
     }
@@ -296,8 +300,8 @@ class SkinHelper {
     /// 根据磁带皮肤名称获取产品ID
     static func getCassetteSkinProductID(_ skinName: String) -> String {
         switch skinName {
-        case "CFT-C60": return StoreManager.ProductIDs.cftC60
         case "CFT-TRA": return StoreManager.ProductIDs.cftTRA
+        case "CFT-C60": return StoreManager.ProductIDs.cftC60
         default: return ""
         }
     }

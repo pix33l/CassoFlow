@@ -30,30 +30,43 @@ struct MusicDetailView: View {
             VStack(spacing: 20) {
                 // 顶部音乐容器信息
                 VStack(spacing: 16) {
-                    
-                    Image("artwork-cassette")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 350)
-/*
-                    if let image = albumArtwork {
-                        Image(uiImage: image)
+                    ZStack {
+                        Image("artwork-cassette")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(width: 200, height: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    } else {
-                        Color.gray
-                            .frame(width: 200, height: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .frame(width: 360)
+                        //磁带封面
+                        if let image = albumArtwork {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 290, height: 140)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+//                                .overlay(
+//                                    RoundedRectangle(cornerRadius: 4)
+//                                        .stroke(.white, lineWidth: 1))
+                                .padding(.bottom, 37)
+                        } else {
+                            Color.gray
+                                .frame(width: 290, height: 140)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .padding(.bottom, 37)
+                        }
+                        
+                        Image("artwork-cassette-hole")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360)
                     }
-*/
+
                     VStack(spacing: 4) {
                         Text(container.title)
                             .font(.title2.bold())
+                            .multilineTextAlignment(.center)
                         
                         Text(container.artistName)
                             .font(.title2)
+                            .multilineTextAlignment(.center)
                             .foregroundColor(.secondary)
                         
                         if let releaseDate = container.releaseDate {

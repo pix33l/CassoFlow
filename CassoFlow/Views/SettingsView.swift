@@ -16,7 +16,7 @@ struct LinkRow: View {
             HStack {
                 Image(systemName: icon)
                     .font(.body)
-                    .frame(width: 30)
+                    .frame(width: 20)
                 
                 Text(title)
                 
@@ -84,27 +84,27 @@ struct SettingsView: View {
                 // Pro版本升级卡片
                 Section {
                     HStack {
-                        Image(systemName: "crown.fill")
-                            .font(.title2)
-                        
                         VStack(alignment: .leading) {
                             Text("CASSOFLOW PRO")
                                 .font(.headline)
                             Text("仅需¥48.00，获取全部功能")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
+                            Spacer()
+                            Button(action: {
+                                // 处理升级操作
+                            }) {
+                                Text("立即升级")
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color.black)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(15)
+                            }
                         }
                         Spacer()
-                        Button(action: {
-                            // 处理升级操作
-                        }) {
-                            Text("立即升级")
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.black)
-                                .foregroundColor(.white)
-                                .cornerRadius(15)
-                        }
+                        Image(systemName: "crown.fill")
+                            .font(.title)
                     }
                     .padding(.vertical, 8)
                 }
@@ -115,7 +115,7 @@ struct SettingsView: View {
                     HStack {
                         Image(systemName: "recordingtape")
                             .font(.body)
-                            .frame(width: 30)
+                            .frame(width: 20)
                         
                         Toggle("磁带音效", isOn: Binding(
                             get: { musicService.isCassetteEffectEnabled },
@@ -131,7 +131,7 @@ struct SettingsView: View {
                     HStack {
                         Image(systemName: "hand.tap")
                             .font(.body)
-                            .frame(width: 30)
+                            .frame(width: 20)
                         
                         Toggle("触觉反馈", isOn: Binding(
                             get: { musicService.isHapticFeedbackEnabled },
@@ -144,7 +144,7 @@ struct SettingsView: View {
                     HStack {
                         Image(systemName: "sun.max")
                             .font(.body)
-                            .frame(width: 30)
+                            .frame(width: 20)
                         
                         Toggle("屏幕常亮", isOn: Binding(
                             get: { musicService.isScreenAlwaysOn },
@@ -163,7 +163,7 @@ struct SettingsView: View {
                     LinkRow(
                         title: "给我们五星好评",
                         destination: URL(string: WebLink.appStoreReview.rawValue)!,
-                        icon: "star.fill"
+                        icon: "star"
                     )
                     
                     Button {
@@ -172,7 +172,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.body)
-                                .frame(width: 30)
+                                .frame(width: 20)
                             
                             Text("把应用推荐给朋友")
                             
@@ -193,7 +193,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "envelope")
                                 .font(.body)
-                                .frame(width: 30)
+                                .frame(width: 20)
                             
                             Text("意见反馈")
                             
@@ -217,7 +217,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "arrow.clockwise")
                                 .font(.body)
-                                .frame(width: 30)
+                                .frame(width: 20)
                             
                             
                             Text("恢复购买")
@@ -237,8 +237,11 @@ struct SettingsView: View {
                     }
                     .disabled(storeManager.isLoading)
                     
-                    NavigationLink("关于作者") {
-                        Text("关于页面")
+                    NavigationLink(destination: ContactUsView()) {
+                        HStack {
+                            Image(systemName: "person") // 使用系统 person 图标
+                            Text("关于作者")
+                        }
                     }
                     
                     // 修改隐私政策链接

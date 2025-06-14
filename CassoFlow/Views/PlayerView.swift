@@ -169,6 +169,7 @@ struct PlayerControlsView: View {
             
             SongInfoView(
                 showSettingsView: $showSettingsView,
+                showLibraryView: $showLibraryView,
                 repeatMode: $repeatMode,
                 isShuffled: $isShuffled,
                 progress: progress
@@ -178,9 +179,7 @@ struct PlayerControlsView: View {
             .background(
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color(musicService.currentPlayerSkin.screenColor))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(.white.opacity(0.1), lineWidth: 8))
+                    
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
@@ -295,6 +294,7 @@ struct ControlButtonsView: View {
 struct SongInfoView: View {
     @EnvironmentObject private var musicService: MusicService
     @Binding var showSettingsView: Bool
+    @Binding var showLibraryView: Bool
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     let progress: CGFloat
@@ -302,7 +302,7 @@ struct SongInfoView: View {
     var body: some View {
         VStack(spacing: 5) {
             TrackInfoHeader(showSettingsView: $showSettingsView)
-            RepeatAndShuffleView(repeatMode: $repeatMode, isShuffled: $isShuffled)
+            RepeatAndShuffleView(repeatMode: $repeatMode, isShuffled: $isShuffled, showLibraryView: $showLibraryView)
             PlaybackProgressView(progress: progress)
         }
     }
@@ -352,6 +352,7 @@ struct RepeatAndShuffleView: View {
     @EnvironmentObject private var musicService: MusicService
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
+    @Binding var showLibraryView: Bool
     
     @State private var repeatTapped = false
     @State private var shuffleTapped = false
@@ -396,7 +397,7 @@ struct RepeatAndShuffleView: View {
             
             Spacer()
             
-            SongTitleView()
+            SongTitleView(showLibraryView: $showLibraryView)
             
             Spacer()
             
@@ -428,19 +429,28 @@ struct RepeatAndShuffleView: View {
 
 struct SongTitleView: View {
     @EnvironmentObject private var musicService: MusicService
+    @Binding var showLibraryView: Bool
     
     var body: some View {
-        VStack {
-            Text(musicService.currentTitle)
-                .font(.title3)
-                .fontWeight(.bold)
-                .lineLimit(1)
-            Text(musicService.currentArtist)
-                .font(.body)
-                .lineLimit(1)
+        Button {
+            if musicService.isHapticFeedbackEnabled {
+                let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                impactFeedback.impactOccurred()
+            }
+            showLibraryView = true
+        } label: {
+            VStack {
+                Text(musicService.currentTitle)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .lineLimit(1)
+                Text(musicService.currentArtist)
+                    .font(.body)
+                    .lineLimit(1)
+            }
+            .frame(height: 40.0)
+            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
         }
-        .frame(height: 40.0)
-        .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
     }
 }
 
