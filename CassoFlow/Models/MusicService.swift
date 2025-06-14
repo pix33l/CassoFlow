@@ -137,10 +137,11 @@ class MusicService: ObservableObject {
         isCassetteEffectEnabled = UserDefaults.standard.bool(forKey: Self.cassetteEffectKey)
         print("🎵 加载磁带音效设置: \(isCassetteEffectEnabled)")
         
+        // 加载触觉反馈设置
         if UserDefaults.standard.object(forKey: Self.hapticFeedbackKey) == nil {
-            // 首次启动时设置默认值为true
-            isHapticFeedbackEnabled = true
-            UserDefaults.standard.set(true, forKey: Self.hapticFeedbackKey)
+            // 首次启动时设置默认值为false
+            isHapticFeedbackEnabled = false
+            UserDefaults.standard.set(false, forKey: Self.hapticFeedbackKey)
         } else {
             isHapticFeedbackEnabled = UserDefaults.standard.bool(forKey: Self.hapticFeedbackKey)
         }

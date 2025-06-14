@@ -178,11 +178,11 @@ struct StoreView: View {
     
     private var buttonBackgroundColor: Color {
         if isCurrentSkinOwned() {
-            return Color.blue
+            return Color.orange
         }
         // 会员用户对于收费皮肤也显示蓝色背景
         if storeManager.membershipStatus.isActive && !isFreeSkin() {
-            return Color.blue
+            return Color.orange
         }
         return Color.white
     }

@@ -43,6 +43,9 @@
     "PIX3L DESIGN 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验。" : {
 
     },
+    "Pro" : {
+
+    },
     "SETTINGS" : {
 
     },
@@ -82,14 +85,27 @@
     "发布于 %@" : {
 
     },
+    "可以保持屏幕一直不锁屏看磁带转动" : {
+
+    },
     "商品类型" : {
 
     },
     "商店" : {
 
     },
-    "媒体库" : {
+    "增加触觉反馈来模拟类似实体的操作感" : {
 
+    },
+    "媒体库" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Library"
+          }
+        }
+      }
     },
     "媒体类型" : {
 
@@ -128,7 +144,14 @@
 
     },
     "抖音" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Douyin"
+          }
+        }
+      }
     },
     "持续欣赏磁带转动的韵律" : {
 
@@ -140,7 +163,14 @@
 
     },
     "播放器" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Player"
+          }
+        }
+      }
     },
     "支持我们" : {
 
@@ -151,8 +181,18 @@
     "未来更新" : {
 
     },
-    "歌单" : {
+    "模拟磁带播放时的底噪和低频抖动效果" : {
 
+    },
+    "歌单" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist"
+          }
+        }
+      }
     },
     "永久" : {
 
@@ -163,11 +203,15 @@
     "确定" : {
 
     },
-    "确认" : {
-
-    },
     "磁带" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette"
+          }
+        }
+      }
     },
     "磁带音效" : {
 

@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		62611B132DFDC13D007DDDD1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 62611B122DFDC13D007DDDD1 /* Localizable.xcstrings */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		62611B122DFDC13D007DDDD1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		6276D7682DD1E6F900ACA539 /* CassoFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CassoFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -45,6 +50,7 @@
 		6276D75F2DD1E6F900ACA539 = {
 			isa = PBXGroup;
 			children = (
+				62611B122DFDC13D007DDDD1 /* Localizable.xcstrings */,
 				6276D76A2DD1E6F900ACA539 /* CassoFlow */,
 				6276D7692DD1E6F900ACA539 /* Products */,
 			);
@@ -100,11 +106,12 @@
 				};
 			};
 			buildConfigurationList = 6276D7632DD1E6F900ACA539 /* Build configuration list for PBXProject "CassoFlow" */;
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 6276D75F2DD1E6F900ACA539;
 			minimizedProjectReferenceProxies = 1;
@@ -123,6 +130,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62611B132DFDC13D007DDDD1 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +207,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -256,6 +265,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -273,11 +283,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CassoFlow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CassoFlow;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "我们需要访问您的Apple Music来播放音乐";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "CassoFlow 需要访问您的音乐库来播放您的歌曲。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
@@ -312,11 +322,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CassoFlow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CassoFlow;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "我们需要访问您的Apple Music来播放音乐";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "CassoFlow 需要访问您的音乐库来播放您的歌曲。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;

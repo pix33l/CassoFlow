@@ -250,17 +250,17 @@ struct PaywallView: View {
         }
         .interactiveDismissDisabled(storeManager.isLoading)
         .alert("购买失败", isPresented: $showError) {
-            Button("确认", role: .cancel) { }
+            Button("确定", role: .cancel) { }
         } message: {
             Text(errorMessage)
         }
         .alert("成功", isPresented: $showSuccessAlert) {
-            Button("确认", role: .cancel) { }
+            Button("确定", role: .cancel) { }
         } message: {
             Text(successMessage)
         }
         .alert("提示", isPresented: $storeManager.showAlert) {
-            Button("确认", role: .cancel) { }
+            Button("确定", role: .cancel) { }
         } message: {
             Text(storeManager.alertMessage)
         }
