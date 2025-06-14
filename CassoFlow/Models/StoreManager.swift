@@ -16,6 +16,50 @@ class StoreManager: ObservableObject {
     @Published var showAlert = false
     @Published var ownedProducts: Set<String> = []
     
+    @Published var membershipStatus: MembershipStatus = .notMember
+    @Published var subscriptionExpirationDate: Date?
+    
+    enum MembershipStatus {
+        case notMember
+        case lifetimeMember
+        case monthlyMember(expiresOn: Date)
+        case yearlyMember(expiresOn: Date)
+        
+        var isActive: Bool {
+            switch self {
+            case .notMember:
+                return false
+            case .lifetimeMember:
+                return true
+            case .monthlyMember(let expiresOn), .yearlyMember(let expiresOn):
+                return expiresOn > Date()
+            }
+        }
+        
+        var displayText: String {
+            switch self {
+            case .notMember:
+                return "解锁 PRO 会员，获取全部高级功能"
+            case .lifetimeMember:
+                return "尊贵的永久 Pro 会员"
+            case .monthlyMember(let expiresOn), .yearlyMember(let expiresOn):
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy年M月d日"
+                formatter.locale = Locale(identifier: "zh_CN")
+                return "Pro 会员将在\(formatter.string(from: expiresOn))到期"
+            }
+        }
+        
+        var shouldShowUpgradeButton: Bool {
+            switch self {
+            case .notMember:
+                return true
+            case .lifetimeMember, .monthlyMember, .yearlyMember:
+                return false
+            }
+        }
+    }
+
     // MARK: - 购买状态枚举
     enum PurchaseResult {
         case success(String)
@@ -58,6 +102,7 @@ class StoreManager: ObservableObject {
         // 启动时检查已拥有的产品
         Task {
             await loadOwnedProducts()
+            await updateMembershipStatus()
         }
     }
     
@@ -174,70 +219,75 @@ class StoreManager: ObservableObject {
         ownedProducts.insert(productID)
         
         // 根据产品ID解锁相应功能
+        let result: String?
         switch productID {
         // 会员产品
         case ProductIDs.lifetime:
             unlockPremiumFeatures()
-            return "终身会员"
+            result = "终身会员"
             
         case ProductIDs.yearly:
             unlockPremiumFeatures()
-            return "年度会员"
+            result = "年度会员"
             
         case ProductIDs.monthly:
             unlockPremiumFeatures()
-            return "月度会员"
+            result = "月度会员"
             
         // 播放器皮肤
         case ProductIDs.cfPC13:
             unlockPlayerSkin("CF-PC13")
-            return "CF-PC13 磁带播放器"
+            result = "CF-PC13 磁带播放器"
             
         case ProductIDs.cfM10:
             unlockPlayerSkin("CF-M10")
-            return "CF-M10 磁带播放器"
+            result = "CF-M10 磁带播放器"
             
         case ProductIDs.cfWIND:
             unlockPlayerSkin("CF-WIND")
-            return "CF-WIND 磁带播放器"
+            result = "CF-WIND 磁带播放器"
             
         case ProductIDs.cfL2:
             unlockPlayerSkin("CF-L2")
-            return "CF-L2 磁带播放器"
+            result = "CF-L2 磁带播放器"
             
         case ProductIDs.cf2:
             unlockPlayerSkin("CF-2")
-            return "CF-2 磁带播放器"
+            result = "CF-2 磁带播放器"
             
         case ProductIDs.cf22:
             unlockPlayerSkin("CF-22")
-            return "CF-22 磁带播放器"
+            result = "CF-22 磁带播放器"
             
         case ProductIDs.cf504:
             unlockPlayerSkin("CF-504")
-            return "CF-504 磁带播放器"
+            result = "CF-504 磁带播放器"
             
         case ProductIDs.cfD6C:
             unlockPlayerSkin("CF-D6C")
-            return "CF-D6C 磁带播放器"
+            result = "CF-D6C 磁带播放器"
             
         case ProductIDs.cfDT1:
             unlockPlayerSkin("CF-DT1")
-            return "CF-DT1 磁带播放器"
+            result = "CF-DT1 磁带播放器"
             
         // 磁带皮肤
         case ProductIDs.cftC60:
             unlockCassetteSkin("CFT-C60")
-            return "CFT-C60 磁带"
+            result = "CFT-C60 磁带"
             
         case ProductIDs.cftTRA:
             unlockCassetteSkin("CFT-TRA")
-            return "CFT-TRA 磁带"
+            result = "CFT-TRA 磁带"
             
         default:
             print("⚠️ 未知产品ID: \(productID)")
-            return nil
+            result = nil
         }
+        
+        await updateMembershipStatus()
+        
+        return result
     }
     
     // MARK: - 解锁功能方法
@@ -285,6 +335,43 @@ class StoreManager: ObservableObject {
         return UserDefaults.standard.bool(forKey: key)
     }
     
+    func updateMembershipStatus() async {
+        // 首先检查终身会员
+        if ownedProducts.contains(ProductIDs.lifetime) {
+            membershipStatus = .lifetimeMember
+            return
+        }
+        
+        // 检查订阅状态
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result {
+                let productID = transaction.productID
+                
+                // 检查订阅是否仍有效
+                if let expirationDate = transaction.expirationDate {
+                    if expirationDate > Date() {
+                        switch productID {
+                        case ProductIDs.yearly:
+                            membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                            subscriptionExpirationDate = expirationDate
+                            return
+                        case ProductIDs.monthly:
+                            membershipStatus = .monthlyMember(expiresOn: expirationDate)
+                            subscriptionExpirationDate = expirationDate
+                            return
+                        default:
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 如果没有找到有效订阅，设为非会员
+        membershipStatus = .notMember
+        subscriptionExpirationDate = nil
+    }
+    
     // MARK: - 加载已拥有的产品
     private func loadOwnedProducts() async {
         for await result in Transaction.currentEntitlements {
@@ -293,6 +380,8 @@ class StoreManager: ObservableObject {
             }
         }
         print("📦 已加载 \(ownedProducts.count) 个已购买产品")
+        
+        await updateMembershipStatus()
     }
     
     // MARK: - 弹窗提示方法

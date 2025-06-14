@@ -6,8 +6,8 @@ struct StoreView: View {
     @StateObject private var storeManager = StoreManager()
     @Environment(\.dismiss) var dismiss
     @State private var selectedSegment = 0
-    @State private var selectedPlayerName: String
-    @State private var selectedCassetteName: String
+    @State private var selectedPlayerName: String = ""
+    @State private var selectedCassetteName: String = ""
     
     @State private var closeTapped = false
     @State private var applyTapped = false
@@ -16,13 +16,6 @@ struct StoreView: View {
     // 数据集
     private var playerSkins: [PlayerSkin] { PlayerSkin.playerSkins }
     private var cassetteSkins: [CassetteSkin] { CassetteSkin.cassetteSkins }
-    
-    // 初始化设置
-    init() {
-        // 使用默认值初始化，实际值在onAppear中设置
-        _selectedPlayerName = State(initialValue: "CF-DEMO")
-        _selectedCassetteName = State(initialValue: "CFT-DEMO")
-    }
     
     // 根据选项卡显示正确内容
     var currentSkinType: (PlayerSkin?, CassetteSkin?) {
@@ -158,8 +151,12 @@ struct StoreView: View {
             }
             .onAppear {
                 // 每次显示时更新为当前选中的皮肤
-                selectedPlayerName = musicService.currentPlayerSkin.name
-                selectedCassetteName = musicService.currentCassetteSkin.name
+                if selectedPlayerName.isEmpty {
+                    selectedPlayerName = musicService.currentPlayerSkin.name
+                }
+                if selectedCassetteName.isEmpty {
+                    selectedCassetteName = musicService.currentCassetteSkin.name
+                }
                 print("🏪 StoreView onAppear - 播放器皮肤: \(selectedPlayerName), 磁带皮肤: \(selectedCassetteName)")
             }
         }

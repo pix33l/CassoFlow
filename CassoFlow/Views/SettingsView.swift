@@ -85,40 +85,42 @@ struct SettingsView: View {
             List {
                 // Pro版本升级卡片
                 Section {
-                    Button(action: {
-                        print("🔘 PRO升级按钮被点击")
-                        if musicService.isHapticFeedbackEnabled {
-                            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                            impactFeedback.impactOccurred()
-                        }
-                        showingPaywall = true
-                    }) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 30)
-                            
-                            Text("解锁 PRO 会员，获取全部高级功能")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            
+                    VStack(alignment: .leading, spacing: 10) {
+                        Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 30)
+                        
+                        Text(storeManager.membershipStatus.displayText)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        if storeManager.membershipStatus.shouldShowUpgradeButton {
                             HStack {
-                                Text("立即升级")
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(colorScheme == .dark ? .white : .black)
-                                    .foregroundColor(colorScheme == .dark ? .black : .white)
-                                    .cornerRadius(15)
+                                Button(action: {
+                                    print("🔘 PRO升级按钮被点击")
+                                    if musicService.isHapticFeedbackEnabled {
+                                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                        impactFeedback.impactOccurred()
+                                    }
+                                    showingPaywall = true
+                                }) {
+                                    Text("立即升级")
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(colorScheme == .dark ? .white : .black)
+                                        .foregroundColor(colorScheme == .dark ? .black : .white)
+                                        .cornerRadius(15)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                                 
                                 Spacer()
                             }
                         }
-                        .padding(.vertical, 10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
                 
                 // 通用设置
@@ -309,6 +311,11 @@ struct SettingsView: View {
                 Button("确定", role: .cancel) { }
             } message: {
                 Text(storeManager.alertMessage)
+            }
+            .onAppear {
+                Task {
+                    await storeManager.updateMembershipStatus()
+                }
             }
         }
     }
