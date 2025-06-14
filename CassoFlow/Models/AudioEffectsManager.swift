@@ -202,15 +202,28 @@ class AudioEffectsManager: ObservableObject {
     
     /// 更新磁带效果
     private func updateCassetteEffect() {
+        // 确定目标状态
+        let shouldPlay = isCassetteEffectEnabled && isMusicPlaying
+        
         // 只有当磁带音效开启且音乐正在播放时才播放噪音
-        if isCassetteEffectEnabled && isMusicPlaying {
+        if shouldPlay {
             startCassetteEffect()
         } else {
             stopCassetteEffect()
         }
         
-        let status = (isCassetteEffectEnabled && isMusicPlaying) ? "播放中" : "已停止"
-        print("🎵 磁带音效状态: \(status) (音效开关: \(isCassetteEffectEnabled), 音乐播放: \(isMusicPlaying))")
+        let status = shouldPlay ? "播放中" : "已停止"
+        let key = "\(isCassetteEffectEnabled)-\(isMusicPlaying)"
+        
+        // 使用静态变量来跟踪上次的状态，避免重复输出
+        struct LastState {
+            static var lastKey = ""
+        }
+        
+        if LastState.lastKey != key {
+            print("🎵 磁带音效状态: \(status) (音效开关: \(isCassetteEffectEnabled), 音乐播放: \(isMusicPlaying))")
+            LastState.lastKey = key
+        }
     }
     
     /// 开始播放磁带效果
@@ -233,7 +246,6 @@ class AudioEffectsManager: ObservableObject {
         
         // 如果已经在播放，直接返回
         if noisePlayer.isPlaying {
-            print("🎵 磁带音效已在播放中")
             return
         }
         
@@ -269,6 +281,8 @@ class AudioEffectsManager: ObservableObject {
     
     /// 设置音乐播放状态
     func setMusicPlayingState(_ isPlaying: Bool) {
+        guard isMusicPlaying != isPlaying else { return }
+        
         print("🎵 更新音乐播放状态: \(isMusicPlaying) -> \(isPlaying)")
         isMusicPlaying = isPlaying
     }

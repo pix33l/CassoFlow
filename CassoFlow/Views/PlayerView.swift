@@ -647,8 +647,8 @@ struct CassetteHole: View {
                 // 直接使用原始角度，不进行标准化
                 currentRotationAngle = newValue
                 
-                // 减少日志输出频率 - 每600度（3圈）输出一次
-                if Int(newValue) % 600 == 0 {
+                // 大幅减少日志输出频率 - 每3600度（20圈）输出一次
+                if Int(newValue) % 3600 == 0 {
                     print("🎵 旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 完整角度: \(newValue)")
                 }
             }
@@ -660,14 +660,20 @@ struct CassetteHole: View {
             }
         }
         .onChange(of: musicService.queueTotalDuration) { oldValue, newValue in
-            print("🎵 queueTotalDuration变化: \(oldValue) -> \(newValue)")
-            if isRotating && oldValue != newValue {
-                animationStarted = false
-                startSizeAnimation()
+            // 只有当值真正变化时才输出日志
+            if oldValue != newValue {
+                print("🎵 queueTotalDuration变化: \(oldValue) -> \(newValue)")
+                if isRotating {
+                    animationStarted = false
+                    startSizeAnimation()
+                }
             }
         }
         // 监听队列累计播放时长变化
-        .onChange(of: musicService.queueElapsedDuration) { _, newValue in
+        .onChange(of: musicService.queueElapsedDuration) { oldValue, newValue in
+            // 只有当变化超过阈值时才更新和输出日志
+            guard abs(oldValue - newValue) > 0.5 else { return }
+            
             let newSize = currentProgressSize
             print("🎵 队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
             
@@ -676,24 +682,30 @@ struct CassetteHole: View {
             }
         }
         .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
-            print("🎵 快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
-            if oldValue && !newValue {
-                // 快进结束，立即更新到当前进度对应的尺寸
-                let newSize = currentProgressSize
-                print("🎵 快进结束，更新尺寸: \(newSize)")
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    circleSize = newSize
+            // 只有当状态真正变化时才输出日志
+            if oldValue != newValue {
+                print("🎵 快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+                if oldValue && !newValue {
+                    // 快进结束，立即更新到当前进度对应的尺寸
+                    let newSize = currentProgressSize
+                    print("🎵 快进结束，更新尺寸: \(newSize)")
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        circleSize = newSize
+                    }
                 }
             }
         }
         .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
-            print("🎵 快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
-            if oldValue && !newValue {
-                // 快退结束，立即更新到当前进度对应的尺寸
-                let newSize = currentProgressSize
-                print("🎵 快退结束，更新尺寸: \(newSize)")
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    circleSize = newSize
+            // 只有当状态真正变化时才输出日志
+            if oldValue != newValue {
+                print("🎵 快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+                if oldValue && !newValue {
+                    // 快退结束，立即更新到当前进度对应的尺寸
+                    let newSize = currentProgressSize
+                    print("🎵 快退结束，更新尺寸: \(newSize)")
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        circleSize = newSize
+                    }
                 }
             }
         }
