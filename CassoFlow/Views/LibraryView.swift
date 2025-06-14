@@ -224,6 +224,11 @@ struct LibraryView: View {
         if status == .authorized {
             // 授权成功后重新加载媒体库
             await loadUserLibrary()
+        } else {
+            // 授权失败，引导用户到设置
+            await MainActor.run {
+                openAppSettings()
+            }
         }
     }
     
@@ -273,6 +278,18 @@ struct LibraryView: View {
     private func openAppleMusic() {
         if let url = URL(string: "music://") {
             UIApplication.shared.open(url)
+        }
+    }
+
+    private func openAppSettings() {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+        
+        if UIApplication.shared.canOpenURL(settingsUrl) {
+            UIApplication.shared.open(settingsUrl) { success in
+                print("打开设置: \(success)")
+            }
         }
     }
 }

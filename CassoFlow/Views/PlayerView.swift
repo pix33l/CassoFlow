@@ -637,7 +637,7 @@ struct CassetteHole: View {
                 .frame(width: circleSize, height: circleSize)
             Image(musicService.currentCassetteSkin.cassetteHole)
                 .resizable()
-                .frame(width: 60, height: 60)
+                .frame(width: 70, height: 70)
                 .rotationEffect(.degrees(currentRotationAngle))
         }
         .frame(width: 100, height: 100)

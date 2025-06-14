@@ -17,7 +17,7 @@ struct PlayerSkin: Identifiable {
     let screenOutlineColor: Color
     let playerImage: String
     let cassetteBgImage: String
-    
+
     // 播放器皮肤集合
     static let playerSkins: [PlayerSkin] = [
         
@@ -190,7 +190,7 @@ struct PlayerSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
+        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2", "CF-22", "CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
     }
 }
 
@@ -216,7 +216,7 @@ struct CassetteSkin: Identifiable {
         ),
         CassetteSkin(
             name: "CFT-TRA",  // 名称作为唯一标识
-            year: "1988",
+            year: "2025",
             description: "经典透明磁带",
             coverImage: "cover-CFT-TRA",
             cassetteImage: "CFT-TRA",
@@ -224,8 +224,8 @@ struct CassetteSkin: Identifiable {
         ),
         CassetteSkin(
             name: "CFT-C60",  // 名称作为唯一标识
-            year: "1988",
-            description: "彩色标签的录音磁带",
+            year: "2025",
+            description: "彩色可书写标签的录音磁带",
             coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
             cassetteHole: "holeDark"
@@ -247,16 +247,40 @@ struct CassetteSkin: Identifiable {
 @MainActor
 class SkinHelper {
     
-    /// 检查播放器皮肤是否已拥有
+    /// 检查播放器皮肤是否已拥有（包含会员权限）
     static func isPlayerSkinOwned(_ skinName: String, storeManager: StoreManager) -> Bool {
         let skin = PlayerSkin.playerSkin(named: skinName)
-        return skin?.isFreeDefaultSkin() == true || storeManager.ownsPlayerSkin(skinName)
+        
+        // 如果是免费皮肤，直接返回true
+        if skin?.isFreeDefaultSkin() == true {
+            return true
+        }
+        
+        // 如果是会员用户（且会员状态有效），可以使用所有皮肤
+        if storeManager.membershipStatus.isActive {
+            return true
+        }
+        
+        // 非会员用户需要单独购买皮肤才能使用
+        return storeManager.ownsPlayerSkin(skinName)
     }
     
-    /// 检查磁带皮肤是否已拥有
+    /// 检查磁带皮肤是否已拥有（包含会员权限）
     static func isCassetteSkinOwned(_ skinName: String, storeManager: StoreManager) -> Bool {
         let skin = CassetteSkin.cassetteSkin(named: skinName)
-        return skin?.isFreeDefaultSkin() == true || storeManager.ownsCassetteSkin(skinName)
+        
+        // 如果是免费皮肤，直接返回true
+        if skin?.isFreeDefaultSkin() == true {
+            return true
+        }
+        
+        // 如果是会员用户（且会员状态有效），可以使用所有皮肤
+        if storeManager.membershipStatus.isActive {
+            return true
+        }
+        
+        // 非会员用户需要单独购买皮肤才能使用
+        return storeManager.ownsCassetteSkin(skinName)
     }
     
     /// 获取播放器皮肤价格
@@ -264,6 +288,11 @@ class SkinHelper {
         let skin = PlayerSkin.playerSkin(named: skinName)
         if skin?.isFreeDefaultSkin() == true {
             return "免费"
+        }
+        
+        // 如果是有效会员，显示"会员专享"
+        if storeManager.membershipStatus.isActive {
+            return "会员专享"
         }
         
         let productID = getPlayerSkinProductID(skinName)
@@ -275,6 +304,11 @@ class SkinHelper {
         let skin = CassetteSkin.cassetteSkin(named: skinName)
         if skin?.isFreeDefaultSkin() == true {
             return "免费"
+        }
+        
+        // 如果是有效会员，显示"会员专享"
+        if storeManager.membershipStatus.isActive {
+            return "会员专享"
         }
         
         let productID = getCassetteSkinProductID(skinName)

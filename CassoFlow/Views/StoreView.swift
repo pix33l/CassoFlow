@@ -180,11 +180,19 @@ struct StoreView: View {
         if isCurrentSkinOwned() {
             return Color.blue
         }
+        // 会员用户对于收费皮肤也显示蓝色背景
+        if storeManager.membershipStatus.isActive && !isFreeSkin() {
+            return Color.blue
+        }
         return Color.white
     }
     
     private var buttonForegroundColor: Color {
         if isCurrentSkinOwned() {
+            return Color.white
+        }
+        // 会员用户对于收费皮肤也显示白色文字
+        if storeManager.membershipStatus.isActive && !isFreeSkin() {
             return Color.white
         }
         return Color.black
@@ -202,15 +210,31 @@ struct StoreView: View {
         return false
     }
     
+    /// 检查当前皮肤是否为免费皮肤
+    private func isFreeSkin() -> Bool {
+        if let playerSkin = currentSkinType.0 {
+            return playerSkin.isFreeDefaultSkin()
+        } else if let cassetteSkin = currentSkinType.1 {
+            return cassetteSkin.isFreeDefaultSkin()
+        }
+        return false
+    }
+    
     /// 处理主按钮操作（使用或购买）
     private func handleMainButtonAction() {
         if isCurrentSkinOwned() {
             // 已拥有，直接使用
             applySelectedSkin()
         } else {
-            // 未拥有，进行购买
-            Task {
-                await purchaseCurrentSkin()
+            // 检查是否为会员用户
+            if storeManager.membershipStatus.isActive {
+                // 会员用户可以直接使用所有皮肤
+                applySelectedSkin()
+            } else {
+                // 非会员用户需要购买皮肤
+                Task {
+                    await purchaseCurrentSkin()
+                }
             }
         }
     }
