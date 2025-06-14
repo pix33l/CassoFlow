@@ -44,44 +44,45 @@ struct StoreView: View {
                     }
                 }
                 
-                // TabView根据选项卡选择展示不同内容
-                TabView(selection: Binding<AnyHashable>(
-                    get: {
-                        selectedSegment == 0 ? AnyHashable(selectedPlayerName) : AnyHashable(selectedCassetteName)
-                    },
-                    set: {
-                        if let name = $0.base as? String {
-                            if selectedSegment == 0 { selectedPlayerName = name }
-                            else { selectedCassetteName = name }
-                        }
-                    }
-                )) {
-                    if selectedSegment == 0 {
+                if selectedSegment == 0 {
+                    // 播放器皮肤TabView
+                    TabView(selection: $selectedPlayerName) {
                         ForEach(playerSkins, id: \.name) { skin in
                             SkinCardView(
                                 playerSkin: skin,
                                 cassetteSkin: nil,
                                 storeManager: storeManager
                             )
-                            .tag(skin.name as AnyHashable)
+                            .tag(skin.name)
                         }
-                    } else {
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .always))
+                    .frame(height: 580)
+                    .onChange(of: selectedPlayerName) { _, _ in
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
+                    }
+                } else {
+                    // 磁带皮肤TabView
+                    TabView(selection: $selectedCassetteName) {
                         ForEach(cassetteSkins, id: \.name) { skin in
                             SkinCardView(
                                 playerSkin: nil,
                                 cassetteSkin: skin,
                                 storeManager: storeManager
                             )
-                            .tag(skin.name as AnyHashable)
+                            .tag(skin.name)
                         }
                     }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .frame(height: 580)
-                .onChange(of: selectedSegment == 0 ? selectedPlayerName : selectedCassetteName) { _, _ in
-                    if musicService.isHapticFeedbackEnabled {
-                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                        impactFeedback.impactOccurred()
+                    .tabViewStyle(.page(indexDisplayMode: .always))
+                    .frame(height: 580)
+                    .onChange(of: selectedCassetteName) { _, _ in
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
                     }
                 }
                 
@@ -150,13 +151,8 @@ struct StoreView: View {
                 await storeManager.fetchProducts()
             }
             .onAppear {
-                // 每次显示时更新为当前选中的皮肤
-                if selectedPlayerName.isEmpty {
-                    selectedPlayerName = musicService.currentPlayerSkin.name
-                }
-                if selectedCassetteName.isEmpty {
-                    selectedCassetteName = musicService.currentCassetteSkin.name
-                }
+                selectedPlayerName = musicService.currentPlayerSkin.name
+                selectedCassetteName = musicService.currentCassetteSkin.name
                 print("🏪 StoreView onAppear - 播放器皮肤: \(selectedPlayerName), 磁带皮肤: \(selectedCassetteName)")
             }
         }
