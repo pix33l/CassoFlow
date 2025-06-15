@@ -24,23 +24,23 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-DEMO",  // 名称作为唯一标识
             year: "2025",
-            description: "正在研发的播放器蓝图",
+            description: "用来做演示的磁带播放器",
             coverImage: "cover-CF-DEMO",
-            panelColor: Color("cassetteLight"),
-            panelOutlineColor: Color("cassetteDark"),
-            buttonColor: Color("cassetteLight"),
-            buttonTextColor: Color("cassetteDark"),
-            buttonShadowColor: Color("cassetteDark"),
-            screenColor: Color("cassetteLight"),
-            screenTextColor: Color("cassetteDark"),
-            screenOutlineColor: Color("cassetteDark"),
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .gray,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-orange"),
+            screenTextColor: Color("text-screen-orange"),
+            screenOutlineColor: .black,
             playerImage: "player-CF-DEMO",
             cassetteBgImage: "bg-cassette"
         ),
         PlayerSkin(
             name: "CF-PC13",  // 名称作为唯一标识
             year: "2024",
-            description: "国产便携式播放器",
+            description: "飞翔的磁带播放器",
             coverImage: "cover-CF-PC13",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -56,7 +56,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-M10",  // 名称作为唯一标识
             year: "2024",
-            description: "国产便携式播放器",
+            description: "动物牌磁带播放器",
             coverImage: "cover-CF-M10",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -72,7 +72,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-WIND",  // 名称作为唯一标识
             year: "2024",
-            description: "国外便携式播放器",
+            description: "公鸡国磁带播放器",
             coverImage: "cover-CF-WIND",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -202,6 +202,7 @@ struct CassetteSkin: Identifiable {
     let coverImage: String
     let cassetteImage: String
     let cassetteHole: String
+    let cassetteColor: Color
 
     // 磁带皮肤集合
     static let cassetteSkins: [CassetteSkin] = [
@@ -209,10 +210,11 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-DEMO",  // 名称作为唯一标识
             year: "2025",
-            description: "演示磁带皮肤",
+            description: "白色演示磁带",
             coverImage: "cover-CFT-DEMO",
             cassetteImage: "CFT-DEMO",
-            cassetteHole: "hole"
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
             name: "CFT-TRA",  // 名称作为唯一标识
@@ -220,7 +222,8 @@ struct CassetteSkin: Identifiable {
             description: "经典透明磁带",
             coverImage: "cover-CFT-TRA",
             cassetteImage: "CFT-TRA",
-            cassetteHole: "holeDark"
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
             name: "CFT-C60",  // 名称作为唯一标识
@@ -228,7 +231,8 @@ struct CassetteSkin: Identifiable {
             description: "彩色可书写标签的录音磁带",
             coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
-            cassetteHole: "holeDark"
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
         )
     ]
 

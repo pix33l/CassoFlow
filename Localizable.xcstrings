@@ -56,13 +56,27 @@
 
     },
     "专辑" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
+          }
+        }
+      }
     },
     "享受真实的磁带音质体验" : {
 
     },
     "仅 %@ /天" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only %@  /day"
+          }
+        }
+      }
     },
     "使用所有磁带播放器和磁带皮肤" : {
 
@@ -71,7 +85,14 @@
 
     },
     "关于作者" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Developer"
+          }
+        }
+      }
     },
     "其他" : {
 
@@ -86,13 +107,27 @@
 
     },
     "可以保持屏幕一直不锁屏看磁带转动" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It is possible to keep the screen unlocked and watch the tape rotate continuously"
+          }
+        }
+      }
     },
     "商品类型" : {
 
     },
     "商店" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Store"
+          }
+        }
+      }
     },
     "增加触觉反馈来模拟类似实体的操作感" : {
 
@@ -111,7 +146,14 @@
 
     },
     "小红书" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        }
+      }
     },
     "屏幕常亮" : {
 
@@ -123,19 +165,54 @@
 
     },
     "开始 3 天免费试用" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start 3 days free trial"
+          }
+        }
+      }
     },
     "开始 7 天免费试用" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start 7 days free trial"
+          }
+        }
+      }
     },
     "微信" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        }
+      }
     },
     "恢复购买" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Purchase"
+          }
+        }
+      }
     },
     "意见反馈" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        }
+      }
     },
     "成功" : {
 
@@ -195,13 +272,27 @@
       }
     },
     "永久" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime"
+          }
+        }
+      }
     },
     "省 50%" : {
 
     },
     "确定" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "磁带" : {
       "localizations" : {
@@ -214,13 +305,34 @@
       }
     },
     "磁带音效" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette sound effect"
+          }
+        }
+      }
     },
     "立即升级" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade Now"
+          }
+        }
+      }
     },
     "继续" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
     },
     "网站" : {
 
@@ -232,13 +344,27 @@
 
     },
     "解锁所有皮肤" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock all skins"
+          }
+        }
+      }
     },
     "触觉反馈" : {
 
     },
     "设置" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setting"
+          }
+        }
+      }
     },
     "购买失败" : {
 
@@ -247,7 +373,14 @@
 
     },
     "邮箱" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail"
+          }
+        }
+      }
     },
     "隐私政策" : {
 

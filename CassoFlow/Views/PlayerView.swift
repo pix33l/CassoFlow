@@ -107,10 +107,11 @@ struct PlayerBackgroundView: View {
     @Binding var rotationAngle: Double
     
     var body: some View {
-        ZStack(alignment: .center) {
+        ZStack {
             Image(musicService.currentPlayerSkin.cassetteBgImage)
                 .resizable()
-                .scaledToFill()
+                .aspectRatio(contentMode: .fill)
+                .clipped()
                 .edgesIgnoringSafeArea(.all)
             
             if musicService.currentTrackID != nil {
@@ -120,7 +121,8 @@ struct PlayerBackgroundView: View {
             
             Image(musicService.currentPlayerSkin.playerImage)
                 .resizable()
-                .scaledToFill()
+                .aspectRatio(contentMode: .fill)
+                .clipped()
                 .edgesIgnoringSafeArea(.all)
         }
     }
@@ -633,7 +635,7 @@ struct CassetteHole: View {
                 .fill(Color.clear)
                 .frame(width: 160, height: 160)
             Circle()
-                .fill(Color("cassetteColor"))
+                .fill(Color(musicService.currentCassetteSkin.cassetteColor))
                 .frame(width: circleSize, height: circleSize)
             Image(musicService.currentCassetteSkin.cassetteHole)
                 .resizable()
