@@ -30,14 +30,17 @@ struct PlayerView: View {
     var body: some View {
         ZStack {
             PlayerBackgroundView(rotationAngle: $rotationAngle)
-            PlayerControlsView(
-                showLibraryView: $showLibraryView,
-                showSettingsView: $showSettingsView,
-                showStoreView: $showStoreView,
-                progress: progress,
-                repeatMode: $repeatMode,
-                isShuffled: $isShuffled
-            )
+            VStack{
+                Spacer()
+                PlayerControlsView(
+                    showLibraryView: $showLibraryView,
+                    showSettingsView: $showSettingsView,
+                    showStoreView: $showStoreView,
+                    progress: progress,
+                    repeatMode: $repeatMode,
+                    isShuffled: $isShuffled
+                )
+            }
         }
         .onAppear {
             if musicService.isPlaying {
@@ -108,22 +111,29 @@ struct PlayerBackgroundView: View {
     
     var body: some View {
         ZStack {
-            Image(musicService.currentPlayerSkin.cassetteBgImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .clipped()
-                .edgesIgnoringSafeArea(.all)
+            GeometryReader { geometry in
+                Image(musicService.currentPlayerSkin.cassetteBgImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            }
+            .edgesIgnoringSafeArea(.all)
             
             if musicService.currentTrackID != nil {
                 HolesView(rotationAngle: $rotationAngle)
                     .padding(.bottom, 280.0)
             }
-            
-            Image(musicService.currentPlayerSkin.playerImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .clipped()
-                .edgesIgnoringSafeArea(.all)
+            GeometryReader { geometry in
+                Image(musicService.currentPlayerSkin.playerImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            }
+            .edgesIgnoringSafeArea(.all)
         }
     }
 }
@@ -163,14 +173,14 @@ struct PlayerControlsView: View {
     var body: some View {
         VStack(spacing: 0) {
             ControlButtonsView(
-                showLibraryView: $showLibraryView,
+                showSettingsView: $showSettingsView,
                 showStoreView: $showStoreView
             )
             .padding(.horizontal, 10.0)
             .padding(.vertical, 5.0)
             
             SongInfoView(
-                showSettingsView: $showSettingsView,
+//                showSettingsView: $showSettingsView,
                 showLibraryView: $showLibraryView,
                 repeatMode: $repeatMode,
                 isShuffled: $isShuffled,
@@ -197,7 +207,6 @@ struct PlayerControlsView: View {
                 .strokeBorder(Color(musicService.currentPlayerSkin.panelOutlineColor), lineWidth: 2)
         )
         .padding()
-        .padding(.top, 550)
     }
 }
 
@@ -205,7 +214,7 @@ struct PlayerControlsView: View {
 
 struct ControlButtonsView: View {
     @EnvironmentObject private var musicService: MusicService
-    @Binding var showLibraryView: Bool
+    @Binding var showSettingsView: Bool
     @Binding var showStoreView: Bool
     
     @State private var libraryTapped = false
@@ -216,13 +225,13 @@ struct ControlButtonsView: View {
     
     var body: some View {
         HStack(spacing: 5) {
-            ControlButton(systemName: "music.note.list", action: {
+            ControlButton(systemName: "recordingtape", action: {
                 libraryTapped.toggle()
                 if musicService.isHapticFeedbackEnabled {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
                 }
-                showLibraryView = true
+                showStoreView = true
             })
             
             ControlButton(
@@ -279,13 +288,13 @@ struct ControlButtonsView: View {
                 }
             )
             
-            ControlButton(systemName: "recordingtape") {
+            ControlButton(systemName: "gearshape") {
                 storeTapped.toggle()
                 if musicService.isHapticFeedbackEnabled {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
                 }
-                showStoreView = true
+                showSettingsView = true
             }
         }
     }
@@ -295,7 +304,7 @@ struct ControlButtonsView: View {
 
 struct SongInfoView: View {
     @EnvironmentObject private var musicService: MusicService
-    @Binding var showSettingsView: Bool
+//    @Binding var showSettingsView: Bool
     @Binding var showLibraryView: Bool
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
@@ -303,7 +312,9 @@ struct SongInfoView: View {
     
     var body: some View {
         VStack(spacing: 5) {
-            TrackInfoHeader(showSettingsView: $showSettingsView)
+            TrackInfoHeader(
+//                showSettingsView: $showSettingsView
+            )
             RepeatAndShuffleView(repeatMode: $repeatMode, isShuffled: $isShuffled, showLibraryView: $showLibraryView)
             PlaybackProgressView(progress: progress)
         }
@@ -314,7 +325,7 @@ struct SongInfoView: View {
 
 struct TrackInfoHeader: View {
     @EnvironmentObject private var musicService: MusicService
-    @Binding var showSettingsView: Bool
+//    @Binding var showSettingsView: Bool
     
     @State private var settingsTapped = false
     
@@ -324,7 +335,7 @@ struct TrackInfoHeader: View {
                 if let index = musicService.currentTrackIndex, musicService.totalTracksInQueue > 0 {
                     Text("PGM NO. \(index)/\(musicService.totalTracksInQueue)")
                 } else {
-                    Text("PGM NO.")
+                    Text("PGM NO. 0/0")
                 }
             }
             .padding(.leading, 4)
@@ -337,9 +348,9 @@ struct TrackInfoHeader: View {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                     impactFeedback.impactOccurred()
                 }
-                showSettingsView = true
+//                showSettingsView = true
             } label: {
-                Text("SETTINGS")
+                Text("TIME")
             }
             .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
         }

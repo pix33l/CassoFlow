@@ -47,10 +47,17 @@ struct MusicDetailView: View {
 //                                        .stroke(.white, lineWidth: 1))
                                 .padding(.bottom, 37)
                         } else {
-                            Color.gray
-                                .frame(width: 290, height: 140)
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                .padding(.bottom, 37)
+                            ZStack{
+                                Color.black
+                                    .frame(width: 290, height: 140)
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .padding(.bottom, 37)
+                                Image("CASSOFLOW")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 120)
+                                    .padding(.bottom, 130)
+                            }
                         }
                         
                         Image("artwork-cassette-hole")
@@ -417,5 +424,554 @@ extension Date {
         formatter.doesRelativeDateFormatting = true
         formatter.locale = Locale.current
         return formatter.string(from: self)
+    }
+}
+
+// MARK: - 预览
+#Preview("专辑详情 - 加载完成") {
+    let musicService = MusicService.shared
+    
+    // 创建模拟专辑详情视图
+    struct MockAlbumDetailView: View {
+        @State private var tracks: [MockTrack] = [
+            MockTrack(id: "1", title: "Love Story", artistName: "Taylor Swift", duration: 235),
+            MockTrack(id: "2", title: "You Belong With Me", artistName: "Taylor Swift", duration: 232),
+            MockTrack(id: "3", title: "White Horse", artistName: "Taylor Swift", duration: 238),
+            MockTrack(id: "4", title: "The Way I Loved You", artistName: "Taylor Swift", duration: 244),
+            MockTrack(id: "5", title: "Forever Winter", artistName: "Taylor Swift", duration: 346),
+            MockTrack(id: "6", title: "Enchanted", artistName: "Taylor Swift", duration: 350)
+        ]
+        @State private var isPlaying = false
+        @State private var currentTrackIndex = 0
+        
+        var body: some View {
+            NavigationStack {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // 顶部专辑信息
+                        VStack(spacing: 16) {
+                            ZStack {
+                                Image("artwork-cassette")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 360)
+                                
+                                ZStack{
+                                    Color.black
+                                        .frame(width: 290, height: 140)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                        .padding(.bottom, 37)
+                                    Image("CASSOFLOW")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 120)
+                                        .padding(.top, 20)
+                                }
+                                
+                                Image("artwork-cassette-hole")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 360)
+                            }
+
+                            VStack(spacing: 4) {
+                                Text("Fearless")
+                                    .font(.title2.bold())
+                                    .multilineTextAlignment(.center)
+                                
+                                Text("Taylor Swift")
+                                    .font(.title2)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.secondary)
+                                
+                                Text("流行音乐 • 2008")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            // 播放控制按钮
+                            HStack(spacing: 20) {
+                                Button {
+                                    // 模拟播放
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "play.fill")
+                                        Text("播放")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.secondary.opacity(0.2))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(8)
+                                }
+                                
+                                Button {
+                                    // 模拟随机播放
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "shuffle")
+                                        Text("随机播放")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.secondary.opacity(0.2))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        
+                        // 歌曲列表
+                        VStack(alignment: .leading, spacing: 0) {
+                            Divider()
+                                .padding(.leading, 20)
+                                .padding(.trailing, 16)
+                            
+                            ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
+                                MockTrackRow(
+                                    index: index,
+                                    track: track,
+                                    isPlaying: isPlaying && currentTrackIndex == index
+                                )
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    currentTrackIndex = index
+                                    isPlaying = true
+                                }
+                                
+                                if index < tracks.count - 1 {
+                                    Divider()
+                                        .padding(.leading, 40)
+                                        .padding(.trailing, 16)
+                                }
+                            }
+                            
+                            Divider()
+                                .padding(.leading, 20)
+                                .padding(.trailing, 16)
+                        }
+                        
+                        // 底部信息
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("发布于 2008年11月11日")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            Text("6首歌曲 • 24分钟")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                    }
+                    .padding(.vertical)
+                }
+                .navigationTitle("专辑详情")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+    }
+    
+    return MockAlbumDetailView()
+        .environmentObject(musicService)
+}
+
+#Preview("播放列表详情 - 加载完成") {
+    let musicService = MusicService.shared
+    
+    // 创建模拟播放列表详情视图
+    struct MockPlaylistDetailView: View {
+        @State private var tracks: [MockTrack] = [
+            MockTrack(id: "1", title: "Shape of You", artistName: "Ed Sheeran", duration: 233),
+            MockTrack(id: "2", title: "Blinding Lights", artistName: "The Weeknd", duration: 200),
+            MockTrack(id: "3", title: "稻香", artistName: "周杰伦", duration: 223),
+            MockTrack(id: "4", title: "青花瓷", artistName: "周杰伦", duration: 235),
+            MockTrack(id: "5", title: "Someone Like You", artistName: "Adele", duration: 285),
+            MockTrack(id: "6", title: "Perfect", artistName: "Ed Sheeran", duration: 263),
+            MockTrack(id: "7", title: "晴天", artistName: "周杰伦", duration: 269),
+            MockTrack(id: "8", title: "Hello", artistName: "Adele", duration: 295)
+        ]
+        @State private var isPlaying = false
+        @State private var currentTrackIndex = 2
+        
+        var body: some View {
+            NavigationStack {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // 顶部播放列表信息
+                        VStack(spacing: 16) {
+                            ZStack {
+                                Image("artwork-cassette")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 360)
+                                
+                                ZStack{
+                                    Color.black
+                                        .frame(width: 290, height: 140)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                        .padding(.bottom, 37)
+                                    Image("CASSOFLOW")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 120)
+                                        .padding(.top, 20)
+                                }
+                                
+                                Image("artwork-cassette-hole")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 360)
+                            }
+
+                            VStack(spacing: 4) {
+                                Text("我的最爱")
+                                    .font(.title2.bold())
+                                    .multilineTextAlignment(.center)
+                                
+                                Text("精选歌单")
+                                    .font(.title2)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.secondary)
+                                
+                                Text("播放列表 • 2024")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            // 播放控制按钮
+                            HStack(spacing: 20) {
+                                Button {
+                                    // 模拟播放
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "play.fill")
+                                        Text("播放")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.secondary.opacity(0.2))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(8)
+                                }
+                                
+                                Button {
+                                    // 模拟随机播放
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "shuffle")
+                                        Text("随机播放")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.secondary.opacity(0.2))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        
+                        // 歌曲列表
+                        VStack(alignment: .leading, spacing: 0) {
+                            Divider()
+                                .padding(.leading, 20)
+                                .padding(.trailing, 16)
+                            
+                            ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
+                                MockTrackRow(
+                                    index: index,
+                                    track: track,
+                                    isPlaying: isPlaying && currentTrackIndex == index
+                                )
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    currentTrackIndex = index
+                                    isPlaying = true
+                                }
+                                
+                                if index < tracks.count - 1 {
+                                    Divider()
+                                        .padding(.leading, 40)
+                                        .padding(.trailing, 16)
+                                }
+                            }
+                            
+                            Divider()
+                                .padding(.leading, 20)
+                                .padding(.trailing, 16)
+                        }
+                        
+                        // 底部信息
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("最后更新于 今天")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            Text("8首歌曲 • 34分钟")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                    }
+                    .padding(.vertical)
+                }
+                .navigationTitle("播放列表详情")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+    }
+    
+    return MockPlaylistDetailView()
+        .environmentObject(musicService)
+}
+
+#Preview("加载状态") {
+    let musicService = MusicService.shared
+    
+    NavigationStack {
+        ScrollView {
+            VStack(spacing: 20) {
+                // 顶部信息（可见）
+                VStack(spacing: 16) {
+                    ZStack {
+                        Image("artwork-cassette")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360)
+                        
+                        ZStack{
+                            Color.black
+                                .frame(width: 290, height: 140)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .padding(.bottom, 37)
+                            Image("CASSOFLOW")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 120)
+                                .padding(.bottom, 130)
+                        }
+                        
+                        Image("artwork-cassette-hole")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360)
+                    }
+
+                    VStack(spacing: 4) {
+                        Text("加载中...")
+                            .font(.title2.bold())
+                            .multilineTextAlignment(.center)
+                        
+                        Text("请稍候")
+                            .font(.title2)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    
+                    // 播放控制按钮（禁用状态）
+                    HStack(spacing: 20) {
+                        Button {
+                            // 禁用
+                        } label: {
+                            HStack {
+                                Image(systemName: "play.fill")
+                                Text("播放")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.1))
+                            .foregroundColor(.secondary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(true)
+                        
+                        Button {
+                            // 禁用
+                        } label: {
+                            HStack {
+                                Image(systemName: "shuffle")
+                                Text("随机播放")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.1))
+                            .foregroundColor(.secondary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(true)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 加载状态
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+            }
+            .padding(.vertical)
+        }
+        .navigationTitle("详情")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    .environmentObject(musicService)
+}
+
+#Preview("错误状态") {
+    let musicService = MusicService.shared
+    
+    NavigationStack {
+        ScrollView {
+            VStack(spacing: 20) {
+                // 顶部信息（可见）
+                VStack(spacing: 16) {
+                    ZStack {
+                        Image("artwork-cassette")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360)
+                        
+                        ZStack{
+                            Color.black
+                                .frame(width: 290, height: 140)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .padding(.bottom, 37)
+                            Image("CASSOFLOW")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 120)
+                                .padding(.top, 20)
+                        }
+                        
+                        Image("artwork-cassette-hole")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360)
+                    }
+
+                    VStack(spacing: 4) {
+                        Text("加载失败")
+                            .font(.title2.bold())
+                            .multilineTextAlignment(.center)
+                        
+                        Text("发生错误")
+                            .font(.title2)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    
+                    // 播放控制按钮（禁用状态）
+                    HStack(spacing: 20) {
+                        Button {
+                            // 禁用
+                        } label: {
+                            HStack {
+                                Image(systemName: "play.fill")
+                                Text("播放")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.1))
+                            .foregroundColor(.secondary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(true)
+                        
+                        Button {
+                            // 禁用
+                        } label: {
+                            HStack {
+                                Image(systemName: "shuffle")
+                                Text("随机播放")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.1))
+                            .foregroundColor(.secondary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(true)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 错误信息
+                Text("加载详情失败: 网络连接超时")
+                    .foregroundColor(.red)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical)
+        }
+        .navigationTitle("详情")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    .environmentObject(musicService)
+}
+
+// MARK: - 模拟数据结构
+struct MockTrack {
+    let id: String
+    let title: String
+    let artistName: String
+    let duration: TimeInterval
+}
+
+// MARK: - 模拟歌曲行视图
+struct MockTrackRow: View {
+    let index: Int
+    let track: MockTrack
+    let isPlaying: Bool
+    
+    var body: some View {
+        HStack {
+            if isPlaying {
+                // 简化的音频波形
+                HStack(spacing: 2) {
+                    ForEach(0..<5, id: \.self) { _ in
+                        Rectangle()
+                            .fill(.primary)
+                            .frame(width: 2, height: 12)
+                    }
+                }
+                .frame(width: 24, height: 24)
+            } else {
+                Text("\(index + 1)")
+                    .frame(width: 24, alignment: .center)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(track.title)
+                    .foregroundColor(.primary)
+                Text(track.artistName)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Text(formattedDuration(track.duration))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 16)
+        .background(
+            isPlaying ? Color.white.opacity(0.1) : Color.clear
+        )
+        .contentShape(Rectangle())
+    }
+    
+    private func formattedDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

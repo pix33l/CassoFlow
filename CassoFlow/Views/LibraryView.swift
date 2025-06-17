@@ -307,7 +307,13 @@ struct AlbumCell: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
-                    Color.gray
+                    ZStack{
+                        Color.black
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 75)
+                    }
                 }
                 .frame(width: 100, height: 160)
                 .clipShape(Rectangle())
@@ -400,7 +406,161 @@ struct PlaylistCell: View {
 
 #Preview("成功状态") {
     let musicService = MusicService.shared
-    LibraryView()
+    
+    // 创建一个带有示例数据的LibraryView
+    struct LibraryViewWithMockData: View {
+        @State private var selectedSegment = 0
+        @State private var userAlbums: [MockAlbum] = [
+            MockAlbum(id: "1", title: "Folklore", artistName: "Taylor Swift"),
+            MockAlbum(id: "2", title: "Blinding Lights", artistName: "The Weeknd"),
+            MockAlbum(id: "3", title: "好想爱这个世界啊好想爱这个世界啊", artistName: "华晨宇好想爱这个世界啊"),
+            MockAlbum(id: "4", title: "七里香", artistName: "周杰伦"),
+            MockAlbum(id: "5", title: "千与千寻", artistName: "久石让"),
+            MockAlbum(id: "6", title: "Bad Habits", artistName: "Ed Sheeran")
+        ]
+        @State private var userPlaylists: [MockPlaylist] = [
+            MockPlaylist(id: "1", name: "我的最爱"),
+            MockPlaylist(id: "2", name: "健身音乐"),
+            MockPlaylist(id: "3", name: "深夜电台"),
+            MockPlaylist(id: "4", name: "开车专用"),
+            MockPlaylist(id: "5", name: "经典老歌"),
+            MockPlaylist(id: "6", name: "学习背景音乐")
+        ]
+        
+        var body: some View {
+            NavigationStack {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        // 分段控制器
+                        Picker("媒体类型", selection: $selectedSegment) {
+                            Text("专辑").tag(0)
+                            Text("歌单").tag(1)
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal)
+                        
+                        LazyVGrid(columns: [
+                            GridItem(.adaptive(minimum: 110), spacing: 5)
+                        ], spacing: 20) {
+                            if selectedSegment == 0 {
+                                ForEach(userAlbums, id: \.id) { album in
+                                    MockAlbumCell(album: album)
+                                }
+                            } else {
+                                ForEach(userPlaylists, id: \.id) { playlist in
+                                    MockPlaylistCell(playlist: playlist)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+                .navigationTitle("媒体库")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            // 预览中的空操作
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.caption)
+                                .foregroundColor(.primary)
+                                .padding(8)
+                                .background(
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.15))
+                                )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // 示例数据结构
+    struct MockAlbum {
+        let id: String
+        let title: String
+        let artistName: String
+    }
+    
+    struct MockPlaylist {
+        let id: String
+        let name: String
+    }
+    
+    // 示例专辑单元格
+    struct MockAlbumCell: View {
+        let album: MockAlbum
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                // 专辑封面
+                ZStack {
+                    ZStack{
+                        Color.black
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 75)
+                    }
+                    .frame(width: 100, height: 160)
+                    .clipShape(Rectangle())
+                    
+                    Image("cover-cassette")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 110, height: 170)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+                // 专辑信息
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(album.title)
+                        .font(.footnote)
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                    
+                    Text(album.artistName)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+                .padding(.top, 4)
+            }
+        }
+    }
+    
+    // 示例歌单单元格
+    struct MockPlaylistCell: View {
+        let playlist: MockPlaylist
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                // 歌单封面
+                ZStack {
+                    Color.gray
+                        .frame(width: 100, height: 160)
+                        .clipShape(Rectangle())
+                    
+                    Image("cover-cassette")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 110, height: 170)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+                // 歌单信息
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(playlist.name)
+                        .foregroundColor(.primary)
+                        .font(.footnote)
+                        .lineLimit(1)
+                }
+                .padding(.top, 4)
+            }
+        }
+    }
+    
+    return LibraryViewWithMockData()
         .environmentObject(musicService)
 }
 
