@@ -353,7 +353,13 @@ struct PlaylistCell: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
-                    Color.gray
+                    ZStack{
+                        Color.black
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 75)
+                    }
                 }
                 .frame(width: 100, height: 160)
                 .clipShape(Rectangle())

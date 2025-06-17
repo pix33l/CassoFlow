@@ -118,14 +118,13 @@ struct PlayerBackgroundView: View {
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .clipped()
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            }
-            .edgesIgnoringSafeArea(.all)
             
-            if musicService.currentTrackID != nil {
-                HolesView(rotationAngle: $rotationAngle)
-                    .padding(.bottom, 280.0)
-            }
-            GeometryReader { geometry in
+                if musicService.currentTrackID != nil {
+                    HolesView(rotationAngle: $rotationAngle)
+                        .padding(.bottom, 280.0)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                }
                 Image(musicService.currentPlayerSkin.playerImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -186,7 +185,7 @@ struct PlayerControlsView: View {
                 isShuffled: $isShuffled,
                 progress: progress
             )
-            .frame(height: 90.0)
+            .frame(height: 80.0)
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 8)
@@ -348,11 +347,27 @@ struct TrackInfoHeader: View {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                     impactFeedback.impactOccurred()
                 }
-//                showSettingsView = true
+                musicService.setCassetteEffect(enabled: !musicService.isCassetteEffectEnabled)
             } label: {
-                Text("TIME")
+                Text("SOUND EFFECT")
+                    .font(.caption)
+                    .padding(4)
+                    .multilineTextAlignment(.leading)
+                    .foregroundColor(
+                        musicService.isCassetteEffectEnabled ?
+                        Color(musicService.currentPlayerSkin.screenTextColor) :
+                        Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(
+                                musicService.isCassetteEffectEnabled ?
+                                Color(musicService.currentPlayerSkin.screenTextColor) :
+                                Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3),
+                                lineWidth: 1
+                            )
+                    )
             }
-            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
         }
         .fontWeight(.bold)
         .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
@@ -404,8 +419,9 @@ struct RepeatAndShuffleView: View {
                     Color(musicService.currentPlayerSkin.screenTextColor)
                 )
                 .padding(4)
-                .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
-                )
+                /*
+                .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)))
+                 */
             }
             
             Spacer()
@@ -431,8 +447,9 @@ struct RepeatAndShuffleView: View {
                         Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3)
                     )
                     .padding(4)
-                    .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1))
-                    )
+                    /*
+                    .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)))
+                     */
             }
         }
     }
@@ -454,14 +471,14 @@ struct SongTitleView: View {
         } label: {
             VStack {
                 Text(musicService.currentTitle)
-                    .font(.title3)
+                    .font(.body)
                     .fontWeight(.bold)
                     .lineLimit(1)
                 Text(musicService.currentArtist)
-                    .font(.body)
+                    .font(.callout)
                     .lineLimit(1)
             }
-            .frame(height: 40.0)
+            .frame(height: 35.0)
             .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
         }
     }
@@ -535,7 +552,6 @@ struct ControlButton: View {
                         .font(.title3)
                         .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
                 }
-                .frame(height: 50)
                 .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: isPressed))
                 .disabled(true)
                 .allowsHitTesting(false)
@@ -582,7 +598,6 @@ struct ControlButton: View {
                         .font(.title3)
                         .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
                 }
-                .frame(height: 50)
                 .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
             }
         }

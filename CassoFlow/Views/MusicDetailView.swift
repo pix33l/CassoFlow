@@ -354,7 +354,7 @@ struct InfoFooter: View {
     let isPlaylist: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .center, spacing: 4) {
             // 根据类型显示不同的日期信息
             if isPlaylist {
                 Text("最后更新于 \(releaseDate.formattedDateString())")
@@ -554,7 +554,7 @@ extension Date {
                         }
                         
                         // 底部信息
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .center, spacing: 4) {
                             Text("发布于 2008年11月11日")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
@@ -562,6 +562,7 @@ extension Date {
                             Text("6首歌曲 • 24分钟")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -706,7 +707,7 @@ extension Date {
                         }
                         
                         // 底部信息
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .center, spacing: 4) {
                             Text("最后更新于 今天")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
@@ -714,6 +715,7 @@ extension Date {
                             Text("8首歌曲 • 34分钟")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)

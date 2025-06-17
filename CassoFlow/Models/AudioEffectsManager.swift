@@ -126,8 +126,8 @@ class AudioEffectsManager: ObservableObject {
         audioEngine.connect(noisePlayer, to: mixerNode, format: outputFormat)
         audioEngine.connect(mixerNode, to: audioEngine.outputNode, format: outputFormat)
         
-        // 设置音量
-        noisePlayer.volume = 0.5 // 磁带音效音量
+        // 初始音量设为0，等待用户设置或加载保存的设置
+        noisePlayer.volume = 0.0
         
         // 准备音频引擎
         audioEngine.prepare()
@@ -146,8 +146,17 @@ class AudioEffectsManager: ObservableObject {
         generateCassetteNoise()
     }
     
-    /// 生成磁带噪音音频缓冲区
-    private func generateCassetteNoise() {
+    /// 生成磁带噪音音频缓冲区 - 支持自定义参数
+    func regenerateCassetteNoise(
+        whiteNoiseRange: Float = 0.06,
+        flutterAmplitude: Float = 0.02,
+        flutterFrequency: Float = 0.0008,
+        frictionAmplitude: Float = 0.015,
+        frictionFrequency: Float = 0.02,
+        hissRange: Float = 0.01,
+        crackleThreshold: Float = 0.998,
+        crackleRange: Float = 0.08
+    ) {
         // 使用与音频引擎输出相同的格式
         let outputFormat = audioEngine.outputNode.inputFormat(forBus: 0)
         let sampleRate = outputFormat.sampleRate
@@ -176,28 +185,48 @@ class AudioEffectsManager: ObservableObject {
             let channelBuffer = channelData[channel]
             
             for frame in 0..<Int(frameCount) {
-                // 生成白噪音 (-1 到 1 之间的随机值)
-                let whiteNoise = Float.random(in: -0.06...0.06)
+                // 生成白噪音 (使用自定义范围)
+                let whiteNoise = Float.random(in: -whiteNoiseRange...whiteNoiseRange)
                 
-                // 添加低频抖动效果 (磁带的慢速度变化)
-                let flutter = sin(Float(frame) * 0.0008) * 0.02
+                // 添加低频抖动效果 (磁带的慢速度变化) - 使用自定义参数
+                let flutter = sin(Float(frame) * flutterFrequency) * flutterAmplitude
                 
-                // 添加中频磁带摩擦声
-                let tape_friction = sin(Float(frame) * 0.02) * 0.015
+                // 添加中频磁带摩擦声 - 使用自定义参数
+                let tape_friction = sin(Float(frame) * frictionFrequency) * frictionAmplitude
                 
-                // 添加高频嘶嘶声
-                let hiss = Float.random(in: -0.01...0.01)
+                // 添加高频嘶嘶声 - 使用自定义范围
+                let hiss = Float.random(in: -hissRange...hissRange)
                 
-                // 偶尔的噪点 (模拟磁带瑕疵)
-                let crackle = (Float.random(in: 0...1) > 0.998) ? Float.random(in: -0.08...0.08) : 0.0
+                // 偶尔的噪点 (模拟磁带瑕疵) - 使用自定义参数
+                let crackle = (Float.random(in: 0...1) > crackleThreshold) ? Float.random(in: -crackleRange...crackleRange) : 0.0
                 
                 let sample = whiteNoise + flutter + tape_friction + hiss + crackle
-                channelBuffer[frame] = sample * 0.5 // 整体降低音量
+                channelBuffer[frame] = sample * 0.5 // 固定整体音量为0.5
             }
         }
         
         cassetteNoiseBuffer = buffer
-        print("🎵 磁带噪音音频生成完成 (采样率: \(sampleRate), 通道数: \(channels))")
+        
+        // 如果当前正在播放音效，重新开始播放新的缓冲区
+        if noisePlayer.isPlaying {
+            noisePlayer.stop()
+            if isCassetteEffectEnabled && isMusicPlaying {
+                startCassetteEffect()
+            }
+        }
+        
+        print("🎵 自定义磁带噪音音频重新生成完成")
+        print("   - 白噪音范围: \(whiteNoiseRange)")
+        print("   - 抖动: 幅度=\(flutterAmplitude), 频率=\(flutterFrequency)")
+        print("   - 摩擦声: 幅度=\(frictionAmplitude), 频率=\(frictionFrequency)")
+        print("   - 嘶嘶声范围: \(hissRange)")
+        print("   - 噪点: 阈值=\(crackleThreshold), 范围=\(crackleRange)")
+        print("   - 整体音量: 0.5 (固定值)")
+    }
+    
+    /// 生成磁带噪音音频缓冲区 - 使用默认参数
+    private func generateCassetteNoise() {
+        regenerateCassetteNoise()
     }
     
     /// 更新磁带效果
@@ -244,13 +273,13 @@ class AudioEffectsManager: ObservableObject {
             }
         }
         
-        // 如果已经在播放，直接返回
+        // 如果已经在播放，先停止再重新开始
         if noisePlayer.isPlaying {
-            return
+            noisePlayer.stop()
         }
         
-        // 停止之前的播放并清除缓冲区
-        noisePlayer.stop()
+        // 清除之前的缓冲区调度
+        noisePlayer.reset()
         
         // 循环播放噪音
         noisePlayer.scheduleBuffer(buffer, at: nil, options: .loops, completionHandler: nil)
@@ -269,8 +298,11 @@ class AudioEffectsManager: ObservableObject {
     
     /// 从 UserDefaults 加载设置
     private func loadSettings() {
-        isCassetteEffectEnabled = UserDefaults.standard.bool(forKey: "CassetteEffectEnabled")
-        print("🎵 加载磁带音效设置: \(isCassetteEffectEnabled)")
+        // 加载保存的音量设置，如果没有则使用默认值0.5
+        let savedVolume = UserDefaults.standard.object(forKey: "CassetteEffectVolume") as? Float ?? 0.5
+        noisePlayer.volume = savedVolume
+        
+        print("🎵 加载磁带音效音量: \(savedVolume)")
     }
     
     /// 设置磁带效果开关
@@ -289,8 +321,13 @@ class AudioEffectsManager: ObservableObject {
     
     /// 调整磁带噪音音量
     func setCassetteNoiseVolume(_ volume: Float) {
-        noisePlayer.volume = max(0.0, min(1.0, volume))
-        print("🎵 设置磁带噪音音量: \(volume)")
+        let clampedVolume = max(0.0, min(1.0, volume))
+        noisePlayer.volume = clampedVolume
+        
+        // 保存到UserDefaults
+        UserDefaults.standard.set(clampedVolume, forKey: "CassetteEffectVolume")
+        
+        print("🎵 设置磁带噪音音量: \(clampedVolume)")
     }
     
     /// 清理资源

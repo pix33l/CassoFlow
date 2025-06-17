@@ -12,7 +12,7 @@ struct ProBadge: View {
             .font(.caption2)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Color.orange)
+            .background(Color.blue)
             .foregroundColor(.white)
             .cornerRadius(4)
     }
@@ -146,17 +146,22 @@ struct SettingsView: View {
                             
                             Toggle("磁带音效", isOn: Binding(
                                 get: {
-                                    // 只有会员才显示真实状态，非会员显示false
-                                    return storeManager.membershipStatus.isActive && musicService.isCassetteEffectEnabled
+                                    // 测试模式：显示真实状态，不检查会员
+                                    return musicService.isCassetteEffectEnabled
+                                    // 原始会员检查逻辑（已注释）：
+                                    // return storeManager.membershipStatus.isActive && musicService.isCassetteEffectEnabled
                                 },
                                 set: { newValue in
-                                    if storeManager.membershipStatus.isActive {
-                                        musicService.setCassetteEffect(enabled: newValue)
-                                    } else {
-                                        // 非会员用户点击时显示升级提示
-                                        print("🔘 非会员点击磁带音效，弹出PaywallView")
-                                        showingPaywall = true
-                                    }
+                                    // 测试模式：直接设置，不检查会员
+                                    musicService.setCassetteEffect(enabled: newValue)
+                                    // 原始会员检查逻辑（已注释）：
+                                    // if storeManager.membershipStatus.isActive {
+                                    //     musicService.setCassetteEffect(enabled: newValue)
+                                    // } else {
+                                    //     // 非会员用户点击时显示升级提示
+                                    //     print("🔘 非会员点击磁带音效，弹出PaywallView")
+                                    //     showingPaywall = true
+                                    // }
                                 }
                             ))
                             // 移除 disabled，让非会员也能点击
@@ -167,13 +172,27 @@ struct SettingsView: View {
                         
                         HStack {
                             Spacer().frame(width: 25) // 与图标对齐
+                            // 测试模式：隐藏Pro标识
+                            // if !storeManager.membershipStatus.isActive {
+                            //     ProBadge()
+                            // }
                             Text("模拟磁带播放时的底噪和低频抖动效果")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            if !storeManager.membershipStatus.isActive {
-                                ProBadge()
-                            }
                             Spacer()
+                        }
+                        
+                        // 新增：音效调节入口
+                       if musicService.isCassetteEffectEnabled {
+                            NavigationLink(destination: AudioEffectsSettingsView().environmentObject(musicService)) {
+                                HStack {
+                                    Spacer().frame(width: 25) // 与图标对齐
+//                                    Image(systemName: "slider.horizontal.3")
+                                    Text("调节音效参数")
+                                    Spacer()
+                                }
+                                .padding(.top, 5)
+                            }
                         }
                     }
                     
@@ -185,17 +204,22 @@ struct SettingsView: View {
                             
                             Toggle("触觉反馈", isOn: Binding(
                                 get: {
-                                    // 只有会员才显示真实状态，非会员显示false
-                                    return storeManager.membershipStatus.isActive && musicService.isHapticFeedbackEnabled
+                                    // 测试模式：显示真实状态，不检查会员
+                                    return musicService.isHapticFeedbackEnabled
+                                    // 原始会员检查逻辑（已注释）：
+                                    // return storeManager.membershipStatus.isActive && musicService.isHapticFeedbackEnabled
                                 },
                                 set: { newValue in
-                                    if storeManager.membershipStatus.isActive {
-                                        musicService.setHapticFeedback(enabled: newValue)
-                                    } else {
-                                        // 非会员用户点击时显示升级提示
-                                        print("🔘 非会员点击触觉反馈，弹出PaywallView")
-                                        showingPaywall = true
-                                    }
+                                    // 测试模式：直接设置，不检查会员
+                                    musicService.setHapticFeedback(enabled: newValue)
+                                    // 原始会员检查逻辑（已注释）：
+                                    // if storeManager.membershipStatus.isActive {
+                                    //     musicService.setHapticFeedback(enabled: newValue)
+                                    // } else {
+                                    //     // 非会员用户点击时显示升级提示
+                                    //     print("🔘 非会员点击触觉反馈，弹出PaywallView")
+                                    //     showingPaywall = true
+                                    // }
                                 }
                             ))
                             // 移除 disabled，让非会员也能点击
@@ -203,12 +227,13 @@ struct SettingsView: View {
                         
                         HStack {
                             Spacer().frame(width: 25) // 与图标对齐
+                            // 测试模式：隐藏Pro标识
+                            // if !storeManager.membershipStatus.isActive {
+                            //     ProBadge()
+                            // }
                             Text("增加触觉反馈来模拟类似实体的操作感")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            if !storeManager.membershipStatus.isActive {
-                                ProBadge()
-                            }
                             Spacer()
                         }
                     }
@@ -221,17 +246,22 @@ struct SettingsView: View {
                             
                             Toggle("屏幕常亮", isOn: Binding(
                                 get: {
-                                    // 只有会员才显示真实状态，非会员显示false
-                                    return storeManager.membershipStatus.isActive && musicService.isScreenAlwaysOn
+                                    // 测试模式：显示真实状态，不检查会员
+                                    return musicService.isScreenAlwaysOn
+                                    // 原始会员检查逻辑（已注释）：
+                                    // return storeManager.membershipStatus.isActive && musicService.isScreenAlwaysOn
                                 },
                                 set: { newValue in
-                                    if storeManager.membershipStatus.isActive {
-                                        musicService.setScreenAlwaysOn(enabled: newValue)
-                                    } else {
-                                        // 非会员用户点击时显示升级提示
-                                        print("🔘 非会员点击屏幕常亮，弹出PaywallView")
-                                        showingPaywall = true
-                                    }
+                                    // 测试模式：直接设置，不检查会员
+                                    musicService.setScreenAlwaysOn(enabled: newValue)
+                                    // 原始会员检查逻辑（已注释）：
+                                    // if storeManager.membershipStatus.isActive {
+                                    //     musicService.setScreenAlwaysOn(enabled: newValue)
+                                    // } else {
+                                    //     // 非会员用户点击时显示升级提示
+                                    //     print("🔘 非会员点击屏幕常亮，弹出PaywallView")
+                                    //     showingPaywall = true
+                                    // }
                                 }
                             ))
                             // 移除 disabled，让非会员也能点击
@@ -242,12 +272,13 @@ struct SettingsView: View {
                         
                         HStack {
                             Spacer().frame(width: 25) // 与图标对齐
+                            // 测试模式：隐藏Pro标识
+                            // if !storeManager.membershipStatus.isActive {
+                            //     ProBadge()
+                            // }
                             Text("可以保持屏幕一直不锁屏看磁带转动")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            if !storeManager.membershipStatus.isActive {
-                                ProBadge()
-                            }
                             Spacer()
                         }
                     }

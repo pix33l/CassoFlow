@@ -44,6 +44,8 @@ struct StoreView: View {
                     }
                 }
                 
+                Spacer()
+                
                 if selectedSegment == 0 {
                     // 播放器皮肤TabView
                     TabView(selection: $selectedPlayerName) {
@@ -57,7 +59,6 @@ struct StoreView: View {
                         }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .always))
-                    .frame(height: 580)
                     .onChange(of: selectedPlayerName) { _, _ in
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -77,7 +78,6 @@ struct StoreView: View {
                         }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .always))
-                    .frame(height: 580)
                     .onChange(of: selectedCassetteName) { _, _ in
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -116,7 +116,7 @@ struct StoreView: View {
                 }
                 .disabled(purchaseInProgress || storeManager.isLoading)
                 .padding(.horizontal)
-                .padding(.bottom, 20)
+//                .padding(.bottom, 20)
             }
             .navigationTitle("商店")
             .navigationBarTitleDisplayMode(.inline)
@@ -178,11 +178,11 @@ struct StoreView: View {
     
     private var buttonBackgroundColor: Color {
         if isCurrentSkinOwned() {
-            return Color.orange
+            return Color.blue
         }
         // 会员用户对于收费皮肤也显示蓝色背景
         if storeManager.membershipStatus.isActive && !isFreeSkin() {
-            return Color.orange
+            return Color.blue
         }
         return Color.white
     }
@@ -307,8 +307,8 @@ struct SkinCardView: View {
                 Image(playerSkin.coverImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxHeight: 400)
-                    .padding(.bottom)
+                    .frame(maxHeight: 500)
+                    .padding()
                 
                 VStack(spacing: 5) {
                     Text(playerSkin.name)
@@ -317,12 +317,13 @@ struct SkinCardView: View {
                     Text(playerSkin.year)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                        .padding(.bottom, 10)
                     
                     Text(playerSkin.description)
                         .font(.body)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
-                        .padding()
+                        .padding(.bottom, 50)
                 }
                 .frame(maxWidth: .infinity)
                 
@@ -331,7 +332,7 @@ struct SkinCardView: View {
                 Image(cassetteSkin.coverImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxHeight: 380)
+                    .frame(maxHeight: 500)
                     .padding()
                 
                 VStack(spacing: 5) {
@@ -341,12 +342,13 @@ struct SkinCardView: View {
                     Text(cassetteSkin.year)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                        .padding(.bottom, 10)
                     
                     Text(cassetteSkin.description)
                         .font(.body)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
-                        .padding()
+                        .padding(.bottom, 50)
                 }
                 .frame(maxWidth: .infinity)
             }

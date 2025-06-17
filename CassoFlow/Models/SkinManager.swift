@@ -17,6 +17,8 @@ struct PlayerSkin: Identifiable {
     let screenOutlineColor: Color
     let playerImage: String
     let cassetteBgImage: String
+    let buttonCornerRadius: CGFloat
+    let buttonHeight: CGFloat
 
     // 播放器皮肤集合
     static let playerSkins: [PlayerSkin] = [
@@ -35,7 +37,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: .black,
             playerImage: "player-CF-DEMO",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 30,
+            buttonHeight: 60
         ),
         PlayerSkin(
             name: "CF-PC13",  // 名称作为唯一标识
@@ -51,7 +55,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-blue"),
             screenOutlineColor: .black,
             playerImage: "player-CF-PC13",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 25,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-M10",  // 名称作为唯一标识
@@ -67,7 +73,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: .black,
             playerImage: "player-CF-M10",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 8,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-WIND",  // 名称作为唯一标识
@@ -83,7 +91,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: .black,
             playerImage: "player-CF-WIND",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 30,
+            buttonHeight: 60
         ),
         PlayerSkin(
             name: "CF-L2",  // 名称作为唯一标识
@@ -99,7 +109,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: .black,
             playerImage: "player-CF-L2",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 8,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-2",  // 名称作为唯一标识
@@ -115,7 +127,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-blue"),
             screenOutlineColor: .black,
             playerImage: "player-CF-2",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 20,
+            buttonHeight: 40
         ),
         PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识
@@ -131,7 +145,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: Color("outline-screen-CF-11"),
             playerImage: "player-CF-22",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 8,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-504",  // 名称作为唯一标识
@@ -147,7 +163,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: Color("outline-screen-CF-11"),
             playerImage: "player-CF-504",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 12,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-D6C",  // 名称作为唯一标识
@@ -163,7 +181,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-orange"),
             screenOutlineColor: .black,
             playerImage: "player-CF-D6C",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 8,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-DT1",  // 名称作为唯一标识
@@ -179,7 +199,9 @@ struct PlayerSkin: Identifiable {
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: .black,
             playerImage: "player-CF-DT1",
-            cassetteBgImage: "bg-cassette"
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 12,
+            buttonHeight: 50
         )
     ]
     
@@ -190,7 +212,7 @@ struct PlayerSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2", "CF-22", "CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
+        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2","CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
     }
 }
 
