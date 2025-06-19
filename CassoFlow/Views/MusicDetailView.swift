@@ -234,19 +234,6 @@ struct MusicDetailView: View {
         }
     }
     
-    private func loadArtwork() async {
-        guard let url = container.artwork?.url(width: 300, height: 300) else { return }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            await MainActor.run {
-                albumArtwork = UIImage(data: data)
-            }
-        } catch {
-            print("图片加载失败: \(error)")
-        }
-    }
-    
     private func loadTracks() async {
         await MainActor.run {
             isLoading = true
@@ -254,20 +241,115 @@ struct MusicDetailView: View {
         }
         
         do {
-            let loadedTracks = try await container.withTracks()
+            print("🎵 开始加载曲目 - 容器类型: \(isPlaylist() ? "播放列表" : "专辑")")
+            print("🎵 容器名称: \(container.title)")
             
-            await MainActor.run {
-                tracks = loadedTracks
-                
-                if tracks.isEmpty {
-                    errorMessage = "无法加载歌曲列表"
+            // 添加重试机制
+            var retryCount = 0
+            let maxRetries = 3
+            
+            while retryCount < maxRetries {
+                do {
+                    print("🎵 尝试加载曲目 (第\(retryCount + 1)次)")
+                    let loadedTracks = try await container.withTracks()
+                    
+                    await MainActor.run {
+                        tracks = loadedTracks
+                        print("🎵 成功加载 \(tracks.count) 首歌曲")
+                        
+                        // 打印前几首歌曲的信息用于调试
+                        for (index, track) in tracks.prefix(3).enumerated() {
+                            print("🎵 歌曲 \(index + 1): \(track.title) - \(track.artistName) - 时长: \(track.duration ?? 0)秒")
+                        }
+                        
+                        if tracks.isEmpty {
+                            errorMessage = "无法加载歌曲列表"
+                        }
+                        isLoading = false
+                    }
+                    return // 成功后退出重试循环
+                } catch {
+                    print("🎵 加载曲目失败 (尝试 \(retryCount + 1)/\(maxRetries)): \(error)")
+                    retryCount += 1
+                    
+                    // 如果是权限相关错误，不要重试
+                    if let nsError = error as NSError?, nsError.code == -7013 || nsError.code == -7007 {
+                        print("🎵 权限相关错误，停止重试")
+                        await MainActor.run {
+                            errorMessage = "访问受限: \(error.localizedDescription)"
+                            isLoading = false
+                        }
+                        return
+                    }
+                    
+                    // 等待后重试
+                    if retryCount < maxRetries {
+                        try await Task.sleep(nanoseconds: 2_000_000_000) // 等待2秒
+                    }
                 }
+            }
+            
+            // 所有重试都失败了
+            await MainActor.run {
+                errorMessage = "加载详情失败: 多次重试后仍然失败"
                 isLoading = false
             }
+            
         } catch {
+            print("🎵 loadTracks整体失败: \(error)")
             await MainActor.run {
                 errorMessage = "加载详情失败: \(error.localizedDescription)"
                 isLoading = false
+            }
+        }
+    }
+    
+    private func loadArtwork() async {
+        guard let url = container.artwork?.url(width: 300, height: 300) else { 
+            print("🎵 \(container.title) 没有封面URL")
+            return 
+        }
+        
+        print("🎵 开始加载封面: \(container.title) - URL: \(url)")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            // 检查HTTP响应
+            if let httpResponse = response as? HTTPURLResponse {
+                print("🎵 封面请求响应码: \(httpResponse.statusCode)")
+                if httpResponse.statusCode != 200 {
+                    print("🎵 封面加载失败: HTTP \(httpResponse.statusCode)")
+                    return
+                }
+            }
+            
+            guard let image = UIImage(data: data) else {
+                print("🎵 无法创建UIImage from data")
+                return
+            }
+            
+            await MainActor.run {
+                albumArtwork = image
+                print("🎵 成功加载封面: \(container.title)")
+            }
+        } catch {
+            print("🎵 图片加载失败: \(container.title) - \(error)")
+            
+            // 如果是网络错误，尝试使用更小的尺寸
+            if let smallerUrl = container.artwork?.url(width: 150, height: 150) {
+                print("🎵 尝试加载较小尺寸的封面...")
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: smallerUrl)
+                    if let image = UIImage(data: data) {
+                        await MainActor.run {
+                            albumArtwork = image
+                            print("🎵 成功加载小尺寸封面: \(container.title)")
+                        }
+                    }
+                } catch {
+                    print("🎵 小尺寸封面也加载失败: \(error)")
+                }
             }
         }
     }

@@ -125,7 +125,7 @@ struct AudioEffectsSettingsView: View {
                             Text("0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $masterVolume, in: 0...1, step: 0.01) { editing in
                                 if !editing {
                                     audioEffectsManager.setCassetteNoiseVolume(masterVolume)
@@ -135,7 +135,7 @@ struct AudioEffectsSettingsView: View {
                             Text("100")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                 }
@@ -149,7 +149,7 @@ struct AudioEffectsSettingsView: View {
                             Text("0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $whiteNoiseRange, in: 0...0.2, step: 0.001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -158,7 +158,7 @@ struct AudioEffectsSettingsView: View {
                             Text("100")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                 }
@@ -172,7 +172,7 @@ struct AudioEffectsSettingsView: View {
                             Text("0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $flutterAmplitude, in: 0...0.1, step: 0.001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -181,7 +181,7 @@ struct AudioEffectsSettingsView: View {
                             Text("100")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                     
@@ -192,7 +192,7 @@ struct AudioEffectsSettingsView: View {
                             Text("低")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $flutterFrequency, in: 0.0001...0.002, step: 0.0001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -201,7 +201,7 @@ struct AudioEffectsSettingsView: View {
                             Text("高")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                 }
@@ -215,7 +215,7 @@ struct AudioEffectsSettingsView: View {
                             Text("0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $frictionAmplitude, in: 0...0.05, step: 0.001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -224,7 +224,7 @@ struct AudioEffectsSettingsView: View {
                             Text("100")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                     
@@ -235,7 +235,7 @@ struct AudioEffectsSettingsView: View {
                             Text("低")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $frictionFrequency, in: 0.01...0.05, step: 0.001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -244,7 +244,7 @@ struct AudioEffectsSettingsView: View {
                             Text("高")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                 }
@@ -258,7 +258,7 @@ struct AudioEffectsSettingsView: View {
                             Text("0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $hissRange, in: 0...0.03, step: 0.001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -267,7 +267,7 @@ struct AudioEffectsSettingsView: View {
                             Text("100")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                 }
@@ -282,7 +282,7 @@ struct AudioEffectsSettingsView: View {
                             Text("0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: $crackleRange, in: 0...0.2, step: 0.001) { editing in
                                 if !editing {
                                     regenerateAudio()
@@ -291,7 +291,7 @@ struct AudioEffectsSettingsView: View {
                             Text("100")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                     VStack(alignment: .leading, spacing: 8) {
@@ -301,7 +301,7 @@ struct AudioEffectsSettingsView: View {
                             Text("低")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                             Slider(value: Binding(
                                 get: {
                                     // 将阈值转换为频率值：1.0 - threshold
@@ -321,7 +321,7 @@ struct AudioEffectsSettingsView: View {
                             Text("高")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                .frame(width: 25)
+                                .frame(width: 30)
                         }
                     }
                 }

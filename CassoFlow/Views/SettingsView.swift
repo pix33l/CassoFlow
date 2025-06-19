@@ -370,14 +370,14 @@ struct SettingsView: View {
                     
                     // 修改隐私政策链接
                     LinkRow(
-                        title: String(localized:"隐私政策"),
+                        title: String(localized: "隐私政策"),
                         destination: URL(string: WebLink.privacyPolicy.rawValue)!,
                         icon: "lock"
                     )
                     
                     // 修改使用条款链接
                     LinkRow(
-                        title: String(localized:"使用条款"),
+                        title: String(localized: "使用条款"),
                         destination: URL(string: WebLink.termsOfUse.rawValue)!,
                         icon: "book"
                     )
@@ -401,7 +401,7 @@ struct SettingsView: View {
                     Button {
                         closeTapped.toggle()
                         // 修复：只有会员才能使用触觉反馈
-                        if storeManager.membershipStatus.isActive && musicService.isHapticFeedbackEnabled {
+                        if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                             impactFeedback.impactOccurred()
                         }

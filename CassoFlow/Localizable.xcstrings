@@ -184,6 +184,16 @@
         }
       }
     },
+    "使用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
+    },
     "使用条款" : {
       "localizations" : {
         "en" : {
@@ -590,6 +600,16 @@
         }
       }
     },
+    "无法找到该产品信息" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The product information cannot be found"
+          }
+        }
+      }
+    },
     "无限使用所有播放器和磁带皮肤" : {
       "localizations" : {
         "en" : {
@@ -599,6 +619,9 @@
           }
         }
       }
+    },
+    "显示调试信息" : {
+
     },
     "暂无价格" : {
       "localizations" : {
@@ -890,6 +913,9 @@
         }
       }
     },
+    "获取皮肤" : {
+
+    },
     "解锁所有皮肤" : {
       "localizations" : {
         "en" : {
@@ -930,6 +956,9 @@
         }
       }
     },
+    "调试信息" : {
+
+    },
     "购买失败" : {
       "localizations" : {
         "en" : {
@@ -966,6 +995,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Purchase successful! Content has been unlocked for you"
+          }
+        }
+      }
+    },
+    "购买正在处理中，请稍后查看" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase is in progress. Please check back later"
           }
         }
       }

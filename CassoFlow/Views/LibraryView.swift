@@ -16,6 +16,8 @@ struct LibraryView: View {
     @State private var closeTapped = false
     @State private var subscriptionStatus: MusicSubscription? = nil
     @State private var showSubscriptionOffer = false
+    @State private var debugInfo: String = ""
+    @State private var showDebugInfo = false
     
     var body: some View {
         NavigationStack {  // 改为 NavigationStack 避免嵌套导航问题
@@ -23,12 +25,31 @@ struct LibraryView: View {
 
                 // 内容视图
                 if isLoading {
-                    ProgressView()
+                    VStack {
+                        ProgressView()
+                        if !debugInfo.isEmpty {
+                            Text(debugInfo)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 10)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
                 } else if let error = errorMessage {
                     errorView(message: error)
                 } else {
                     contentView
                 }
+                
+                #if DEBUG
+                if !debugInfo.isEmpty {
+                    Button("显示调试信息") {
+                        showDebugInfo.toggle()
+                    }
+                    .font(.caption)
+                    .padding(.bottom, 5)
+                }
+                #endif
             }
             .navigationTitle("媒体库")
             .navigationBarTitleDisplayMode(.inline)
@@ -60,7 +81,12 @@ struct LibraryView: View {
                 isPresented: $showSubscriptionOffer,
                 options: MusicSubscriptionOffer.Options()
             ) { result in
-                print("订阅弹窗结果: \(String(describing: result))")
+                print("🎵 订阅弹窗结果: \(String(describing: result))")
+            }
+            .alert("调试信息", isPresented: $showDebugInfo) {
+                Button("确定") { }
+            } message: {
+                Text(debugInfo)
             }
         }
     }
@@ -165,58 +191,177 @@ struct LibraryView: View {
     private func loadUserLibrary() async {
         isLoading = true
         errorMessage = nil
+        debugInfo = "开始加载媒体库..."
         
-        do {
-            let status = await musicService.requestAuthorization()
-            guard status == .authorized else {
-                // 授权失败时检查订阅状态
-                await checkSubscriptionStatus()
-                errorMessage = "需要授权才能访问您的音乐库"
-                isLoading = false
-                return
-            }
-
-            // 检查订阅状态
+        debugInfo = "检查授权状态..."
+        let currentAuth = MusicAuthorization.currentStatus
+        print("🎵 当前授权状态: \(currentAuth)")
+        
+        let status = await musicService.requestAuthorization()
+        print("🎵 请求授权后状态: \(status)")
+        debugInfo = "授权状态: \(status)"
+        
+        guard status == .authorized else {
+            // 授权失败时检查订阅状态
             await checkSubscriptionStatus()
+            errorMessage = "需要授权才能访问您的音乐库"
+            isLoading = false
+            return
+        }
+
+        debugInfo = "检查订阅状态..."
+        await checkSubscriptionStatus()
+        
+        if let subscription = subscriptionStatus {
+            print("🎵 订阅状态详情:")
+            print("🎵 - canPlayCatalogContent: \(subscription.canPlayCatalogContent)")
+            print("🎵 - hasCloudLibraryEnabled: \(subscription.hasCloudLibraryEnabled)")
+            debugInfo += "\n订阅详情: canPlay=\(subscription.canPlayCatalogContent), cloud=\(subscription.hasCloudLibraryEnabled)"
             
             // 如果用户没有Apple Music订阅，直接显示订阅提示
-            if let subscription = subscriptionStatus,
-               !subscription.canPlayCatalogContent {
+            if !subscription.canPlayCatalogContent {
                 errorMessage = "需要 Apple Music 订阅才能使用"
                 isLoading = false
                 return
             }
+        } else {
+            print("🎵 无法获取订阅状态")
+            debugInfo += "\n无法获取订阅状态"
+        }
 
-            // 同时加载专辑和歌单
-            async let albums = musicService.fetchUserLibraryAlbums()
-            async let playlists = musicService.fetchUserLibraryPlaylists()
-            
-            let (albumsResult, playlistsResult) = await (try? albums, try? playlists)
-            
-            userAlbums = albumsResult ?? []
-            userPlaylists = playlistsResult ?? []
-            
-            if userAlbums.isEmpty && userPlaylists.isEmpty {
-                errorMessage = "您的媒体库是空的\n请先在 Apple Music 中添加一些音乐"
-            }
-        } catch {
-            await checkSubscriptionStatus()
-            errorMessage = "加载媒体库失败: \(error.localizedDescription)"
+        debugInfo = "开始加载专辑和播放列表..."
+        
+        // 同时加载专辑和歌单
+        async let albums = loadAlbumsWithDetails()
+        async let playlists = loadPlaylistsWithDetails()
+        
+        let (albumsResult, playlistsResult) = await (albums, playlists)
+        
+        userAlbums = albumsResult
+        userPlaylists = playlistsResult
+        
+        print("🎵 加载结果: \(userAlbums.count) 张专辑, \(userPlaylists.count) 个播放列表")
+        debugInfo = "加载完成: \(userAlbums.count) 张专辑, \(userPlaylists.count) 个播放列表"
+        
+        if userAlbums.isEmpty && userPlaylists.isEmpty {
+            errorMessage = "您的媒体库是空的\n请先在 Apple Music 中添加一些音乐"
         }
         
         isLoading = false
     }
     
-    private func checkSubscriptionStatus() async {
+    private func loadAlbumsWithDetails() async -> MusicItemCollection<Album> {
         do {
-            // 使用MusicSubscription的静态属性来检查当前订阅状态
-            let subscription = try await MusicSubscription.current
-            await MainActor.run {
-                self.subscriptionStatus = subscription
+            print("🎵 开始获取用户专辑...")
+            let albums = try await musicService.fetchUserLibraryAlbums()
+            print("🎵 获取到 \(albums.count) 张专辑")
+            
+            // 检查前几张专辑的详细信息
+            for (index, album) in albums.prefix(3).enumerated() {
+                print("🎵 专辑 \(index + 1): \(album.title) - \(album.artistName)")
+                print("🎵 - ID: \(album.id)")
+                print("🎵 - 封面可用: \(album.artwork != nil)")
+                if let artwork = album.artwork {
+                    print("🎵 - 封面URL: \(String(describing: artwork.url(width: 300, height: 300)))")
+                }
+                
+                // 尝试获取专辑的歌曲
+                do {
+                    let detailedAlbum = try await album.with(.tracks)
+                    if let tracks = detailedAlbum.tracks {
+                        print("🎵 - 歌曲数量: \(tracks.count)")
+                        for (trackIndex, track) in tracks.prefix(2).enumerated() {
+                            print("🎵   歌曲 \(trackIndex + 1): \(track.title)")
+                        }
+                    } else {
+                        print("🎵 - 无法获取歌曲列表")
+                    }
+                } catch {
+                    print("🎵 - 获取专辑歌曲失败: \(error)")
+                }
             }
+            
+            return albums
         } catch {
-            print("检查订阅状态失败: \(error)")
+            print("🎵 获取专辑失败: \(error)")
+            return []
         }
+    }
+    
+    private func loadPlaylistsWithDetails() async -> MusicItemCollection<Playlist> {
+        do {
+            print("🎵 开始获取用户播放列表...")
+            let playlists = try await musicService.fetchUserLibraryPlaylists()
+            print("🎵 获取到 \(playlists.count) 个播放列表")
+            
+            // 检查前几个播放列表的详细信息
+            for (index, playlist) in playlists.prefix(3).enumerated() {
+                print("🎵 播放列表 \(index + 1): \(playlist.name)")
+                print("🎵 - ID: \(playlist.id)")
+                print("🎵 - 封面可用: \(playlist.artwork != nil)")
+                if let artwork = playlist.artwork {
+                    print("🎵 - 封面URL: \(String(describing: artwork.url(width: 300, height: 300)))")
+                }
+                
+                // 尝试获取播放列表的歌曲
+                do {
+                    let detailedPlaylist = try await playlist.with(.tracks)
+                    if let tracks = detailedPlaylist.tracks {
+                        print("🎵 - 歌曲数量: \(tracks.count)")
+                        for (trackIndex, track) in tracks.prefix(2).enumerated() {
+                            print("🎵   歌曲 \(trackIndex + 1): \(track.title)")
+                        }
+                    } else {
+                        print("🎵 - 无法获取歌曲列表")
+                    }
+                } catch {
+                    print("🎵 - 获取播放列表歌曲失败: \(error)")
+                }
+            }
+            
+            return playlists
+        } catch {
+            print("🎵 获取播放列表失败: \(error)")
+            return []
+        }
+    }
+    
+    private func checkSubscriptionStatus() async {
+        print("🎵 检查订阅状态...")
+        // 添加重试机制
+        var retryCount = 0
+        let maxRetries = 3
+        
+        while retryCount < maxRetries {
+            do {
+                let subscription = try await MusicSubscription.current
+                await MainActor.run {
+                    self.subscriptionStatus = subscription
+                    print("🎵 订阅状态获取成功")
+                }
+                return // 成功后退出重试循环
+            } catch {
+                print("🎵 检查订阅状态失败 (尝试 \(retryCount + 1)/\(maxRetries)): \(error)")
+                retryCount += 1
+                
+                // 如果是权限错误，不要重试
+                if let nsError = error as NSError?, nsError.code == -7013 {
+                    print("🎵 权限错误，停止重试")
+                    break
+                }
+                
+                // 等待后重试
+                if retryCount < maxRetries {
+                    do {
+                        try await Task.sleep(nanoseconds: 1_000_000_000) // 等待1秒
+                    } catch {
+                        print("🎵 等待失败: \(error)")
+                    }
+                }
+            }
+        }
+        
+        print("🎵 检查订阅状态完全失败: 达到最大重试次数")
     }
     
     private func requestAuthorizationAndReload() async {
@@ -294,7 +439,6 @@ struct LibraryView: View {
     }
 }
 
-// 专辑单元格视图
 struct AlbumCell: View {
     let album: Album
     
@@ -317,6 +461,13 @@ struct AlbumCell: View {
                 }
                 .frame(width: 100, height: 160)
                 .clipShape(Rectangle())
+                .onAppear {
+                    if let artworkURL = album.artwork?.url(width: 300, height: 300) {
+                        print("🎵 尝试加载封面: \(album.title) - \(artworkURL)")
+                    } else {
+                        print("🎵 无封面URL: \(album.title)")
+                    }
+                }
                 Image("cover-cassette")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -340,7 +491,6 @@ struct AlbumCell: View {
     }
 }
 
-// 歌单单元格视图
 struct PlaylistCell: View {
     let playlist: Playlist
     
@@ -363,6 +513,13 @@ struct PlaylistCell: View {
                 }
                 .frame(width: 100, height: 160)
                 .clipShape(Rectangle())
+                .onAppear {
+                    if let artworkURL = playlist.artwork?.url(width: 300, height: 300) {
+                        print("🎵 尝试加载播放列表封面: \(playlist.name) - \(artworkURL)")
+                    } else {
+                        print("🎵 播放列表无封面URL: \(playlist.name)")
+                    }
+                }
                 Image("cover-cassette")
                     .resizable()
                     .aspectRatio(contentMode: .fill)

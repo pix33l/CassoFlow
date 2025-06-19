@@ -162,18 +162,18 @@ struct StoreView: View {
     private var buttonTitle: String {
         if let playerSkin = currentSkinType.0 {
             if isCurrentSkinOwned() {
-                return "使用"
+                return String(localized: "使用")
             } else {
                 return SkinHelper.getPlayerSkinPrice(playerSkin.name, storeManager: storeManager)
             }
         } else if let cassetteSkin = currentSkinType.1 {
             if isCurrentSkinOwned() {
-                return "使用"
+                return String(localized: "使用")
             } else {
                 return SkinHelper.getCassetteSkinPrice(cassetteSkin.name, storeManager: storeManager)
             }
         }
-        return "获取皮肤"
+        return String(localized: "获取皮肤")
     }
     
     private var buttonBackgroundColor: Color {
@@ -254,7 +254,7 @@ struct StoreView: View {
         guard !productID.isEmpty,
               let product = storeManager.getProduct(for: productID) else {
             purchaseInProgress = false
-            storeManager.alertMessage = "无法找到该产品信息"
+            storeManager.alertMessage = String(localized: "无法找到该产品信息")
             storeManager.showAlert = true
             return
         }
@@ -276,7 +276,7 @@ struct StoreView: View {
             storeManager.showAlert = true
             
         case .pending:
-            storeManager.alertMessage = "购买正在处理中，请稍后查看。"
+            storeManager.alertMessage = String(localized: "购买正在处理中，请稍后查看")
             storeManager.showAlert = true
         }
         
