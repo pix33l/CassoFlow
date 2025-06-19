@@ -200,8 +200,8 @@ class MusicService: ObservableObject {
         
         guard let entry = player.queue.currentEntry else {
             DispatchQueue.main.async {
-                self.currentTitle = "未播放歌曲"
-                self.currentArtist = "点此选择音乐"
+                self.currentTitle = String(localized: "未播放歌曲")
+                self.currentArtist = String(localized: "点此选择音乐")
                 self.currentDuration = 0
                 self.totalDuration = 0
                 self.isPlaying = false  // 添加播放状态重置

@@ -276,7 +276,7 @@ struct SettingsView: View {
                             // if !storeManager.membershipStatus.isActive {
                             //     ProBadge()
                             // }
-                            Text("可以保持屏幕一直不锁屏看磁带转动")
+                            Text("保持屏幕一直不锁屏")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -286,7 +286,7 @@ struct SettingsView: View {
                 // 支持我们
                 Section(header: Text("支持我们")) {
                     LinkRow(
-                        title: "给我们五星好评",
+                        title: String(localized:"给我们五星好评"),
                         destination: URL(string: WebLink.appStoreReview.rawValue)!,
                         icon: "star"
                     )

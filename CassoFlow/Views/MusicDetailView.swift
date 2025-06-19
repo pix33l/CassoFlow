@@ -382,12 +382,12 @@ struct InfoFooter: View {
         let minutes = Int(duration) / 60
         
         if minutes < 60 {
-            return "\(minutes)分钟"
+            return String(localized:"\(minutes)分钟")
         } else {
             let hours = minutes / 60
             let remainingMinutes = minutes % 60
             // 显示小时和分钟，如"1小时22分钟"
-            return "\(hours)小时\(remainingMinutes)分钟"
+            return String(localized:"\(hours)小时\(remainingMinutes)分钟")
         }
     }
 }

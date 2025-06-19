@@ -14,8 +14,40 @@
     "%lld" : {
 
     },
+    "%lld分钟" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldMin"
+          }
+        }
+      }
+    },
+    "%lld小时%lld分钟" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lldHour%2$lldMin"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld小时%2$lld分钟"
+          }
+        }
+      }
+    },
     "%lld首歌曲 • %@" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lldSong • %2$@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "new",
@@ -46,18 +78,38 @@
     "PGM NO. 0/0" : {
 
     },
-    "PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验。" : {
+    "PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PIX3L DESIGN STUDIO is an independent individual studio specializing in digital products. With innovative design and outstanding concepts, it creates unique experiences for users in the digital world."
+            "value" : "PIX3L DESIGN STUDIO is an independent individual studio specializing in digital products. With innovative design and outstanding concepts, it creates unique experiences for users in the digital world"
+          }
+        }
+      }
+    },
+    "pix3l_me（备注：CassoFlow）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Note: CassoFlow)"
           }
         }
       }
     },
     "Pro" : {
 
+    },
+    "Pro 会员将在%@到期" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro members will expire at @%"
+          }
+        }
+      }
     },
     "SOUND EFFECT" : {
 
@@ -127,7 +179,17 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terms for usage\n"
+            "value" : "Terms for usage"
+          }
+        }
+      }
+    },
+    "保持屏幕一直不锁屏" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the screen from locking at all times"
           }
         }
       }
@@ -172,22 +234,22 @@
         }
       }
     },
+    "升级 PRO 会员，获取全部高级功能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to PRO membership to access all advanced features"
+          }
+        }
+      }
+    },
     "发布于 %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Published on %@"
-          }
-        }
-      }
-    },
-    "可以保持屏幕一直不锁屏看磁带转动" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "It is possible to keep the screen unlocked and watch the tape rotate continuously"
           }
         }
       }
@@ -242,6 +304,16 @@
         }
       }
     },
+    "尊贵的永久 Pro 会员" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dear Permanent Pro Member"
+          }
+        }
+      }
+    },
     "小红书" : {
       "localizations" : {
         "en" : {
@@ -268,6 +340,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copied"
+          }
+        }
+      }
+    },
+    "已解锁会员功能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Membership features have been unlocked"
+          }
+        }
+      }
+    },
+    "已解锁播放器皮肤: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Player skin unlocked: %@"
+          }
+        }
+      }
+    },
+    "已解锁磁带皮肤: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette skin unlocked: %@"
           }
         }
       }
@@ -332,6 +434,16 @@
         }
       }
     },
+    "怀旧" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nostalgia"
+          }
+        }
+      }
+    },
     "恢复购买" : {
       "localizations" : {
         "en" : {
@@ -358,6 +470,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Succeed"
+          }
+        }
+      }
+    },
+    "成功恢复 %lld 个购买项目：%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successfully restored %1$lld purchase items: %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "成功恢复 %1$lld 个购买项目：%2$@"
           }
         }
       }
@@ -442,6 +570,16 @@
         }
       }
     },
+    "暂无价格" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No price available"
+          }
+        }
+      }
+    },
     "月度" : {
       "localizations" : {
         "en" : {
@@ -452,12 +590,32 @@
         }
       }
     },
+    "未播放歌曲" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unplayed songs"
+          }
+        }
+      }
+    },
     "未来更新" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Future update"
+          }
+        }
+      }
+    },
+    "标准" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
           }
         }
       }
@@ -498,6 +656,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lifetime"
+          }
+        }
+      }
+    },
+    "没有找到可恢复的购买项目" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No purchase items that can be restored were found"
+          }
+        }
+      }
+    },
+    "点此选择音乐" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click here to select music"
           }
         }
       }
@@ -547,7 +725,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tape friction sound"
+            "value" : "Friction"
           }
         }
       }
@@ -568,6 +746,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upgrade Now"
+          }
+        }
+      }
+    },
+    "给我们五星好评" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give us a five-star rating"
           }
         }
       }
@@ -647,7 +835,57 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restore purchase failed"
+            "value" : "Purchase failed"
+          }
+        }
+      }
+    },
+    "购买失败，未知错误" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase failed. Unknown error"
+          }
+        }
+      }
+    },
+    "购买失败: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase failed: %@"
+          }
+        }
+      }
+    },
+    "购买成功！已为您解锁内容" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase successful! Content has been unlocked for you"
+          }
+        }
+      }
+    },
+    "购买验证失败，请稍后重试" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase verification failed. Please try again later"
+          }
+        }
+      }
+    },
+    "轻度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
           }
         }
       }
@@ -668,6 +906,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "E-mail"
+          }
+        }
+      }
+    },
+    "重度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heavy"
           }
         }
       }
@@ -747,7 +995,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "High-frequency hissing sound"
+            "value" : "High-frequency hissing"
           }
         }
       }

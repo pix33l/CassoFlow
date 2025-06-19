@@ -19,7 +19,7 @@ struct ContactUsView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                         .frame(width: 60.0, height: 60.0)
                     
-                    Text("PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验。")
+                    Text("PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验")
                         .font(.footnote)
                         .foregroundColor(.primary)
                         .padding([.leading], 4)
@@ -39,7 +39,7 @@ struct ContactUsView: View {
                 
                 ContactRow(
                     title: String(localized: "微信"),
-                    account: "pix3l_me（备注：CassoFlow）"
+                    account: String(localized: "pix3l_me（备注：CassoFlow）")
                 )
             
                 ContactRow(

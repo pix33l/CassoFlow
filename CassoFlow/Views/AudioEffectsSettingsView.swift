@@ -19,7 +19,7 @@ struct AudioEffectsSettingsView: View {
     // 预设方案
     private let presets: [AudioEffectPreset] = [
         AudioEffectPreset(
-            name: "轻度",
+            name: String(localized: "轻度"),
             whiteNoiseRange: 0.03,
             flutterAmplitude: 0.01,
             flutterFrequency: 0.0006,
@@ -31,7 +31,7 @@ struct AudioEffectsSettingsView: View {
             masterVolume: 0.3
         ),
         AudioEffectPreset(
-            name: "标准",
+            name: String(localized: "标准"),
             whiteNoiseRange: 0.06,
             flutterAmplitude: 0.02,
             flutterFrequency: 0.0008,
@@ -43,7 +43,7 @@ struct AudioEffectsSettingsView: View {
             masterVolume: 0.5
         ),
         AudioEffectPreset(
-            name: "重度",
+            name: String(localized: "重度"),
             whiteNoiseRange: 0.12,
             flutterAmplitude: 0.04,
             flutterFrequency: 0.001,
@@ -55,7 +55,7 @@ struct AudioEffectsSettingsView: View {
             masterVolume: 0.7
         ),
         AudioEffectPreset(
-            name: "怀旧",
+            name: String(localized: "怀旧"),
             whiteNoiseRange: 0.08,
             flutterAmplitude: 0.035,
             flutterFrequency: 0.0005,
@@ -340,13 +340,13 @@ struct AudioEffectsSettingsView: View {
     // 获取预设方案对应的图标
     private func getPresetIcon(for presetName: String) -> String {
         switch presetName {
-        case "轻度":
+        case String(localized: "轻度"):
             return "speaker.wave.1"  // 单波浪，表示轻微
-        case "标准":
+        case String(localized: "标准"):
             return "speaker.wave.2"  // 双波浪，表示标准
-        case "重度":
+        case String(localized: "重度"):
             return "speaker.wave.3"  // 三波浪，表示重度
-        case "怀旧":
+        case String(localized: "怀旧"):
             return "clock.arrow.circlepath"  // 复古时钟，表示怀旧
         default:
             return "speaker.wave.2"

@@ -39,14 +39,17 @@ class StoreManager: ObservableObject {
         var displayText: String {
             switch self {
             case .notMember:
-                return "升级 PRO 会员，获取全部高级功能"
+                return String(localized:"升级 PRO 会员，获取全部高级功能")
             case .lifetimeMember:
-                return "尊贵的永久 Pro 会员"
+                return String(localized:"尊贵的永久 Pro 会员")
             case .monthlyMember(let expiresOn), .yearlyMember(let expiresOn):
                 let formatter = DateFormatter()
-                formatter.dateFormat = "yyyy年M月d日"
-                formatter.locale = Locale(identifier: "zh_CN")
-                return "Pro 会员将在\(formatter.string(from: expiresOn))到期"
+                // 使用系统的本地化日期格式
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .none
+                // 使用当前用户的区域设置
+                formatter.locale = Locale.current
+                return String(localized:"Pro 会员将在\(formatter.string(from: expiresOn))到期")
             }
         }
         
@@ -151,12 +154,12 @@ class StoreManager: ObservableObject {
                     // ✅ 购买成功，解锁功能
                     await handleSuccessfulPurchase(transaction)
                     isLoading = false
-                    return .success("购买成功！已为您解锁相关内容。")
+                    return .success(String(localized: "购买成功！已为您解锁内容"))
                     
                 case .unverified(_, let error):
                     print("❌ 购买验证失败: \(error)")
                     isLoading = false
-                    return .failed("购买验证失败，请稍后重试。")
+                    return .failed(String(localized: "购买验证失败，请稍后重试"))
                 }
                 
             case .userCancelled:
@@ -172,13 +175,13 @@ class StoreManager: ObservableObject {
             @unknown default:
                 print("❓ 未知购买结果")
                 isLoading = false
-                return .failed("购买失败，未知错误。")
+                return .failed(String(localized: "购买失败，未知错误"))
             }
             
         } catch {
             print("❌ 购买出错: \(error)")
             isLoading = false
-            return .failed("购买失败: \(error.localizedDescription)")
+            return .failed(String(localized: "购买失败: \(error.localizedDescription)"))
         }
     }
     
@@ -202,10 +205,10 @@ class StoreManager: ObservableObject {
         // 显示恢复结果
         if restoredCount > 0 {
             let itemList = restoredItems.joined(separator: "、")
-            showSuccessAlert("成功恢复 \(restoredCount) 个购买项目：\(itemList)")
+            showSuccessAlert(String(localized: "成功恢复 \(restoredCount) 个购买项目：\(itemList)"))
             print("✅ 成功恢复 \(restoredCount) 个购买项目")
         } else {
-            showInfoAlert("没有找到可恢复的购买项目。")
+            showInfoAlert(String(localized: "没有找到可恢复的购买项目"))
             print("ℹ️ 没有找到可恢复的购买项目")
         }
         
@@ -237,48 +240,48 @@ class StoreManager: ObservableObject {
         // 播放器皮肤
         case ProductIDs.cfPC13:
             unlockPlayerSkin("CF-PC13")
-            result = "CF-PC13 磁带播放器"
+            result = "CF-PC13"
             
         case ProductIDs.cfM10:
             unlockPlayerSkin("CF-M10")
-            result = "CF-M10 磁带播放器"
+            result = "CF-M10"
             
         case ProductIDs.cfWIND:
             unlockPlayerSkin("CF-WIND")
-            result = "CF-WIND 磁带播放器"
+            result = "CF-WIND"
             
         case ProductIDs.cfL2:
             unlockPlayerSkin("CF-L2")
-            result = "CF-L2 磁带播放器"
+            result = "CF-L2"
             
         case ProductIDs.cf2:
             unlockPlayerSkin("CF-2")
-            result = "CF-2 磁带播放器"
+            result = "CF-2"
             
         case ProductIDs.cf22:
             unlockPlayerSkin("CF-22")
-            result = "CF-22 磁带播放器"
+            result = "CF-22"
             
         case ProductIDs.cf504:
             unlockPlayerSkin("CF-504")
-            result = "CF-504 磁带播放器"
+            result = "CF-504"
             
         case ProductIDs.cfD6C:
             unlockPlayerSkin("CF-D6C")
-            result = "CF-D6C 磁带播放器"
+            result = "CF-D6C"
             
         case ProductIDs.cfDT1:
             unlockPlayerSkin("CF-DT1")
-            result = "CF-DT1 磁带播放器"
+            result = "CF-DT1"
             
         // 磁带皮肤
         case ProductIDs.cftC60:
             unlockCassetteSkin("CFT-C60")
-            result = "CFT-C60 磁带"
+            result = "CFT-C60"
             
         case ProductIDs.cftTRA:
             unlockCassetteSkin("CFT-TRA")
-            result = "CFT-TRA 磁带"
+            result = "CFT-TRA"
             
         default:
             print("⚠️ 未知产品ID: \(productID)")
@@ -296,21 +299,21 @@ class StoreManager: ObservableObject {
     private func unlockPremiumFeatures() {
         // 保存会员状态到UserDefaults
         UserDefaults.standard.set(true, forKey: "isPremiumUser")
-        print("✅ 已解锁会员功能")
+        print(String(localized: "已解锁会员功能"))
     }
     
     /// 解锁播放器皮肤
     private func unlockPlayerSkin(_ skinName: String) {
         let key = "owned_player_skin_\(skinName)"
         UserDefaults.standard.set(true, forKey: key)
-        print("✅ 已解锁播放器皮肤: \(skinName)")
+        print(String(localized: "已解锁播放器皮肤: \(skinName)"))
     }
     
     /// 解锁磁带皮肤
     private func unlockCassetteSkin(_ skinName: String) {
         let key = "owned_cassette_skin_\(skinName)"
         UserDefaults.standard.set(true, forKey: key)
-        print("✅ 已解锁磁带皮肤: \(skinName)")
+        print(String(localized: "已解锁磁带皮肤: \(skinName)"))
     }
     
     // MARK: - 检查购买状态
@@ -403,7 +406,7 @@ class StoreManager: ObservableObject {
     // MARK: - 获取产品价格
     func getProductPrice(for productID: String) -> String {
         guard let product = products.first(where: { $0.id == productID }) else {
-            return "暂无价格"
+            return String(localized: "暂无价格")
         }
         return product.displayPrice
     }
