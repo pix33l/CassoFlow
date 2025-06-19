@@ -116,7 +116,7 @@ struct StoreView: View {
                 }
                 .disabled(purchaseInProgress || storeManager.isLoading)
                 .padding(.horizontal)
-//                .padding(.bottom, 20)
+                .padding(.bottom, 20)
             }
             .navigationTitle("商店")
             .navigationBarTitleDisplayMode(.inline)

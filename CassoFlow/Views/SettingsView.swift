@@ -176,7 +176,7 @@ struct SettingsView: View {
                             // if !storeManager.membershipStatus.isActive {
                             //     ProBadge()
                             // }
-                            Text("模拟磁带播放时的底噪和低频抖动效果")
+                            Text("模拟磁带底噪和低频抖动")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -231,7 +231,7 @@ struct SettingsView: View {
                             // if !storeManager.membershipStatus.isActive {
                             //     ProBadge()
                             // }
-                            Text("增加触觉反馈来模拟类似实体的操作感")
+                            Text("增加反馈来模拟实体操作感")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Spacer()

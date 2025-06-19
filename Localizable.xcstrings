@@ -46,8 +46,15 @@
     "PGM NO. 0/0" : {
 
     },
-    "PIX3L DESIGN 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验。" : {
-
+    "PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO is an independent individual studio specializing in digital products. With innovative design and outstanding concepts, it creates unique experiences for users in the digital world."
+          }
+        }
+      }
     },
     "Pro" : {
 
@@ -55,11 +62,25 @@
     "SOUND EFFECT" : {
 
     },
-    "一次性付费，享受未来的功能更新" : {
-
+    "一次性付费" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-time Payment"
+          }
+        }
+      }
     },
-    "一次性付费，永久拥有" : {
-
+    "一次性付费，享受未来功能更新" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-time payment, free update in the future"
+          }
+        }
+      }
     },
     "专辑" : {
       "localizations" : {
@@ -70,9 +91,6 @@
           }
         }
       }
-    },
-    "享受真实的磁带音质体验" : {
-
     },
     "仅 %@ /天" : {
       "localizations" : {
@@ -85,16 +103,34 @@
       }
     },
     "低" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
+          }
+        }
+      }
     },
     "低频抖动 (Flutter)" : {
-
-    },
-    "使用所有磁带播放器和磁带皮肤" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter"
+          }
+        }
+      }
     },
     "使用条款" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms for usage\n"
+          }
+        }
+      }
     },
     "关于作者" : {
       "localizations" : {
@@ -107,16 +143,44 @@
       }
     },
     "其他" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        }
+      }
     },
     "最划算" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best value"
+          }
+        }
+      }
     },
     "最后更新于 %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last updated on %@"
+          }
+        }
+      }
     },
     "发布于 %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Published on %@"
+          }
+        }
+      }
     },
     "可以保持屏幕一直不锁屏看磁带转动" : {
       "localizations" : {
@@ -129,7 +193,14 @@
       }
     },
     "商品类型" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Product Type"
+          }
+        }
+      }
     },
     "商店" : {
       "localizations" : {
@@ -141,8 +212,15 @@
         }
       }
     },
-    "增加触觉反馈来模拟类似实体的操作感" : {
-
+    "增加反馈来模拟实体操作感" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add feedback to simulate the physical operation sensation"
+          }
+        }
+      }
     },
     "媒体库" : {
       "localizations" : {
@@ -155,7 +233,14 @@
       }
     },
     "媒体类型" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media Type"
+          }
+        }
+      }
     },
     "小红书" : {
       "localizations" : {
@@ -168,16 +253,44 @@
       }
     },
     "屏幕常亮" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen always on"
+          }
+        }
+      }
     },
     "已复制" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        }
+      }
     },
     "年度" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yearly"
+          }
+        }
+      }
     },
     "底噪" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noise"
+          }
+        }
+      }
     },
     "开始 3 天免费试用" : {
       "localizations" : {
@@ -200,7 +313,14 @@
       }
     },
     "强度" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strength"
+          }
+        }
+      }
     },
     "微信" : {
       "localizations" : {
@@ -233,10 +353,24 @@
       }
     },
     "成功" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succeed"
+          }
+        }
+      }
     },
     "把应用推荐给朋友" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommend to your friends"
+          }
+        }
+      }
     },
     "抖音" : {
       "localizations" : {
@@ -248,14 +382,35 @@
         }
       }
     },
-    "持续欣赏磁带转动的韵律" : {
-
+    "持续欣赏磁带转动的机械感" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enjoy the mechanical feeling of the rotating"
+          }
+        }
+      }
     },
     "提示" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminder"
+          }
+        }
+      }
     },
     "播放" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
+      }
     },
     "播放器" : {
       "localizations" : {
@@ -268,16 +423,64 @@
       }
     },
     "支持我们" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support us"
+          }
+        }
+      }
+    },
+    "无限使用所有播放器和磁带皮肤" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited use of all player and cassette skins"
+          }
+        }
+      }
     },
     "月度" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly"
+          }
+        }
+      }
     },
     "未来更新" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Future update"
+          }
+        }
+      }
     },
-    "模拟磁带播放时的底噪和低频抖动效果" : {
-
+    "模拟真实磁带音效" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulate the sound effect of real cassette"
+          }
+        }
+      }
+    },
+    "模拟磁带底噪和低频抖动" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulate noise and flutter effects"
+          }
+        }
+      }
     },
     "歌单" : {
       "localizations" : {
@@ -300,10 +503,24 @@
       }
     },
     "瑕疵噪点 (Crackle)" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crackle"
+          }
+        }
+      }
     },
     "省 50%" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50% Off"
+          }
+        }
+      }
     },
     "确定" : {
       "localizations" : {
@@ -326,7 +543,14 @@
       }
     },
     "磁带摩擦声" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tape friction sound"
+          }
+        }
+      }
     },
     "磁带音效" : {
       "localizations" : {
@@ -359,13 +583,24 @@
       }
     },
     "网站" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        }
+      }
     },
     "联系方式" : {
-
-    },
-    "解锁 PRO 会员，获取全部高级功能" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact information"
+          }
+        }
+      }
     },
     "解锁所有皮肤" : {
       "localizations" : {
@@ -378,7 +613,14 @@
       }
     },
     "触觉反馈" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haptic feedback"
+          }
+        }
+      }
     },
     "设置" : {
       "localizations" : {
@@ -391,13 +633,34 @@
       }
     },
     "调节音效参数" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjust the audio effect"
+          }
+        }
+      }
     },
     "购买失败" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore purchase failed"
+          }
+        }
+      }
     },
     "通用" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
     },
     "邮箱" : {
       "localizations" : {
@@ -410,28 +673,84 @@
       }
     },
     "隐私政策" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy policy"
+          }
+        }
+      }
     },
     "随机播放" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shuffle play"
+          }
+        }
+      }
     },
     "音效音量" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound effect volume"
+          }
+        }
+      }
     },
     "音效预设" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound effect preset"
+          }
+        }
+      }
     },
     "音量" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
+          }
+        }
+      }
     },
     "频率" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequency"
+          }
+        }
+      }
     },
     "高" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
+          }
+        }
+      }
     },
     "高频嘶嘶声" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High-frequency hissing sound"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

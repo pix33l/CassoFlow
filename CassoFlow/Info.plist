@@ -17,5 +17,8 @@
 		<key>UIImageName</key>
 		<string>LaunchScreenLogo</string>
 	</dict>
+	<!-- ADD: 添加账户访问权限描述 -->
+	<key>NSAccountUsageDescription</key>
+	<string>CassoFlow 需要访问您的账户来获取音乐库内容</string>
 </dict>
 </plist>

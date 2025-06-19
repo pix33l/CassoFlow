@@ -14,13 +14,34 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "6747073026",
+      "localizations" : [
+        {
+          "description" : "永久买断 Pro 会员",
+          "displayName" : "永久 Pro",
+          "locale" : "zh_Hans"
+        },
+        {
+          "description" : "Lifetime Time Access",
+          "displayName" : "Pro Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "me.pix3l.CassoFlow.Lifetime",
+      "referenceName" : "永久版",
+      "type" : "NonConsumable"
+    }
   ],
   "settings" : {
     "_applicationInternalID" : "6746403175",
     "_developerTeamID" : "4U3CXVZX7T",
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 771332173.24174094,
+    "_lastSynchronizedDate" : 771851998.10055006,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
     "_storeKitErrors" : [
       {
         "current" : null,
@@ -70,7 +91,86 @@
     ]
   },
   "subscriptionGroups" : [
+    {
+      "id" : "21709234",
+      "localizations" : [
 
+      ],
+      "name" : "订阅会员",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6747306942",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Yearly Time Access",
+              "displayName" : "Pro Yearly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "年度订阅 Pro 会员",
+              "displayName" : "年度 Pro",
+              "locale" : "zh_Hans"
+            }
+          ],
+          "productID" : "me.pix3l.CassoFlow.Yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "年度 Pro",
+          "subscriptionGroupID" : "21709234",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "0.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6747307047",
+          "introductoryOffer" : {
+            "internalID" : "29309D67",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "Monthly Time Access",
+              "displayName" : "Pro Monthly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "月度订阅 Pro 会员",
+              "displayName" : "月度 Pro",
+              "locale" : "zh_Hans"
+            }
+          ],
+          "productID" : "me.pix3l.CassoFlow.Monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "月度 Pro",
+          "subscriptionGroupID" : "21709234",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
   ],
   "version" : {
     "major" : 4,

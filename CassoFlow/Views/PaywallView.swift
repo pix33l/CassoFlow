@@ -9,9 +9,10 @@ import SwiftUI
 import StoreKit
 
 enum MembershipProduct: String, CaseIterable {
-    case monthly = "me.pix3l.CassoFlow.monthly"
-    case yearly = "me.pix3l.CassoFlow.yearly"
-    case lifetime = "me.pix3l.CassoFlow.lifetime"
+    // FIX: 修正产品ID以匹配StoreKitConfig.storekit中的配置
+    case monthly = "me.pix3l.CassoFlow.Monthly"
+    case yearly = "me.pix3l.CassoFlow.Yearly"
+    case lifetime = "me.pix3l.CassoFlow.Lifetime"
     
     var displayName: String {
         switch self {
@@ -94,7 +95,7 @@ struct PaywallView: View {
                                 .aspectRatio(contentMode: .fit)
                                 .frame(height: 30.0)
                             
-                            Text("解锁 PRO 会员，获取全部高级功能")
+                            Text(storeManager.membershipStatus.displayText)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -105,31 +106,31 @@ struct PaywallView: View {
                             FeatureRow(
                                 systemImage: "recordingtape",
                                 title: String(localized: "解锁所有皮肤"),
-                                description: String(localized:"使用所有磁带播放器和磁带皮肤")
+                                description: String(localized:"无限使用所有播放器和磁带皮肤")
                             )
                             Divider()
                             FeatureRow(
                                 systemImage: "waveform",
                                 title: String(localized: "磁带音效"),
-                                description: String(localized:"享受真实的磁带音质体验")
+                                description: String(localized:"模拟真实磁带音效")
                             )
                             Divider()
                             FeatureRow(
                                 systemImage: "sun.max",
                                 title: String(localized: "屏幕常亮"),
-                                description: String(localized:"持续欣赏磁带转动的韵律")
+                                description: String(localized:"持续欣赏磁带转动的机械感")
                             )
                             Divider()
                             FeatureRow(
                                 systemImage: "infinity",
                                 title: String(localized: "未来更新"),
-                                description: String(localized:"一次性付费，享受未来的功能更新")
+                                description: String(localized:"一次性付费，享受未来功能更新")
                             )
                         }
                         .padding(.horizontal)
                         .background(colorScheme == .dark ? Color.white.opacity(0.1) : .gray.opacity(0.15))
                         .cornerRadius(10)
-                        
+/*
                         // 付费选项
                         VStack(spacing: 15) {
                             HStack(spacing: 10) {
@@ -142,11 +143,22 @@ struct PaywallView: View {
                                         ) {
                                             selectedPlan = plan
                                         }
+                                    } else {
+                                        VStack {
+                                            Text("产品未找到")
+                                                .font(.caption)
+                                                .foregroundColor(.red)
+                                            Text(plan.rawValue)
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        .padding()
+                                        .border(Color.red.opacity(0.3))
                                     }
                                 }
                             }
                         }
-                        
+*/
                         // 底部链接
                         HStack {
                             HStack(spacing: 10) {
@@ -163,19 +175,14 @@ struct PaywallView: View {
                             
                             Button("恢复购买") {
                                 Task {
-                                    print("🔄 开始恢复购买")
                                     await storeManager.restorePurchases()
-                                    print("🔄 恢复购买完成，当前会员状态: \(storeManager.isPremiumUser())")
                                     
                                     // 检查是否成功恢复为会员用户
                                     if storeManager.isPremiumUser() {
-                                        print("✅ 检测到会员状态，准备关闭页面")
                                         // 使用延迟关闭来避免视图更新冲突
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                             dismiss()
                                         }
-                                    } else {
-                                        print("❌ 恢复购买后仍非会员状态")
                                     }
                                 }
                             }
@@ -183,7 +190,7 @@ struct PaywallView: View {
                             .foregroundColor(.primary)
                             .disabled(storeManager.isLoading)
                         }
-                        .padding(.bottom, 10)
+                        .padding(.top, 10)
                     }
                     .padding()
                 }
@@ -233,7 +240,7 @@ struct PaywallView: View {
                         }
                     }
                 }
-                .disabled(storeManager.isLoading)
+                .disabled(storeManager.isLoading || storeManager.products.isEmpty)
                 .padding()
             }
         }
@@ -353,7 +360,7 @@ struct PlanOptionView: View {
             let dailyPrice = product.price / 365
             return String(localized: "仅 \(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
         case .lifetime:
-            return String(localized: "一次性付费，永久拥有")
+            return String(localized: "一次性付费")
         }
     }
 }

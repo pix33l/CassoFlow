@@ -39,7 +39,7 @@ class StoreManager: ObservableObject {
         var displayText: String {
             switch self {
             case .notMember:
-                return "解锁 PRO 会员，获取全部高级功能"
+                return "升级 PRO 会员，获取全部高级功能"
             case .lifetimeMember:
                 return "尊贵的永久 Pro 会员"
             case .monthlyMember(let expiresOn), .yearlyMember(let expiresOn):
@@ -71,9 +71,9 @@ class StoreManager: ObservableObject {
     // MARK: - 产品ID常量
     struct ProductIDs {
         // 会员订阅
-        static let lifetime = "me.pix3l.CassoFlow.lifetime"
-        static let yearly = "me.pix3l.CassoFlow.yearly"
-        static let monthly = "me.pix3l.CassoFlow.monthly"
+        static let lifetime = "me.pix3l.CassoFlow.Lifetime"
+        static let yearly = "me.pix3l.CassoFlow.Yearly"
+        static let monthly = "me.pix3l.CassoFlow.Monthly"
         
         // 播放器皮肤
         static let cfPC13 = "me.pix3l.CassoFlow.CF_PC13"

@@ -42,7 +42,6 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
         let isPressed = configuration.isPressed || externalIsPressed // 使用外部状态或内部状态
         // 使用皮肤的圆角半径和按钮高度
         let cornerRadius = musicService.currentPlayerSkin.buttonCornerRadius
-        let buttonHeight = musicService.currentPlayerSkin.buttonHeight
         
         return ZStack{
             // 按钮的外框内凹
@@ -93,7 +92,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
             configuration.label
                 .offset(y: isPressed ? offset : 0)
         }
-        .frame(height: buttonHeight)
+//        .frame(height: buttonHeight)
         .animation(.easeOut(duration: 0.2), value: isPressed)
         .compositingGroup()
         .shadow(color: .black.opacity(0.3), radius: 6, y: 3)

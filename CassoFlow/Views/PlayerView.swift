@@ -2,6 +2,17 @@ import SwiftUI
 import MusicKit
 import Foundation
 
+// MARK: - 设备适配扩展
+extension UIScreen {
+    /// 检测是否为小屏设备（iPhone SE系列等）
+    static var isCompactDevice: Bool {
+        // iPhone SE系列和其他小屏设备的屏幕高度通常在667以下
+        // iPhone SE (1st gen): 568pt
+        // iPhone SE (2nd & 3rd gen): 667pt
+        return UIScreen.main.bounds.height <= 667
+    }
+}
+
 struct PlayerView: View {
     @EnvironmentObject private var musicService: MusicService
     @State private var showLibraryView = false
@@ -170,11 +181,17 @@ struct PlayerControlsView: View {
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     
     var body: some View {
+        
+        let baseButtonHeight = musicService.currentPlayerSkin.buttonHeight
+        // 如果是小屏设备，按钮高度减少10
+        let buttonHeight = UIScreen.isCompactDevice ? baseButtonHeight - 10 : baseButtonHeight
+        
         VStack(spacing: 0) {
             ControlButtonsView(
                 showSettingsView: $showSettingsView,
                 showStoreView: $showStoreView
             )
+            .frame(height: buttonHeight)
             .padding(.horizontal, 10.0)
             .padding(.vertical, 5.0)
             
@@ -185,7 +202,6 @@ struct PlayerControlsView: View {
                 isShuffled: $isShuffled,
                 progress: progress
             )
-            .frame(height: 80.0)
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 8)
@@ -310,13 +326,18 @@ struct SongInfoView: View {
     let progress: CGFloat
     
     var body: some View {
-        VStack(spacing: 5) {
-            TrackInfoHeader(
-//                showSettingsView: $showSettingsView
-            )
-            RepeatAndShuffleView(repeatMode: $repeatMode, isShuffled: $isShuffled, showLibraryView: $showLibraryView)
-            PlaybackProgressView(progress: progress)
+        GeometryReader { geometry in
+            VStack(spacing: UIScreen.isCompactDevice ? 8 : 5) {
+                // 根据屏幕尺寸判断是否显示TrackInfoHeader
+                if !UIScreen.isCompactDevice {
+                    TrackInfoHeader()
+                }
+                
+                RepeatAndShuffleView(repeatMode: $repeatMode, isShuffled: $isShuffled, showLibraryView: $showLibraryView)
+                PlaybackProgressView(progress: progress)
+            }
         }
+        .frame(height: UIScreen.isCompactDevice ? 55.0 : 80.0)
     }
 }
 

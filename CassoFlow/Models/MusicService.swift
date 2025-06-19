@@ -389,18 +389,42 @@ class MusicService: ObservableObject {
 
     /// 获取用户媒体库专辑
     func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
+        print("🔍 开始获取用户媒体库专辑...")
+        
         var request = MusicLibraryRequest<Album>()
         request.sort(by: \.libraryAddedDate, ascending: false)
         request.limit = 100 // 设置合理的限制
-        return try await request.response().items
+        
+        do {
+            let response = try await request.response()
+            let albums = response.items
+            print("✅ 成功获取到 \(albums.count) 张专辑")
+            return albums
+        } catch {
+            print("❌ 获取专辑失败: \(error)")
+            print("❌ 错误详情: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     /// 获取用户媒体库播放列表
     func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
+        print("🔍 开始获取用户媒体库播放列表...")
+        
         var request = MusicLibraryRequest<Playlist>()
         request.sort(by: \.libraryAddedDate, ascending: false)
         request.limit = 100
-        return try await request.response().items
+        
+        do {
+            let response = try await request.response()
+            let playlists = response.items
+            print("✅ 成功获取到 \(playlists.count) 个播放列表")
+            return playlists
+        } catch {
+            print("❌ 获取播放列表失败: \(error)")
+            print("❌ 错误详情: \(error.localizedDescription)")
+            throw error
+        }
     }
     
     // 格式化时间显示
