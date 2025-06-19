@@ -26,7 +26,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-DEMO",  // 名称作为唯一标识
             year: "2025",
-            description: "用来做演示的磁带播放器",
+            description: String(localized: "用来演示的磁带播放器"),
             coverImage: "cover-CF-DEMO",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -44,7 +44,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-PC13",  // 名称作为唯一标识
             year: "2024",
-            description: "飞翔的磁带播放器",
+            description: String(localized: "能飞的磁带播放器"),
             coverImage: "cover-CF-PC13",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -62,7 +62,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-M10",  // 名称作为唯一标识
             year: "2024",
-            description: "动物牌磁带播放器",
+            description: String(localized: "动物牌磁带播放器"),
             coverImage: "cover-CF-M10",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -80,7 +80,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-WIND",  // 名称作为唯一标识
             year: "2024",
-            description: "公鸡国磁带播放器",
+            description: String(localized: "公鸡国磁带播放器"),
             coverImage: "cover-CF-WIND",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -98,7 +98,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-L2",  // 名称作为唯一标识
             year: "1979",
-            description: "首款个人立体声磁带播放器",
+            description: String(localized: "首款个人立体声磁带播放器"),
             coverImage: "cover-CF-L2",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -116,7 +116,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-2",  // 名称作为唯一标识
             year: "1981",
-            description: "据说能穿越时间的磁带播放器",
+            description: String(localized: "能时间旅行的磁带播放器"),
             coverImage: "cover-CF-2",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -134,7 +134,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识
             year: "1984",
-            description: "首款廉价磁带播放器",
+            description: String(localized: "首款廉价磁带播放器"),
             coverImage: "cover-CF-22",
             panelColor: Color("bg-panel-dark"),
             panelOutlineColor: .black,
@@ -152,7 +152,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-504",  // 名称作为唯一标识
             year: "1987",
-            description: "首款全透明磁带播放器",
+            description: String(localized: "首款全透明磁带播放器"),
             coverImage: "cover-CF-504",
             panelColor: Color("bg-panel-dark"),
             panelOutlineColor: .black,
@@ -170,7 +170,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-D6C",  // 名称作为唯一标识
             year: "1984",
-            description: "磁带播放器的老大哥，专为专业用户生产",
+            description: String(localized: "专为专业用户生产的磁带播放器"),
             coverImage: "cover-CF-D6C",
             panelColor: Color("bg-panel-dark"),
             panelOutlineColor: .black,
@@ -188,7 +188,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-DT1",  // 名称作为唯一标识
             year: "1993",
-            description: "经典动漫中反复出现的播放器",
+            description: String(localized: "经典动漫中的磁带播放器"),
             coverImage: "cover-CF-DT1",
             panelColor: Color("bg-panel-dark"),
             panelOutlineColor: .black,
@@ -232,7 +232,7 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-DEMO",  // 名称作为唯一标识
             year: "2025",
-            description: "白色演示磁带",
+            description: String(localized: "白色演示磁带"),
             coverImage: "cover-CFT-DEMO",
             cassetteImage: "CFT-DEMO",
             cassetteHole: "holeDark",
@@ -241,7 +241,7 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-TRA",  // 名称作为唯一标识
             year: "2025",
-            description: "经典透明磁带",
+            description: String(localized: "经典透明磁带"),
             coverImage: "cover-CFT-TRA",
             cassetteImage: "CFT-TRA",
             cassetteHole: "holeDark",
@@ -250,7 +250,7 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-C60",  // 名称作为唯一标识
             year: "2025",
-            description: "彩色可书写标签的录音磁带",
+            description: String(localized: "标签可写的彩色磁带"),
             coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
             cassetteHole: "holeDark",

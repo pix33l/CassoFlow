@@ -19,7 +19,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lldMin"
+            "value" : "%lld Min"
           }
         }
       }
@@ -29,7 +29,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lldHour%2$lldMin"
+            "value" : "%1$lld Hour %2$lld Min"
           }
         },
         "zh-Hans" : {
@@ -45,7 +45,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lldSong • %2$@"
+            "value" : "%1$lld Song • %2$@"
           }
         },
         "zh-Hans" : {
@@ -134,6 +134,16 @@
         }
       }
     },
+    "专为专业用户生产的磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cassette player designed for pro users"
+          }
+        }
+      }
+    },
     "专辑" : {
       "localizations" : {
         "en" : {
@@ -194,6 +204,16 @@
         }
       }
     },
+    "公鸡国磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rooster kingdom cassette player"
+          }
+        }
+      }
+    },
     "关于作者" : {
       "localizations" : {
         "en" : {
@@ -230,6 +250,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last updated on %@"
+          }
+        }
+      }
+    },
+    "动物牌磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animal brand cassette player"
           }
         }
       }
@@ -620,6 +650,16 @@
         }
       }
     },
+    "标签可写的彩色磁带" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colorable cassette with labels"
+          }
+        }
+      }
+    },
     "模拟真实磁带音效" : {
       "localizations" : {
         "en" : {
@@ -690,6 +730,26 @@
         }
       }
     },
+    "用来演示的磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Demo cassette player"
+          }
+        }
+      }
+    },
+    "白色演示磁带" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White demo cassette"
+          }
+        }
+      }
+    },
     "省 50%" : {
       "localizations" : {
         "en" : {
@@ -750,6 +810,26 @@
         }
       }
     },
+    "经典动漫中的磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic anime cassette player"
+          }
+        }
+      }
+    },
+    "经典透明磁带" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic transparent cassette"
+          }
+        }
+      }
+    },
     "给我们五星好评" : {
       "localizations" : {
         "en" : {
@@ -786,6 +866,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contact information"
+          }
+        }
+      }
+    },
+    "能时间旅行的磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A time-traveling cassette player"
+          }
+        }
+      }
+    },
+    "能飞的磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A flying cassette player"
           }
         }
       }
@@ -976,6 +1076,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frequency"
+          }
+        }
+      }
+    },
+    "首款个人立体声磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first personal stereo cassette player"
+          }
+        }
+      }
+    },
+    "首款全透明磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first fully transparent cassette player"
+          }
+        }
+      }
+    },
+    "首款廉价磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first low-cost cassette player"
           }
         }
       }

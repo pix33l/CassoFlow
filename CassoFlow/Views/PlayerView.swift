@@ -40,7 +40,7 @@ struct PlayerView: View {
 
     var body: some View {
         ZStack {
-            PlayerBackgroundView(rotationAngle: $rotationAngle)
+            PlayerBackgroundView(rotationAngle: $rotationAngle, showLibraryView: $showLibraryView)
             VStack{
                 Spacer()
                 PlayerControlsView(
@@ -119,6 +119,7 @@ struct PlayerView: View {
 struct PlayerBackgroundView: View {
     @EnvironmentObject private var musicService: MusicService
     @Binding var rotationAngle: Double
+    @Binding var showLibraryView: Bool
     
     var body: some View {
         ZStack {
@@ -136,12 +137,27 @@ struct PlayerBackgroundView: View {
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }
+
                 Image(musicService.currentPlayerSkin.playerImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .clipped()
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                
+                Button(action: {
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                    showLibraryView = true
+                }) {
+                    Rectangle()
+                        .fill(Color.clear)
+                        .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.55)
+                }
+                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.35)
+                
             }
             .edgesIgnoringSafeArea(.all)
         }
