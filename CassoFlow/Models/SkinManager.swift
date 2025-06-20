@@ -212,7 +212,7 @@ struct PlayerSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2","CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
+        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-DT1"].contains(self.name)
     }
 }
 

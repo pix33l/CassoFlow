@@ -7,8 +7,6 @@ import UIKit
 class MusicService: ObservableObject {
     static let shared = MusicService()
     
-    
-    
     private let player = ApplicationMusicPlayer.shared
     private let audioEffectsManager = AudioEffectsManager.shared
     
@@ -29,6 +27,7 @@ class MusicService: ObservableObject {
     @Published var isFastForwarding: Bool = false
     @Published var isFastRewinding: Bool = false
     private var seekTimer: Timer?
+    private var updateTimer: Timer?
     
     // MARK: - 磁带音效属性
     @Published var isCassetteEffectEnabled: Bool = false {
@@ -55,6 +54,13 @@ class MusicService: ObservableObject {
     private static let cassetteEffectKey = "CassetteEffectEnabled"
     private static let hapticFeedbackKey = "HapticFeedbackEnabled"
     private static let screenAlwaysOnKey = "ScreenAlwaysOnEnabled"
+    
+    // 缓存上一次的关键值，只对不需要频繁更新的属性使用
+    private var lastTitle: String = ""
+    private var lastArtist: String = ""
+    private var lastTrackID: MusicItemID? = nil
+    private var lastTrackIndex: Int? = nil
+    private var lastTotalTracks: Int = 0
     
     var repeatMode: MusicPlayer.RepeatMode {
         get { player.state.repeatMode ?? .none }
@@ -114,28 +120,23 @@ class MusicService: ObservableObject {
         let savedPlayerSkinName = UserDefaults.standard.string(forKey: Self.playerSkinKey)
         if let skinName = savedPlayerSkinName,
            let skin = PlayerSkin.playerSkin(named: skinName) {
-            print("🎨 加载已保存的播放器皮肤: \(skinName)")
             currentPlayerSkin = skin
         } else {
             let defaultSkin = PlayerSkin.playerSkin(named: "CF-DEMO") ?? PlayerSkin.playerSkins[0]
-            print("🎨 使用默认播放器皮肤: \(defaultSkin.name)")
             currentPlayerSkin = defaultSkin
         }
         
         let savedCassetteSkinName = UserDefaults.standard.string(forKey: Self.cassetteSkinKey)
         if let skinName = savedCassetteSkinName,
            let skin = CassetteSkin.cassetteSkin(named: skinName) {
-            print("🎨 加载已保存的磁带皮肤: \(skinName)")
             currentCassetteSkin = skin
         } else {
             let defaultSkin = CassetteSkin.cassetteSkin(named: "CFT-DEMO") ?? CassetteSkin.cassetteSkins[0]
-            print("🎨 使用默认磁带皮肤: \(defaultSkin.name)")
             currentCassetteSkin = defaultSkin
         }
         
         // 加载磁带音效设置
         isCassetteEffectEnabled = UserDefaults.standard.bool(forKey: Self.cassetteEffectKey)
-        print("🎵 加载磁带音效设置: \(isCassetteEffectEnabled)")
         
         // 加载触觉反馈设置
         if UserDefaults.standard.object(forKey: Self.hapticFeedbackKey) == nil {
@@ -145,18 +146,32 @@ class MusicService: ObservableObject {
         } else {
             isHapticFeedbackEnabled = UserDefaults.standard.bool(forKey: Self.hapticFeedbackKey)
         }
-        print("📳 加载触觉反馈设置: \(isHapticFeedbackEnabled)")
         
         // 加载屏幕常亮设置
         isScreenAlwaysOn = UserDefaults.standard.bool(forKey: Self.screenAlwaysOnKey)
-        print("🔆 加载屏幕常亮设置: \(isScreenAlwaysOn)")
         // 应用屏幕常亮设置
         UIApplication.shared.isIdleTimerDisabled = isScreenAlwaysOn
         
-        // 监听播放器队列变化
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        // 启动定时器
+        startUpdateTimer()
+    }
+    
+    deinit {
+        stopUpdateTimer()
+    }
+    
+    // MARK: - 定时器管理
+    
+    private func startUpdateTimer() {
+        stopUpdateTimer() // 确保没有重复的定时器
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateCurrentSongInfo()
         }
+    }
+    
+    private func stopUpdateTimer() {
+        updateTimer?.invalidate()
+        updateTimer = nil
     }
     
     // MARK: - 皮肤持久化方法
@@ -165,46 +180,40 @@ class MusicService: ObservableObject {
     func setPlayerSkin(_ skin: PlayerSkin) {
         currentPlayerSkin = skin
         UserDefaults.standard.set(skin.name, forKey: Self.playerSkinKey)
-        print("🎨 保存播放器皮肤: \(skin.name)")
     }
     
     /// 设置并保存磁带皮肤
     func setCassetteSkin(_ skin: CassetteSkin) {
         currentCassetteSkin = skin
         UserDefaults.standard.set(skin.name, forKey: Self.cassetteSkinKey)
-        print("🎨 保存磁带皮肤: \(skin.name)")
     }
     
     /// 设置磁带音效开关
     func setCassetteEffect(enabled: Bool) {
         isCassetteEffectEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: Self.cassetteEffectKey)
-        print("🎵 保存磁带音效设置: \(enabled)")
     }
     
     /// 设置触觉反馈开关
     func setHapticFeedback(enabled: Bool) {
         isHapticFeedbackEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: Self.hapticFeedbackKey)
-        print("📳 保存触觉反馈设置: \(enabled)")
     }
     
     /// 设置屏幕常亮开关
     func setScreenAlwaysOn(enabled: Bool) {
         isScreenAlwaysOn = enabled
         UserDefaults.standard.set(enabled, forKey: Self.screenAlwaysOnKey)
-        print("📱 保存屏幕常亮设置: \(enabled)")
     }
 
     private func updateCurrentSongInfo() {
-        
         guard let entry = player.queue.currentEntry else {
             DispatchQueue.main.async {
                 self.currentTitle = String(localized: "未播放歌曲")
                 self.currentArtist = String(localized: "点此选择音乐")
                 self.currentDuration = 0
                 self.totalDuration = 0
-                self.isPlaying = false  // 添加播放状态重置
+                self.isPlaying = false
                 self.currentTrackID = nil
                 self.currentTrackIndex = nil
                 self.totalTracksInQueue = 0
@@ -212,6 +221,13 @@ class MusicService: ObservableObject {
                 self.queueElapsedDuration = 0
                 // 同步播放状态到音频效果管理器
                 self.audioEffectsManager.setMusicPlayingState(false)
+                
+                // 重置缓存值
+                self.lastTitle = ""
+                self.lastArtist = ""
+                self.lastTrackID = nil
+                self.lastTrackIndex = nil
+                self.lastTotalTracks = 0
             }
             return
         }
@@ -237,23 +253,51 @@ class MusicService: ObservableObject {
         
         let entries = player.queue.entries
         let trackIndex = entries.firstIndex(where: { $0.id == entry.id })
-        
-        let totalQueueDuration = calculateQueueTotalDuration(entries: entries)
-        let elapsedQueueDuration = calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
-        
         let playbackStatus = player.state.playbackStatus == .playing
         
+        let newTitle = entry.title
+        let newArtist = entry.subtitle ?? ""
+        let newTrackIndex = trackIndex.map { $0 + 1 }
+        let newTotalTracks = entries.count
+        
+        // 检查是否需要更新歌曲基本信息（只对不经常变化的信息做缓存检查）
+        let songInfoChanged = newTitle != lastTitle ||
+                             newArtist != lastArtist ||
+                             trackID != lastTrackID ||
+                             newTrackIndex != lastTrackIndex ||
+                             newTotalTracks != lastTotalTracks
+        
+        if songInfoChanged {
+            let totalQueueDuration = calculateQueueTotalDuration(entries: entries)
+            
+            // 更新缓存值
+            lastTitle = newTitle
+            lastArtist = newArtist
+            lastTrackID = trackID
+            lastTrackIndex = newTrackIndex
+            lastTotalTracks = newTotalTracks
+            
+            DispatchQueue.main.async {
+                self.currentTitle = newTitle
+                self.currentArtist = newArtist
+                self.totalDuration = duration
+                self.currentTrackID = trackID
+                self.currentTrackIndex = newTrackIndex
+                self.totalTracksInQueue = newTotalTracks
+                self.queueTotalDuration = totalQueueDuration
+            }
+        }
+        
+        // 这些需要持续更新以保证磁带转动和快进/快退功能正常
         DispatchQueue.main.async {
-            self.currentTitle = entry.title
-            self.currentArtist = entry.subtitle ?? ""
+            // 播放状态和时间需要实时更新
+            self.isPlaying = playbackStatus
             self.currentDuration = self.player.playbackTime
-            self.totalDuration = duration
-            self.isPlaying = playbackStatus  // 同步播放状态
-            self.currentTrackID = trackID
-            self.currentTrackIndex = trackIndex.map { $0 + 1 } // 转换为1-based索引
-            self.totalTracksInQueue = entries.count
-            self.queueTotalDuration = totalQueueDuration
+            
+            // 更新队列累计时长
+            let elapsedQueueDuration = self.calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
             self.queueElapsedDuration = elapsedQueueDuration
+            
             // 同步播放状态到音频效果管理器
             self.audioEffectsManager.setMusicPlayingState(playbackStatus)
         }
@@ -273,8 +317,6 @@ class MusicService: ObservableObject {
                 totalDuration += 180.0
             }
         }
-        
-        print("🎵 队列总时长计算: \(totalDuration)秒, 条目数量: \(entries.count)")
         
         // 如果总时长为0，返回默认值
         return totalDuration > 0 ? totalDuration : 180.0
@@ -303,8 +345,6 @@ class MusicService: ObservableObject {
         
         // 加上当前歌曲的播放时长
         elapsedDuration += player.playbackTime
-        
-        print("🎵 队列累计播放时长: \(elapsedDuration)秒, 当前歌曲索引: \(currentIndex)")
         
         return elapsedDuration
     }
@@ -337,7 +377,6 @@ class MusicService: ObservableObject {
     }
     
     func startFastRewind() {
-        print("🎵 开始快退")
         stopSeek() // 停止任何现有的快进/快退
         isFastRewinding = true
         
@@ -345,12 +384,10 @@ class MusicService: ObservableObject {
             guard let self = self else { return }
             let newTime = max(0, self.player.playbackTime - 5.0) // 每0.1秒后退5秒
             self.player.playbackTime = newTime
-            print("🎵 快退中 - 当前时间: \(newTime)秒")
         }
     }
     
     func startFastForward() {
-        print("🎵 开始快进")
         stopSeek() // 停止任何现有的快进/快退
         isFastForwarding = true
         
@@ -358,12 +395,10 @@ class MusicService: ObservableObject {
             guard let self = self else { return }
             let newTime = min(self.totalDuration, self.player.playbackTime + 5.0) // 每0.1秒前进5秒
             self.player.playbackTime = newTime
-            print("🎵 快进中 - 当前时间: \(newTime)秒")
         }
     }
     
     func stopSeek() {
-        print("🎵 停止快进/快退")
         seekTimer?.invalidate()
         seekTimer = nil
         isFastForwarding = false
@@ -380,51 +415,27 @@ class MusicService: ObservableObject {
         let trackIndex = entries.firstIndex(where: { $0.id == currentEntry?.id })
         let elapsedDuration = calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
         
-        // 只有当值发生变化时才更新，避免不必要的更新
-        if abs(self.queueElapsedDuration - elapsedDuration) > 0.5 { // 0.5秒的阈值
-            self.queueElapsedDuration = elapsedDuration
-            print("🎵 延迟更新队列累计时长: \(elapsedDuration)秒")
-        }
+        self.queueElapsedDuration = elapsedDuration
     }
 
     /// 获取用户媒体库专辑
     func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
-        print("🔍 开始获取用户媒体库专辑...")
-        
         var request = MusicLibraryRequest<Album>()
         request.sort(by: \.libraryAddedDate, ascending: false)
         request.limit = 100 // 设置合理的限制
         
-        do {
-            let response = try await request.response()
-            let albums = response.items
-            print("✅ 成功获取到 \(albums.count) 张专辑")
-            return albums
-        } catch {
-            print("❌ 获取专辑失败: \(error)")
-            print("❌ 错误详情: \(error.localizedDescription)")
-            throw error
-        }
+        let response = try await request.response()
+        return response.items
     }
 
     /// 获取用户媒体库播放列表
     func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
-        print("🔍 开始获取用户媒体库播放列表...")
-        
         var request = MusicLibraryRequest<Playlist>()
         request.sort(by: \.libraryAddedDate, ascending: false)
         request.limit = 100
         
-        do {
-            let response = try await request.response()
-            let playlists = response.items
-            print("✅ 成功获取到 \(playlists.count) 个播放列表")
-            return playlists
-        } catch {
-            print("❌ 获取播放列表失败: \(error)")
-            print("❌ 错误详情: \(error.localizedDescription)")
-            throw error
-        }
+        let response = try await request.response()
+        return response.items
     }
     
     // 格式化时间显示

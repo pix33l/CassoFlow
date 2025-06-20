@@ -527,6 +527,11 @@ struct PlaybackProgressView: View {
     @EnvironmentObject private var musicService: MusicService
     let progress: CGFloat
     
+    // 确保进度值在有效范围内
+    private var clampedProgress: CGFloat {
+        return min(max(progress, 0.0), 1.0)
+    }
+    
     private func formatRemainingTime(_ time: TimeInterval) -> String {
         guard time > 0 else { return "-00:00" }
         let minutes = Int(time) / 60
@@ -540,7 +545,7 @@ struct PlaybackProgressView: View {
                 .font(.caption.monospacedDigit())
                 .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
             
-            ProgressView(value: progress)
+            ProgressView(value: clampedProgress)
                 .progressViewStyle(
                     CustomProgressViewStyle(
                         tint: Color(musicService.currentPlayerSkin.screenTextColor),

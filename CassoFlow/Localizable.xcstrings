@@ -78,6 +78,9 @@
     "PGM NO. 0/0" : {
 
     },
+    "PIX3L DESIGN STUDIO" : {
+
+    },
     "PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验" : {
       "localizations" : {
         "en" : {
@@ -736,6 +739,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Click here to select music"
+          }
+        }
+      }
+    },
+    "版本 %@ (%@)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "版本 %1$@ (%2$@)"
           }
         }
       }

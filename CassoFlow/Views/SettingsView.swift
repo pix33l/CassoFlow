@@ -67,8 +67,6 @@ struct SettingsView: View {
     @State private var showingPaywall = false
     
     private var feedbackMailURL: URL? {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-        let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
         let systemVersion = ProcessInfo.processInfo.operatingSystemVersionString
         let deviceModel = "iOS Device" // 简化设备信息
         let locale = Locale.current
@@ -90,6 +88,14 @@ struct SettingsView: View {
         let subject = "CassoFlow 意见反馈".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         
         return URL(string: "mailto:service@pix3l.me?subject=\(subject)&body=\(body)")
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    }
+    
+    private var appBuild: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
     }
 
     var body: some View {
@@ -381,8 +387,19 @@ struct SettingsView: View {
                         destination: URL(string: WebLink.termsOfUse.rawValue)!,
                         icon: "book"
                     )
-                    
                 }
+                HStack {
+                    Spacer()
+                    VStack {
+                        Text("PIX3L DESIGN STUDIO")
+                            .fontWeight(.bold)
+                        Text("版本 \(appVersion) (\(appBuild))")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .listRowBackground(Color.clear)
             }
             .navigationTitle("设置")
             .navigationBarTitleDisplayMode(.inline)

@@ -184,7 +184,7 @@ struct StoreView: View {
         if storeManager.membershipStatus.isActive && !isFreeSkin() {
             return Color.blue
         }
-        return Color.white
+        return Color.blue
     }
     
     private var buttonForegroundColor: Color {
@@ -195,7 +195,7 @@ struct StoreView: View {
         if storeManager.membershipStatus.isActive && !isFreeSkin() {
             return Color.white
         }
-        return Color.black
+        return Color.white
     }
     
     // MARK: - 私有方法

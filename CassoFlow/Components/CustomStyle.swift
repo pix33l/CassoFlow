@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 // 自定义进度条样式结构
 struct CustomProgressViewStyle: ProgressViewStyle {
@@ -36,6 +37,24 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
     
     @EnvironmentObject private var musicService: MusicService
     let externalIsPressed: Bool
+    
+    // 静态音效播放器，避免频繁创建销毁
+    private static var buttonAudioPlayer: AVAudioPlayer? = {
+        guard let soundURL = Bundle.main.url(forResource: "button", withExtension: "m4a") else {
+            print("❌ 未找到按钮音效文件")
+            return nil
+        }
+        
+        do {
+            let player = try AVAudioPlayer(contentsOf: soundURL)
+            player.prepareToPlay()
+            player.volume = 0.2 // 降低音量避免与其他音效冲突
+            return player
+        } catch {
+            print("❌ 按钮音效初始化失败: \(error.localizedDescription)")
+            return nil
+        }
+    }()
     
     func makeBody(configuration: Configuration) -> some View {
         let offset: CGFloat = 8
@@ -94,6 +113,17 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
         }
 //        .frame(height: buttonHeight)
         .animation(.easeOut(duration: 0.2), value: isPressed)
+        .onChange(of: isPressed) { oldValue, newValue in
+            // 使用防抖动机制，避免频繁触发
+            if !oldValue && newValue {
+                // 播放按钮音效
+                DispatchQueue.main.async {
+                    Self.buttonAudioPlayer?.stop()
+                    Self.buttonAudioPlayer?.currentTime = 0
+                    Self.buttonAudioPlayer?.play()
+                }
+            }
+        }
         .compositingGroup()
         .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
         .shadow(color: .black.opacity(0.2), radius: 12, y: 6)

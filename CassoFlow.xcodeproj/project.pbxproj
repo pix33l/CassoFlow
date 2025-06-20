@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6249C1762DD4915600117512 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */ = {
+		6255CB7B2E0555D600F23075 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		6276D76A2DD1E6F900ACA539 /* CassoFlow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				6249C1762DD4915600117512 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */,
+				6255CB7B2E0555D600F23075 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */,
 			);
 			path = CassoFlow;
 			sourceTree = "<group>";
@@ -280,7 +280,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = CassoFlow;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "CassoFlow 需要访问您的音乐库来播放您的歌曲。";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "CassoFlow 需要访问您的音乐库来播放您的歌曲";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
@@ -319,7 +319,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = CassoFlow;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "CassoFlow 需要访问您的音乐库来播放您的歌曲。";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "CassoFlow 需要访问您的音乐库来播放您的歌曲";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
