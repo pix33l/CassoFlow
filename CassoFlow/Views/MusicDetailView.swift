@@ -5,7 +5,7 @@ import MusicKit
 struct MusicDetailView: View {
     @EnvironmentObject private var musicService: MusicService
     let containerType: MusicContainerType
-    @State private var tracks: MusicItemCollection<Track> = []
+    @State private var tracks: [Track] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var albumArtwork: UIImage? = nil
@@ -20,11 +20,37 @@ struct MusicDetailView: View {
     
     /// 判断当前是否正在播放指定歌曲
     private func isPlaying(_ track: Track) -> Bool {
-        musicService.currentTitle == track.title &&
-        musicService.currentArtist == track.artistName &&
+        // 根据Track的类型来获取正确的标题和艺术家
+        let (trackTitle, trackArtist) = getTrackInfo(track)
+        return musicService.currentTitle == trackTitle &&
+        musicService.currentArtist == trackArtist &&
         musicService.isPlaying
     }
     
+    /// 获取Track的信息（处理枚举类型）
+    private func getTrackInfo(_ track: Track) -> (title: String, artist: String) {
+        switch track {
+        case .song(let song):
+            return (song.title, song.artistName)
+        case .musicVideo(let musicVideo):
+            return (musicVideo.title, musicVideo.artistName)
+        @unknown default:
+            return ("未知歌曲", "未知艺术家")
+        }
+    }
+    
+    /// 获取Track的时长（处理枚举类型）
+    private func getTrackDuration(_ track: Track) -> TimeInterval {
+        switch track {
+        case .song(let song):
+            return song.duration ?? 0
+        case .musicVideo(let musicVideo):
+            return musicVideo.duration ?? 0
+        @unknown default:
+            return 0
+        }
+    }
+
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 20) {
@@ -180,7 +206,7 @@ struct MusicDetailView: View {
                 
                 // 底部信息
                 if let releaseDate = container.releaseDate, !tracks.isEmpty {
-                    let totalDuration = tracks.reduce(0) { $0 + ($1.duration ?? 0) }
+                    let totalDuration = tracks.reduce(0) { $0 + getTrackDuration($1) }
                     
                     InfoFooter(
                         releaseDate: releaseDate,
@@ -227,9 +253,7 @@ struct MusicDetailView: View {
         case .album(let album):
             try await musicService.playTrack(track, in: album)
         case .playlist(let playlist):
-            // 对于播放列表，我们需要设置整个播放列表然后跳转到指定歌曲
-            try await musicService.playPlaylist(playlist)
-            // 这里可能需要额外的逻辑来跳转到指定歌曲
+            try await musicService.playTrack(track, in: playlist)
         }
     }
     
@@ -259,8 +283,8 @@ struct MusicDetailView: View {
     }
     
     private func loadArtwork() async {
-        guard let url = container.artwork?.url(width: 300, height: 300) else { 
-            return 
+        guard let url = container.artwork?.url(width: 300, height: 300) else {
+            return
         }
         
         do {
@@ -269,10 +293,13 @@ struct MusicDetailView: View {
             // 检查HTTP响应状态
             if let httpResponse = response as? HTTPURLResponse,
                httpResponse.statusCode != 200 {
+                // 尝试更小尺寸
+                await tryLowerQualityArtwork()
                 return
             }
             
             guard let image = UIImage(data: data) else {
+                await tryLowerQualityArtwork()
                 return
             }
             
@@ -281,18 +308,24 @@ struct MusicDetailView: View {
             }
         } catch {
             // 如果网络错误，尝试使用更小的尺寸
-            if let smallerUrl = container.artwork?.url(width: 150, height: 150) {
-                do {
-                    let (data, _) = try await URLSession.shared.data(from: smallerUrl)
-                    if let image = UIImage(data: data) {
-                        await MainActor.run {
-                            albumArtwork = image
-                        }
-                    }
-                } catch {
-                    // 静默处理错误
+            await tryLowerQualityArtwork()
+        }
+    }
+    
+    private func tryLowerQualityArtwork() async {
+        guard let smallerUrl = container.artwork?.url(width: 150, height: 150) else {
+            return
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: smallerUrl)
+            if let image = UIImage(data: data) {
+                await MainActor.run {
+                    albumArtwork = image
                 }
             }
+        } catch {
+            // 静默处理错误，使用默认占位符
         }
     }
 }
@@ -333,20 +366,18 @@ struct MusicTrackRow: View, Equatable {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(track.title)
+                Text(trackTitle)
                     .foregroundColor(.primary)
-                Text(track.artistName)
+                Text(trackArtist)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            Text(
-                formattedDuration(track.duration ?? 0)
-            )
-            .font(.caption)
-            .foregroundColor(.secondary)
+            Text(formattedDuration(trackDuration))
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .padding(.horizontal)
         .padding(.vertical, 16)
@@ -356,7 +387,41 @@ struct MusicTrackRow: View, Equatable {
         .contentShape(Rectangle())
     }
     
-    // Equatable实现 - 关键性能优化点
+    // 处理Track枚举的计算属性
+    private var trackTitle: String {
+        switch track {
+        case .song(let song):
+            return song.title
+        case .musicVideo(let musicVideo):
+            return musicVideo.title
+        @unknown default:
+            return "未知歌曲"
+        }
+    }
+    
+    private var trackArtist: String {
+        switch track {
+        case .song(let song):
+            return song.artistName
+        case .musicVideo(let musicVideo):
+            return musicVideo.artistName
+        @unknown default:
+            return "未知艺术家"
+        }
+    }
+    
+    private var trackDuration: TimeInterval {
+        switch track {
+        case .song(let song):
+            return song.duration ?? 0
+        case .musicVideo(let musicVideo):
+            return musicVideo.duration ?? 0
+        @unknown default:
+            return 0
+        }
+    }
+    
+    // Equatable实现
     static func == (lhs: MusicTrackRow, rhs: MusicTrackRow) -> Bool {
         lhs.index == rhs.index &&
         lhs.track.id == rhs.track.id &&

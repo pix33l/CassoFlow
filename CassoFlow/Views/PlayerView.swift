@@ -88,21 +88,21 @@ struct PlayerView: View {
         let (interval, angleIncrement) = getRotationParameters()
         
         rotationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
-            self.rotationAngle += angleIncrement
-            // 完全移除角度限制，让SwiftUI自己处理
-            // SwiftUI的rotationEffect可以很好地处理大角度值
+            withAnimation(.linear(duration: interval)) {
+                self.rotationAngle += angleIncrement
+            }
         }
     }
     
     private func getRotationParameters() -> (TimeInterval, Double) {
         if musicService.isFastForwarding {
-            return (0.02, 15.0)
+            return (0.01, 8.0) // 提高频率，减少每次角度增量
         } else if musicService.isFastRewinding {
-            return (0.02, -15.0)
+            return (0.01, -8.0) // 提高频率，减少每次角度增量
         } else if musicService.isPlaying {
-            return (0.05, 5.0)
+            return (0.03, 3.0) // 正常播放也稍微提高频率
         } else {
-            return (0.05, 5.0)
+            return (0.03, 3.0)
         }
     }
     
@@ -603,7 +603,7 @@ struct ControlButton: View {
                         .fill(Color.clear)
                         .contentShape(Rectangle()) // 确保整个区域都能接收手势
                         .onTapGesture {
-                            print("🎵 短按: \(systemName)")
+                            print("短按: \(systemName)")
                             // 模拟按压动画
                             withAnimation(.easeInOut(duration: 0.1)) {
                                 isPressed = true
@@ -619,7 +619,7 @@ struct ControlButton: View {
                             minimumDuration: 0.5,
                             maximumDistance: 50,
                             perform: {
-                                print("🎵 长按开始: \(systemName)")
+                                print("长按开始: \(systemName)")
                                 longPressAction?()
                             },
                             onPressingChanged: { pressing in
@@ -627,7 +627,7 @@ struct ControlButton: View {
                                     isPressed = pressing
                                 }
                                 if !pressing {
-                                    print("🎵 松开按钮: \(systemName)")
+                                    print("松开按钮: \(systemName)")
                                     longPressEndAction?()
                                 }
                             }
@@ -661,7 +661,7 @@ struct CassetteHole: View {
     // 使用播放队列的总时长
     private var queueTotalDuration: TimeInterval {
         let duration = musicService.queueTotalDuration > 0 ? musicService.queueTotalDuration : 180.0
-        print("🎵 CassetteHole - shouldGrow: \(shouldGrow), queueTotalDuration: \(duration)秒")
+        print("CassetteHole - shouldGrow: \(shouldGrow), queueTotalDuration: \(duration)秒")
         return duration
     }
     
@@ -673,7 +673,7 @@ struct CassetteHole: View {
         let progress = musicService.queueElapsedDuration / queueTotalDuration
         let clampedProgress = min(max(progress, 0.0), 1.0) // 确保进度在0-1之间
         
-        print("🎵 播放进度计算 - shouldGrow: \(shouldGrow), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
+        print("播放进度计算 - shouldGrow: \(shouldGrow), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
         
         if shouldGrow {
             // 从100变到200
@@ -719,12 +719,12 @@ struct CassetteHole: View {
                 
                 // 大幅减少日志输出频率 - 每3600度（20圈）输出一次
                 if Int(newValue) % 3600 == 0 {
-                    print("🎵 旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 完整角度: \(newValue)")
+                    print("旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 完整角度: \(newValue)")
                 }
             }
         }
         .onChange(of: isRotating) { _, newValue in
-            print("🎵 isRotating变化: -> \(newValue)")
+            print("isRotating变化: -> \(newValue)")
             if newValue && !animationStarted {
                 startSizeAnimation()
             }
@@ -732,7 +732,7 @@ struct CassetteHole: View {
         .onChange(of: musicService.queueTotalDuration) { oldValue, newValue in
             // 只有当值真正变化时才输出日志
             if oldValue != newValue {
-                print("🎵 queueTotalDuration变化: \(oldValue) -> \(newValue)")
+                print("queueTotalDuration变化: \(oldValue) -> \(newValue)")
                 if isRotating {
                     animationStarted = false
                     startSizeAnimation()
@@ -745,7 +745,7 @@ struct CassetteHole: View {
             guard abs(oldValue - newValue) > 0.5 else { return }
             
             let newSize = currentProgressSize
-            print("🎵 队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
+            print("队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
             
             withAnimation(.easeInOut(duration: 0.3)) {
                 circleSize = newSize
@@ -754,11 +754,11 @@ struct CassetteHole: View {
         .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
             // 只有当状态真正变化时才输出日志
             if oldValue != newValue {
-                print("🎵 快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+                print("快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
                 if oldValue && !newValue {
                     // 快进结束，立即更新到当前进度对应的尺寸
                     let newSize = currentProgressSize
-                    print("🎵 快进结束，更新尺寸: \(newSize)")
+                    print("快进结束，更新尺寸: \(newSize)")
                     withAnimation(.easeInOut(duration: 0.5)) {
                         circleSize = newSize
                     }
@@ -768,11 +768,11 @@ struct CassetteHole: View {
         .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
             // 只有当状态真正变化时才输出日志
             if oldValue != newValue {
-                print("🎵 快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
+                print("快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
                 if oldValue && !newValue {
                     // 快退结束，立即更新到当前进度对应的尺寸
                     let newSize = currentProgressSize
-                    print("🎵 快退结束，更新尺寸: \(newSize)")
+                    print("快退结束，更新尺寸: \(newSize)")
                     withAnimation(.easeInOut(duration: 0.5)) {
                         circleSize = newSize
                     }
@@ -780,7 +780,7 @@ struct CassetteHole: View {
             }
         }
         .onAppear {
-            print("🎵 CassetteHole onAppear - shouldGrow: \(shouldGrow), isRotating: \(isRotating), isPlaying: \(musicService.isPlaying)")
+            print("CassetteHole onAppear - shouldGrow: \(shouldGrow), isRotating: \(isRotating), isPlaying: \(musicService.isPlaying)")
             setupInitialSize()
             currentRotationAngle = rotationAngle
             if isRotating && musicService.isPlaying && !animationStarted {
@@ -794,25 +794,25 @@ struct CassetteHole: View {
         // 使用当前播放进度来设置初始尺寸
         circleSize = currentProgressSize
         animationStarted = false
-        print("🎵 初始尺寸设置 - shouldGrow: \(shouldGrow), circleSize: \(circleSize)")
+        print("初始尺寸设置 - shouldGrow: \(shouldGrow), circleSize: \(circleSize)")
     }
     
     // 修正尺寸动画逻辑
     private func startSizeAnimation() {
         guard !animationStarted else {
-            print("🎵 动画已经开始，跳过重复调用")
+            print("动画已经开始，跳过重复调用")
             return
         }
         
         animationStarted = true
-        print("🎵 开始尺寸动画 - shouldGrow: \(shouldGrow), 当前尺寸: \(circleSize), 队列总时长: \(queueTotalDuration)秒")
+        print("开始尺寸动画 - shouldGrow: \(shouldGrow), 当前尺寸: \(circleSize), 队列总时长: \(queueTotalDuration)秒")
         
         // 从当前队列进度对应的尺寸开始，动画到最终尺寸
         let startSize = currentProgressSize
         let endSize: CGFloat = shouldGrow ? 200 : 100
         let remainingDuration = queueTotalDuration - musicService.queueElapsedDuration
         
-        print("🎵 动画参数 - 起始尺寸: \(startSize), 结束尺寸: \(endSize), 剩余时长: \(remainingDuration)秒")
+        print("动画参数 - 起始尺寸: \(startSize), 结束尺寸: \(endSize), 剩余时长: \(remainingDuration)秒")
         
         circleSize = startSize
         
@@ -823,7 +823,7 @@ struct CassetteHole: View {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            print("🎵 动画开始2秒后 - shouldGrow: \(self.shouldGrow), 当前尺寸: \(self.circleSize)")
+            print("动画开始2秒后 - shouldGrow: \(self.shouldGrow), 当前尺寸: \(self.circleSize)")
         }
     }
 }

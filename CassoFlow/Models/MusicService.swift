@@ -302,7 +302,7 @@ class MusicService: ObservableObject {
             self.audioEffectsManager.setMusicPlayingState(playbackStatus)
         }
     }
-    
+/// 计算队列中所有歌曲的总时长
     private func calculateQueueTotalDuration(entries: ApplicationMusicPlayer.Queue.Entries) -> TimeInterval {
         var totalDuration: TimeInterval = 0
         
@@ -321,7 +321,7 @@ class MusicService: ObservableObject {
         // 如果总时长为0，返回默认值
         return totalDuration > 0 ? totalDuration : 180.0
     }
-
+/// 计算队列中已播放的总时长
     private func calculateQueueElapsedDuration(entries: ApplicationMusicPlayer.Queue.Entries, currentEntryIndex: Int?) -> TimeInterval {
         guard let currentIndex = currentEntryIndex else { return 0 }
         
@@ -349,7 +349,7 @@ class MusicService: ObservableObject {
         return elapsedDuration
     }
 
-    /// 播放控制
+    /// 播放
     func play() async throws {
         try await player.play()
         await MainActor.run {
@@ -358,7 +358,7 @@ class MusicService: ObservableObject {
             audioEffectsManager.setMusicPlayingState(true)
         }
     }
-    
+    /// 暂停
     func pause() async {
         player.pause()
         await MainActor.run {
@@ -367,15 +367,15 @@ class MusicService: ObservableObject {
             audioEffectsManager.setMusicPlayingState(false)
         }
     }
-    
+    /// 播放下一首
     func skipToNext() async throws {
         try await player.skipToNextEntry()
     }
-    
+    /// 播放上一首
     func skipToPrevious() async throws {
         try await player.skipToPreviousEntry()
     }
-    
+    /// 开始快退
     func startFastRewind() {
         stopSeek() // 停止任何现有的快进/快退
         isFastRewinding = true
@@ -386,7 +386,7 @@ class MusicService: ObservableObject {
             self.player.playbackTime = newTime
         }
     }
-    
+    /// 开始快进
     func startFastForward() {
         stopSeek() // 停止任何现有的快进/快退
         isFastForwarding = true
@@ -397,7 +397,7 @@ class MusicService: ObservableObject {
             self.player.playbackTime = newTime
         }
     }
-    
+    /// 停止快速前进或快退
     func stopSeek() {
         seekTimer?.invalidate()
         seekTimer = nil
@@ -408,7 +408,7 @@ class MusicService: ObservableObject {
             self.updateQueueElapsedDuration()
         }
     }
-    
+    // MARK: - 队列管理
     private func updateQueueElapsedDuration() {
         let entries = player.queue.entries
         let currentEntry = player.queue.currentEntry
@@ -422,7 +422,7 @@ class MusicService: ObservableObject {
     func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
         var request = MusicLibraryRequest<Album>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 100 // 设置合理的限制
+        request.limit = 50 // 设置合理的限制
         
         let response = try await request.response()
         return response.items
@@ -432,7 +432,7 @@ class MusicService: ObservableObject {
     func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
         var request = MusicLibraryRequest<Playlist>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 100
+        request.limit = 50
         
         let response = try await request.response()
         return response.items

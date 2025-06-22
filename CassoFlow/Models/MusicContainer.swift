@@ -11,7 +11,7 @@ protocol MusicContainer {
     var genreNames: [String] { get }
     
     /// 获取包含歌曲的详细信息
-    func withTracks() async throws -> MusicItemCollection<Track>
+    func withTracks() async throws -> [Track]
 }
 
 /// 专辑容器包装
@@ -25,9 +25,10 @@ struct AlbumContainer: MusicContainer {
     var releaseDate: Date? { album.releaseDate }
     var genreNames: [String] { album.genreNames }
     
-    func withTracks() async throws -> MusicItemCollection<Track> {
+    func withTracks() async throws -> [Track] {
         let detailedAlbum = try await album.with([.tracks])
-        return detailedAlbum.tracks ?? []
+        guard let tracks = detailedAlbum.tracks else { return [] }
+        return Array(tracks)
     }
 }
 
@@ -42,9 +43,10 @@ struct PlaylistContainer: MusicContainer {
     var releaseDate: Date? { playlist.lastModifiedDate }
     var genreNames: [String] { [] } // 播放列表通常没有流派信息
     
-    func withTracks() async throws -> MusicItemCollection<Track> {
+    func withTracks() async throws -> [Track] {
         let detailedPlaylist = try await playlist.with([.tracks])
-        return detailedPlaylist.tracks ?? []
+        guard let tracks = detailedPlaylist.tracks else { return [] }
+        return Array(tracks)
     }
 }
 
