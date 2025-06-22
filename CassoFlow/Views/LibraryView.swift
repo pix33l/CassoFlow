@@ -9,7 +9,7 @@ class LibraryDataManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var subscriptionStatus: MusicSubscription? = nil
     
-    private var hasLoaded = false
+    @Published var hasLoaded = false
     
     func loadUserLibraryIfNeeded() async {
         guard !hasLoaded else { return }
@@ -66,6 +66,23 @@ class LibraryDataManager: ObservableObject {
         }
     }
     
+    func forceReload() async {
+        print("🔍 [LibraryData] 强制重新加载")
+        
+        // 完全重置状态
+        await MainActor.run {
+            hasLoaded = false
+            isLoading = true
+            errorMessage = nil
+            userAlbums = []
+            userPlaylists = []
+            subscriptionStatus = nil
+        }
+        
+        // 重新加载数据
+        await loadUserLibraryIfNeeded()
+    }
+    
     private func checkSubscriptionStatus() async {
         do {
             let subscription = try await MusicSubscription.current
@@ -106,7 +123,6 @@ struct LibraryView: View {
     
     // 选中的分段
     @State private var selectedSegment = 0
-    @State private var closeTapped = false
     @State private var showSubscriptionOffer = false
     
     var body: some View {
@@ -114,10 +130,36 @@ struct LibraryView: View {
             VStack(spacing: 0) {
                 // 内容视图
                 if libraryData.isLoading {
-                    ProgressView()
+                    ProgressView("正在加载媒体库...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = libraryData.errorMessage {
                     errorView(message: error)
+                    // 兜底场景
+                } else if !libraryData.hasLoaded {
+                    // 处理初始状态
+                    VStack(spacing: 20) {
+                        ProgressView("准备加载...")
+                        
+                        Button {
+                            print("🔍 [LibraryView] 用户点击重新加载按钮")
+                            Task {
+                                await libraryData.forceReload()
+                            }
+                        } label: {
+                            Text("重新加载")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 25)
+                                        .fill(Color.red)
+                                )
+                        }
+                        .padding(.top, 10)
+                        // 添加手动加载按钮
+                    }
+                
                 } else {
                     contentView
                 }
@@ -127,7 +169,6 @@ struct LibraryView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        closeTapped.toggle()
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                             impactFeedback.impactOccurred()
@@ -216,34 +257,50 @@ struct LibraryView: View {
                 }
             }
             
-            // 滚动内容区域
-            ScrollView {
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
-                    spacing: 20
-                ) {
-                    if selectedSegment == 0 {
-                        ForEach(libraryData.userAlbums) { album in
+            // 滚动内容区域 - 为每个分段使用独立的视图
+            TabView(selection: $selectedSegment) {
+                // 专辑视图
+                ScrollView {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
+                        spacing: 20
+                    ) {
+                        ForEach(libraryData.userAlbums, id: \.id) { album in
                             NavigationLink {
                                 AlbumDetailView(album: album)
                                     .environmentObject(musicService)
                             } label: {
                                 AlbumCell(album: album)
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
-                    } else {
-                        ForEach(libraryData.userPlaylists) { playlist in
+                    }
+                    .padding()
+                }
+                .tag(0)
+                
+                // 播放列表视图
+                ScrollView {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
+                        spacing: 20
+                    ) {
+                        ForEach(libraryData.userPlaylists, id: \.id) { playlist in
                             NavigationLink {
                                 PlaylistDetailView(playlist: playlist)
                                     .environmentObject(musicService)
                             } label: {
                                 PlaylistCell(playlist: playlist)
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
+                    .padding()
                 }
-                .padding()
+                .tag(1)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .animation(.easeInOut(duration: 0.3), value: selectedSegment)
         }
     }
 

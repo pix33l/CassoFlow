@@ -73,8 +73,34 @@ class MusicService: ObservableObject {
     }
     
     /// 请求音乐授权
-    func requestAuthorization() async -> MusicAuthorization.Status {
-        await MusicAuthorization.request()
+    func requestMusicAuthorization() async {
+        let status = await MusicAuthorization.request()
+        
+        switch status {
+        case .authorized:
+            print("✅ MusicKit授权成功")
+            await setupMusicKit()
+        case .denied:
+            print("❌ MusicKit授权被拒绝")
+        case .notDetermined:
+            print("⏳ MusicKit授权状态未确定")
+        case .restricted:
+            print("🚫 MusicKit访问受限")
+        @unknown default:
+            break
+        }
+    }
+    
+    // 设置MusicKit
+    private func setupMusicKit() async {
+        do {
+            // 检查订阅状态
+            let subscription = try await MusicSubscription.current
+            print("🎵 Apple Music订阅状态: \(subscription)")
+            
+        } catch {
+            print("❌ MusicKit设置失败: \(error)")
+        }
     }
     
     /// 播放专辑中的特定歌曲
