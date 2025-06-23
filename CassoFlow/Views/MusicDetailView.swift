@@ -8,7 +8,6 @@ struct MusicDetailView: View {
     @State private var tracks: [Track] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var albumArtwork: UIImage? = nil
     
     @State private var playTapped = false
     @State private var shufflePlayTapped = false
@@ -62,10 +61,8 @@ struct MusicDetailView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 360)
                         //磁带封面
-                        if let image = albumArtwork {
-                            Image(uiImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
+                        if let artwork = container.artwork {
+                            ArtworkImage(artwork, width: 300, height: 300)
                                 .frame(width: 290, height: 140)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                 .padding(.bottom, 37)
@@ -222,9 +219,6 @@ struct MusicDetailView: View {
         .task {
             await loadTracks()
         }
-        .task {
-            await loadArtwork()
-        }
     }
     
     /// 检查是否为播放列表
@@ -280,71 +274,6 @@ struct MusicDetailView: View {
                 isLoading = false
             }
         }
-    }
-    
-    private func loadArtwork() async {
-        guard let url = container.artwork?.url(width: 300, height: 300) else {
-            return
-        }
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(from: url)
-            
-            // 检查HTTP响应状态
-            if let httpResponse = response as? HTTPURLResponse,
-               httpResponse.statusCode != 200 {
-                // 尝试更小尺寸
-                await tryLowerQualityArtwork()
-                return
-            }
-            
-            guard let image = UIImage(data: data) else {
-                await tryLowerQualityArtwork()
-                return
-            }
-            
-            await MainActor.run {
-                albumArtwork = image
-            }
-        } catch {
-            // 如果网络错误，尝试使用更小的尺寸
-            await tryLowerQualityArtwork()
-        }
-    }
-    
-    private func tryLowerQualityArtwork() async {
-        guard let smallerUrl = container.artwork?.url(width: 150, height: 150) else {
-            return
-        }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: smallerUrl)
-            if let image = UIImage(data: data) {
-                await MainActor.run {
-                    albumArtwork = image
-                }
-            }
-        } catch {
-            // 静默处理错误，使用默认占位符
-        }
-    }
-}
-
-// MARK: - 为了保持向后兼容性，保留原始的 AlbumDetailView
-struct AlbumDetailView: View {
-    let album: Album
-    
-    var body: some View {
-        MusicDetailView(containerType: .album(album))
-    }
-}
-
-// MARK: - 新的播放列表详情视图
-struct PlaylistDetailView: View {
-    let playlist: Playlist
-    
-    var body: some View {
-        MusicDetailView(containerType: .playlist(playlist))
     }
 }
 
