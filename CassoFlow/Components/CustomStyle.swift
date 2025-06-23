@@ -130,6 +130,44 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
     }
 }
 
+// 音频波形动画视图
+struct AudioWaveView: View {
+    @EnvironmentObject private var musicService: MusicService
+    @State private var animationAmounts = [0.5, 0.3, 0.7, 0.4, 0.6]
+    
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(0..<5, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(.primary)
+                    .frame(width: 2, height: animationAmounts[index] * 20)
+                    .animation(
+                        // 只有在播放时才有动画，暂停时保持静态
+                        musicService.isPlaying ?
+                        Animation.easeInOut(duration: 0.5)
+                            .repeatForever()
+                            .delay(Double(index) * 0.1) :
+                        nil,
+                        value: animationAmounts[index]
+                    )
+                    .onAppear {
+                        if musicService.isPlaying {
+                            animationAmounts[index] = [0.3, 0.5, 0.7, 0.9, 0.6].randomElement()!
+                        }
+                    }
+                    .onChange(of: musicService.isPlaying) { _, isPlaying in
+                        if isPlaying {
+                            // 开始播放时，重新设置随机高度并开始动画
+                            animationAmounts[index] = [0.3, 0.5, 0.7, 0.9, 0.6].randomElement()!
+                        }
+                        // 暂停时不需要做任何事，动画会自然停止并保持当前高度
+                    }
+            }
+        }
+        .frame(width: 24, height: 24)
+    }
+}
+
 // MARK: - 预览
 #Preview {
     VStack(spacing: 20) {

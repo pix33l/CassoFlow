@@ -19,11 +19,20 @@ struct MusicDetailView: View {
     
     /// 判断当前是否正在播放指定歌曲
     private func isPlaying(_ track: Track) -> Bool {
-        // 根据Track的类型来获取正确的标题和艺术家
+        
+        // 方法1: 尝试ID匹配（如果相同则最准确）
+        if musicService.currentTrackID == track.id {
+            return true
+        }
+        
+        // 方法2: 元数据匹配（处理ID不匹配的情况）
         let (trackTitle, trackArtist) = getTrackInfo(track)
-        return musicService.currentTitle == trackTitle &&
-        musicService.currentArtist == trackArtist &&
-        musicService.isPlaying
+        let titleMatch = musicService.currentTitle.trimmingCharacters(in: .whitespaces).lowercased() ==
+                        trackTitle.trimmingCharacters(in: .whitespaces).lowercased()
+        let artistMatch = musicService.currentArtist.trimmingCharacters(in: .whitespaces).lowercased() ==
+                         trackArtist.trimmingCharacters(in: .whitespaces).lowercased()
+        
+        return titleMatch && artistMatch
     }
     
     /// 获取Track的信息（处理枚举类型）
@@ -61,17 +70,24 @@ struct MusicDetailView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 360)
                         //磁带封面
+                        Color.black
+                            .frame(width: 290, height: 140)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .padding(.bottom, 37)
+                        
                         if let artwork = container.artwork {
                             ArtworkImage(artwork, width: 300, height: 300)
                                 .frame(width: 290, height: 140)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                 .padding(.bottom, 37)
+                            
                         } else {
                             ZStack{
                                 Color.black
                                     .frame(width: 290, height: 140)
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                     .padding(.bottom, 37)
+                                
                                 Image("CASSOFLOW")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
@@ -282,12 +298,15 @@ struct MusicTrackRow: View, Equatable {
     let index: Int
     let track: Track
     let isPlaying: Bool
+    @EnvironmentObject private var musicService: MusicService
     
     var body: some View {
         HStack {
             if isPlaying {
                 AudioWaveView()
                     .frame(width: 24, height: 24)
+                    // 根据实际播放状态控制动画
+                    .opacity(musicService.isPlaying ? 1.0 : 0.6)
             } else {
                 Text("\(index + 1)")
                     .frame(width: 24, alignment: .center)
@@ -410,31 +429,6 @@ struct InfoFooter: View {
     }
 }
 
-// 音频波形动画视图
-struct AudioWaveView: View {
-    @State private var animationAmounts = [0.5, 0.3, 0.7, 0.4, 0.6]
-    
-    var body: some View {
-        HStack(spacing: 2) {
-            ForEach(0..<5, id: \.self) { index in
-                Rectangle()
-                    .fill(.primary)
-                    .frame(width: 2, height: animationAmounts[index] * 20)
-                    .animation(
-                        Animation.easeInOut(duration: 0.5)
-                            .repeatForever()
-                            .delay(Double(index) * 0.1),
-                        value: animationAmounts[index]
-                    )
-                    .onAppear {
-                        animationAmounts[index] = [0.3, 0.5, 0.7, 0.9, 0.6].randomElement()!
-                    }
-            }
-        }
-        .frame(width: 24, height: 24)
-    }
-}
-
 extension Date {
     func formattedDateString() -> String {
         let formatter = DateFormatter()
@@ -483,7 +477,7 @@ extension Date {
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .frame(width: 120)
-                                        .padding(.top, 20)
+                                        .padding(.bottom, 130)
                                 }
                                 
                                 Image("artwork-cassette-hole")

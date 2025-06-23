@@ -4,12 +4,14 @@ import Foundation
 
 // MARK: - 设备适配扩展
 extension UIScreen {
-    /// 检测是否为小屏设备（iPhone SE系列等）
+    /// 检测是否为小屏设备（iPhone SE系列和iPhone 13 mini等）
     static var isCompactDevice: Bool {
-        // iPhone SE系列和其他小屏设备的屏幕高度通常在667以下
         // iPhone SE (1st gen): 568pt
         // iPhone SE (2nd & 3rd gen): 667pt
-        return UIScreen.main.bounds.height <= 667
+        // iPhone 13 mini: 812pt
+        // iPhone 12 mini: 812pt
+        // 小屏设备通常在812以下
+        return UIScreen.main.bounds.height <= 812
     }
 }
 
@@ -172,7 +174,7 @@ struct HolesView: View {
     
     var body: some View {
         ZStack {
-            VStack(spacing: 110) {
+            VStack(spacing: 15) {
                 CassetteHole(isRotating: musicService.isPlaying, rotationAngle: $rotationAngle, shouldGrow: true)
                 CassetteHole(isRotating: musicService.isPlaying, rotationAngle: $rotationAngle, shouldGrow: false)
             }
@@ -180,7 +182,8 @@ struct HolesView: View {
             
             Image(musicService.currentCassetteSkin.cassetteImage)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 400, height:400)
         }
     }
 }
@@ -700,9 +703,6 @@ struct CassetteHole: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Color.clear)
-                .frame(width: 160, height: 160)
-            Circle()
                 .fill(Color(musicService.currentCassetteSkin.cassetteColor))
                 .frame(width: circleSize, height: circleSize)
             Image(musicService.currentCassetteSkin.cassetteHole)
@@ -710,7 +710,7 @@ struct CassetteHole: View {
                 .frame(width: 70, height: 70)
                 .rotationEffect(.degrees(currentRotationAngle))
         }
-        .frame(width: 100, height: 100)
+        .frame(width: 200, height: 200)
         .onChange(of: rotationAngle) { _, newValue in
             // 根据当前状态决定是否更新旋转角度
             if musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding {
@@ -833,4 +833,215 @@ struct CassetteHole: View {
     
     return PlayerView()
         .environmentObject(musicService)
+}
+
+#Preview("正在播放") {
+    let musicService = MusicService.shared
+    
+    // 简单的静态预览视图，显示磁带和磁带孔
+    ZStack {
+        GeometryReader { geometry in
+            // 背景
+            Image(musicService.currentPlayerSkin.cassetteBgImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            
+            // 磁带孔区域
+            ZStack {
+                VStack(spacing: 15) {
+                    // 上磁带孔
+                    ZStack {
+                        Circle()
+                            .fill(Color(musicService.currentCassetteSkin.cassetteColor))
+                            .frame(width: 110, height: 110)
+                        Image(musicService.currentCassetteSkin.cassetteHole)
+                            .resizable()
+                            .frame(width: 70, height: 70)
+                    }
+                    .frame(width: 200, height: 200)
+                    
+                    // 下磁带孔
+                    ZStack {
+                        Circle()
+                            .fill(Color(musicService.currentCassetteSkin.cassetteColor))
+                            .frame(width: 200, height: 200)
+                        Image(musicService.currentCassetteSkin.cassetteHole)
+                            .resizable()
+                            .frame(width: 70, height: 70)
+                    }
+                    .frame(width: 200, height: 200)
+                }
+                .padding(.leading, 25.0)
+                
+                // 磁带图片
+                Image(musicService.currentCassetteSkin.cassetteImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 400, height:400)
+                    
+            }
+            .padding(.bottom, 280.0)
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+
+            // 播放器面板
+            Image("player-CF-504")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+
+        }
+        .edgesIgnoringSafeArea(.all)
+        
+        VStack {
+            Spacer()
+            
+            // 控制面板
+            VStack(spacing: 0) {
+                let baseButtonHeight = musicService.currentPlayerSkin.buttonHeight
+                let buttonHeight = UIScreen.isCompactDevice ? baseButtonHeight - 10 : baseButtonHeight
+                
+                HStack(spacing: 5) {
+                    // 磁带按钮
+                    Button(action: {}) {
+                        Image(systemName: "recordingtape")
+                            .font(.title3)
+                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
+                    }
+                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+                    
+                    // 上一首按钮
+                    Button(action: {}) {
+                        Image(systemName: "backward.fill")
+                            .font(.title3)
+                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
+                    }
+                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+                    
+                    // 播放按钮
+                    Button(action: {}) {
+                        Image(systemName: "play.fill")
+                            .font(.title3)
+                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
+                    }
+                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+                    
+                    // 下一首按钮
+                    Button(action: {}) {
+                        Image(systemName: "forward.fill")
+                            .font(.title3)
+                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
+                    }
+                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+                    
+                    // 设置按钮
+                    Button(action: {}) {
+                        Image(systemName: "gearshape")
+                            .font(.title3)
+                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
+                    }
+                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+                }
+                .frame(height: buttonHeight)
+                .padding(.horizontal, 10.0)
+                .padding(.vertical, 5.0)
+                
+                VStack(spacing: UIScreen.isCompactDevice ? 8 : 5) {
+                    if !UIScreen.isCompactDevice {
+                        HStack {
+                            Text("PGM NO. 3/13")
+                                .padding(.leading, 4)
+                            
+                            Spacer()
+                            
+                            Text("SOUND EFFECT")
+                                .font(.caption)
+                                .padding(4)
+                                .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .strokeBorder(Color(musicService.currentPlayerSkin.screenTextColor), lineWidth: 1)
+                                )
+                        }
+                        .fontWeight(.bold)
+                        .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+                    }
+                    
+                    // 播放控制和歌曲信息
+                    HStack {
+                        Image(systemName: "repeat")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3))
+                            .padding(4)
+                        
+                        Spacer()
+                        
+                        VStack {
+                            Text("Love Story")
+                                .font(.body)
+                                .fontWeight(.bold)
+                                .lineLimit(1)
+                            Text("Taylor Swift")
+                                .font(.callout)
+                                .lineLimit(1)
+                        }
+                        .frame(height: 35.0)
+                        .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+                        
+                        Spacer()
+                        
+                        Image(systemName: "shuffle")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3))
+                            .padding(4)
+                    }
+                    
+                    // 进度条
+                    HStack {
+                        Text("02:00")
+                            .font(.caption.monospacedDigit())
+                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+                        
+                        ProgressView(value: 0.5)
+                            .progressViewStyle(
+                                CustomProgressViewStyle(
+                                    tint: Color(musicService.currentPlayerSkin.screenTextColor),
+                                    background: Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)
+                                )
+                            )
+                        
+                        Text("-01:55")
+                            .font(.caption.monospacedDigit())
+                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+                    }
+                }
+                .frame(height: UIScreen.isCompactDevice ? 55.0 : 80.0)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(musicService.currentPlayerSkin.screenColor))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4)
+                        )
+                )
+                .padding(10)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(musicService.currentPlayerSkin.panelColor))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Color(musicService.currentPlayerSkin.panelOutlineColor), lineWidth: 2)
+            )
+            .padding()
+        }
+    }
+    .environmentObject(musicService)
 }
