@@ -67,17 +67,17 @@ struct MusicDetailView: View {
                     ZStack {
                         Image("artwork-cassette")
                             .resizable()
-                            .aspectRatio(contentMode: .fill)
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 360)
                         //磁带封面
                         Color.black
-                            .frame(width: 290, height: 140)
+                            .frame(width: 270, height: 120)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                             .padding(.bottom, 37)
                         
                         if let artwork = container.artwork {
-                            ArtworkImage(artwork, width: 300, height: 300)
-                                .frame(width: 290, height: 140)
+                            ArtworkImage(artwork, width: 270, height: 270)
+                                .frame(width: 270, height: 120)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                 .padding(.bottom, 37)
                             
@@ -91,17 +91,40 @@ struct MusicDetailView: View {
                                 Image("CASSOFLOW")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 120)
-                                    .padding(.bottom, 130)
+                                    .frame(width: 100)
+                                    .padding(.bottom, 110)
                             }
                         }
                         
                         Image("artwork-cassette-hole")
                             .resizable()
-                            .aspectRatio(contentMode: .fill)
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 360)
+                        
+                        HStack{
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(container.title)
+                                    .font(.title3.bold())
+                                    .lineLimit(1)
+                                
+                                Text(container.artistName)
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                
+                                if let releaseDate = container.releaseDate {
+                                    let genreText = container.genreNames.first ?? (isPlaylist() ? "播放列表" : "未知风格")
+                                    Text("\(genreText) • \(releaseDate.formatted(.dateTime.year()))")
+                                        .font(.footnote)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.top, 115)
+                            Spacer()
+                        }
+                        .frame(width: 300)
                     }
-
+                    
+/*
                     VStack(spacing: 4) {
                         Text(container.title)
                             .font(.title2.bold())
@@ -120,6 +143,7 @@ struct MusicDetailView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
+ */
                     
                     // 播放控制按钮
                     HStack(spacing: 20) {
@@ -465,28 +489,49 @@ extension Date {
                             ZStack {
                                 Image("artwork-cassette")
                                     .resizable()
-                                    .aspectRatio(contentMode: .fill)
+                                    .aspectRatio(contentMode: .fit)
                                     .frame(width: 360)
                                 
                                 ZStack{
                                     Color.black
-                                        .frame(width: 290, height: 140)
+                                        .frame(width: 270, height: 120)
                                         .clipShape(RoundedRectangle(cornerRadius: 4))
                                         .padding(.bottom, 37)
                                     Image("CASSOFLOW")
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: 120)
-                                        .padding(.bottom, 130)
+                                        .frame(width: 100)
+                                        .padding(.bottom, 110)
                                 }
                                 
                                 Image("artwork-cassette-hole")
                                     .resizable()
-                                    .aspectRatio(contentMode: .fill)
+                                    .aspectRatio(contentMode: .fit)
                                     .frame(width: 360)
+                                
+                                HStack{
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        
+                                        Text("FearlFearlFearlFearlFearl")
+                                            .font(.title3.bold())
+                                            .lineLimit(1)
+                                        
+                                        Text("Taylor Swift")
+                                            .font(.body)
+                                            .foregroundColor(.secondary)
+                                        
+                                        Text("流行音乐 • 2008")
+                                            .font(.footnote)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .padding(.top, 115)
+                                    
+                                    Spacer()
+                                }
+                                .frame(width: 300)
                             }
 
-                            VStack(spacing: 4) {
+/*                            VStack(spacing: 4) {
                                 Text("Fearless")
                                     .font(.title2.bold())
                                     .multilineTextAlignment(.center)
@@ -501,6 +546,7 @@ extension Date {
                                     .foregroundColor(.secondary)
                             }
                             .frame(maxWidth: .infinity)
+ */
                             
                             // 播放控制按钮
                             HStack(spacing: 20) {

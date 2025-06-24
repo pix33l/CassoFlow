@@ -19,6 +19,8 @@ class StoreManager: ObservableObject {
     @Published var membershipStatus: MembershipStatus = .notMember
     @Published var subscriptionExpirationDate: Date?
     
+    private var transactionUpdateTask: Task<Void, Never>?
+    
     enum MembershipStatus {
         case notMember
         case lifetimeMember
@@ -107,8 +109,41 @@ class StoreManager: ObservableObject {
             await loadOwnedProducts()
             await updateMembershipStatus()
         }
+        
+        startTransactionListener()
     }
     
+    private func startTransactionListener() {
+        transactionUpdateTask = Task {
+            for await result in Transaction.updates {
+                switch result {
+                case .verified(let transaction):
+                    print("✅ 收到交易更新: \(transaction.productID)")
+                    await handleTransactionUpdate(transaction)
+                case .unverified(let transaction, let error):
+                    print("❌ 未验证的交易更新: \(transaction.productID), 错误: \(error)")
+                }
+            }
+        }
+    }
+    
+    private func handleTransactionUpdate(_ transaction: Transaction) async {
+        // 完成交易
+        await transaction.finish()
+        
+        // 更新拥有的产品列表
+        ownedProducts.insert(transaction.productID)
+        
+        // 解锁相应功能
+        await handleSuccessfulPurchase(transaction)
+        
+        print("🔄 交易已处理并完成: \(transaction.productID)")
+    }
+    
+    deinit {
+        transactionUpdateTask?.cancel()
+    }
+
     // MARK: - 获取产品信息
     func fetchProducts() async {
         isLoading = true
@@ -153,6 +188,7 @@ class StoreManager: ObservableObject {
                 case .verified(let transaction):
                     // ✅ 购买成功，解锁功能
                     await handleSuccessfulPurchase(transaction)
+                    await transaction.finish()
                     isLoading = false
                     return .success(String(localized: "购买成功！已为您解锁内容"))
                     
@@ -195,6 +231,7 @@ class StoreManager: ObservableObject {
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result {
                 let productName = await handleSuccessfulPurchase(transaction)
+                await transaction.finish()
                 if let name = productName {
                     restoredCount += 1
                     restoredItems.append(name)

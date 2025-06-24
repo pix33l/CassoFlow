@@ -135,7 +135,8 @@ struct PlayerBackgroundView: View {
             
                 if musicService.currentTrackID != nil {
                     HolesView(rotationAngle: $rotationAngle)
-                        .padding(.bottom, 280.0)
+                        .padding(.bottom, 270.0)
+                        .padding(.leading, 30.0)
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }
@@ -223,9 +224,23 @@ struct PlayerControlsView: View {
             )
             .padding()
             .background(
+
                 RoundedRectangle(cornerRadius: 8)
+                    .inset(by: 4)
                     .fill(Color(musicService.currentPlayerSkin.screenColor))
-                    
+
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(.white.opacity(0.1), lineWidth: 8))
+                
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.black.opacity(0.4), lineWidth: 8)
+                            .blur(radius: 12)
+                            .offset(x: 0, y: 0)
+                            .mask(RoundedRectangle(cornerRadius: 8))
+                    )
+
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .strokeBorder(Color(musicService.currentPlayerSkin.screenOutlineColor), lineWidth: 4))
@@ -883,7 +898,8 @@ struct CassetteHole: View {
                     .frame(width: 400, height:400)
                     
             }
-            .padding(.bottom, 280.0)
+            .padding(.bottom, 270.0)
+            .padding(.leading, 25.0)
             .frame(width: geometry.size.width, height: geometry.size.height)
             .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
 

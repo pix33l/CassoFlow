@@ -389,7 +389,7 @@ struct AlbumCell: View {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = album.artwork {
                     ArtworkImage(artwork, width: 160, height: 160)
-                        .frame(width: 100, height: 160)
+                        .frame(width: 105, height: 160)
                         .clipShape(Rectangle())
                 } else {
                     ZStack{
@@ -399,7 +399,7 @@ struct AlbumCell: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 75)
                     }
-                    .frame(width: 100, height: 160)
+                    .frame(width: 105, height: 160)
                     .clipShape(Rectangle())
                 }
                 
@@ -436,7 +436,7 @@ struct PlaylistCell: View {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = playlist.artwork {
                     ArtworkImage(artwork, width: 160, height: 160)
-                        .frame(width: 100, height: 160)
+                        .frame(width: 105, height: 160)
                         .clipShape(Rectangle())
                 } else {
                     ZStack{
@@ -446,7 +446,7 @@ struct PlaylistCell: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 75)
                     }
-                    .frame(width: 100, height: 160)
+                    .frame(width: 105, height: 160)
                     .clipShape(Rectangle())
                 }
                 
