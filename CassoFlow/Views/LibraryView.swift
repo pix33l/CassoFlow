@@ -113,7 +113,7 @@ struct LibraryView: View {
             VStack(spacing: 0) {
                 // 内容视图
                 if libraryData.isLoading {
-                    ProgressView("正在加载媒体库...")
+                    ProgressView("正在加载...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = libraryData.errorMessage {
                     errorView(message: error)

@@ -80,7 +80,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-MU01",  // 名称作为唯一标识
             year: "2024",
-            description: String(localized: "牧农牌磁带播放器"),
+            description: String(localized: "卡农牌磁带播放器"),
             coverImage: "cover-CF-MU01",
             panelColor: .clear,
             panelOutlineColor: .clear,

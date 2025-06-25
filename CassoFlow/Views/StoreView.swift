@@ -177,6 +177,7 @@ struct StoreView: View {
                 return SkinHelper.getCassetteSkinPrice(cassetteSkin.name, storeManager: storeManager)
             }
         }
+        return String(localized: "皮肤数据异常")
     }
     
     private var buttonBackgroundColor: Color {

@@ -104,19 +104,15 @@
     "PRO" : {
 
     },
-    "Pro 会员将在%@到期" : {
-      "extractionState" : "stale",
+    "PRO 会员将在%@到期" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro members will expire at @%"
+            "value" : "PRO members will expire at @%"
           }
         }
       }
-    },
-    "PRO 会员将在%@到期" : {
-
     },
     "SOUND EFFECT" : {
 
@@ -141,17 +137,6 @@
         }
       }
     },
-    "专为专业用户生产的磁带播放器" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A cassette player designed for pro users"
-          }
-        }
-      }
-    },
     "专辑" : {
       "localizations" : {
         "en" : {
@@ -163,13 +148,34 @@
       }
     },
     "为专业用户生产的磁带播放器" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cassette player designed for professional users"
+          }
+        }
+      }
     },
     "二氧化铬作为材料的高端磁带" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top cassette made of chromium dioxide as the material"
+          }
+        }
+      }
     },
     "产品未找到" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Product not found"
+          }
+        }
+      }
     },
     "仅 %@ /天" : {
       "localizations" : {
@@ -212,7 +218,14 @@
       }
     },
     "使用中" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In use"
+          }
+        }
+      }
     },
     "使用条款" : {
       "localizations" : {
@@ -230,17 +243,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep the screen from locking at all times"
-          }
-        }
-      }
-    },
-    "公鸡国磁带播放器" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rooster kingdom cassette player"
           }
         }
       }
@@ -285,23 +287,22 @@
         }
       }
     },
-    "动物牌磁带播放器" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Animal brand cassette player"
-          }
-        }
-      }
-    },
     "升级 PRO 会员，获取全部高级功能" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upgrade to PRO membership to access all advanced features"
+          }
+        }
+      }
+    },
+    "卡农牌磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canon brand cassette player"
           }
         }
       }
@@ -337,7 +338,14 @@
       }
     },
     "国宝牌磁带播放器" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animal brand cassette player"
+          }
+        }
+      }
     },
     "增加反馈来模拟实体操作感" : {
       "localizations" : {
@@ -369,19 +377,15 @@
         }
       }
     },
-    "尊贵的永久 Pro 会员" : {
-      "extractionState" : "stale",
+    "尊贵的永久 PRO 会员" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dear Permanent Pro Member"
+            "value" : "Dear Permanent PRO Member"
           }
         }
       }
-    },
-    "尊贵的永久 PRO 会员" : {
-
     },
     "小红书" : {
       "localizations" : {
@@ -494,7 +498,14 @@
       }
     },
     "彩虹色的录音磁带" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow-colored cassette"
+          }
+        }
+      }
     },
     "微信" : {
       "localizations" : {
@@ -527,7 +538,14 @@
       }
     },
     "您将获得" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You will receive"
+          }
+        }
+      }
     },
     "意见反馈" : {
       "localizations" : {
@@ -716,7 +734,14 @@
       }
     },
     "模拟实体操作的交互反馈" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulate physical feedbak"
+          }
+        }
+      }
     },
     "模拟真实磁带音效" : {
       "localizations" : {
@@ -748,8 +773,15 @@
         }
       }
     },
-    "正在加载媒体库..." : {
-
+    "正在加载..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading…"
+          }
+        }
+      }
     },
     "永久" : {
       "localizations" : {
@@ -772,7 +804,14 @@
       }
     },
     "演示用磁带播放器" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Demo cassette player"
+          }
+        }
+      }
     },
     "点此选择音乐" : {
       "localizations" : {
@@ -786,6 +825,12 @@
     },
     "版本 %@ (%@)" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@ (%2$@)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "new",
@@ -793,9 +838,6 @@
           }
         }
       }
-    },
-    "牧农牌磁带播放器" : {
-
     },
     "瑕疵噪点 (Crackle)" : {
       "localizations" : {
@@ -807,33 +849,25 @@
         }
       }
     },
-    "用来演示的磁带播放器" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A Demo cassette player"
-          }
-        }
-      }
-    },
-    "白色演示磁带" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "White demo cassette"
-          }
-        }
-      }
-    },
     "白色陶瓷外壳的顶级磁带" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The top cassette with a white ceramic casing"
+          }
+        }
+      }
     },
-    "皮肤数据错误" : {
-
+    "皮肤数据异常" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abnormal skin data"
+          }
+        }
+      }
     },
     "省 50%" : {
       "localizations" : {
@@ -856,7 +890,14 @@
       }
     },
     "确认购买后，将通过您的 Apple 帐户收取费用。 PRO 会员订阅默认会自动续订，除非在当前订阅结束前至少提前 24 小时前往「设置 -  Apple 账户 - 订阅」关闭自动续订，否则您的 Apple 账户将在当前订阅结束前的 24 小时内被收取续订费用。试用 PRO 会员期间内，如不手动关闭自动续订，则会在试用期结束时自动开通订阅并扣取费用。免费试用机会仅在每位用户首次订阅前试用一次，购买订阅后剩余的免费试用期（如有）将自动失效。" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After confirming the purchase, the payment will be made through your Apple account. The PRO membership subscription will be automatically renewed by default. Unless you go to \"Settings - Apple Account - Subscriptions\" at least 24 hours before the current subscription ends to turn off the automatic renewal, your Apple account will be charged for the renewal fee 24 hours before the end of the current subscription. During the trial period of the PRO membership, if you do not manually turn off the automatic renewal, the subscription will be automatically activated and the fee will be deducted at the end of the trial period. The free trial opportunity is only available for one trial per user before the first subscription. The remaining free trial period (if any) after purchasing the subscription will automatically expire."
+          }
+        }
+      }
     },
     "磁带" : {
       "localizations" : {
@@ -908,17 +949,6 @@
         }
       }
     },
-    "经典透明磁带" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Classic transparent cassette"
-          }
-        }
-      }
-    },
     "给我们五星好评" : {
       "localizations" : {
         "en" : {
@@ -965,17 +995,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A time-traveling cassette player"
-          }
-        }
-      }
-    },
-    "能飞的磁带播放器" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A flying cassette player"
           }
         }
       }
@@ -1091,7 +1110,14 @@
       }
     },
     "透明演示磁带" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transparent demo cassette"
+          }
+        }
+      }
     },
     "通用" : {
       "localizations" : {
@@ -1184,21 +1210,24 @@
       }
     },
     "飞翔牌磁带播放器" : {
-
-    },
-    "首款个人立体声磁带播放器" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The first personal stereo cassette player"
+            "value" : "Fly brand cassette player"
           }
         }
       }
     },
     "首款便携式磁带播放器" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first portable cassette player"
+          }
+        }
+      }
     },
     "首款全透明磁带播放器" : {
       "localizations" : {
