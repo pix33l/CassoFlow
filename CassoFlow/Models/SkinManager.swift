@@ -78,10 +78,10 @@ struct PlayerSkin: Identifiable {
             buttonHeight: 50
         ),
         PlayerSkin(
-            name: "CF-MU",  // 名称作为唯一标识
+            name: "CF-MU01",  // 名称作为唯一标识
             year: "2024",
             description: String(localized: "牧农牌磁带播放器"),
-            coverImage: "cover-CF-MU",
+            coverImage: "cover-CF-MU01",
             panelColor: .clear,
             panelOutlineColor: .clear,
             buttonColor: Color("button-dark"),
@@ -90,7 +90,7 @@ struct PlayerSkin: Identifiable {
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: .black,
-            playerImage: "player-CF-MU",
+            playerImage: "player-CF-MU01",
             cassetteBgImage: "bg-cassette",
             buttonCornerRadius: 4,
             buttonHeight: 50
@@ -212,7 +212,11 @@ struct PlayerSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-MU", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-DT1"].contains(self.name)
+        return ["CF-DEMO"].contains(self.name)
+    }
+    
+    func isMemberExclusiveSkin() -> Bool {
+        return ["CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
     }
 }
 
@@ -240,7 +244,7 @@ struct CassetteSkin: Identifiable {
         ),
         CassetteSkin(
             name: "CFT-W60",  // 名称作为唯一标识
-            year: "2025",
+            year: "2022",
             description: String(localized: "彩虹色的录音磁带"),
             coverImage: "cover-CFT-W60",
             cassetteImage: "CFT-W60",
@@ -249,7 +253,7 @@ struct CassetteSkin: Identifiable {
         ),
         CassetteSkin(
             name: "CFT-C60",  // 名称作为唯一标识
-            year: "2025",
+            year: "1985",
             description: String(localized: "标签可写的彩色磁带"),
             coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
@@ -259,18 +263,18 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-60CR",  // 名称作为唯一标识
             year: "2025",
-            description: String(localized: "CHROME 的高端磁带"),
+            description: String(localized: "二氧化铬作为材料的高端磁带"),
             coverImage: "cover-CFT-60CR",
             cassetteImage: "CFT-60CR",
             cassetteHole: "holeDark",
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
-            name: "CFT-MM",  // 名称作为唯一标识
-            year: "2025",
+            name: "CFT-MM60",  // 名称作为唯一标识
+            year: "1988",
             description: String(localized: "白色陶瓷外壳的顶级磁带"),
-            coverImage: "cover-CFT-MM",
-            cassetteImage: "CFT-MM",
+            coverImage: "cover-CFT-MM60",
+            cassetteImage: "CFT-MM60",
             cassetteHole: "holeDark",
             cassetteColor: Color("cassetteColor")
         )
@@ -283,7 +287,11 @@ struct CassetteSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CFT-DEMO", "CFT-W660", "CFT-C60", "CFT-60CR", "CFT-MM"].contains(self.name)
+        return ["CFT-DEMO"].contains(self.name)
+    }
+    
+    func isMemberExclusiveSkin() -> Bool {
+        return ["CFT-60CR", "CFT-MM60"].contains(self.name)
     }
 }
 
@@ -327,32 +335,42 @@ class SkinHelper {
         return storeManager.ownsCassetteSkin(skinName)
     }
     
-    /// 获取播放器皮肤价格
+    /// 根据播放器皮肤名称获取价格显示文本
     static func getPlayerSkinPrice(_ skinName: String, storeManager: StoreManager) -> String {
         let skin = PlayerSkin.playerSkin(named: skinName)
         if skin?.isFreeDefaultSkin() == true {
             return "免费"
         }
         
+        // 如果是会员专享皮肤，显示会员专享
+        if skin?.isMemberExclusiveSkin() == true {
+            return "PRO 专享"
+        }
+        
         // 如果是有效会员，显示"会员专享"
         if storeManager.membershipStatus.isActive {
-            return "会员专享"
+            return "使用"
         }
         
         let productID = getPlayerSkinProductID(skinName)
         return storeManager.getProductPrice(for: productID)
     }
     
-    /// 获取磁带皮肤价格
+    /// 根据磁带皮肤名称获取价格显示文本
     static func getCassetteSkinPrice(_ skinName: String, storeManager: StoreManager) -> String {
         let skin = CassetteSkin.cassetteSkin(named: skinName)
         if skin?.isFreeDefaultSkin() == true {
             return "免费"
         }
         
+        // 如果是会员专享皮肤，显示会员专享
+        if skin?.isMemberExclusiveSkin() == true {
+            return "PRO 专享"
+        }
+        
         // 如果是有效会员，显示"会员专享"
         if storeManager.membershipStatus.isActive {
-            return "会员专享"
+            return "使用"
         }
         
         let productID = getCassetteSkinProductID(skinName)
@@ -364,7 +382,7 @@ class SkinHelper {
         switch skinName {
         case "CF-PC13": return StoreManager.ProductIDs.cfPC13
         case "CF-M10": return StoreManager.ProductIDs.cfM10
-        case "CF-MU": return StoreManager.ProductIDs.cfMU
+        case "CF-MU01": return StoreManager.ProductIDs.cfMU01
         case "CF-L2": return StoreManager.ProductIDs.cfL2
         case "CF-2": return StoreManager.ProductIDs.cf2
         case "CF-22": return StoreManager.ProductIDs.cf22
@@ -381,7 +399,7 @@ class SkinHelper {
         case "CFT-W60": return StoreManager.ProductIDs.cftW60
         case "CFT-C60": return StoreManager.ProductIDs.cftC60
         case "CFT-60CR": return StoreManager.ProductIDs.cft60CR
-        case "CFT-MM": return StoreManager.ProductIDs.cftMM
+        case "CFT-MM60": return StoreManager.ProductIDs.cftMM60
         default: return ""
         }
     }

@@ -43,7 +43,7 @@ class StoreManager: ObservableObject {
             case .notMember:
                 return String(localized:"升级 PRO 会员，获取全部高级功能")
             case .lifetimeMember:
-                return String(localized:"尊贵的永久 Pro 会员")
+                return String(localized:"尊贵的永久 PRO 会员")
             case .monthlyMember(let expiresOn), .yearlyMember(let expiresOn):
                 let formatter = DateFormatter()
                 // 使用系统的本地化日期格式
@@ -51,7 +51,7 @@ class StoreManager: ObservableObject {
                 formatter.timeStyle = .none
                 // 使用当前用户的区域设置
                 formatter.locale = Locale.current
-                return String(localized:"Pro 会员将在\(formatter.string(from: expiresOn))到期")
+                return String(localized:"PRO 会员将在\(formatter.string(from: expiresOn))到期")
             }
         }
         
@@ -83,7 +83,7 @@ class StoreManager: ObservableObject {
         // 播放器皮肤
         static let cfPC13 = "me.pix3l.CassoFlow.CF_PC13"
         static let cfM10 = "me.pix3l.CassoFlow.CF_M10"
-        static let cfMU = "me.pix3l.CassoFlow.CF_MU"
+        static let cfMU01 = "me.pix3l.CassoFlow.CF_MU01"
         static let cfL2 = "me.pix3l.CassoFlow.CF_L2"
         static let cf2 = "me.pix3l.CassoFlow.CF_2"
         static let cf22 = "me.pix3l.CassoFlow.CF_22"
@@ -95,13 +95,13 @@ class StoreManager: ObservableObject {
         static let cftW60 = "me.pix3l.CassoFlow.CFT_W60"
         static let cftC60 = "me.pix3l.CassoFlow.CFT_C60"
         static let cft60CR = "me.pix3l.CassoFlow.CFT_60CR"
-        static let cftMM = "me.pix3l.CassoFlow.CFT_MM"
+        static let cftMM60 = "me.pix3l.CassoFlow.CFT_MM60"
         
         // 所有产品ID
         static let allProducts = [
             lifetime, yearly, monthly,
-            cfPC13, cfM10, cfMU, cfL2, cf2, cf22, cf504, cfD6C, cfDT1,
-            cftW60, cftC60, cft60CR, cftMM
+            cfPC13, cfM10, cfMU01, cfL2, cf2, cf22, cf504, cfD6C, cfDT1,
+            cftW60, cftC60, cft60CR, cftMM60
         ]
     }
     
@@ -233,7 +233,7 @@ class StoreManager: ObservableObject {
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result {
                 let productName = await handleSuccessfulPurchase(transaction)
-                await transaction.finish()
+                // 注意：不要在这里调用 transaction.finish()，因为这是恢复购买不是新购买
                 if let name = productName {
                     restoredCount += 1
                     restoredItems.append(name)
@@ -241,17 +241,20 @@ class StoreManager: ObservableObject {
             }
         }
         
-        // 显示恢复结果
-        if restoredCount > 0 {
-            let itemList = restoredItems.joined(separator: "、")
-            showSuccessAlert(String(localized: "成功恢复 \(restoredCount) 个购买项目：\(itemList)"))
-            print("✅ 成功恢复 \(restoredCount) 个购买项目")
-        } else {
-            showInfoAlert(String(localized: "没有找到可恢复的购买项目"))
-            print("ℹ️ 没有找到可恢复的购买项目")
+        // 确保状态更新在主线程上执行
+        await MainActor.run {
+            isLoading = false
+            
+            // 显示恢复结果
+            if restoredCount > 0 {
+                let itemList = restoredItems.joined(separator: "、")
+                showSuccessAlert(String(localized: "成功恢复 \(restoredCount) 个购买项目：\(itemList)"))
+                print("✅ 成功恢复 \(restoredCount) 个购买项目")
+            } else {
+                showInfoAlert(String(localized: "没有找到可恢复的购买项目"))
+                print("ℹ️ 没有找到可恢复的购买项目")
+            }
         }
-        
-        isLoading = false
     }
     
     // MARK: - 处理成功购买/恢复
@@ -285,9 +288,9 @@ class StoreManager: ObservableObject {
             unlockPlayerSkin("CF-M10")
             result = "CF-M10"
             
-        case ProductIDs.cfMU:
-            unlockPlayerSkin("CF-MU")
-            result = "CF-MU"
+        case ProductIDs.cfMU01:
+            unlockPlayerSkin("CF-MU01")
+            result = "CF-MU01"
             
         case ProductIDs.cfL2:
             unlockPlayerSkin("CF-L2")
@@ -322,13 +325,13 @@ class StoreManager: ObservableObject {
             unlockCassetteSkin("CFT-C60")
             result = "CFT-C60"
             
-        case ProductIDs.cftC60:
+        case ProductIDs.cft60CR:
             unlockCassetteSkin("CFT-60CR")
             result = "CFT-60CR"
             
-        case ProductIDs.cftMM:
-            unlockCassetteSkin("CFT-MM")
-            result = "CFT-MM"
+        case ProductIDs.cftMM60:
+            unlockCassetteSkin("CFT-MM60")
+            result = "CFT-MM60"
             
         default:
             print("⚠️ 未知产品ID: \(productID)")
@@ -386,13 +389,7 @@ class StoreManager: ObservableObject {
     }
     
     func updateMembershipStatus() async {
-        // 首先检查终身会员
-        if ownedProducts.contains(ProductIDs.lifetime) {
-            membershipStatus = .lifetimeMember
-            return
-        }
-        
-        // 检查订阅状态
+        // 先检查订阅状态（月度/年度会员）
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result {
                 let productID = transaction.productID
@@ -415,6 +412,18 @@ class StoreManager: ObservableObject {
                     }
                 }
             }
+        }
+        
+        // 然后检查 StoreKit 交易中的终身会员
+        if ownedProducts.contains(ProductIDs.lifetime) {
+            membershipStatus = .lifetimeMember
+            return
+        }
+        
+        // 最后检查 UserDefaults 中的会员状态（用于测试或终身会员）
+        if UserDefaults.standard.bool(forKey: "isPremiumUser") {
+            membershipStatus = .lifetimeMember
+            return
         }
         
         // 如果没有找到有效订阅，设为非会员

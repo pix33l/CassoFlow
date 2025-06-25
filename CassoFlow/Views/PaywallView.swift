@@ -41,7 +41,6 @@ enum MembershipProduct: String, CaseIterable {
 
 struct FeatureRow: View {
     
-    @Environment(\.colorScheme) var colorScheme
     let systemImage: String
     let title: String
     let description: String
@@ -51,7 +50,7 @@ struct FeatureRow: View {
             Image(systemName: systemImage)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 30.0, height: 30.0)
+                .frame(width: 20.0, height: 20.0)
             
             
             VStack(alignment: .leading){
@@ -70,7 +69,6 @@ struct FeatureRow: View {
 
 struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject private var storeManager: StoreManager
     @EnvironmentObject private var musicService: MusicService
     @State private var selectedPlan: MembershipProduct = .monthly
@@ -87,53 +85,26 @@ struct PaywallView: View {
 
         // 主要内容区域
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 30) {
                 // 标题和副标题
-                VStack(alignment: .leading, spacing: 10) {
-                    Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
+                VStack(spacing: 10) {
+                    Image("PRO-dark")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 30.0)
                     
-                    Text(storeManager.membershipStatus.displayText)
+                    Text("升级 PRO 会员，获取全部高级功能")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-                .padding()
                 
-                // 功能列表
-                VStack(alignment: .leading, spacing: 0) {
-                    FeatureRow(
-                        systemImage: "recordingtape",
-                        title: String(localized: "解锁所有皮肤"),
-                        description: String(localized:"无限使用所有播放器和磁带皮肤")
-                    )
-                    Divider()
-                    FeatureRow(
-                        systemImage: "waveform",
-                        title: String(localized: "磁带音效"),
-                        description: String(localized:"模拟真实磁带音效")
-                    )
-                    Divider()
-                    FeatureRow(
-                        systemImage: "sun.max",
-                        title: String(localized: "屏幕常亮"),
-                        description: String(localized:"持续欣赏磁带转动的机械感")
-                    )
-                    Divider()
-                    FeatureRow(
-                        systemImage: "infinity",
-                        title: String(localized: "未来更新"),
-                        description: String(localized:"一次性付费，享受未来功能更新")
-                    )
-                }
-                .padding(.horizontal)
-                .background(.white.opacity(0.1))
-                .cornerRadius(10)
-
+                Image("paywall-cassette")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .padding(.horizontal, -10)
+                
                 // 付费选项
-                
-                VStack(spacing: 15) {
+                VStack(spacing: 10) {
                     ForEach(MembershipProduct.allCases, id: \.self) { plan in
                         if let product = storeManager.getProduct(for: plan.rawValue) {
                             PlanOptionView(
@@ -158,9 +129,51 @@ struct PaywallView: View {
                     }
                 }
                 
+                VStack {
+                    Text("您将获得")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    // 功能列表
+                    VStack(alignment: .leading, spacing: 0) {
+                        FeatureRow(
+                            systemImage: "recordingtape",
+                            title: String(localized: "解锁所有皮肤"),
+                            description: String(localized:"无限使用所有播放器和磁带皮肤")
+                        )
+                        Divider()
+                        FeatureRow(
+                            systemImage: "waveform",
+                            title: String(localized: "磁带音效"),
+                            description: String(localized:"模拟真实磁带音效")
+                        )
+                        Divider()
+                        FeatureRow(
+                            systemImage: "hand.tap",
+                            title: String(localized: "触觉反馈"),
+                            description: String(localized:"模拟实体操作的交互反馈")
+                        )
+                        Divider()
+                        FeatureRow(
+                            systemImage: "sun.max",
+                            title: String(localized: "屏幕常亮"),
+                            description: String(localized:"持续欣赏磁带转动的机械感")
+                        )
+                        Divider()
+                        FeatureRow(
+                            systemImage: "infinity",
+                            title: String(localized: "未来更新"),
+                            description: String(localized:"一次性付费，享受未来功能更新")
+                        )
+                    }
+                    .padding(.horizontal)
+                    .background(.white.opacity(0.1))
+                    .cornerRadius(10)
+                }
                 
-                Text("确认购买后，您的 Apple 帐户将被收取费用。订阅将会自动续订，除非在当前订阅结束前至少提前 24 小时关闭自动续订。您的账户将在当前订阅结束前的最后 24 小时里被收取续订费用，并确定续订开支。您后续可以在购买后前往「账户设置」管理订阅和关闭自动续订。")
-                    .font(.footnote)
+                
+                Text("确认购买后，将通过您的 Apple 帐户收取费用。 PRO 会员订阅默认会自动续订，除非在当前订阅结束前至少提前 24 小时前往「设置 -  Apple 账户 - 订阅」关闭自动续订，否则您的 Apple 账户将在当前订阅结束前的 24 小时内被收取续订费用。试用 PRO 会员期间内，如不手动关闭自动续订，则会在试用期结束时自动开通订阅并扣取费用。免费试用机会仅在每位用户首次订阅前试用一次，购买订阅后剩余的免费试用期（如有）将自动失效。")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
                 // 底部链接
                 HStack {
@@ -174,7 +187,6 @@ struct PaywallView: View {
                     .font(.footnote)
                     .foregroundColor(.secondary)
                 }
-                .padding(.top, 20)
             }
             .padding()
         }
@@ -184,19 +196,24 @@ struct PaywallView: View {
                     Task {
                         await storeManager.restorePurchases()
                         
-                        // 检查是否成功恢复为会员用户
                         if storeManager.isPremiumUser() {
-                            // 确保在主线程上安全地关闭视图
-                            await MainActor.run {
+                            // 恢复购买成功，延迟关闭避免视图更新冲突
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                 dismiss()
                             }
                         }
+                        // 如果恢复购买失败（用户依然不是会员），不关闭页面
+                        // 失败提示会通过 storeManager.showAlert 显示
                     }
                 }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
                 .foregroundColor(.primary)
                 .disabled(storeManager.isLoading)
                 .padding()
+                
                 Spacer()
+                
                 Button {
                     if musicService.isHapticFeedbackEnabled {
                         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -205,12 +222,12 @@ struct PaywallView: View {
                     dismiss()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.caption)
+                        .font(.body)
                         .foregroundColor(.primary)
                         .padding(8)
                         .background(
                             Circle()
-                                .fill(Color.gray.opacity(0.15))
+                                .fill(Color.gray.opacity(0.25))
                         )
                 }
                 .padding()
@@ -248,16 +265,16 @@ struct PaywallView: View {
                 ZStack {
                     Text(selectedPlan.buttonText)
                         .font(.title3)
-                        .fontWeight(.medium)
+                        .fontWeight(.bold)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(colorScheme == .dark ? .white : .black)
-                        .foregroundColor(colorScheme == .dark ? .black : .white)
+                        .background(.blue)
+                        .foregroundColor(.white)
                         .cornerRadius(12)
                     
                     if storeManager.isLoading {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: colorScheme == .dark ? .black : .white))
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     }
                 }
             }
@@ -270,10 +287,9 @@ struct PaywallView: View {
             Task {
                 await storeManager.fetchProducts()
                 
-                // 如果用户已经是会员，直接关闭页面
-                if storeManager.isPremiumUser() {
-                    dismiss()
-                }
+                // if storeManager.isPremiumUser() {
+                //     dismiss()
+                // }
             }
         }
         .interactiveDismissDisabled(storeManager.isLoading)
@@ -323,9 +339,27 @@ struct PlanOptionView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     
                     Text(plan.displayName)
-                        .font(.body)
-                        .fontWeight(.medium)
+                        .font(.title3)
+                        .fontWeight(.bold)
                     
+                    if let tag = plan.tag {
+                        Text(tag)
+                            .font(.footnote)
+                            .fontWeight(.medium)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(4)
+                    } else {
+                        Color.clear
+                            .frame(height: 26)
+                    }
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 5) {
                     Text(product.displayPrice)
                         .font(.title3)
                         .fontWeight(.bold)
@@ -333,20 +367,6 @@ struct PlanOptionView: View {
                     Text(getPerDayPrice(for: product))
                         .font(.footnote)
                         .foregroundColor(.secondary)
-                }
-                Spacer()
-                if let tag = plan.tag {
-                    Text(tag)
-                        .font(.footnote)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(4)
-                } else {
-                    Color.clear
-                        .frame(height: 26)
                 }
             }
             .padding()
@@ -368,10 +388,10 @@ struct PlanOptionView: View {
         switch plan {
         case .monthly:
             let dailyPrice = product.price / 30
-            return String(localized: "\(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
+            return String(localized: "仅 \(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
         case .yearly:
             let dailyPrice = product.price / 365
-            return String(localized: "\(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
+            return String(localized: "仅 \(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
         case .lifetime:
             return String(localized: "一次性付费")
         }
