@@ -8,8 +8,9 @@ enum WebLink: String {
 
 struct ProBadge: View {
     var body: some View {
-        Text("Pro")
+        Text("PRO")
             .font(.caption2)
+            .fontWeight(.bold)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background(Color.blue)
@@ -57,7 +58,6 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct SettingsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var musicService: MusicService
     @StateObject private var storeManager = StoreManager()
@@ -104,10 +104,10 @@ struct SettingsView: View {
                 // Pro版本升级卡片
                 Section {
                     VStack(alignment: .leading, spacing: 10) {
-                        Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
+                        Image("PRO-dark")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(height: 30)
+                            .frame(height: 25)
                         
                         Text(storeManager.membershipStatus.displayText)
                             .font(.subheadline)
@@ -118,8 +118,8 @@ struct SettingsView: View {
                                 Text("立即升级")
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(colorScheme == .dark ? .white : .black)
-                                    .foregroundColor(colorScheme == .dark ? .black : .white)
+                                    .background(.white)
+                                    .foregroundColor(.black)
                                     .cornerRadius(15)
                                 
                                 Spacer()
@@ -132,7 +132,6 @@ struct SettingsView: View {
                     .onTapGesture {
                         // 只有在显示升级按钮时才可以点击
                         if storeManager.membershipStatus.shouldShowUpgradeButton {
-                            print("🔘 PRO升级区域被点击")
                             if musicService.isHapticFeedbackEnabled {
                                 let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                                 impactFeedback.impactOccurred()
@@ -152,25 +151,16 @@ struct SettingsView: View {
                             
                             Toggle("磁带音效", isOn: Binding(
                                 get: {
-                                    // 测试模式：显示真实状态，不检查会员
-                                    return musicService.isCassetteEffectEnabled
-                                    // 原始会员检查逻辑（已注释）：
-                                    // return storeManager.membershipStatus.isActive && musicService.isCassetteEffectEnabled
+                                    return storeManager.membershipStatus.isActive && musicService.isCassetteEffectEnabled
                                 },
                                 set: { newValue in
-                                    // 测试模式：直接设置，不检查会员
-                                    musicService.setCassetteEffect(enabled: newValue)
-                                    // 原始会员检查逻辑（已注释）：
-                                    // if storeManager.membershipStatus.isActive {
-                                    //     musicService.setCassetteEffect(enabled: newValue)
-                                    // } else {
-                                    //     // 非会员用户点击时显示升级提示
-                                    //     print("🔘 非会员点击磁带音效，弹出PaywallView")
-                                    //     showingPaywall = true
-                                    // }
+                                    if storeManager.membershipStatus.isActive {
+                                        musicService.setCassetteEffect(enabled: newValue)
+                                    } else {
+                                        showingPaywall = true
+                                    }
                                 }
                             ))
-                            // 移除 disabled，让非会员也能点击
                             .onChange(of: musicService.isCassetteEffectEnabled) { _, newValue in
                                 print("🎵 磁带音效开关切换: \(newValue)")
                             }
@@ -179,9 +169,9 @@ struct SettingsView: View {
                         HStack {
                             Spacer().frame(width: 25) // 与图标对齐
                             // 测试模式：隐藏Pro标识
-                            // if !storeManager.membershipStatus.isActive {
-                            //     ProBadge()
-                            // }
+                            if !storeManager.membershipStatus.isActive {
+                                 ProBadge()
+                            }
                             Text("模拟磁带底噪和低频抖动")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -210,33 +200,23 @@ struct SettingsView: View {
                             
                             Toggle("触觉反馈", isOn: Binding(
                                 get: {
-                                    // 测试模式：显示真实状态，不检查会员
-                                    return musicService.isHapticFeedbackEnabled
-                                    // 原始会员检查逻辑（已注释）：
-                                    // return storeManager.membershipStatus.isActive && musicService.isHapticFeedbackEnabled
+                                    return storeManager.membershipStatus.isActive && musicService.isHapticFeedbackEnabled
                                 },
                                 set: { newValue in
-                                    // 测试模式：直接设置，不检查会员
-                                    musicService.setHapticFeedback(enabled: newValue)
-                                    // 原始会员检查逻辑（已注释）：
-                                    // if storeManager.membershipStatus.isActive {
-                                    //     musicService.setHapticFeedback(enabled: newValue)
-                                    // } else {
-                                    //     // 非会员用户点击时显示升级提示
-                                    //     print("🔘 非会员点击触觉反馈，弹出PaywallView")
-                                    //     showingPaywall = true
-                                    // }
+                                    if storeManager.membershipStatus.isActive {
+                                        musicService.setHapticFeedback(enabled: newValue)
+                                    } else {
+                                        showingPaywall = true
+                                    }
                                 }
                             ))
-                            // 移除 disabled，让非会员也能点击
                         }
                         
                         HStack {
                             Spacer().frame(width: 25) // 与图标对齐
-                            // 测试模式：隐藏Pro标识
-                            // if !storeManager.membershipStatus.isActive {
-                            //     ProBadge()
-                            // }
+                            if !storeManager.membershipStatus.isActive {
+                                ProBadge()
+                            }
                             Text("增加反馈来模拟实体操作感")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -252,36 +232,28 @@ struct SettingsView: View {
                             
                             Toggle("屏幕常亮", isOn: Binding(
                                 get: {
-                                    // 测试模式：显示真实状态，不检查会员
-                                    return musicService.isScreenAlwaysOn
-                                    // 原始会员检查逻辑（已注释）：
-                                    // return storeManager.membershipStatus.isActive && musicService.isScreenAlwaysOn
+                                    return storeManager.membershipStatus.isActive && musicService.isScreenAlwaysOn
                                 },
                                 set: { newValue in
-                                    // 测试模式：直接设置，不检查会员
-                                    musicService.setScreenAlwaysOn(enabled: newValue)
-                                    // 原始会员检查逻辑（已注释）：
-                                    // if storeManager.membershipStatus.isActive {
-                                    //     musicService.setScreenAlwaysOn(enabled: newValue)
-                                    // } else {
-                                    //     // 非会员用户点击时显示升级提示
-                                    //     print("🔘 非会员点击屏幕常亮，弹出PaywallView")
-                                    //     showingPaywall = true
-                                    // }
+
+                                    if storeManager.membershipStatus.isActive {
+                                        musicService.setScreenAlwaysOn(enabled: newValue)
+                                    } else {
+
+                                        showingPaywall = true
+                                    }
                                 }
                             ))
-                            // 移除 disabled，让非会员也能点击
                             .onChange(of: musicService.isScreenAlwaysOn) { _, newValue in
                                 print("🔆 屏幕常亮开关切换: \(newValue)")
                             }
                         }
                         
                         HStack {
-                            Spacer().frame(width: 25) // 与图标对齐
-                            // 测试模式：隐藏Pro标识
-                            // if !storeManager.membershipStatus.isActive {
-                            //     ProBadge()
-                            // }
+                            Spacer().frame(width: 25)
+                            if !storeManager.membershipStatus.isActive {
+                                ProBadge()
+                            }
                             Text("保持屏幕一直不锁屏")
                                 .font(.caption)
                                 .foregroundColor(.secondary)

@@ -12,7 +12,8 @@ struct StoreView: View {
     @State private var closeTapped = false
     @State private var applyTapped = false
     @State private var purchaseInProgress = false
-    
+    @State private var showingPaywall = false
+
     // 数据集
     private var playerSkins: [PlayerSkin] { PlayerSkin.playerSkins }
     private var cassetteSkins: [CassetteSkin] { CassetteSkin.cassetteSkins }
@@ -121,9 +122,9 @@ struct StoreView: View {
             .navigationTitle("商店")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        closeTapped.toggle()
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                             impactFeedback.impactOccurred()
@@ -145,6 +146,11 @@ struct StoreView: View {
                 Button("确定", role: .cancel) { }
             } message: {
                 Text(storeManager.alertMessage)
+            }
+            .fullScreenCover(isPresented: $showingPaywall) {
+                PaywallView()
+                    .environmentObject(storeManager)
+                    .environmentObject(musicService)
             }
             .task {
                 // 页面加载时获取产品信息
@@ -171,7 +177,6 @@ struct StoreView: View {
                 return SkinHelper.getCassetteSkinPrice(cassetteSkin.name, storeManager: storeManager)
             }
         }
-        return String(localized: "获取皮肤")
     }
     
     private var buttonBackgroundColor: Color {
@@ -232,6 +237,16 @@ struct StoreView: View {
         return false
     }
     
+    /// 检查当前皮肤是否为会员专享皮肤
+    private func isMemberExclusiveSkin() -> Bool {
+        if let playerSkin = currentSkinType.0 {
+            return playerSkin.isMemberExclusiveSkin()
+        } else if let cassetteSkin = currentSkinType.1 {
+            return cassetteSkin.isMemberExclusiveSkin()
+        }
+        return false
+    }
+    
     /// 处理主按钮操作（使用或购买）
     private func handleMainButtonAction() {
         // 如果是正在使用中的皮肤，不执行任何操作
@@ -243,6 +258,13 @@ struct StoreView: View {
             // 已拥有，直接使用
             applySelectedSkin()
         } else {
+            // 检查是否为会员专享皮肤且用户不是会员
+            if isMemberExclusiveSkin() && !storeManager.membershipStatus.isActive {
+                // 会员专享皮肤，非会员用户跳转到 PaywallView
+                showingPaywall = true
+                return
+            }
+            
             // 检查是否为会员用户
             if storeManager.membershipStatus.isActive {
                 // 会员用户可以直接使用所有皮肤
@@ -266,6 +288,13 @@ struct StoreView: View {
             productID = SkinHelper.getPlayerSkinProductID(playerSkin.name)
         } else if let cassetteSkin = currentSkinType.1 {
             productID = SkinHelper.getCassetteSkinProductID(cassetteSkin.name)
+        }
+        
+        // 如果是会员专享皮肤，不执行购买逻辑
+        if isMemberExclusiveSkin() {
+            purchaseInProgress = false
+            showingPaywall = true
+            return
         }
         
         guard !productID.isEmpty,

@@ -65,23 +65,7 @@ class LibraryDataManager: ObservableObject {
             }
         }
     }
-    
-    func forceReload() async {
-        
-        // 完全重置状态
-        await MainActor.run {
-            hasLoaded = false
-            isLoading = false  // 先设为false，然后在loadUserLibraryIfNeeded中设为true
-            errorMessage = nil
-            userAlbums = []
-            userPlaylists = []
-            subscriptionStatus = nil
-        }
-        
-        // 重新加载数据
-        await loadUserLibraryIfNeeded()
-    }
-    
+
     private func checkSubscriptionStatus() async {
         do {
             let subscription = try await MusicSubscription.current
@@ -133,30 +117,6 @@ struct LibraryView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = libraryData.errorMessage {
                     errorView(message: error)
-                } else if !libraryData.hasLoaded {
-                    // 处理初始状态
-                    VStack(spacing: 20) {
-                        ProgressView("准备加载...")
-                        
-                        Button {
-                            Task {
-                                await libraryData.forceReload()
-                            }
-                        } label: {
-                            Text("重新加载")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 25)
-                                        .fill(Color.red)
-                                )
-                        }
-                        .padding(.top, 10)
-                        // 添加手动加载按钮
-                    }
-                
                 } else {
                     contentView
                 }
