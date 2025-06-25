@@ -694,11 +694,11 @@ struct CassetteHole: View {
         print("播放进度计算 - shouldGrow: \(shouldGrow), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
         
         if shouldGrow {
-            // 从100变到200
-            return 100 + CGFloat(clampedProgress) * 100
-        } else {
             // 从200变到100
             return 200 - CGFloat(clampedProgress) * 100
+        } else {
+            // 从100变到200
+            return 100 + CGFloat(clampedProgress) * 100
         }
     }
     

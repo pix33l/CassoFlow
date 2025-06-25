@@ -25,8 +25,8 @@ struct PlayerSkin: Identifiable {
         
         PlayerSkin(
             name: "CF-DEMO",  // 名称作为唯一标识
-            year: "2025",
-            description: String(localized: "用来演示的磁带播放器"),
+            year: "2022",
+            description: String(localized: "演示用磁带播放器"),
             coverImage: "cover-CF-DEMO",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -44,7 +44,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-PC13",  // 名称作为唯一标识
             year: "2024",
-            description: String(localized: "能飞的磁带播放器"),
+            description: String(localized: "飞翔牌磁带播放器"),
             coverImage: "cover-CF-PC13",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -62,7 +62,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-M10",  // 名称作为唯一标识
             year: "2024",
-            description: String(localized: "动物牌磁带播放器"),
+            description: String(localized: "国宝牌磁带播放器"),
             coverImage: "cover-CF-M10",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -78,10 +78,10 @@ struct PlayerSkin: Identifiable {
             buttonHeight: 50
         ),
         PlayerSkin(
-            name: "CF-WIND",  // 名称作为唯一标识
+            name: "CF-MU",  // 名称作为唯一标识
             year: "2024",
-            description: String(localized: "公鸡国磁带播放器"),
-            coverImage: "cover-CF-WIND",
+            description: String(localized: "牧农牌磁带播放器"),
+            coverImage: "cover-CF-MU",
             panelColor: .clear,
             panelOutlineColor: .clear,
             buttonColor: Color("button-dark"),
@@ -90,15 +90,15 @@ struct PlayerSkin: Identifiable {
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
             screenOutlineColor: .black,
-            playerImage: "player-CF-WIND",
+            playerImage: "player-CF-MU",
             cassetteBgImage: "bg-cassette",
-            buttonCornerRadius: 30,
-            buttonHeight: 60
+            buttonCornerRadius: 4,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-L2",  // 名称作为唯一标识
             year: "1979",
-            description: String(localized: "首款个人立体声磁带播放器"),
+            description: String(localized: "首款便携式磁带播放器"),
             coverImage: "cover-CF-L2",
             panelColor: .clear,
             panelOutlineColor: .clear,
@@ -170,7 +170,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-D6C",  // 名称作为唯一标识
             year: "1984",
-            description: String(localized: "专为专业用户生产的磁带播放器"),
+            description: String(localized: "为专业用户生产的磁带播放器"),
             coverImage: "cover-CF-D6C",
             panelColor: Color("bg-panel-dark"),
             panelOutlineColor: .black,
@@ -212,7 +212,7 @@ struct PlayerSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-WIND", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-DT1"].contains(self.name)
+        return ["CF-DEMO", "CF-PC13", "CF-M10", "CF-MU", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-DT1"].contains(self.name)
     }
 }
 
@@ -232,18 +232,18 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-DEMO",  // 名称作为唯一标识
             year: "2025",
-            description: String(localized: "白色演示磁带"),
+            description: String(localized: "透明演示磁带"),
             coverImage: "cover-CFT-DEMO",
             cassetteImage: "CFT-DEMO",
             cassetteHole: "holeDark",
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
-            name: "CFT-TRA",  // 名称作为唯一标识
+            name: "CFT-W60",  // 名称作为唯一标识
             year: "2025",
-            description: String(localized: "经典透明磁带"),
-            coverImage: "cover-CFT-TRA",
-            cassetteImage: "CFT-TRA",
+            description: String(localized: "彩虹色的录音磁带"),
+            coverImage: "cover-CFT-W60",
+            cassetteImage: "CFT-W60",
             cassetteHole: "holeDark",
             cassetteColor: Color("cassetteColor")
         ),
@@ -253,6 +253,24 @@ struct CassetteSkin: Identifiable {
             description: String(localized: "标签可写的彩色磁带"),
             coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
+            name: "CFT-60CR",  // 名称作为唯一标识
+            year: "2025",
+            description: String(localized: "CHROME 的高端磁带"),
+            coverImage: "cover-CFT-60CR",
+            cassetteImage: "CFT-60CR",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
+            name: "CFT-MM",  // 名称作为唯一标识
+            year: "2025",
+            description: String(localized: "白色陶瓷外壳的顶级磁带"),
+            coverImage: "cover-CFT-MM",
+            cassetteImage: "CFT-MM",
             cassetteHole: "holeDark",
             cassetteColor: Color("cassetteColor")
         )
@@ -265,7 +283,7 @@ struct CassetteSkin: Identifiable {
     
     // 检查是否为默认免费皮肤
     func isFreeDefaultSkin() -> Bool {
-        return ["CFT-DEMO", "CFT-TRA", "CFT-C60"].contains(self.name)
+        return ["CFT-DEMO", "CFT-W660", "CFT-C60", "CFT-60CR", "CFT-MM"].contains(self.name)
     }
 }
 
@@ -346,7 +364,7 @@ class SkinHelper {
         switch skinName {
         case "CF-PC13": return StoreManager.ProductIDs.cfPC13
         case "CF-M10": return StoreManager.ProductIDs.cfM10
-        case "CF-WIND": return StoreManager.ProductIDs.cfWIND
+        case "CF-MU": return StoreManager.ProductIDs.cfMU
         case "CF-L2": return StoreManager.ProductIDs.cfL2
         case "CF-2": return StoreManager.ProductIDs.cf2
         case "CF-22": return StoreManager.ProductIDs.cf22
@@ -360,8 +378,10 @@ class SkinHelper {
     /// 根据磁带皮肤名称获取产品ID
     static func getCassetteSkinProductID(_ skinName: String) -> String {
         switch skinName {
-        case "CFT-TRA": return StoreManager.ProductIDs.cftTRA
+        case "CFT-W60": return StoreManager.ProductIDs.cftW60
         case "CFT-C60": return StoreManager.ProductIDs.cftC60
+        case "CFT-60CR": return StoreManager.ProductIDs.cft60CR
+        case "CFT-MM": return StoreManager.ProductIDs.cftMM
         default: return ""
         }
     }

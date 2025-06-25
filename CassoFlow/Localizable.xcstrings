@@ -65,6 +65,9 @@
     "100" : {
 
     },
+    "CHROME 的高端磁带" : {
+
+    },
     "PGM NO. %lld/%lld" : {
       "localizations" : {
         "zh-Hans" : {
@@ -104,6 +107,9 @@
     "Pro" : {
 
     },
+    "PRO 会员" : {
+
+    },
     "Pro 会员将在%@到期" : {
       "localizations" : {
         "en" : {
@@ -138,6 +144,7 @@
       }
     },
     "专为专业用户生产的磁带播放器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -156,6 +163,12 @@
           }
         }
       }
+    },
+    "为专业用户生产的磁带播放器" : {
+
+    },
+    "产品未找到" : {
+
     },
     "仅 %@ /天" : {
       "localizations" : {
@@ -221,6 +234,7 @@
       }
     },
     "公鸡国磁带播放器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -274,6 +288,7 @@
 
     },
     "动物牌磁带播放器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -322,6 +337,9 @@
           }
         }
       }
+    },
+    "国宝牌磁带播放器" : {
+
     },
     "增加反馈来模拟实体操作感" : {
       "localizations" : {
@@ -472,6 +490,9 @@
           }
         }
       }
+    },
+    "彩虹色的录音磁带" : {
+
     },
     "微信" : {
       "localizations" : {
@@ -742,6 +763,9 @@
         }
       }
     },
+    "演示用磁带播放器" : {
+
+    },
     "点此选择音乐" : {
       "localizations" : {
         "en" : {
@@ -762,6 +786,9 @@
         }
       }
     },
+    "牧农牌磁带播放器" : {
+
+    },
     "瑕疵噪点 (Crackle)" : {
       "localizations" : {
         "en" : {
@@ -773,6 +800,7 @@
       }
     },
     "用来演示的磁带播放器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -783,6 +811,7 @@
       }
     },
     "白色演示磁带" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -791,6 +820,9 @@
           }
         }
       }
+    },
+    "白色陶瓷外壳的顶级磁带" : {
+
     },
     "省 50%" : {
       "localizations" : {
@@ -863,6 +895,7 @@
       }
     },
     "经典透明磁带" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -923,6 +956,7 @@
       }
     },
     "能飞的磁带播放器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1045,6 +1079,9 @@
         }
       }
     },
+    "透明演示磁带" : {
+
+    },
     "通用" : {
       "localizations" : {
         "en" : {
@@ -1138,7 +1175,11 @@
         }
       }
     },
+    "飞翔牌磁带播放器" : {
+
+    },
     "首款个人立体声磁带播放器" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1147,6 +1188,9 @@
           }
         }
       }
+    },
+    "首款便携式磁带播放器" : {
+
     },
     "首款全透明磁带播放器" : {
       "localizations" : {

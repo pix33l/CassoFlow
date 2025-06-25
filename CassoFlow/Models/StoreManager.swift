@@ -83,7 +83,7 @@ class StoreManager: ObservableObject {
         // 播放器皮肤
         static let cfPC13 = "me.pix3l.CassoFlow.CF_PC13"
         static let cfM10 = "me.pix3l.CassoFlow.CF_M10"
-        static let cfWIND = "me.pix3l.CassoFlow.CF_WIND"
+        static let cfMU = "me.pix3l.CassoFlow.CF_MU"
         static let cfL2 = "me.pix3l.CassoFlow.CF_L2"
         static let cf2 = "me.pix3l.CassoFlow.CF_2"
         static let cf22 = "me.pix3l.CassoFlow.CF_22"
@@ -92,14 +92,16 @@ class StoreManager: ObservableObject {
         static let cfDT1 = "me.pix3l.CassoFlow.CF_DT1"
         
         // 磁带皮肤
+        static let cftW60 = "me.pix3l.CassoFlow.CFT_W60"
         static let cftC60 = "me.pix3l.CassoFlow.CFT_C60"
-        static let cftTRA = "me.pix3l.CassoFlow.CFT_TRA"
+        static let cft60CR = "me.pix3l.CassoFlow.CFT_60CR"
+        static let cftMM = "me.pix3l.CassoFlow.CFT_MM"
         
         // 所有产品ID
         static let allProducts = [
             lifetime, yearly, monthly,
-            cfPC13, cfM10, cfWIND, cfL2, cf2, cf22, cf504, cfD6C, cfDT1,
-            cftC60, cftTRA
+            cfPC13, cfM10, cfMU, cfL2, cf2, cf22, cf504, cfD6C, cfDT1,
+            cftW60, cftC60, cft60CR, cftMM
         ]
     }
     
@@ -283,9 +285,9 @@ class StoreManager: ObservableObject {
             unlockPlayerSkin("CF-M10")
             result = "CF-M10"
             
-        case ProductIDs.cfWIND:
-            unlockPlayerSkin("CF-WIND")
-            result = "CF-WIND"
+        case ProductIDs.cfMU:
+            unlockPlayerSkin("CF-MU")
+            result = "CF-MU"
             
         case ProductIDs.cfL2:
             unlockPlayerSkin("CF-L2")
@@ -312,13 +314,21 @@ class StoreManager: ObservableObject {
             result = "CF-DT1"
             
         // 磁带皮肤
+        case ProductIDs.cftW60:
+            unlockCassetteSkin("CFT-TRA")
+            result = "CFT-TRA"
+            
         case ProductIDs.cftC60:
             unlockCassetteSkin("CFT-C60")
             result = "CFT-C60"
             
-        case ProductIDs.cftTRA:
-            unlockCassetteSkin("CFT-TRA")
-            result = "CFT-TRA"
+        case ProductIDs.cftC60:
+            unlockCassetteSkin("CFT-60CR")
+            result = "CFT-60CR"
+            
+        case ProductIDs.cftMM:
+            unlockCassetteSkin("CFT-MM")
+            result = "CFT-MM"
             
         default:
             print("⚠️ 未知产品ID: \(productID)")

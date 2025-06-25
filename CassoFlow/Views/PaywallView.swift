@@ -72,6 +72,7 @@ struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject private var storeManager: StoreManager
+    @EnvironmentObject private var musicService: MusicService
     @State private var selectedPlan: MembershipProduct = .monthly
     @State private var showError = false
     @State private var errorMessage = ""
@@ -83,167 +84,187 @@ struct PaywallView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // 主要内容区域
-                ScrollView {
-                    VStack(spacing: 10) {
-                        // 标题和副标题
-                        VStack(alignment: .leading, spacing: 10) {
-                            Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 30.0)
-                            
-                            Text(storeManager.membershipStatus.displayText)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding()
-                        
-                        // 功能列表
-                        VStack(alignment: .leading, spacing: 0) {
-                            FeatureRow(
-                                systemImage: "recordingtape",
-                                title: String(localized: "解锁所有皮肤"),
-                                description: String(localized:"无限使用所有播放器和磁带皮肤")
-                            )
-                            Divider()
-                            FeatureRow(
-                                systemImage: "waveform",
-                                title: String(localized: "磁带音效"),
-                                description: String(localized:"模拟真实磁带音效")
-                            )
-                            Divider()
-                            FeatureRow(
-                                systemImage: "sun.max",
-                                title: String(localized: "屏幕常亮"),
-                                description: String(localized:"持续欣赏磁带转动的机械感")
-                            )
-                            Divider()
-                            FeatureRow(
-                                systemImage: "infinity",
-                                title: String(localized: "未来更新"),
-                                description: String(localized:"一次性付费，享受未来功能更新")
-                            )
-                        }
-                        .padding(.horizontal)
-                        .background(colorScheme == .dark ? Color.white.opacity(0.1) : .gray.opacity(0.15))
-                        .cornerRadius(10)
-/*
-                        // 付费选项
-                        VStack(spacing: 15) {
-                            HStack(spacing: 10) {
-                                ForEach(MembershipProduct.allCases, id: \.self) { plan in
-                                    if let product = storeManager.getProduct(for: plan.rawValue) {
-                                        PlanOptionView(
-                                            product: product,
-                                            plan: plan,
-                                            isSelected: selectedPlan == plan
-                                        ) {
-                                            selectedPlan = plan
-                                        }
-                                    } else {
-                                        VStack {
-                                            Text("产品未找到")
-                                                .font(.caption)
-                                                .foregroundColor(.red)
-                                            Text(plan.rawValue)
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        .padding()
-                                        .border(Color.red.opacity(0.3))
-                                    }
-                                }
-                            }
-                        }
-*/
-                        // 底部链接
-                        HStack {
-                            HStack(spacing: 10) {
-                                Link("隐私政策", destination: URL(string: "https://pix3l.me/cf-privacy-policy/")!)
-                                
-                                Text("|")
-                                
-                                Link("使用条款", destination: URL(string: "https://pix3l.me/cf-terms-of-use/")!)
-                            }
-                            .font(.footnote)
-                            .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            Button("恢复购买") {
-                                Task {
-                                    await storeManager.restorePurchases()
-                                    
-                                    // 检查是否成功恢复为会员用户
-                                    if storeManager.isPremiumUser() {
-                                        // 使用延迟关闭来避免视图更新冲突
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            dismiss()
-                                        }
-                                    }
-                                }
-                            }
-                            .font(.footnote)
-                            .foregroundColor(.primary)
-                            .disabled(storeManager.isLoading)
-                        }
-                        .padding(.top, 10)
-                    }
-                    .padding()
+
+        // 主要内容区域
+        ScrollView {
+            VStack(spacing: 20) {
+                // 标题和副标题
+                VStack(alignment: .leading, spacing: 10) {
+                    Image(colorScheme == .dark ? "PRO-dark" : "PRO-light")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 30.0)
+                    
+                    Text(storeManager.membershipStatus.displayText)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
+                .padding()
                 
-                // 底部固定按钮
-                Button(action: {
-                    Task {
-                        if let product = storeManager.getProduct(for: selectedPlan.rawValue) {
-                            let result = await storeManager.purchase(product)
-                            
-                            switch result {
-                            case .success(_):
-                                // 购买成功，延迟关闭页面避免视图更新冲突
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    dismiss()
-                                }
-                            case .cancelled:
-                                // 用户取消，不做任何操作
-                                break
-                            case .failed(let error):
-                                errorMessage = error
-                                showError = true
-                            case .pending:
-                                errorMessage = "购买正在处理中，请稍后再试"
-                                showError = true
+                // 功能列表
+                VStack(alignment: .leading, spacing: 0) {
+                    FeatureRow(
+                        systemImage: "recordingtape",
+                        title: String(localized: "解锁所有皮肤"),
+                        description: String(localized:"无限使用所有播放器和磁带皮肤")
+                    )
+                    Divider()
+                    FeatureRow(
+                        systemImage: "waveform",
+                        title: String(localized: "磁带音效"),
+                        description: String(localized:"模拟真实磁带音效")
+                    )
+                    Divider()
+                    FeatureRow(
+                        systemImage: "sun.max",
+                        title: String(localized: "屏幕常亮"),
+                        description: String(localized:"持续欣赏磁带转动的机械感")
+                    )
+                    Divider()
+                    FeatureRow(
+                        systemImage: "infinity",
+                        title: String(localized: "未来更新"),
+                        description: String(localized:"一次性付费，享受未来功能更新")
+                    )
+                }
+                .padding(.horizontal)
+                .background(.white.opacity(0.1))
+                .cornerRadius(10)
+
+                // 付费选项
+                
+                VStack(spacing: 15) {
+                    ForEach(MembershipProduct.allCases, id: \.self) { plan in
+                        if let product = storeManager.getProduct(for: plan.rawValue) {
+                            PlanOptionView(
+                                product: product,
+                                plan: plan,
+                                isSelected: selectedPlan == plan
+                            ) {
+                                selectedPlan = plan
                             }
                         } else {
-                            // 产品不存在的错误处理
-                            errorMessage = "产品信息加载失败，请重试"
-                            showError = true
-                        }
-                    }
-                }) {
-                    ZStack {
-                        Text(selectedPlan.buttonText)
-                            .font(.title3)
-                            .fontWeight(.medium)
-                            .frame(maxWidth: .infinity)
+                            VStack {
+                                Text("产品未找到")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                Text(plan.rawValue)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
                             .padding()
-                            .background(colorScheme == .dark ? .white : .black)
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
-                            .cornerRadius(12)
-                        
-                        if storeManager.isLoading {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: colorScheme == .dark ? .black : .white))
+                            .border(Color.red.opacity(0.3))
                         }
                     }
                 }
-                .disabled(storeManager.isLoading || storeManager.products.isEmpty)
+                
+                
+                Text("确认购买后，您的 Apple 帐户将被收取费用。订阅将会自动续订，除非在当前订阅结束前至少提前 24 小时关闭自动续订。您的账户将在当前订阅结束前的最后 24 小时里被收取续订费用，并确定续订开支。您后续可以在购买后前往「账户设置」管理订阅和关闭自动续订。")
+                    .font(.footnote)
+
+                // 底部链接
+                HStack {
+                    HStack(spacing: 10) {
+                        Link("隐私政策", destination: URL(string: "https://pix3l.me/cf-privacy-policy/")!)
+                        
+                        Text("|")
+                        
+                        Link("使用条款", destination: URL(string: "https://pix3l.me/cf-terms-of-use/")!)
+                    }
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                }
+                .padding(.top, 20)
+            }
+            .padding()
+        }
+        .safeAreaInset(edge: .top) {
+            HStack{
+                Button("恢复购买") {
+                    Task {
+                        await storeManager.restorePurchases()
+                        
+                        // 检查是否成功恢复为会员用户
+                        if storeManager.isPremiumUser() {
+                            // 确保在主线程上安全地关闭视图
+                            await MainActor.run {
+                                dismiss()
+                            }
+                        }
+                    }
+                }
+                .foregroundColor(.primary)
+                .disabled(storeManager.isLoading)
+                .padding()
+                Spacer()
+                Button {
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption)
+                        .foregroundColor(.primary)
+                        .padding(8)
+                        .background(
+                            Circle()
+                                .fill(Color.gray.opacity(0.15))
+                        )
+                }
                 .padding()
             }
         }
+        .safeAreaInset(edge: .bottom) {
+            Button(action: {
+                Task {
+                    if let product = storeManager.getProduct(for: selectedPlan.rawValue) {
+                        let result = await storeManager.purchase(product)
+                        
+                        switch result {
+                        case .success(_):
+                            // 购买成功，延迟关闭页面避免视图更新冲突
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                dismiss()
+                            }
+                        case .cancelled:
+                            // 用户取消，不做任何操作
+                            break
+                        case .failed(let error):
+                            errorMessage = error
+                            showError = true
+                        case .pending:
+                            errorMessage = "购买正在处理中，请稍后再试"
+                            showError = true
+                        }
+                    } else {
+                        // 产品不存在的错误处理
+                        errorMessage = "产品信息加载失败，请重试"
+                        showError = true
+                    }
+                }
+            }) {
+                ZStack {
+                    Text(selectedPlan.buttonText)
+                        .font(.title3)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(colorScheme == .dark ? .white : .black)
+                        .foregroundColor(colorScheme == .dark ? .black : .white)
+                        .cornerRadius(12)
+                    
+                    if storeManager.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: colorScheme == .dark ? .black : .white))
+                    }
+                }
+            }
+            .disabled(storeManager.isLoading || storeManager.products.isEmpty)
+            .padding()
+        }
+
         .onAppear {
             // 页面出现时加载产品信息
             Task {
@@ -283,58 +304,50 @@ struct PlanOptionView: View {
     
     private var borderColor: Color {
         if isSelected {
-            return colorScheme == .dark ? .white : .black
+            return .white
         } else {
-            return Color.gray.opacity(0.3)
+            return .white.opacity(0.2)
         }
     }
     
     private var backgroundColor: Color {
         if isSelected {
-            return (colorScheme == .dark ? Color.white : Color.black).opacity(0.1)
+            return .white.opacity(0.1)
         } else {
-            return Color.clear
+            return .clear
         }
     }
     
-    private var tagBackgroundColor: Color {
-        colorScheme == .dark ? .white : .black
-    }
-    
-    private var tagForegroundColor: Color {
-        colorScheme == .dark ? .black : .white
-    }
-    
     var body: some View {
-        VStack {
-            if let tag = plan.tag {
-                Text(tag)
-                    .font(.footnote)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(tagBackgroundColor)
-                    .foregroundColor(tagForegroundColor)
-                    .cornerRadius(4)
-            } else {
-                Color.clear
-                    .frame(height: 26)
-            }
-            
-            VStack(spacing: 5) {
-                Text(plan.displayName)
-                    .font(.body)
-                    .fontWeight(.medium)
-                
-                Text(product.displayPrice)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                
-                Text(getPerDayPrice(for: product))
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+            HStack {
+                VStack(alignment: .leading, spacing: 5) {
+                    
+                    Text(plan.displayName)
+                        .font(.body)
+                        .fontWeight(.medium)
+                    
+                    Text(product.displayPrice)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                    
+                    Text(getPerDayPrice(for: product))
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                if let tag = plan.tag {
+                    Text(tag)
+                        .font(.footnote)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(4)
+                } else {
+                    Color.clear
+                        .frame(height: 26)
+                }
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -348,17 +361,17 @@ struct PlanOptionView: View {
             )
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture(perform: action)
-        }
+
     }
     
     private func getPerDayPrice(for product: Product) -> String {
         switch plan {
         case .monthly:
             let dailyPrice = product.price / 30
-            return String(localized: "仅 \(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
+            return String(localized: "\(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
         case .yearly:
             let dailyPrice = product.price / 365
-            return String(localized: "仅 \(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
+            return String(localized: "\(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
         case .lifetime:
             return String(localized: "一次性付费")
         }

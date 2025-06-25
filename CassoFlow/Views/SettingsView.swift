@@ -409,7 +409,7 @@ struct SettingsView: View {
                     URL(string: "https://apps.apple.com/app/id6746403175")!
                 ])
             }
-            .sheet(isPresented: $showingPaywall) {
+            .fullScreenCover (isPresented: $showingPaywall) {
                 PaywallView()
                     .environmentObject(storeManager)
             }
