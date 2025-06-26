@@ -118,6 +118,7 @@
 
     },
     "一次性付费" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -168,6 +169,7 @@
       }
     },
     "产品未找到" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -268,6 +270,7 @@
       }
     },
     "最划算" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -448,6 +451,7 @@
       }
     },
     "年度" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -456,6 +460,9 @@
           }
         }
       }
+    },
+    "年度 PRO" : {
+
     },
     "底噪" : {
       "localizations" : {
@@ -673,6 +680,9 @@
         }
       }
     },
+    "早鸟特惠" : {
+
+    },
     "暂无价格" : {
       "localizations" : {
         "en" : {
@@ -684,6 +694,7 @@
       }
     },
     "月度" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -692,6 +703,9 @@
           }
         }
       }
+    },
+    "月度 PRO" : {
+
     },
     "未播放歌曲" : {
       "localizations" : {
@@ -784,6 +798,7 @@
       }
     },
     "永久" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -792,6 +807,9 @@
           }
         }
       }
+    },
+    "永久 PRO" : {
+
     },
     "没有找到可恢复的购买项目" : {
       "localizations" : {
@@ -870,6 +888,7 @@
       }
     },
     "省 50%" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -998,6 +1017,9 @@
           }
         }
       }
+    },
+    "解锁所有播放器和磁带" : {
+
     },
     "解锁所有皮肤" : {
       "localizations" : {
@@ -1148,6 +1170,9 @@
           }
         }
       }
+    },
+    "限时 5 折优惠" : {
+
     },
     "隐私政策" : {
       "localizations" : {

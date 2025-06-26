@@ -15,7 +15,7 @@
   ],
   "products" : [
     {
-      "displayPrice" : "9.99",
+      "displayPrice" : "14.99",
       "familyShareable" : false,
       "internalID" : "6747073026",
       "localizations" : [
@@ -39,7 +39,7 @@
     "_applicationInternalID" : "6746403175",
     "_developerTeamID" : "4U3CXVZX7T",
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 772550852.38611805,
+    "_lastSynchronizedDate" : 772601669.51296306,
     "_locale" : "en_US",
     "_storefront" : "USA",
     "_storeKitErrors" : [
@@ -143,7 +143,7 @@
           "groupNumber" : 2,
           "internalID" : "6747307047",
           "introductoryOffer" : {
-            "internalID" : "7F211A17",
+            "internalID" : "FCD1E930",
             "numberOfPeriods" : 1,
             "paymentMode" : "free",
             "subscriptionPeriod" : "P3D"

@@ -269,69 +269,69 @@ class StoreManager: ObservableObject {
         // 会员产品
         case ProductIDs.lifetime:
             unlockPremiumFeatures()
-            result = "终身会员"
+            result = "永久 PRO"
             
         case ProductIDs.yearly:
             unlockPremiumFeatures()
-            result = "年度会员"
+            result = "年度 PRO"
             
         case ProductIDs.monthly:
             unlockPremiumFeatures()
-            result = "月度会员"
+            result = "月度 PRO"
             
         // 播放器皮肤
         case ProductIDs.cfPC13:
             unlockPlayerSkin("CF-PC13")
-            result = "CF-PC13"
+            result = "CF-PC13 播放器"
             
         case ProductIDs.cfM10:
             unlockPlayerSkin("CF-M10")
-            result = "CF-M10"
+            result = "CF-M10 播放器"
             
         case ProductIDs.cfMU01:
             unlockPlayerSkin("CF-MU01")
-            result = "CF-MU01"
+            result = "CF-MU01 播放器"
             
         case ProductIDs.cfL2:
             unlockPlayerSkin("CF-L2")
-            result = "CF-L2"
+            result = "CF-L2 播放器"
             
         case ProductIDs.cf2:
             unlockPlayerSkin("CF-2")
-            result = "CF-2"
+            result = "CF-2 播放器"
             
         case ProductIDs.cf22:
             unlockPlayerSkin("CF-22")
-            result = "CF-22"
+            result = "CF-22 播放器"
             
         case ProductIDs.cf504:
             unlockPlayerSkin("CF-504")
-            result = "CF-504"
+            result = "CF-504 播放器"
             
         case ProductIDs.cfD6C:
             unlockPlayerSkin("CF-D6C")
-            result = "CF-D6C"
+            result = "CF-D6C 播放器"
             
         case ProductIDs.cfDT1:
             unlockPlayerSkin("CF-DT1")
-            result = "CF-DT1"
+            result = "CF-DT1 播放器"
             
         // 磁带皮肤
         case ProductIDs.cftW60:
             unlockCassetteSkin("CFT-TRA")
-            result = "CFT-TRA"
+            result = "CFT-TRA 磁带"
             
         case ProductIDs.cftC60:
             unlockCassetteSkin("CFT-C60")
-            result = "CFT-C60"
+            result = "CFT-C60 磁带"
             
         case ProductIDs.cft60CR:
             unlockCassetteSkin("CFT-60CR")
-            result = "CFT-60CR"
+            result = "CFT-60CR 磁带"
             
         case ProductIDs.cftMM60:
             unlockCassetteSkin("CFT-MM60")
-            result = "CFT-MM60"
+            result = "CFT-MM60 磁带"
             
         default:
             print("⚠️ 未知产品ID: \(productID)")

@@ -168,6 +168,51 @@ struct AudioWaveView: View {
     }
 }
 
+struct PayLabel: View {
+    @State private var showingPaywall = false
+    @EnvironmentObject private var musicService: MusicService
+    @StateObject private var storeManager = StoreManager()
+    
+    var body: some View {
+        Button {
+            if musicService.isHapticFeedbackEnabled {
+                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                impactFeedback.impactOccurred()
+            }
+            showingPaywall = true
+        } label: {
+            HStack{
+                VStack(alignment: .leading) {
+                    Image("PRO-black")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 10)
+                    Text("解锁所有播放器和磁带")
+                        .font(.caption2)
+                        .foregroundColor(Color.black)
+                }
+                Image(systemName: "chevron.right")
+                    .font(.callout)
+                    .foregroundColor(.black)
+            }
+            .padding(6)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(.yellow)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(.black, lineWidth: 2))
+            )
+        }
+        .buttonStyle(.plain) // 使用纯样式避免额外的按钮效果
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView()
+                .environmentObject(storeManager)
+                .environmentObject(musicService)
+        }
+    }
+}
+
 // MARK: - 预览
 #Preview {
     VStack(spacing: 20) {
@@ -218,4 +263,9 @@ struct AudioWaveView: View {
     .padding()
     .background(Color.gray)
     .environmentObject(MusicService.shared)
+}
+
+#Preview("支付标签") {
+    PayLabel()
+        .environmentObject(MusicService.shared)
 }

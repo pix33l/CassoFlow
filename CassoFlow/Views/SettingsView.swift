@@ -36,8 +36,8 @@ struct LinkRow: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.subheadline)
-                    .foregroundColor(.primary.opacity(0.3))
+                    .font(.body)
+                    .foregroundColor(.primary.opacity(0.25))
             }
             .foregroundColor(.primary)
         }
@@ -104,7 +104,7 @@ struct SettingsView: View {
                 // Pro版本升级卡片
                 Section {
                     VStack(alignment: .leading, spacing: 10) {
-                        Image("PRO-dark")
+                        Image("PRO-white")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(height: 25)
@@ -282,8 +282,8 @@ struct SettingsView: View {
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .font(.subheadline)
-                                .foregroundColor(.primary.opacity(0.3))
+                                .font(.body)
+                                .foregroundColor(.primary.opacity(0.25))
                         }
                         .foregroundColor(.primary)
                     }
@@ -303,8 +303,8 @@ struct SettingsView: View {
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .font(.subheadline)
-                                .foregroundColor(.primary.opacity(0.3))
+                                .font(.body)
+                                .foregroundColor(.primary.opacity(0.25))
                         }
                         .foregroundColor(.primary)
                     }
@@ -331,8 +331,8 @@ struct SettingsView: View {
                                     .scaleEffect(0.8)
                             } else {
                                 Image(systemName: "chevron.right")
-                                    .font(.subheadline)
-                                    .foregroundColor(.primary.opacity(0.3))
+                                    .font(.body)
+                                    .foregroundColor(.primary.opacity(0.25))
                             }
                         }
                         .foregroundColor(.primary)
@@ -341,8 +341,17 @@ struct SettingsView: View {
                     
                     NavigationLink(destination: ContactUsView()) {
                         HStack {
-                            Image(systemName: "person") // 使用系统 person 图标
+                            Image(systemName: "person")
+                                .font(.body)
+                                .frame(width: 20)
+                            
                             Text("关于作者")
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.body)
+                                .foregroundColor(.primary.opacity(0.25))
                         }
                     }
                     

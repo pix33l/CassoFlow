@@ -120,6 +120,7 @@ struct PlayerView: View {
 
 struct PlayerBackgroundView: View {
     @EnvironmentObject private var musicService: MusicService
+    @StateObject private var storeManager = StoreManager()
     @Binding var rotationAngle: Double
     @Binding var showLibraryView: Bool
     
@@ -157,10 +158,14 @@ struct PlayerBackgroundView: View {
                 }) {
                     Rectangle()
                         .fill(Color.clear)
-                        .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.55)
+                        .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.5)
                 }
-                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.35)
+                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.40)
                 
+                if !storeManager.membershipStatus.isActive && musicService.currentPlayerSkin.name == "CF-DEMO" {
+                    PayLabel()
+                        .position(x: geometry.size.width / 2, y: geometry.size.height * 0.1)
+                }
             }
             .edgesIgnoringSafeArea(.all)
         }

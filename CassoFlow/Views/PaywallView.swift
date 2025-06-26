@@ -16,16 +16,17 @@ enum MembershipProduct: String, CaseIterable {
     
     var displayName: String {
         switch self {
-        case .monthly: return String(localized: "月度")
-        case .yearly: return String(localized: "年度")
-        case .lifetime: return String(localized: "永久")
+        case .monthly: return String(localized: "月度 PRO")
+        case .yearly: return String(localized: "年度 PRO")
+        case .lifetime: return String(localized: "永久 PRO")
         }
     }
     
     var tag: String? {
         switch self {
-        case .yearly: return String(localized: "省 50%")
-        case .lifetime: return String(localized: "最划算")
+//        case .monthly: return String(localized: "尝鲜之选")
+//        case .yearly: return String(localized: "省 50%")
+        case .lifetime: return String(localized: "早鸟特惠")
         default: return nil
         }
     }
@@ -88,7 +89,7 @@ struct PaywallView: View {
             VStack(spacing: 30) {
                 // 标题和副标题
                 VStack(spacing: 10) {
-                    Image("PRO-dark")
+                    Image("PRO-white")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 30.0)
@@ -114,17 +115,6 @@ struct PaywallView: View {
                             ) {
                                 selectedPlan = plan
                             }
-                        } else {
-                            VStack {
-                                Text("产品未找到")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                                Text(plan.rawValue)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding()
-                            .border(Color.red.opacity(0.3))
                         }
                     }
                 }
@@ -348,8 +338,8 @@ struct PlanOptionView: View {
                             .fontWeight(.medium)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(.blue)
-                            .foregroundColor(.white)
+                            .background(.yellow)
+                            .foregroundColor(.black)
                             .cornerRadius(4)
                     } else {
                         Color.clear
@@ -393,7 +383,7 @@ struct PlanOptionView: View {
             let dailyPrice = product.price / 365
             return String(localized: "仅 \(dailyPrice.formatted(.currency(code: product.priceFormatStyle.currencyCode))) /天")
         case .lifetime:
-            return String(localized: "一次性付费")
+            return String(localized: "限时 5 折优惠")
         }
     }
 }

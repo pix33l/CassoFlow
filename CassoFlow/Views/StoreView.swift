@@ -351,6 +351,10 @@ struct SkinCardView: View {
         VStack(spacing: 10) {
             if let playerSkin = playerSkin {
                 // 显示播放器皮肤
+                if !storeManager.membershipStatus.isActive {
+                    PayLabel()
+                }
+                
                 Image(playerSkin.coverImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -361,14 +365,14 @@ struct SkinCardView: View {
                     Text(playerSkin.name)
                         .font(.title2.bold())
                     
-                    Text(playerSkin.year)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 10)
+//                    Text(playerSkin.year)
+//                        .font(.subheadline)
+//                        .foregroundColor(.secondary)
+//                        .padding(.bottom, 10)
                     
                     Text(playerSkin.description)
                         .font(.body)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.bottom, 50)
                 }
@@ -376,6 +380,10 @@ struct SkinCardView: View {
                 
             } else if let cassetteSkin = cassetteSkin {
                 // 显示磁带皮肤
+                if !storeManager.membershipStatus.isActive {
+                    PayLabel()
+                }
+                
                 Image(cassetteSkin.coverImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -386,14 +394,14 @@ struct SkinCardView: View {
                     Text(cassetteSkin.name)
                         .font(.title2.bold())
                     
-                    Text(cassetteSkin.year)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 10)
+//                    Text(cassetteSkin.year)
+//                        .font(.subheadline)
+//                        .foregroundColor(.secondary)
+//                        .padding(.bottom, 10)
                     
                     Text(cassetteSkin.description)
                         .font(.body)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.bottom, 50)
                 }
