@@ -247,17 +247,6 @@
         }
       }
     },
-    "最划算" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Best value"
-          }
-        }
-      }
-    },
     "最后更新于 %@" : {
       "localizations" : {
         "en" : {
@@ -840,6 +829,16 @@
         }
       }
     },
+    "物美价廉的磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An affordable and high-quality tape player"
+          }
+        }
+      }
+    },
     "瑕疵噪点 (Crackle)" : {
       "localizations" : {
         "en" : {
@@ -1236,16 +1235,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The first fully transparent cassette player"
-          }
-        }
-      }
-    },
-    "首款廉价磁带播放器" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The first low-cost cassette player"
           }
         }
       }

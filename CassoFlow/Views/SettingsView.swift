@@ -346,16 +346,8 @@ struct SettingsView: View {
                                 .frame(width: 20)
                             
                             Text("关于作者")
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(.body)
-                                .foregroundColor(.primary.opacity(0.25))
                         }
-                        .foregroundColor(.primary)
                     }
-                    .buttonStyle(PlainButtonStyle())
                     
                     // 修改隐私政策链接
                     LinkRow(

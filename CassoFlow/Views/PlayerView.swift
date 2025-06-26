@@ -92,6 +92,13 @@ struct PlayerView: View {
                 print("🎵 用户已升级为会员，移除播放时间限制")
             }
         }
+        .onChange(of: musicService.currentPlayerSkin.name) { _, skinName in
+            if skinName != "CF-DEMO" {
+                // 用户切换到非默认皮肤，重置播放时间限制
+                resetPlaybackTimer()
+                print("🎵 用户切换到非默认皮肤(\(skinName))，移除播放时间限制")
+            }
+        }
         .onDisappear {
             stopRotation()
             stopPlaybackTracking()
@@ -147,31 +154,30 @@ struct PlayerView: View {
     
     /// 开始追踪播放时间（仅针对非会员用户）
     private func startPlaybackTracking() {
-        // 如果用户是会员，不需要追踪时间
-        guard !storeManager.membershipStatus.isActive else {
-            print("🎵 用户是会员，跳过播放时间限制")
+        guard !storeManager.membershipStatus.isActive && musicService.currentPlayerSkin.name == "CF-DEMO" else {
+            if storeManager.membershipStatus.isActive {
+                print("用户是会员，跳过播放时间限制")
+            } else {
+                print("用户使用非默认皮肤(\(musicService.currentPlayerSkin.name))，跳过播放时间限制")
+            }
             return
         }
         
         // 停止现有的计时器
         stopPlaybackTracking()
         
-        print("🎵 开始追踪非会员播放时间，当前累计时间: \(accumulatedPlaybackTime)秒")
-        
-        // 每秒更新一次播放时间
         playbackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             accumulatedPlaybackTime += 1.0
             
             // 每30秒输出一次日志，避免过多输出
             if Int(accumulatedPlaybackTime) % 30 == 0 {
                 // 更新日志显示为10分钟限制
-                let remainingTime = 600 - accumulatedPlaybackTime
-                print("🎵 非会员播放时间: \(accumulatedPlaybackTime)秒, 剩余: \(remainingTime)秒")
+                let remainingTime = 300 - accumulatedPlaybackTime
+                print("非会员播放时间: \(accumulatedPlaybackTime)秒, 剩余: \(remainingTime)秒")
             }
             
             // 检查是否达到10分钟限制（600秒）
-            if accumulatedPlaybackTime >= 600 {
-                print("🎵 非会员播放时间已达10分钟，检查会员状态")
+            if accumulatedPlaybackTime >= 300 {
                 showPlaybackLimitReached()
             }
         }
@@ -181,14 +187,16 @@ struct PlayerView: View {
     private func stopPlaybackTracking() {
         playbackTimer?.invalidate()
         playbackTimer = nil
-        print("🛑️ 停止追踪播放时间")
     }
     
     /// 播放时间限制达到时的处理
     private func showPlaybackLimitReached() {
-        // 在10分钟时检查会员状态，确保不会误触发
-        guard !storeManager.membershipStatus.isActive else {
-            print("🎵 检测到用户是会员，取消限制弹窗")
+        guard !storeManager.membershipStatus.isActive && musicService.currentPlayerSkin.name == "CF-DEMO" else {
+            if storeManager.membershipStatus.isActive {
+                print("🎵 检测到用户是会员，取消限制弹窗")
+            } else {
+                print("🎵 检测到用户使用非默认皮肤，取消限制弹窗")
+            }
             stopPlaybackTracking()
             resetPlaybackTimer()
             return
@@ -205,15 +213,12 @@ struct PlayerView: View {
             let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
             impactFeedback.impactOccurred()
         }
-        
-        print("🛑️ 已暂停播放并显示升级弹窗")
     }
     
     /// 重置播放时间计数器（当用户成为会员后调用）
     private func resetPlaybackTimer() {
         accumulatedPlaybackTime = 0
         stopPlaybackTracking()
-        print("🔄 播放时间计数器已重置")
     }
     
     /// 处理PaywallView关闭后的逻辑
@@ -222,11 +227,9 @@ struct PlayerView: View {
         if storeManager.membershipStatus.isActive {
             // 用户已升级为会员，重置计时器
             resetPlaybackTimer()
-            print("🎉 用户已升级为会员，重置播放时间限制")
         } else {
             // 用户依然是非会员，重置计时器让用户可以继续播放10分钟
             accumulatedPlaybackTime = 0
-            print("⏰ 用户关闭弹窗但未升级，重置计时器，10分钟后再次提醒")
             
             // 如果音乐正在播放，重新开始追踪
             if musicService.isPlaying {
@@ -343,7 +346,6 @@ struct PlayerControlsView: View {
             .padding(.vertical, 5.0)
             
             SongInfoView(
-//                showSettingsView: $showSettingsView,
                 showLibraryView: $showLibraryView,
                 repeatMode: $repeatMode,
                 isShuffled: $isShuffled,
@@ -475,7 +477,6 @@ struct ControlButtonsView: View {
 
 struct SongInfoView: View {
     @EnvironmentObject private var musicService: MusicService
-//    @Binding var showSettingsView: Bool
     @Binding var showLibraryView: Bool
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
@@ -501,7 +502,6 @@ struct SongInfoView: View {
 
 struct TrackInfoHeader: View {
     @EnvironmentObject private var musicService: MusicService
-//    @Binding var showSettingsView: Bool
     
     @State private var settingsTapped = false
     
@@ -703,7 +703,6 @@ struct PlaybackProgressView: View {
 
 // 新增ControlButton视图来简化按钮样式
 struct ControlButton: View {
-    
     @EnvironmentObject private var musicService: MusicService
     let systemName: String
     let action: () -> Void
@@ -744,8 +743,6 @@ struct ControlButton: View {
                         .fill(Color.clear)
                         .contentShape(Rectangle()) // 确保整个区域都能接收手势
                         .onTapGesture {
-                            print("短按: \(systemName)")
-                            // 模拟按压动画
                             withAnimation(.easeInOut(duration: 0.1)) {
                                 isPressed = true
                             }
@@ -760,7 +757,6 @@ struct ControlButton: View {
                             minimumDuration: 0.5,
                             maximumDistance: 50,
                             perform: {
-                                print("长按开始: \(systemName)")
                                 longPressAction?()
                             },
                             onPressingChanged: { pressing in
@@ -768,7 +764,6 @@ struct ControlButton: View {
                                     isPressed = pressing
                                 }
                                 if !pressing {
-                                    print("松开按钮: \(systemName)")
                                     longPressEndAction?()
                                 }
                             }
@@ -862,19 +857,14 @@ struct CassetteHole: View {
             }
         }
         .onChange(of: isRotating) { _, newValue in
-            print("isRotating变化: -> \(newValue)")
             if newValue && !animationStarted {
                 startSizeAnimation()
             }
         }
         .onChange(of: musicService.queueTotalDuration) { oldValue, newValue in
-            // 只有当值真正变化时才输出日志
-            if oldValue != newValue {
-                print("queueTotalDuration变化: \(oldValue) -> \(newValue)")
-                if isRotating {
-                    animationStarted = false
-                    startSizeAnimation()
-                }
+            if oldValue != newValue && isRotating {
+                animationStarted = false
+                startSizeAnimation()
             }
         }
         // 监听队列累计播放时长变化
@@ -883,42 +873,28 @@ struct CassetteHole: View {
             guard abs(oldValue - newValue) > 0.5 else { return }
             
             let newSize = currentProgressSize
-            print("队列播放时间变化 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 新尺寸: \(newSize)")
             
             withAnimation(.easeInOut(duration: 0.3)) {
                 circleSize = newSize
             }
         }
         .onChange(of: musicService.isFastForwarding) { oldValue, newValue in
-            // 只有当状态真正变化时才输出日志
-            if oldValue != newValue {
-                print("快进状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
-                if oldValue && !newValue {
-                    // 快进结束，立即更新到当前进度对应的尺寸
-                    let newSize = currentProgressSize
-                    print("快进结束，更新尺寸: \(newSize)")
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        circleSize = newSize
-                    }
+            if oldValue != newValue && oldValue && !newValue {
+                let newSize = currentProgressSize
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    circleSize = newSize
                 }
             }
         }
         .onChange(of: musicService.isFastRewinding) { oldValue, newValue in
-            // 只有当状态真正变化时才输出日志
-            if oldValue != newValue {
-                print("快退状态变化: \(oldValue) -> \(newValue), shouldGrow: \(shouldGrow)")
-                if oldValue && !newValue {
-                    // 快退结束，立即更新到当前进度对应的尺寸
-                    let newSize = currentProgressSize
-                    print("快退结束，更新尺寸: \(newSize)")
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        circleSize = newSize
-                    }
+            if oldValue != newValue && oldValue && !newValue {
+                let newSize = currentProgressSize
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    circleSize = newSize
                 }
             }
         }
         .onAppear {
-            print("CassetteHole onAppear - shouldGrow: \(shouldGrow), isRotating: \(isRotating), isPlaying: \(musicService.isPlaying)")
             setupInitialSize()
             currentRotationAngle = rotationAngle
             if isRotating && musicService.isPlaying && !animationStarted {
@@ -950,18 +926,12 @@ struct CassetteHole: View {
         let endSize: CGFloat = shouldGrow ? 200 : 100
         let remainingDuration = queueTotalDuration - musicService.queueElapsedDuration
         
-        print("动画参数 - 起始尺寸: \(startSize), 结束尺寸: \(endSize), 剩余时长: \(remainingDuration)秒")
-        
         circleSize = startSize
         
         if remainingDuration > 0 {
             withAnimation(.linear(duration: remainingDuration)) {
                 circleSize = endSize
             }
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            print("动画开始2秒后 - shouldGrow: \(self.shouldGrow), 当前尺寸: \(self.circleSize)")
         }
     }
 }

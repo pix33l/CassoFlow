@@ -134,7 +134,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识
             year: "1984",
-            description: String(localized: "首款廉价磁带播放器"),
+            description: String(localized: "物美价廉的磁带播放器"),
             coverImage: "cover-CF-22",
             panelColor: Color("bg-panel-dark"),
             panelOutlineColor: .black,

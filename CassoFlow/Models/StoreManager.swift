@@ -21,7 +21,7 @@ class StoreManager: ObservableObject {
     
     private var transactionUpdateTask: Task<Void, Never>?
     
-    enum MembershipStatus {
+    enum MembershipStatus: Equatable {
         case notMember
         case lifetimeMember
         case monthlyMember(expiresOn: Date)
@@ -251,19 +251,16 @@ class StoreManager: ObservableObject {
         _ = await restorationTask.value
         timeoutTask.cancel()
         
-        // 确保状态更新在主线程上执行
-        await MainActor.run {
-            isLoading = false
-            
-            // 显示恢复结果
-            if restoredCount > 0 {
-                let itemList = restoredItems.joined(separator: "、")
-                showSuccessAlert(String(localized: "成功恢复 \(restoredCount) 个购买项目：\(itemList)"))
-                print("✅ 成功恢复 \(restoredCount) 个购买项目")
-            } else {
-                showInfoAlert(String(localized: "没有找到可恢复的购买项目"))
-                print("ℹ️ 没有找到可恢复的购买项目")
-            }
+        isLoading = false
+        
+        // 显示恢复结果
+        if restoredCount > 0 {
+            let itemList = restoredItems.joined(separator: "、")
+            showSuccessAlert(String(localized: "成功恢复 \(restoredCount) 个购买项目：\(itemList)"))
+            print("✅ 成功恢复 \(restoredCount) 个购买项目")
+        } else {
+            showInfoAlert(String(localized: "没有找到可恢复的购买项目"))
+            print("ℹ️ 没有找到可恢复的购买项目")
         }
     }
     
@@ -357,8 +354,7 @@ class StoreManager: ObservableObject {
     
     /// 解锁会员功能
     private func unlockPremiumFeatures() {
-        // 保存会员状态到UserDefaults
-        UserDefaults.standard.set(true, forKey: "isPremiumUser")
+        // 订阅会员的状态通过 Transaction.currentEntitlements 管理
         print(String(localized: "已解锁会员功能"))
     }
     
@@ -380,10 +376,8 @@ class StoreManager: ObservableObject {
     
     /// 检查是否为会员用户
     func isPremiumUser() -> Bool {
-        return UserDefaults.standard.bool(forKey: "isPremiumUser") ||
-               ownedProducts.contains(ProductIDs.lifetime) ||
-               ownedProducts.contains(ProductIDs.yearly) ||
-               ownedProducts.contains(ProductIDs.monthly)
+        /// 检查是否为会员用户
+        return membershipStatus.isActive
     }
     
     /// 检查是否拥有播放器皮肤
@@ -409,20 +403,23 @@ class StoreManager: ObservableObject {
                     // 检查订阅是否仍有效
                     if let expirationDate = transaction.expirationDate {
                         if expirationDate > Date() {
-                            await MainActor.run {
-                                switch productID {
-                                case ProductIDs.yearly:
-                                    membershipStatus = .yearlyMember(expiresOn: expirationDate)
-                                    subscriptionExpirationDate = expirationDate
-                                case ProductIDs.monthly:
-                                    membershipStatus = .monthlyMember(expiresOn: expirationDate)
-                                    subscriptionExpirationDate = expirationDate
-                                default:
-                                    break
-                                }
+                            switch productID {
+                            case ProductIDs.yearly:
+                                membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                                subscriptionExpirationDate = expirationDate
+                            case ProductIDs.monthly:
+                                membershipStatus = .monthlyMember(expiresOn: expirationDate)
+                                subscriptionExpirationDate = expirationDate
+                            default:
+                                break
                             }
                             return
                         }
+                    }
+                    // 检查终身会员购买记录
+                    else if productID == ProductIDs.lifetime {
+                        membershipStatus = .lifetimeMember
+                        return
                     }
                 }
             }
@@ -436,36 +433,41 @@ class StoreManager: ObservableObject {
         _ = await statusTask.value
         timeoutTask.cancel()
         
-        // 先检查 ownedProducts 中的终身会员
+        // 检查 ownedProducts 中的终身会员
         if ownedProducts.contains(ProductIDs.lifetime) {
-            await MainActor.run {
-                membershipStatus = .lifetimeMember
-            }
+            membershipStatus = .lifetimeMember
             return
         }
         
-        // 然后检查 UserDefaults 中的会员状态（用于测试或终身会员）
-        if UserDefaults.standard.bool(forKey: "isPremiumUser") {
-            await MainActor.run {
-                membershipStatus = .lifetimeMember
-            }
+        if case .notMember = membershipStatus,
+           UserDefaults.standard.bool(forKey: "isPremiumUser") {
+            membershipStatus = .lifetimeMember
             return
         }
         
-        // 如果没有找到有效订阅，设为非会员
-        await MainActor.run {
-            membershipStatus = .notMember
+        if case .notMember = membershipStatus {
             subscriptionExpirationDate = nil
         }
     }
     
     // MARK: - 加载已拥有的产品
     private func loadOwnedProducts() async {
-        for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result {
-                ownedProducts.insert(transaction.productID)
+        let loadTask = Task {
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result {
+                    ownedProducts.insert(transaction.productID)
+                }
             }
         }
+        
+        let timeoutTask = Task {
+            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5秒超时
+            loadTask.cancel()
+        }
+        
+        _ = await loadTask.value
+        timeoutTask.cancel()
+        
         print("📦 已加载 \(ownedProducts.count) 个已购买产品")
         
         await updateMembershipStatus()
