@@ -15,18 +15,18 @@
   ],
   "products" : [
     {
-      "displayPrice" : "14.99",
+      "displayPrice" : "8.99",
       "familyShareable" : false,
       "internalID" : "6747073026",
       "localizations" : [
         {
-          "description" : "永久买断 Pro 会员",
-          "displayName" : "永久 Pro",
+          "description" : "永久 PRO 会员",
+          "displayName" : "永久 PRO",
           "locale" : "zh_Hans"
         },
         {
           "description" : "Lifetime Time Access",
-          "displayName" : "Pro Lifetime",
+          "displayName" : "PRO Lifetime",
           "locale" : "en_US"
         }
       ],
@@ -39,7 +39,7 @@
     "_applicationInternalID" : "6746403175",
     "_developerTeamID" : "4U3CXVZX7T",
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 772601669.51296306,
+    "_lastSynchronizedDate" : 772616703.00589895,
     "_locale" : "en_US",
     "_storefront" : "USA",
     "_storeKitErrors" : [
@@ -143,7 +143,7 @@
           "groupNumber" : 2,
           "internalID" : "6747307047",
           "introductoryOffer" : {
-            "internalID" : "FCD1E930",
+            "internalID" : "A1E196A4",
             "numberOfPeriods" : 1,
             "paymentMode" : "free",
             "subscriptionPeriod" : "P3D"

@@ -99,6 +99,7 @@ class LibraryDataManager: ObservableObject {
 struct LibraryView: View {
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var musicService: MusicService
+    @EnvironmentObject private var storeManager: StoreManager
     @Environment(\.dismiss) var dismiss
     
     // 使用独立的数据管理器
@@ -218,6 +219,12 @@ struct LibraryView: View {
             TabView(selection: $selectedSegment) {
                 // 专辑视图
                 ScrollView {
+                    
+                    if !storeManager.membershipStatus.isActive {
+                        PayLabel()
+                            .padding(.top, 20)
+                    }
+                    
                     LazyVGrid(
                         columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
                         spacing: 20
@@ -235,6 +242,12 @@ struct LibraryView: View {
                 
                 // 播放列表视图
                 ScrollView {
+                    
+                    if !storeManager.membershipStatus.isActive {
+                        PayLabel()
+                            .padding(.top, 20)
+                    }
+                    
                     LazyVGrid(
                         columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
                         spacing: 20

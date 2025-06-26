@@ -3,7 +3,7 @@ import SwiftUI
 struct StoreView: View {
     // MARK: - 属性
     @EnvironmentObject private var musicService: MusicService
-    @StateObject private var storeManager = StoreManager()
+    @EnvironmentObject private var storeManager: StoreManager
     @Environment(\.dismiss) var dismiss
     @State private var selectedSegment = 0
     @State private var selectedPlayerName: String = ""

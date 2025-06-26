@@ -389,7 +389,8 @@ class StoreManager: ObservableObject {
     }
     
     func updateMembershipStatus() async {
-        // 先检查订阅状态（月度/年度会员）
+        
+        // 检查订阅状态（月度/年度会员）
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result {
                 let productID = transaction.productID
@@ -397,38 +398,45 @@ class StoreManager: ObservableObject {
                 // 检查订阅是否仍有效
                 if let expirationDate = transaction.expirationDate {
                     if expirationDate > Date() {
-                        switch productID {
-                        case ProductIDs.yearly:
-                            membershipStatus = .yearlyMember(expiresOn: expirationDate)
-                            subscriptionExpirationDate = expirationDate
-                            return
-                        case ProductIDs.monthly:
-                            membershipStatus = .monthlyMember(expiresOn: expirationDate)
-                            subscriptionExpirationDate = expirationDate
-                            return
-                        default:
-                            break
+                        await MainActor.run {
+                            switch productID {
+                            case ProductIDs.yearly:
+                                membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                                subscriptionExpirationDate = expirationDate
+                            case ProductIDs.monthly:
+                                membershipStatus = .monthlyMember(expiresOn: expirationDate)
+                                subscriptionExpirationDate = expirationDate
+                            default:
+                                break
+                            }
                         }
+                        return
                     }
                 }
             }
         }
         
-        // 然后检查 StoreKit 交易中的终身会员
+        // 先检查 ownedProducts 中的终身会员
         if ownedProducts.contains(ProductIDs.lifetime) {
-            membershipStatus = .lifetimeMember
+            await MainActor.run {
+                membershipStatus = .lifetimeMember
+            }
             return
         }
         
-        // 最后检查 UserDefaults 中的会员状态（用于测试或终身会员）
+        // 然后检查 UserDefaults 中的会员状态（用于测试或终身会员）
         if UserDefaults.standard.bool(forKey: "isPremiumUser") {
-            membershipStatus = .lifetimeMember
+            await MainActor.run {
+                membershipStatus = .lifetimeMember
+            }
             return
         }
         
         // 如果没有找到有效订阅，设为非会员
-        membershipStatus = .notMember
-        subscriptionExpirationDate = nil
+        await MainActor.run {
+            membershipStatus = .notMember
+            subscriptionExpirationDate = nil
+        }
     }
     
     // MARK: - 加载已拥有的产品

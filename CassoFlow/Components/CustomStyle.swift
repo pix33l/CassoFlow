@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import AVFoundation
+//import AVFoundation
 
 // 自定义进度条样式结构
 struct CustomProgressViewStyle: ProgressViewStyle {
@@ -38,23 +38,23 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
     @EnvironmentObject private var musicService: MusicService
     let externalIsPressed: Bool
     
-    // 静态音效播放器，避免频繁创建销毁
-    private static var buttonAudioPlayer: AVAudioPlayer? = {
-        guard let soundURL = Bundle.main.url(forResource: "button", withExtension: "m4a") else {
-            print("❌ 未找到按钮音效文件")
-            return nil
-        }
-        
-        do {
-            let player = try AVAudioPlayer(contentsOf: soundURL)
-            player.prepareToPlay()
-            player.volume = 0.2 // 降低音量避免与其他音效冲突
-            return player
-        } catch {
-            print("❌ 按钮音效初始化失败: \(error.localizedDescription)")
-            return nil
-        }
-    }()
+//    // 静态音效播放器，避免频繁创建销毁
+//    private static var buttonAudioPlayer: AVAudioPlayer? = {
+//        guard let soundURL = Bundle.main.url(forResource: "button", withExtension: "m4a") else {
+//            print("❌ 未找到按钮音效文件")
+//            return nil
+//        }
+//        
+//        do {
+//            let player = try AVAudioPlayer(contentsOf: soundURL)
+//            player.prepareToPlay()
+//            player.volume = 0.2 // 降低音量避免与其他音效冲突
+//            return player
+//        } catch {
+//            print("❌ 按钮音效初始化失败: \(error.localizedDescription)")
+//            return nil
+//        }
+//    }()
     
     func makeBody(configuration: Configuration) -> some View {
         let offset: CGFloat = 8
@@ -116,12 +116,13 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
         .onChange(of: isPressed) { oldValue, newValue in
             // 使用防抖动机制，避免频繁触发
             if !oldValue && newValue {
-                // 播放按钮音效
-                DispatchQueue.main.async {
-                    Self.buttonAudioPlayer?.stop()
-                    Self.buttonAudioPlayer?.currentTime = 0
-                    Self.buttonAudioPlayer?.play()
-                }
+                SoundManager.shared.playSound(.button)
+//                // 播放按钮音效
+//                DispatchQueue.main.async {
+//                    Self.buttonAudioPlayer?.stop()
+//                    Self.buttonAudioPlayer?.currentTime = 0
+//                    Self.buttonAudioPlayer?.play()
+//                }
             }
         }
         .compositingGroup()
@@ -171,7 +172,22 @@ struct AudioWaveView: View {
 struct PayLabel: View {
     @State private var showingPaywall = false
     @EnvironmentObject private var musicService: MusicService
-    @StateObject private var storeManager = StoreManager()
+    @State private var storeManager = StoreManager()
+    
+    private var lifetimePrice: String? {
+        if let product = storeManager.getProduct(for: "me.pix3l.CassoFlow.Lifetime") {
+            return product.displayPrice
+        }
+        return nil
+    }
+    
+    private var displayText: String {
+        if let price = lifetimePrice {
+            return "\(price) 终身使用所有功能和主题"
+        } else {
+            return "终身使用所有功能和主题"
+        }
+    }
     
     var body: some View {
         Button {
@@ -186,8 +202,8 @@ struct PayLabel: View {
                     Image("PRO-black")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 10)
-                    Text("解锁所有播放器和磁带")
+                        .frame(height: 12)
+                    Text(displayText)
                         .font(.caption2)
                         .foregroundColor(Color.black)
                 }
@@ -204,11 +220,14 @@ struct PayLabel: View {
                             .stroke(.black, lineWidth: 2))
             )
         }
-        .buttonStyle(.plain) // 使用纯样式避免额外的按钮效果
+        .buttonStyle(.plain)
         .fullScreenCover(isPresented: $showingPaywall) {
             PaywallView()
                 .environmentObject(storeManager)
                 .environmentObject(musicService)
+        }
+        .task {
+            await storeManager.fetchProducts()
         }
     }
 }

@@ -120,7 +120,7 @@ struct PlayerView: View {
 
 struct PlayerBackgroundView: View {
     @EnvironmentObject private var musicService: MusicService
-    @StateObject private var storeManager = StoreManager()
+    @EnvironmentObject private var storeManager: StoreManager
     @Binding var rotationAngle: Double
     @Binding var showLibraryView: Bool
     
@@ -154,6 +154,7 @@ struct PlayerBackgroundView: View {
                         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                         impactFeedback.impactOccurred()
                     }
+                    SoundManager.shared.playSound(.eject)
                     showLibraryView = true
                 }) {
                     Rectangle()
@@ -280,7 +281,6 @@ struct ControlButtonsView: View {
     var body: some View {
         HStack(spacing: 5) {
             ControlButton(systemName: "recordingtape", action: {
-                libraryTapped.toggle()
                 if musicService.isHapticFeedbackEnabled {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
@@ -291,7 +291,6 @@ struct ControlButtonsView: View {
             ControlButton(
                 systemName: "backward.fill",
                 action: {
-                    previousTapped.toggle()
                     if musicService.isHapticFeedbackEnabled {
                         let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
                         impactFeedback.impactOccurred()
@@ -309,7 +308,6 @@ struct ControlButtonsView: View {
             ControlButton(
                 systemName: musicService.isPlaying ? "pause.fill" : "play.fill",
                 action: {
-                    playPauseTapped.toggle()
                     if musicService.isHapticFeedbackEnabled {
                         let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
                         impactFeedback.impactOccurred()
@@ -327,7 +325,6 @@ struct ControlButtonsView: View {
             ControlButton(
                 systemName: "forward.fill",
                 action: {
-                    nextTapped.toggle()
                     if musicService.isHapticFeedbackEnabled {
                         let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
                         impactFeedback.impactOccurred()
@@ -343,7 +340,6 @@ struct ControlButtonsView: View {
             )
             
             ControlButton(systemName: "gearshape") {
-                storeTapped.toggle()
                 if musicService.isHapticFeedbackEnabled {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
@@ -527,6 +523,7 @@ struct SongTitleView: View {
                 let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                 impactFeedback.impactOccurred()
             }
+            SoundManager.shared.playSound(.eject)
             showLibraryView = true
         } label: {
             VStack {

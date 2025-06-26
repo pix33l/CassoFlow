@@ -231,7 +231,9 @@ struct PaywallView: View {
                         
                         switch result {
                         case .success(_):
-                            // 购买成功，延迟关闭页面避免视图更新冲突
+                            // 先等待状态更新
+                            await storeManager.updateMembershipStatus()
+                            // 然后延迟关闭页面避免视图更新冲突
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 dismiss()
                             }
