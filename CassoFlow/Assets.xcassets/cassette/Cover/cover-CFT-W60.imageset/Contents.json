@@ -1,10 +1,12 @@
 {
   "images" : [
     {
+      "filename" : "cover-CFT-W60.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "cover-CFT-W60@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

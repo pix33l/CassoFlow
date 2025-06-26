@@ -1,10 +1,12 @@
 {
   "images" : [
     {
+      "filename" : "artwork-cassette-hole.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "artwork-cassette-hole@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

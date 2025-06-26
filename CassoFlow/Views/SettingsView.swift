@@ -353,7 +353,9 @@ struct SettingsView: View {
                                 .font(.body)
                                 .foregroundColor(.primary.opacity(0.25))
                         }
+                        .foregroundColor(.primary)
                     }
+                    .buttonStyle(PlainButtonStyle())
                     
                     // 修改隐私政策链接
                     LinkRow(

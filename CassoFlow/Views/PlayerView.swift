@@ -17,6 +17,7 @@ extension UIScreen {
 
 struct PlayerView: View {
     @EnvironmentObject private var musicService: MusicService
+    @EnvironmentObject private var storeManager: StoreManager
     @State private var showLibraryView = false
     @State private var showSettingsView = false
     @State private var showStoreView = false
@@ -25,6 +26,10 @@ struct PlayerView: View {
     @State private var rotationAngle: Double = 0
     @State private var rotationTimer: Timer?
     @State private var isRotating = false
+    
+    @State private var playbackTimer: Timer?
+    @State private var accumulatedPlaybackTime: TimeInterval = 0
+    @State private var showPaywallForLimit = false
     
     // 计算属性：当前播放进度
     private var progress: CGFloat {
@@ -58,13 +63,16 @@ struct PlayerView: View {
         .onAppear {
             if musicService.isPlaying {
                 startRotation()
+                startPlaybackTracking()
             }
         }
         .onChange(of: musicService.isPlaying) { _, isPlaying in
             if isPlaying {
                 startRotation()
+                startPlaybackTracking()
             } else {
                 stopRotation()
+                stopPlaybackTracking()
             }
         }
         .onChange(of: musicService.isFastForwarding) { _, newValue in
@@ -77,10 +85,31 @@ struct PlayerView: View {
                 startRotation()
             }
         }
-        .onDisappear { stopRotation() }
+        .onChange(of: storeManager.membershipStatus.isActive) { _, isActive in
+            if isActive {
+                // 用户升级为会员，重置播放时间限制
+                resetPlaybackTimer()
+                print("🎵 用户已升级为会员，移除播放时间限制")
+            }
+        }
+        .onDisappear {
+            stopRotation()
+            stopPlaybackTracking()
+        }
         .sheet(isPresented: $showLibraryView) { LibraryView() }
         .sheet(isPresented: $showSettingsView) { SettingsView() }
         .sheet(isPresented: $showStoreView) { StoreView() }
+        .fullScreenCover(isPresented: $showPaywallForLimit) {
+            PaywallView()
+                .environmentObject(storeManager)
+                .environmentObject(musicService)
+        }
+        .onChange(of: showPaywallForLimit) { _, isPresented in
+            if !isPresented {
+                // PaywallView被关闭，执行处理逻辑
+                handlePaywallDismissed()
+            }
+        }
     }
     
     private func startRotation() {
@@ -113,7 +142,98 @@ struct PlayerView: View {
         rotationTimer = nil
         isRotating = false
     }
-
+    
+    // MARK: - ADD: 播放时间追踪方法
+    
+    /// 开始追踪播放时间（仅针对非会员用户）
+    private func startPlaybackTracking() {
+        // 如果用户是会员，不需要追踪时间
+        guard !storeManager.membershipStatus.isActive else {
+            print("🎵 用户是会员，跳过播放时间限制")
+            return
+        }
+        
+        // 停止现有的计时器
+        stopPlaybackTracking()
+        
+        print("🎵 开始追踪非会员播放时间，当前累计时间: \(accumulatedPlaybackTime)秒")
+        
+        // 每秒更新一次播放时间
+        playbackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            accumulatedPlaybackTime += 1.0
+            
+            // 每30秒输出一次日志，避免过多输出
+            if Int(accumulatedPlaybackTime) % 30 == 0 {
+                // 更新日志显示为10分钟限制
+                let remainingTime = 600 - accumulatedPlaybackTime
+                print("🎵 非会员播放时间: \(accumulatedPlaybackTime)秒, 剩余: \(remainingTime)秒")
+            }
+            
+            // 检查是否达到10分钟限制（600秒）
+            if accumulatedPlaybackTime >= 600 {
+                print("🎵 非会员播放时间已达10分钟，检查会员状态")
+                showPlaybackLimitReached()
+            }
+        }
+    }
+    
+    /// 停止追踪播放时间
+    private func stopPlaybackTracking() {
+        playbackTimer?.invalidate()
+        playbackTimer = nil
+        print("🛑️ 停止追踪播放时间")
+    }
+    
+    /// 播放时间限制达到时的处理
+    private func showPlaybackLimitReached() {
+        // 在10分钟时检查会员状态，确保不会误触发
+        guard !storeManager.membershipStatus.isActive else {
+            print("🎵 检测到用户是会员，取消限制弹窗")
+            stopPlaybackTracking()
+            resetPlaybackTimer()
+            return
+        }
+        
+        // 停止计时器
+        stopPlaybackTracking()
+        
+        // 显示升级弹窗
+        showPaywallForLimit = true
+        
+        // 可选：添加触觉反馈
+        if musicService.isHapticFeedbackEnabled {
+            let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+            impactFeedback.impactOccurred()
+        }
+        
+        print("🛑️ 已暂停播放并显示升级弹窗")
+    }
+    
+    /// 重置播放时间计数器（当用户成为会员后调用）
+    private func resetPlaybackTimer() {
+        accumulatedPlaybackTime = 0
+        stopPlaybackTracking()
+        print("🔄 播放时间计数器已重置")
+    }
+    
+    /// 处理PaywallView关闭后的逻辑
+    private func handlePaywallDismissed() {
+        // 检查用户是否已经成为会员
+        if storeManager.membershipStatus.isActive {
+            // 用户已升级为会员，重置计时器
+            resetPlaybackTimer()
+            print("🎉 用户已升级为会员，重置播放时间限制")
+        } else {
+            // 用户依然是非会员，重置计时器让用户可以继续播放10分钟
+            accumulatedPlaybackTime = 0
+            print("⏰ 用户关闭弹窗但未升级，重置计时器，10分钟后再次提醒")
+            
+            // 如果音乐正在播放，重新开始追踪
+            if musicService.isPlaying {
+                startPlaybackTracking()
+            }
+        }
+    }
 }
 
 // MARK: - 背景视图 (提取出来)
@@ -165,6 +285,7 @@ struct PlayerBackgroundView: View {
                 
                 if !storeManager.membershipStatus.isActive && musicService.currentPlayerSkin.name == "CF-DEMO" {
                     PayLabel()
+                        .environmentObject(storeManager)
                         .position(x: geometry.size.width / 2, y: geometry.size.height * 0.1)
                 }
             }
@@ -693,7 +814,7 @@ struct CassetteHole: View {
         let progress = musicService.queueElapsedDuration / queueTotalDuration
         let clampedProgress = min(max(progress, 0.0), 1.0) // 确保进度在0-1之间
         
-        print("播放进度计算 - shouldGrow: \(shouldGrow), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
+        print("播放进度计算 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
         
         if shouldGrow {
             // 从200变到100

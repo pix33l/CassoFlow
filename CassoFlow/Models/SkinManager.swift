@@ -128,8 +128,8 @@ struct PlayerSkin: Identifiable {
             screenOutlineColor: .black,
             playerImage: "player-CF-2",
             cassetteBgImage: "bg-cassette",
-            buttonCornerRadius: 20,
-            buttonHeight: 40
+            buttonCornerRadius: 25,
+            buttonHeight: 50
         ),
         PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识

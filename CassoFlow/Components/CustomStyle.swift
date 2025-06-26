@@ -44,7 +44,7 @@ struct ThreeDButtonStyleWithExternalPress: ButtonStyle {
 //            print("❌ 未找到按钮音效文件")
 //            return nil
 //        }
-//        
+//
 //        do {
 //            let player = try AVAudioPlayer(contentsOf: soundURL)
 //            player.prepareToPlay()
@@ -172,7 +172,7 @@ struct AudioWaveView: View {
 struct PayLabel: View {
     @State private var showingPaywall = false
     @EnvironmentObject private var musicService: MusicService
-    @State private var storeManager = StoreManager()
+    @EnvironmentObject private var storeManager: StoreManager
     
     private var lifetimePrice: String? {
         if let product = storeManager.getProduct(for: "me.pix3l.CassoFlow.Lifetime") {
@@ -225,9 +225,6 @@ struct PayLabel: View {
             PaywallView()
                 .environmentObject(storeManager)
                 .environmentObject(musicService)
-        }
-        .task {
-            await storeManager.fetchProducts()
         }
     }
 }

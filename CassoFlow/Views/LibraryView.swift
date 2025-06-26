@@ -222,6 +222,7 @@ struct LibraryView: View {
                     
                     if !storeManager.membershipStatus.isActive {
                         PayLabel()
+                            .environmentObject(storeManager)
                             .padding(.top, 20)
                     }
                     
@@ -245,6 +246,7 @@ struct LibraryView: View {
                     
                     if !storeManager.membershipStatus.isActive {
                         PayLabel()
+                            .environmentObject(storeManager)
                             .padding(.top, 20)
                     }
                     
@@ -376,7 +378,7 @@ struct AlbumCell: View {
                     .clipShape(Rectangle())
                 }
                 
-                Image("cover-cassette")
+                Image("package-cassette")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)
@@ -423,7 +425,7 @@ struct PlaylistCell: View {
                     .clipShape(Rectangle())
                 }
                 
-                Image("cover-cassette")
+                Image("package-cassette")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)

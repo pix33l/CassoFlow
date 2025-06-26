@@ -117,17 +117,6 @@
     "SOUND EFFECT" : {
 
     },
-    "一次性付费" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One-time Payment"
-          }
-        }
-      }
-    },
     "一次性付费，享受未来功能更新" : {
       "localizations" : {
         "en" : {
@@ -164,17 +153,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Top cassette made of chromium dioxide as the material"
-          }
-        }
-      }
-    },
-    "产品未找到" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Product not found"
           }
         }
       }
@@ -296,6 +274,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upgrade to PRO membership to access all advanced features"
+          }
+        }
+      }
+    },
+    "升级获取全部高级功能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to access all advanced features"
           }
         }
       }
@@ -450,19 +438,15 @@
         }
       }
     },
-    "年度" : {
-      "extractionState" : "stale",
+    "年度 PRO" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yearly"
+            "value" : "Yearly PRO"
           }
         }
       }
-    },
-    "年度 PRO" : {
-
     },
     "底噪" : {
       "localizations" : {
@@ -681,7 +665,14 @@
       }
     },
     "早鸟特惠" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Special Offer"
+          }
+        }
+      }
     },
     "暂无价格" : {
       "localizations" : {
@@ -693,19 +684,15 @@
         }
       }
     },
-    "月度" : {
-      "extractionState" : "stale",
+    "月度 PRO" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Monthly"
+            "value" : "Monthly PRO"
           }
         }
       }
-    },
-    "月度 PRO" : {
-
     },
     "未播放歌曲" : {
       "localizations" : {
@@ -797,19 +784,15 @@
         }
       }
     },
-    "永久" : {
-      "extractionState" : "stale",
+    "永久 PRO" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lifetime"
+            "value" : "Lifetime PRO"
           }
         }
       }
-    },
-    "永久 PRO" : {
-
     },
     "没有找到可恢复的购买项目" : {
       "localizations" : {
@@ -883,17 +866,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abnormal skin data"
-          }
-        }
-      }
-    },
-    "省 50%" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "50% Off"
           }
         }
       }
@@ -1169,7 +1141,14 @@
       }
     },
     "限时 5 折优惠" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limited-time 50% off"
+          }
+        }
+      }
     },
     "隐私政策" : {
       "localizations" : {

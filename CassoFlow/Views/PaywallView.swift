@@ -92,11 +92,11 @@ struct PaywallView: View {
                     Image("PRO-white")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 30.0)
+                        .frame(height: 15.0)
                     
-                    Text("升级 PRO 会员，获取全部高级功能")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    Text("升级获取全部高级功能")
+                        .font(.title)
+                        .fontWeight(.bold)
                 }
                 
                 Image("paywall-cassette")

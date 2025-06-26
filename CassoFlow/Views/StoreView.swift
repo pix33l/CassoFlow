@@ -353,6 +353,7 @@ struct SkinCardView: View {
                 // 显示播放器皮肤
                 if !storeManager.membershipStatus.isActive {
                     PayLabel()
+                        .environmentObject(storeManager)
                 }
                 
                 Image(playerSkin.coverImage)
@@ -382,6 +383,7 @@ struct SkinCardView: View {
                 // 显示磁带皮肤
                 if !storeManager.membershipStatus.isActive {
                     PayLabel()
+                        .environmentObject(storeManager)
                 }
                 
                 Image(cassetteSkin.coverImage)

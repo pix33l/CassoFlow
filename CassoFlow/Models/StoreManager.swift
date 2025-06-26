@@ -229,17 +229,27 @@ class StoreManager: ObservableObject {
         var restoredCount = 0
         var restoredItems: [String] = []
         
-        // 遍历所有当前有效的交易
-        for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result {
-                let productName = await handleSuccessfulPurchase(transaction)
-                // 注意：不要在这里调用 transaction.finish()，因为这是恢复购买不是新购买
-                if let name = productName {
-                    restoredCount += 1
-                    restoredItems.append(name)
+        let restorationTask = Task {
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result {
+                    let productName = await handleSuccessfulPurchase(transaction)
+                    // 注意：不要在这里调用 transaction.finish()，因为这是恢复购买不是新购买
+                    if let name = productName {
+                        restoredCount += 1
+                        restoredItems.append(name)
+                    }
                 }
             }
         }
+        
+        let timeoutTask = Task {
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10秒超时
+            restorationTask.cancel()
+        }
+        
+        // 等待恢复完成或超时
+        _ = await restorationTask.value
+        timeoutTask.cancel()
         
         // 确保状态更新在主线程上执行
         await MainActor.run {
@@ -390,31 +400,41 @@ class StoreManager: ObservableObject {
     
     func updateMembershipStatus() async {
         
-        // 检查订阅状态（月度/年度会员）
-        for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result {
-                let productID = transaction.productID
-                
-                // 检查订阅是否仍有效
-                if let expirationDate = transaction.expirationDate {
-                    if expirationDate > Date() {
-                        await MainActor.run {
-                            switch productID {
-                            case ProductIDs.yearly:
-                                membershipStatus = .yearlyMember(expiresOn: expirationDate)
-                                subscriptionExpirationDate = expirationDate
-                            case ProductIDs.monthly:
-                                membershipStatus = .monthlyMember(expiresOn: expirationDate)
-                                subscriptionExpirationDate = expirationDate
-                            default:
-                                break
+        let statusTask = Task {
+            // 检查订阅状态（月度/年度会员）
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result {
+                    let productID = transaction.productID
+                    
+                    // 检查订阅是否仍有效
+                    if let expirationDate = transaction.expirationDate {
+                        if expirationDate > Date() {
+                            await MainActor.run {
+                                switch productID {
+                                case ProductIDs.yearly:
+                                    membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                                    subscriptionExpirationDate = expirationDate
+                                case ProductIDs.monthly:
+                                    membershipStatus = .monthlyMember(expiresOn: expirationDate)
+                                    subscriptionExpirationDate = expirationDate
+                                default:
+                                    break
+                                }
                             }
+                            return
                         }
-                        return
                     }
                 }
             }
         }
+        
+        let timeoutTask = Task {
+            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5秒超时
+            statusTask.cancel()
+        }
+        
+        _ = await statusTask.value
+        timeoutTask.cancel()
         
         // 先检查 ownedProducts 中的终身会员
         if ownedProducts.contains(ProductIDs.lifetime) {
