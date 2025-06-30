@@ -183,9 +183,9 @@ struct PayLabel: View {
     
     private var displayText: String {
         if let price = lifetimePrice {
-            return "\(price) 终身使用所有功能和主题"
+            return String(localized: "\(price) 终身使用所有功能和主题")
         } else {
-            return "终身使用所有功能和主题"
+            return String(localized:"终身使用所有功能和主题")
         }
     }
     

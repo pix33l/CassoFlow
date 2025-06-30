@@ -11,6 +11,16 @@
         }
       }
     },
+    "%@ 终身使用所有功能和主题" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Lifetime All Functions and Themes"
+          }
+        }
+      }
+    },
     "%lld" : {
 
     },
@@ -104,6 +114,16 @@
     "PRO" : {
 
     },
+    "PRO 专享" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO Only"
+          }
+        }
+      }
+    },
     "PRO 会员将在%@到期" : {
       "localizations" : {
         "en" : {
@@ -187,16 +207,6 @@
         }
       }
     },
-    "使用" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select"
-          }
-        }
-      }
-    },
     "使用中" : {
       "localizations" : {
         "en" : {
@@ -226,6 +236,9 @@
           }
         }
       }
+    },
+    "免费" : {
+
     },
     "关于作者" : {
       "localizations" : {
@@ -393,36 +406,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copied"
-          }
-        }
-      }
-    },
-    "已解锁会员功能" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Membership features have been unlocked"
-          }
-        }
-      }
-    },
-    "已解锁播放器皮肤: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Player skin unlocked: %@"
-          }
-        }
-      }
-    },
-    "已解锁磁带皮肤: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cassette skin unlocked: %@"
           }
         }
       }
@@ -929,6 +912,16 @@
         }
       }
     },
+    "终身使用所有功能和主题" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime All Functions and Themes"
+          }
+        }
+      }
+    },
     "经典动漫中的磁带播放器" : {
       "localizations" : {
         "en" : {
@@ -1095,6 +1088,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Light"
+          }
+        }
+      }
+    },
+    "选择" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
           }
         }
       }

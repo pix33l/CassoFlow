@@ -339,17 +339,17 @@ class SkinHelper {
     static func getPlayerSkinPrice(_ skinName: String, storeManager: StoreManager) -> String {
         let skin = PlayerSkin.playerSkin(named: skinName)
         if skin?.isFreeDefaultSkin() == true {
-            return "免费"
+            return String(localized: "免费")
         }
         
         // 如果是会员专享皮肤，显示会员专享
         if skin?.isMemberExclusiveSkin() == true {
-            return "PRO 专享"
+            return String(localized: "PRO 专享")
         }
         
         // 如果是有效会员，显示"会员专享"
         if storeManager.membershipStatus.isActive {
-            return "使用"
+            return String(localized: "选择")
         }
         
         let productID = getPlayerSkinProductID(skinName)
@@ -360,17 +360,17 @@ class SkinHelper {
     static func getCassetteSkinPrice(_ skinName: String, storeManager: StoreManager) -> String {
         let skin = CassetteSkin.cassetteSkin(named: skinName)
         if skin?.isFreeDefaultSkin() == true {
-            return "免费"
+            return String(localized: "免费")
         }
         
         // 如果是会员专享皮肤，显示会员专享
         if skin?.isMemberExclusiveSkin() == true {
-            return "PRO 专享"
+            return String(localized: "PRO 专享")
         }
         
         // 如果是有效会员，显示"会员专享"
         if storeManager.membershipStatus.isActive {
-            return "使用"
+            return String(localized: "选择")
         }
         
         let productID = getCassetteSkinProductID(skinName)

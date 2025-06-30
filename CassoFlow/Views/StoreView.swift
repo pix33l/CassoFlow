@@ -169,7 +169,7 @@ struct StoreView: View {
         if isCurrentSkinInUse() {
             return String(localized: "使用中")
         } else if isCurrentSkinOwned() {
-            return String(localized: "使用")
+            return String(localized: "选择")
         } else {
             if let playerSkin = currentSkinType.0 {
                 return SkinHelper.getPlayerSkinPrice(playerSkin.name, storeManager: storeManager)

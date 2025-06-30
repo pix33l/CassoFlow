@@ -120,10 +120,9 @@ class StoreManager: ObservableObject {
             for await result in Transaction.updates {
                 switch result {
                 case .verified(let transaction):
-                    print("✅ 收到交易更新: \(transaction.productID)")
                     await handleTransactionUpdate(transaction)
-                case .unverified(let transaction, let error):
-                    print("❌ 未验证的交易更新: \(transaction.productID), 错误: \(error)")
+                case .unverified(_, _):
+                    break
                 }
             }
         }
@@ -138,10 +137,8 @@ class StoreManager: ObservableObject {
         
         // 解锁相应功能
         await handleSuccessfulPurchase(transaction)
-        
-        print("🔄 交易已处理并完成: \(transaction.productID)")
     }
-    
+
     deinit {
         transactionUpdateTask?.cancel()
     }
@@ -152,7 +149,6 @@ class StoreManager: ObservableObject {
         
         do {
             products = try await Product.products(for: ProductIDs.allProducts)
-            print("✅ 成功加载 \(products.count) 个产品")
             
             // 排序产品：会员产品在前，皮肤产品在后
             products.sort { product1, product2 in
@@ -170,7 +166,6 @@ class StoreManager: ObservableObject {
             }
             
         } catch {
-            print("❌ 加载商品失败: \(error)")
             showErrorAlert("加载商品失败: \(error.localizedDescription)")
         }
         
@@ -188,36 +183,31 @@ class StoreManager: ObservableObject {
             case .success(let verification):
                 switch verification {
                 case .verified(let transaction):
-                    // ✅ 购买成功，解锁功能
+                    // 购买成功，解锁功能
                     await handleSuccessfulPurchase(transaction)
                     await transaction.finish()
                     isLoading = false
                     return .success(String(localized: "购买成功！已为您解锁内容"))
                     
-                case .unverified(_, let error):
-                    print("❌ 购买验证失败: \(error)")
+                case .unverified(_, _):
                     isLoading = false
                     return .failed(String(localized: "购买验证失败，请稍后重试"))
                 }
                 
             case .userCancelled:
-                print("ℹ️ 用户取消购买")
                 isLoading = false
                 return .cancelled
                 
             case .pending:
-                print("⏳ 购买等待中")
                 isLoading = false
                 return .pending
                 
             @unknown default:
-                print("❓ 未知购买结果")
                 isLoading = false
                 return .failed(String(localized: "购买失败，未知错误"))
             }
             
         } catch {
-            print("❌ 购买出错: \(error)")
             isLoading = false
             return .failed(String(localized: "购买失败: \(error.localizedDescription)"))
         }
@@ -257,10 +247,8 @@ class StoreManager: ObservableObject {
         if restoredCount > 0 {
             let itemList = restoredItems.joined(separator: "、")
             showSuccessAlert(String(localized: "成功恢复 \(restoredCount) 个购买项目：\(itemList)"))
-            print("✅ 成功恢复 \(restoredCount) 个购买项目")
         } else {
             showInfoAlert(String(localized: "没有找到可恢复的购买项目"))
-            print("ℹ️ 没有找到可恢复的购买项目")
         }
     }
     
@@ -341,10 +329,9 @@ class StoreManager: ObservableObject {
             result = "CFT-MM60 磁带"
             
         default:
-            print("⚠️ 未知产品ID: \(productID)")
             result = nil
         }
-        
+
         await updateMembershipStatus()
         
         return result
@@ -355,21 +342,18 @@ class StoreManager: ObservableObject {
     /// 解锁会员功能
     private func unlockPremiumFeatures() {
         // 订阅会员的状态通过 Transaction.currentEntitlements 管理
-        print(String(localized: "已解锁会员功能"))
     }
     
     /// 解锁播放器皮肤
     private func unlockPlayerSkin(_ skinName: String) {
         let key = "owned_player_skin_\(skinName)"
         UserDefaults.standard.set(true, forKey: key)
-        print(String(localized: "已解锁播放器皮肤: \(skinName)"))
     }
     
     /// 解锁磁带皮肤
     private func unlockCassetteSkin(_ skinName: String) {
         let key = "owned_cassette_skin_\(skinName)"
         UserDefaults.standard.set(true, forKey: key)
-        print(String(localized: "已解锁磁带皮肤: \(skinName)"))
     }
     
     // MARK: - 检查购买状态
@@ -467,8 +451,6 @@ class StoreManager: ObservableObject {
         
         _ = await loadTask.value
         timeoutTask.cancel()
-        
-        print("📦 已加载 \(ownedProducts.count) 个已购买产品")
         
         await updateMembershipStatus()
     }

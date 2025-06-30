@@ -78,14 +78,9 @@ class MusicService: ObservableObject {
         
         switch status {
         case .authorized:
-            print("✅ MusicKit授权成功")
             await setupMusicKit()
-        case .denied:
-            print("❌ MusicKit授权被拒绝")
-        case .notDetermined:
-            print("⏳ MusicKit授权状态未确定")
-        case .restricted:
-            print("🚫 MusicKit访问受限")
+        case .denied, .notDetermined, .restricted:
+            break
         @unknown default:
             break
         }
@@ -95,11 +90,9 @@ class MusicService: ObservableObject {
     private func setupMusicKit() async {
         do {
             // 检查订阅状态
-            let subscription = try await MusicSubscription.current
-            print("🎵 Apple Music订阅状态: \(subscription)")
-            
+            _ = try await MusicSubscription.current
         } catch {
-            print("❌ MusicKit设置失败: \(error)")
+            // 设置失败，静默处理
         }
     }
     

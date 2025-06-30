@@ -39,9 +39,8 @@ class AudioEffectsManager: ObservableObject {
             // 使用 .playback 类别，允许背景播放并与其他音频混合
             try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try audioSession.setActive(true)
-            print("🎵 音频会话配置成功 - 支持音频混合")
         } catch {
-            print("🎵 音频会话配置失败: \(error)")
+            // 音频会话配置失败，静默处理
         }
     }
     
@@ -65,7 +64,6 @@ class AudioEffectsManager: ObservableObject {
     }
     
     @objc private func handleConfigurationChange() {
-        print("🎵 音频引擎配置发生变化，重新启动...")
         restartAudioEngine()
     }
     
@@ -78,14 +76,11 @@ class AudioEffectsManager: ObservableObject {
         
         switch type {
         case .began:
-            print("🎵 音频会话中断开始")
             stopCassetteEffect()
         case .ended:
-            print("🎵 音频会话中断结束")
             if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
                 let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
                 if options.contains(.shouldResume) {
-                    print("🎵 恢复音频播放")
                     restartAudioEngine()
                 }
             }
@@ -101,14 +96,13 @@ class AudioEffectsManager: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             do {
                 try self.audioEngine.start()
-                print("🎵 音频引擎重新启动成功")
                 
                 // 如果之前在播放磁带音效，重新开始
                 if self.isCassetteEffectEnabled && self.isMusicPlaying {
                     self.startCassetteEffect()
                 }
             } catch {
-                print("🎵 音频引擎重新启动失败: \(error)")
+                // 音频引擎重新启动失败，静默处理
             }
         }
     }
@@ -134,9 +128,8 @@ class AudioEffectsManager: ObservableObject {
         
         do {
             try audioEngine.start()
-            print("🎵 音频引擎启动成功")
         } catch {
-            print("🎵 音频引擎启动失败: \(error)")
+            // 音频引擎启动失败，静默处理
         }
     }
     
@@ -163,13 +156,11 @@ class AudioEffectsManager: ObservableObject {
         let channels = outputFormat.channelCount
         
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: channels) else {
-            print("🎵 无法创建音频格式")
             return
         }
         
         let frameCount = AVAudioFrameCount(sampleRate * 3) // 3秒的音频
         guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else {
-            print("🎵 无法创建音频缓冲区")
             return
         }
         
@@ -177,7 +168,6 @@ class AudioEffectsManager: ObservableObject {
         
         // 生成白噪音和磁带特有的嘶嘶声
         guard let channelData = buffer.floatChannelData else {
-            print("🎵 无法获取音频通道数据")
             return
         }
         
@@ -214,14 +204,6 @@ class AudioEffectsManager: ObservableObject {
                 startCassetteEffect()
             }
         }
-        
-        print("🎵 自定义磁带噪音音频重新生成完成")
-        print("   - 白噪音范围: \(whiteNoiseRange)")
-        print("   - 抖动: 幅度=\(flutterAmplitude), 频率=\(flutterFrequency)")
-        print("   - 摩擦声: 幅度=\(frictionAmplitude), 频率=\(frictionFrequency)")
-        print("   - 嘶嘶声范围: \(hissRange)")
-        print("   - 噪点: 阈值=\(crackleThreshold), 范围=\(crackleRange)")
-        print("   - 整体音量: 0.5 (固定值)")
     }
     
     /// 生成磁带噪音音频缓冲区 - 使用默认参数
@@ -240,25 +222,11 @@ class AudioEffectsManager: ObservableObject {
         } else {
             stopCassetteEffect()
         }
-        
-        let status = shouldPlay ? "播放中" : "已停止"
-        let key = "\(isCassetteEffectEnabled)-\(isMusicPlaying)"
-        
-        // 使用静态变量来跟踪上次的状态，避免重复输出
-        struct LastState {
-            static var lastKey = ""
-        }
-        
-        if LastState.lastKey != key {
-            print("🎵 磁带音效状态: \(status) (音效开关: \(isCassetteEffectEnabled), 音乐播放: \(isMusicPlaying))")
-            LastState.lastKey = key
-        }
     }
     
     /// 开始播放磁带效果
     private func startCassetteEffect() {
         guard let buffer = cassetteNoiseBuffer else {
-            print("🎵 磁带噪音缓冲区未准备好")
             return
         }
         
@@ -266,9 +234,7 @@ class AudioEffectsManager: ObservableObject {
         if !audioEngine.isRunning {
             do {
                 try audioEngine.start()
-                print("🎵 重新启动音频引擎")
             } catch {
-                print("🎵 无法启动音频引擎: \(error)")
                 return
             }
         }
@@ -285,14 +251,12 @@ class AudioEffectsManager: ObservableObject {
         noisePlayer.scheduleBuffer(buffer, at: nil, options: .loops, completionHandler: nil)
         
         noisePlayer.play()
-        print("🎵 开始播放磁带噪音效果 (音量: \(noisePlayer.volume))")
     }
     
     /// 停止磁带效果
     private func stopCassetteEffect() {
         if noisePlayer.isPlaying {
             noisePlayer.stop()
-            print("🎵 停止磁带噪音效果")
         }
     }
     
@@ -301,8 +265,6 @@ class AudioEffectsManager: ObservableObject {
         // 加载保存的音量设置，如果没有则使用默认值0.5
         let savedVolume = UserDefaults.standard.object(forKey: "CassetteEffectVolume") as? Float ?? 0.5
         noisePlayer.volume = savedVolume
-        
-        print("🎵 加载磁带音效音量: \(savedVolume)")
     }
     
     /// 设置磁带效果开关
@@ -315,7 +277,6 @@ class AudioEffectsManager: ObservableObject {
     func setMusicPlayingState(_ isPlaying: Bool) {
         guard isMusicPlaying != isPlaying else { return }
         
-        print("🎵 更新音乐播放状态: \(isMusicPlaying) -> \(isPlaying)")
         isMusicPlaying = isPlaying
     }
     
@@ -326,14 +287,11 @@ class AudioEffectsManager: ObservableObject {
         
         // 保存到UserDefaults
         UserDefaults.standard.set(clampedVolume, forKey: "CassetteEffectVolume")
-        
-        print("🎵 设置磁带噪音音量: \(clampedVolume)")
     }
     
     /// 清理资源
     deinit {
         NotificationCenter.default.removeObserver(self)
         audioEngine.stop()
-        print("🎵 音频效果管理器已清理")
     }
 }
