@@ -129,7 +129,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PRO members will expire at @%"
+            "value" : "PRO members will expire at %@"
           }
         }
       }
@@ -238,7 +238,14 @@
       }
     },
     "免费" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free"
+          }
+        }
+      }
     },
     "关于作者" : {
       "localizations" : {

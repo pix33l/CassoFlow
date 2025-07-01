@@ -29,9 +29,9 @@ class SoundManager: ObservableObject {
         var volume: Float {
             switch self {
             case .button:
-                return 0.3
+                return 0.2
             case .eject:
-                return 0.3
+                return 0.2
             }
         }
     }
