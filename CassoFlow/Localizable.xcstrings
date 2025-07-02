@@ -9,7 +9,8 @@
             "value" : "%1$@ • %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%@ 终身使用所有功能和主题" : {
       "localizations" : {
@@ -18,11 +19,17 @@
             "state" : "translated",
             "value" : "%@ Lifetime All Functions and Themes"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 永久解鎖所有功能和主題"
+          }
         }
       }
     },
     "%lld" : {
-
+      "shouldTranslate" : false
     },
     "%lld分钟" : {
       "localizations" : {
@@ -30,6 +37,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld Min"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld分鐘"
           }
         }
       }
@@ -47,6 +60,12 @@
             "state" : "new",
             "value" : "%1$lld小时%2$lld分钟"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld小時%2$lld分鐘"
+          }
         }
       }
     },
@@ -63,17 +82,23 @@
             "state" : "new",
             "value" : "%1$lld首歌曲 • %2$@"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld首曲目 • %2$@"
+          }
         }
       }
     },
     "|" : {
-
+      "shouldTranslate" : false
     },
     "0" : {
-
+      "shouldTranslate" : false
     },
     "100" : {
-
+      "shouldTranslate" : false
     },
     "PGM NO. %lld/%lld" : {
       "localizations" : {
@@ -83,13 +108,14 @@
             "value" : "PGM NO. %1$lld/%2$lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "PGM NO. 0/0" : {
-
+      "shouldTranslate" : false
     },
     "PIX3L DESIGN STUDIO" : {
-
+      "shouldTranslate" : false
     },
     "PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验" : {
       "localizations" : {
@@ -97,6 +123,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIX3L DESIGN STUDIO is an independent individual studio specializing in digital products. With innovative design and outstanding concepts, it creates unique experiences for users in the digital world"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO是一個專注數位產品的獨立工作室，我們以創新設計和卓越理念，為您打造獨特的數位體驗"
           }
         }
       }
@@ -108,11 +140,17 @@
             "state" : "translated",
             "value" : "pix3l_me (Note: CassoFlow)"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (備註：CassoFlow)"
+          }
         }
       }
     },
     "PRO" : {
-
+      "shouldTranslate" : false
     },
     "PRO 专享" : {
       "localizations" : {
@@ -120,6 +158,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PRO Only"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO 會員獨享"
           }
         }
       }
@@ -131,11 +175,17 @@
             "state" : "translated",
             "value" : "PRO members will expire at %@"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您的PRO會員資格將於 %@ 到期"
+          }
         }
       }
     },
     "SOUND EFFECT" : {
-
+      "shouldTranslate" : false
     },
     "一次性付费，享受未来功能更新" : {
       "localizations" : {
@@ -143,6 +193,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "One-time payment, free update in the future"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次性買斷，享未來功能免費更新"
           }
         }
       }
@@ -154,6 +210,12 @@
             "state" : "translated",
             "value" : "Album"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "專輯"
+          }
         }
       }
     },
@@ -163,6 +225,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A cassette player designed for professional users"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "為專業人士打造的錄音帶播放器"
           }
         }
       }
@@ -174,6 +242,12 @@
             "state" : "translated",
             "value" : "Top cassette made of chromium dioxide as the material"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以二氧化鉻為材料的高階錄音帶"
+          }
         }
       }
     },
@@ -183,6 +257,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Only %@  /day"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅 %@ /天"
           }
         }
       }
@@ -194,6 +274,12 @@
             "state" : "translated",
             "value" : "Low"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低"
+          }
         }
       }
     },
@@ -203,6 +289,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flutter"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低頻抖動"
           }
         }
       }
@@ -214,6 +306,12 @@
             "state" : "translated",
             "value" : "In use"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用中"
+          }
         }
       }
     },
@@ -223,6 +321,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terms for usage"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用條款"
           }
         }
       }
@@ -234,6 +338,18 @@
             "state" : "translated",
             "value" : "Keep the screen from locking at all times"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "常に画面のロックを解除しておく"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保持螢幕恆亮"
+          }
         }
       }
     },
@@ -243,6 +359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Free"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免費"
           }
         }
       }
@@ -254,6 +376,12 @@
             "state" : "translated",
             "value" : "About Developer"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於作者"
+          }
         }
       }
     },
@@ -263,6 +391,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Other"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其他"
           }
         }
       }
@@ -274,6 +408,12 @@
             "state" : "translated",
             "value" : "Last updated on %@"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後更新於 %@"
+          }
         }
       }
     },
@@ -283,6 +423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upgrade to PRO membership to access all advanced features"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升級PRO會員，解鎖所有進階功能"
           }
         }
       }
@@ -294,6 +440,12 @@
             "state" : "translated",
             "value" : "Upgrade to access all advanced features"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即升級，享有完整進階功能"
+          }
         }
       }
     },
@@ -303,6 +455,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Canon brand cassette player"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卡農牌錄音帶播放機"
           }
         }
       }
@@ -314,6 +472,12 @@
             "state" : "translated",
             "value" : "Published on %@"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發佈於 %@"
+          }
         }
       }
     },
@@ -323,6 +487,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Product Type"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "商品類型"
           }
         }
       }
@@ -334,6 +504,12 @@
             "state" : "translated",
             "value" : "Store"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "商店"
+          }
         }
       }
     },
@@ -343,6 +519,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Animal brand cassette player"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "國寶牌錄音帶播放器"
           }
         }
       }
@@ -354,6 +536,12 @@
             "state" : "translated",
             "value" : "Add feedback to simulate the physical operation sensation"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "增加觸覺回饋，模擬實體操作手感"
+          }
         }
       }
     },
@@ -363,6 +551,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Library"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我的媒體"
           }
         }
       }
@@ -374,6 +568,12 @@
             "state" : "translated",
             "value" : "Media Type"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "媒體類型"
+          }
         }
       }
     },
@@ -383,6 +583,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dear Permanent PRO Member"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尊榮永久PRO會員"
           }
         }
       }
@@ -394,6 +600,12 @@
             "state" : "translated",
             "value" : "RedNote"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小紅書"
+          }
         }
       }
     },
@@ -403,6 +615,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Screen always on"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "螢幕恆亮"
           }
         }
       }
@@ -414,6 +632,12 @@
             "state" : "translated",
             "value" : "Copied"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已複製"
+          }
         }
       }
     },
@@ -423,6 +647,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yearly PRO"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年度 PRO"
           }
         }
       }
@@ -434,6 +664,12 @@
             "state" : "translated",
             "value" : "Noise"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "底噪"
+          }
         }
       }
     },
@@ -443,6 +679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start 3 days free trial"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即開始 3 天免費試用"
           }
         }
       }
@@ -454,6 +696,12 @@
             "state" : "translated",
             "value" : "Start 7 days free trial"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即開始 7 天免費試用"
+          }
         }
       }
     },
@@ -463,6 +711,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Strength"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "強度"
           }
         }
       }
@@ -474,6 +728,18 @@
             "state" : "translated",
             "value" : "Rainbow-colored cassette"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "虹色のカセットテープ"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩虹色錄音帶"
+          }
         }
       }
     },
@@ -483,6 +749,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "WeChat"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "微信 (WeChat)"
           }
         }
       }
@@ -494,6 +766,12 @@
             "state" : "translated",
             "value" : "Nostalgia"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "懷舊"
+          }
         }
       }
     },
@@ -503,6 +781,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Restore Purchase"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢復購買"
           }
         }
       }
@@ -514,6 +798,12 @@
             "state" : "translated",
             "value" : "You will receive"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您將獲得"
+          }
         }
       }
     },
@@ -524,6 +814,12 @@
             "state" : "translated",
             "value" : "Feedback"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "意見回饋"
+          }
         }
       }
     },
@@ -533,6 +829,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Succeed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成功"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成功"
           }
         }
       }
@@ -545,10 +853,22 @@
             "value" : "Successfully restored %1$lld purchase items: %2$@"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld 購入の回収に成功: %2$@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "成功恢复 %1$lld 个购买项目：%2$@"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成功恢復 %1$lld 個購買項目：%2$@"
           }
         }
       }
@@ -560,6 +880,18 @@
             "state" : "translated",
             "value" : "Recommend to your friends"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "友人にアプリを勧める"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推薦應用程式給朋友"
+          }
         }
       }
     },
@@ -569,6 +901,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Douyin"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "抖音"
           }
         }
       }
@@ -580,6 +918,18 @@
             "state" : "translated",
             "value" : "Enjoy the mechanical feeling of the rotating"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テープが回転するメカニカルな感触を味わい続ける"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "享受錄音帶轉動的機械美感"
+          }
         }
       }
     },
@@ -589,6 +939,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reminder"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提示"
           }
         }
       }
@@ -600,6 +956,18 @@
             "state" : "translated",
             "value" : "Play"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレイアブル"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放"
+          }
         }
       }
     },
@@ -609,6 +977,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Player"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選手"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放器"
           }
         }
       }
@@ -620,6 +1000,12 @@
             "state" : "translated",
             "value" : "Support us"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持我們"
+          }
         }
       }
     },
@@ -629,6 +1015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The product information cannot be found"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到此產品資訊"
           }
         }
       }
@@ -640,6 +1032,12 @@
             "state" : "translated",
             "value" : "Unlimited use of all player and cassette skins"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有播放器與錄音帶造型無限使用"
+          }
         }
       }
     },
@@ -649,6 +1047,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Special Offer"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "早鳥優惠"
           }
         }
       }
@@ -660,6 +1064,12 @@
             "state" : "translated",
             "value" : "No price available"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暫不提供價格"
+          }
         }
       }
     },
@@ -669,6 +1079,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monthly PRO"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月度 PRO"
           }
         }
       }
@@ -680,6 +1096,12 @@
             "state" : "translated",
             "value" : "Unplayed songs"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未播放曲目"
+          }
         }
       }
     },
@@ -689,6 +1111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Future update"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "後續更新"
           }
         }
       }
@@ -700,6 +1128,18 @@
             "state" : "translated",
             "value" : "Standard"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本位"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準"
+          }
         }
       }
     },
@@ -709,6 +1149,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Colorable cassette with labels"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書き込み可能なラベル付きカラーテープ"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可寫標籤的彩色錄音帶"
           }
         }
       }
@@ -720,6 +1172,12 @@
             "state" : "translated",
             "value" : "Simulate physical feedbak"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模擬實體操作的互動回饋"
+          }
         }
       }
     },
@@ -729,6 +1187,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Simulate the sound effect of real cassette"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模擬真實錄音帶音效"
           }
         }
       }
@@ -740,6 +1204,12 @@
             "state" : "translated",
             "value" : "Simulate noise and flutter effects"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模擬錄音帶底噪與低頻抖動"
+          }
         }
       }
     },
@@ -749,6 +1219,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Playlist"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放清單"
           }
         }
       }
@@ -760,6 +1236,12 @@
             "state" : "translated",
             "value" : "Loading…"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "讀取中..."
+          }
         }
       }
     },
@@ -769,6 +1251,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lifetime PRO"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永久 PRO"
           }
         }
       }
@@ -780,6 +1268,12 @@
             "state" : "translated",
             "value" : "No purchase items that can be restored were found"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到可恢復的購買項目"
+          }
         }
       }
     },
@@ -790,6 +1284,12 @@
             "state" : "translated",
             "value" : "A Demo cassette player"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "示範用錄音帶播放器"
+          }
         }
       }
     },
@@ -799,6 +1299,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Click here to select music"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "點此選擇音樂"
           }
         }
       }
@@ -816,6 +1322,12 @@
             "state" : "new",
             "value" : "版本 %1$@ (%2$@)"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本 %1$@ (%2$@)"
+          }
         }
       }
     },
@@ -825,6 +1337,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "An affordable and high-quality tape player"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平價高質感的錄音帶播放器"
           }
         }
       }
@@ -836,6 +1354,12 @@
             "state" : "translated",
             "value" : "Crackle"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "瑕疵雜訊"
+          }
         }
       }
     },
@@ -845,6 +1369,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The top cassette with a white ceramic casing"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "白いセラミックケースに入った最高品質のテープ"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "白色陶瓷外殼的頂級錄音帶"
           }
         }
       }
@@ -856,6 +1392,12 @@
             "state" : "translated",
             "value" : "Abnormal skin data"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "造型資料異常"
+          }
         }
       }
     },
@@ -865,6 +1407,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確定"
           }
         }
       }
@@ -876,6 +1424,12 @@
             "state" : "translated",
             "value" : "After confirming the purchase, the payment will be made through your Apple account. The PRO membership subscription will be automatically renewed by default. Unless you go to \"Settings - Apple Account - Subscriptions\" at least 24 hours before the current subscription ends to turn off the automatic renewal, your Apple account will be charged for the renewal fee 24 hours before the end of the current subscription. During the trial period of the PRO membership, if you do not manually turn off the automatic renewal, the subscription will be automatically activated and the fee will be deducted at the end of the trial period. The free trial opportunity is only available for one trial per user before the first subscription. The remaining free trial period (if any) after purchasing the subscription will automatically expire."
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認購買後，費用將透過您的 Apple 帳號收取。PRO 會員訂閱預設為自動續訂，除非您在當前訂閱期結束前至少 24 小時前往「設定 > Apple ID > 訂閱」關閉自動續訂功能，否則您的 Apple 帳號將在當前訂閱期結束前 24 小時內自動續訂並收取費用。在 PRO 會員試用期間，若您未手動關閉自動續訂，試用期結束時將自動開通訂閱並扣款。每個用戶只有首次訂閱前可享有一次免費試用機會，購買訂閱後，剩餘的免費試用期（如有）將自動失效。"
+          }
         }
       }
     },
@@ -885,6 +1439,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cassette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "磁気テープ"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錄音帶"
           }
         }
       }
@@ -896,6 +1462,18 @@
             "state" : "translated",
             "value" : "Friction"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テープのひっかき"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錄音帶摩擦聲"
+          }
         }
       }
     },
@@ -905,6 +1483,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cassette sound effect"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テープ音"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錄音帶音效"
           }
         }
       }
@@ -916,6 +1506,12 @@
             "state" : "translated",
             "value" : "Upgrade Now"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即升級"
+          }
         }
       }
     },
@@ -925,6 +1521,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lifetime All Functions and Themes"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永久解鎖所有功能和主題"
           }
         }
       }
@@ -936,6 +1538,12 @@
             "state" : "translated",
             "value" : "Classic anime cassette player"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "經典動漫裡的錄音帶播放器"
+          }
         }
       }
     },
@@ -945,6 +1553,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Give us a five-star rating"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請給我們五星好評"
           }
         }
       }
@@ -956,6 +1570,12 @@
             "state" : "translated",
             "value" : "Next"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繼續"
+          }
         }
       }
     },
@@ -965,6 +1585,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Website"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "官方網站"
           }
         }
       }
@@ -976,6 +1602,12 @@
             "state" : "translated",
             "value" : "Contact information"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聯絡方式"
+          }
         }
       }
     },
@@ -985,6 +1617,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A time-traveling cassette player"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "能時空旅行的錄音帶播放器"
           }
         }
       }
@@ -996,6 +1634,12 @@
             "state" : "translated",
             "value" : "Unlock all skins"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "解鎖所有造型"
+          }
         }
       }
     },
@@ -1005,6 +1649,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Haptic feedback"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "触覚フィードバック"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "觸覺回饋"
           }
         }
       }
@@ -1016,6 +1672,12 @@
             "state" : "translated",
             "value" : "Setting"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
         }
       }
     },
@@ -1025,6 +1687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adjust the audio effect"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整音效參數"
           }
         }
       }
@@ -1036,6 +1704,12 @@
             "state" : "translated",
             "value" : "Purchase failed"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買失敗"
+          }
         }
       }
     },
@@ -1046,15 +1720,27 @@
             "state" : "translated",
             "value" : "Purchase failed. Unknown error"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買失敗，發生未知錯誤"
+          }
         }
       }
     },
-    "购买失败: %@" : {
+    "购买失败：%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Purchase failed: %@"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買失敗：%@"
           }
         }
       }
@@ -1066,6 +1752,12 @@
             "state" : "translated",
             "value" : "Purchase successful! Content has been unlocked for you"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買成功！您已解鎖所有內容"
+          }
         }
       }
     },
@@ -1075,6 +1767,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Purchase is in progress. Please check back later"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買正在處理中，請稍後查看"
           }
         }
       }
@@ -1086,6 +1784,12 @@
             "state" : "translated",
             "value" : "Purchase verification failed. Please try again later"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買驗證失敗，請稍後再試"
+          }
         }
       }
     },
@@ -1095,6 +1799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Light"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輕度"
           }
         }
       }
@@ -1106,6 +1816,12 @@
             "state" : "translated",
             "value" : "Select"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇"
+          }
         }
       }
     },
@@ -1115,6 +1831,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transparent demo cassette"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "透明示範錄音帶"
           }
         }
       }
@@ -1126,6 +1848,12 @@
             "state" : "translated",
             "value" : "General"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通用"
+          }
         }
       }
     },
@@ -1135,6 +1863,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "E-mail"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "郵箱"
           }
         }
       }
@@ -1146,6 +1880,12 @@
             "state" : "translated",
             "value" : "Heavy"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重度"
+          }
         }
       }
     },
@@ -1155,6 +1895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Limited-time 50% off"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "限時五折優惠"
           }
         }
       }
@@ -1166,6 +1912,12 @@
             "state" : "translated",
             "value" : "Privacy policy"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱私權政策"
+          }
         }
       }
     },
@@ -1175,6 +1927,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shuffle play"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隨機播放"
           }
         }
       }
@@ -1186,6 +1944,12 @@
             "state" : "translated",
             "value" : "Sound effect volume"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音效音量"
+          }
         }
       }
     },
@@ -1195,6 +1959,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sound effect preset"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預設音效"
           }
         }
       }
@@ -1206,6 +1976,12 @@
             "state" : "translated",
             "value" : "Volume"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音量"
+          }
         }
       }
     },
@@ -1215,6 +1991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frequency"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "頻率"
           }
         }
       }
@@ -1226,6 +2008,12 @@
             "state" : "translated",
             "value" : "Fly brand cassette player"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "飛翔牌錄音帶播放器"
+          }
         }
       }
     },
@@ -1235,6 +2023,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The first portable cassette player"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首款可攜式錄音帶播放機"
           }
         }
       }
@@ -1246,6 +2040,12 @@
             "state" : "translated",
             "value" : "The first fully transparent cassette player"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首款全透明錄音帶播放器"
+          }
         }
       }
     },
@@ -1256,6 +2056,12 @@
             "state" : "translated",
             "value" : "High"
           }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高"
+          }
         }
       }
     },
@@ -1265,6 +2071,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "High-frequency hissing"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高頻嘶嘶聲"
           }
         }
       }

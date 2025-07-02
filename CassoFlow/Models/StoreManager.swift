@@ -209,7 +209,7 @@ class StoreManager: ObservableObject {
             
         } catch {
             isLoading = false
-            return .failed(String(localized: "购买失败: \(error.localizedDescription)"))
+            return .failed(String(localized: "购买失败：\(error.localizedDescription)"))
         }
     }
     
