@@ -24,7 +24,7 @@ class LibraryDataManager: ObservableObject {
         guard status == .authorized else {
             await checkSubscriptionStatus()
             await MainActor.run {
-                errorMessage = "需要授权才能访问您的音乐库"
+                errorMessage = String(localized: "需要授权才能访问您的媒体库")
                 isLoading = false
             }
             return
@@ -34,7 +34,7 @@ class LibraryDataManager: ObservableObject {
         
         if let subscription = subscriptionStatus, !subscription.canPlayCatalogContent {
             await MainActor.run {
-                errorMessage = "需要 Apple Music 订阅才能使用"
+                errorMessage = String(localized: "需要 Apple Music 订阅才能使用")
                 isLoading = false
             }
             return
@@ -52,7 +52,7 @@ class LibraryDataManager: ObservableObject {
                 userPlaylists = playlistsResult
                 
                 if userAlbums.isEmpty && userPlaylists.isEmpty {
-                    errorMessage = "您的媒体库是空的\n请先在 Apple Music 中添加一些音乐"
+                    errorMessage = String(localized: "您的媒体库是空的")
                 }
                 
                 isLoading = false
@@ -60,7 +60,7 @@ class LibraryDataManager: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                errorMessage = "加载媒体库失败: \(error.localizedDescription)"
+                errorMessage = String(localized: "加载媒体库失败: \(error.localizedDescription)")
                 isLoading = false
             }
         }
@@ -272,11 +272,11 @@ struct LibraryView: View {
 
     private func getErrorIcon(for message: String) -> String {
         switch message {
-        case "需要授权才能访问您的音乐库":
+        case String(localized: "需要授权才能访问您的媒体库"):
             return "music.note.list"
-        case "需要 Apple Music 订阅才能使用":
+        case String(localized: "需要 Apple Music 订阅才能使用"):
             return "music.note.list"
-        case let msg where msg.contains("您的媒体库是空的"):
+        case String(localized: "您的媒体库是空的"):
             return "music.note.list"
         default:
             return "exclamationmark.triangle"
@@ -285,39 +285,39 @@ struct LibraryView: View {
     
     private func getErrorDescription(for message: String) -> String {
         switch message {
-        case "需要授权才能访问您的音乐库":
-            return "允许访问您的 Apple Music 以查看专辑和播放列表"
-        case "需要 Apple Music 订阅才能使用":
-            return "现在加入 Apple Music，最多可享 3 个月免费试用"
-        case let msg where msg.contains("您的媒体库是空的"):
-            return "在 Apple Music 中添加专辑和播放列表以开始使用"
+        case String(localized: "需要授权才能访问您的媒体库"):
+            return String(localized: "允许访问您的 Apple Music 以查看专辑和播放列表")
+        case String(localized: "需要 Apple Music 订阅才能使用"):
+            return String(localized: "现在加入 Apple Music，最多可享 3 个月免费试用")
+        case String(localized: "您的媒体库是空的"):
+            return String(localized: "请先在 Apple Music 中添加专辑和播放列表")
         default:
-            return "请重试或检查网络连接"
+            return String(localized: "请重试或检查网络连接")
         }
     }
     
     private func getButtonTitle(for message: String) -> String {
         switch message {
-        case "需要授权才能访问您的音乐库":
-            return "授权访问"
-        case "需要 Apple Music 订阅才能使用":
-            return "立即体验"
-        case let msg where msg.contains("您的媒体库是空的"):
-            return "打开 Apple Music"
+        case String(localized: "需要授权才能访问您的媒体库"):
+            return String(localized: "授权访问")
+        case String(localized: "需要 Apple Music 订阅才能使用"):
+            return String(localized: "立即体验")
+        case String(localized: "您的媒体库是空的"):
+            return String(localized: "打开 Apple Music")
         default:
-            return "重试"
+            return String(localized: "重试")
         }
     }
     
     private func handleErrorAction(for message: String) {
         switch message {
-        case "需要授权才能访问您的音乐库":
+        case String(localized: "需要授权才能访问您的媒体库"):
             Task {
                 await requestAuthorizationAndReload()
             }
-        case "需要 Apple Music 订阅才能使用":
+        case String(localized: "需要 Apple Music 订阅才能使用"):
             showSubscriptionOffer = true
-        case let msg where msg.contains("您的媒体库是空的"):
+        case String(localized: "您的媒体库是空的"):
             openAppleMusic()
         default:
             Task {
@@ -612,7 +612,7 @@ struct PlaylistCell: View {
                     .font(.system(size: 48))
                     .foregroundColor(.red)
                 
-                Text("需要 Apple Music 订阅才能使用")
+                Text(String(localized: "需要 Apple Music 订阅才能使用"))
                     .font(.title2)
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
@@ -620,7 +620,7 @@ struct PlaylistCell: View {
                 
                 VStack(spacing: 40) {
                     
-                    Text("现在加入 Apple Music，最多可享 3 个月免费试用")
+                    Text(String(localized: "现在加入 Apple Music，最多可享 3 个月免费试用"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -628,7 +628,7 @@ struct PlaylistCell: View {
                     Button {
                         // 预览中的空操作
                     } label: {
-                        Text("立即体验")
+                        Text(String(localized: "立即体验"))
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding(.horizontal, 24)
@@ -673,7 +673,7 @@ struct PlaylistCell: View {
                     .font(.system(size: 48))
                     .foregroundColor(.red)
                 
-                Text("需要授权才能访问您的音乐库")
+                Text(String(localized: "需要授权才能访问您的音乐库"))
                     .font(.title2)
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
@@ -681,7 +681,7 @@ struct PlaylistCell: View {
                 
                 VStack(spacing: 40) {
                     
-                    Text("允许访问您的 Apple Music 以查看专辑和播放列表")
+                    Text(String(localized: "允许访问您的 Apple Music 以查看专辑和播放列表"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -689,7 +689,7 @@ struct PlaylistCell: View {
                     Button {
                         // 预览中的空操作
                     } label: {
-                        Text("授权访问")
+                        Text(String(localized: "授权访问"))
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding(.horizontal, 24)
@@ -734,7 +734,7 @@ struct PlaylistCell: View {
                     .font(.system(size: 48))
                     .foregroundColor(.red)
                 
-                Text("您的媒体库是空的\n请先在 Apple Music 中添加一些音乐")
+                Text(String(localized: "您的媒体库是空的\n请先在 Apple Music 中添加一些音乐"))
                     .font(.title2)
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
@@ -742,7 +742,7 @@ struct PlaylistCell: View {
                 
                 VStack(spacing: 40) {
                     
-                    Text("在 Apple Music 中添加专辑和播放列表以开始使用")
+                    Text(String(localized: "在 Apple Music 中添加专辑和播放列表以开始使用"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -750,7 +750,7 @@ struct PlaylistCell: View {
                     Button {
                         // 预览中的空操作
                     } label: {
-                        Text("打开 Apple Music")
+                        Text(String(localized: "打开 Apple Music"))
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding(.horizontal, 24)
