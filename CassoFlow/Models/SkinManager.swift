@@ -186,6 +186,24 @@ struct PlayerSkin: Identifiable {
             buttonHeight: 50
         ),
         PlayerSkin(
+            name: "CF-DD9",  // 名称作为唯一标识
+            year: "1989",
+            description: String(localized: "磁带播放器之王"),
+            coverImage: "cover-CF-DD9",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .gray,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-blue"),
+            screenTextColor: Color("text-screen-blue"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-DD9",
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 12,
+            buttonHeight: 50
+        ),
+        PlayerSkin(
             name: "CF-DT1",  // 名称作为唯一标识
             year: "1993",
             description: String(localized: "经典动漫中的磁带播放器"),
@@ -216,7 +234,7 @@ struct PlayerSkin: Identifiable {
     }
     
     func isMemberExclusiveSkin() -> Bool {
-        return ["CF-504", "CF-D6C", "CF-DT1"].contains(self.name)
+        return ["CF-PC13", "CF-M10", "CF-MU01", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DD9", "CF-DT1"].contains(self.name)
     }
 }
 
@@ -291,7 +309,7 @@ struct CassetteSkin: Identifiable {
     }
     
     func isMemberExclusiveSkin() -> Bool {
-        return ["CFT-60CR", "CFT-MM60"].contains(self.name)
+        return ["CFT-W60", "CFT-C60", "CFT-60CR", "CFT-MM60"].contains(self.name)
     }
 }
 
@@ -388,6 +406,7 @@ class SkinHelper {
         case "CF-22": return StoreManager.ProductIDs.cf22
         case "CF-504": return StoreManager.ProductIDs.cf504
         case "CF-D6C": return StoreManager.ProductIDs.cfD6C
+        case "CF-DD9": return StoreManager.ProductIDs.cfDD9
         case "CF-DT1": return StoreManager.ProductIDs.cfDT1
         default: return ""
         }

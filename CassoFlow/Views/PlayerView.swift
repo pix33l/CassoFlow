@@ -54,6 +54,7 @@ struct PlayerView: View {
                     showLibraryView: $showLibraryView,
                     showSettingsView: $showSettingsView,
                     showStoreView: $showStoreView,
+                    showPaywallForLimit: $showPaywallForLimit,
                     progress: progress,
                     repeatMode: $repeatMode,
                     isShuffled: $isShuffled
@@ -326,6 +327,7 @@ struct PlayerControlsView: View {
     @Binding var showLibraryView: Bool
     @Binding var showSettingsView: Bool
     @Binding var showStoreView: Bool
+    @Binding var showPaywallForLimit: Bool
     let progress: CGFloat
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
@@ -347,6 +349,7 @@ struct PlayerControlsView: View {
             
             SongInfoView(
                 showLibraryView: $showLibraryView,
+                showPaywallForLimit: $showPaywallForLimit,
                 repeatMode: $repeatMode,
                 isShuffled: $isShuffled,
                 progress: progress
@@ -478,6 +481,7 @@ struct ControlButtonsView: View {
 struct SongInfoView: View {
     @EnvironmentObject private var musicService: MusicService
     @Binding var showLibraryView: Bool
+    @Binding var showPaywallForLimit: Bool
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     let progress: CGFloat
@@ -487,7 +491,7 @@ struct SongInfoView: View {
             VStack(spacing: UIScreen.isCompactDevice ? 8 : 5) {
                 // 根据屏幕尺寸判断是否显示TrackInfoHeader
                 if !UIScreen.isCompactDevice {
-                    TrackInfoHeader()
+                    TrackInfoHeader(showPaywallForLimit: $showPaywallForLimit)
                 }
                 
                 RepeatAndShuffleView(repeatMode: $repeatMode, isShuffled: $isShuffled, showLibraryView: $showLibraryView)
@@ -502,7 +506,9 @@ struct SongInfoView: View {
 
 struct TrackInfoHeader: View {
     @EnvironmentObject private var musicService: MusicService
-    
+    @EnvironmentObject private var storeManager: StoreManager
+    @Binding var showPaywallForLimit: Bool
+
     @State private var settingsTapped = false
     
     var body: some View {
@@ -524,21 +530,29 @@ struct TrackInfoHeader: View {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                     impactFeedback.impactOccurred()
                 }
-                musicService.setCassetteEffect(enabled: !musicService.isCassetteEffectEnabled)
+                
+                // 检查会员状态
+                if storeManager.membershipStatus.isActive {
+                    musicService.setCassetteEffect(enabled: !musicService.isCassetteEffectEnabled)
+                } else {
+                    // 非会员用户，弹出PaywallView
+                    showPaywallForLimit = true
+                }
+
             } label: {
                 Text("SOUND EFFECT")
                     .font(.caption)
                     .padding(4)
                     .multilineTextAlignment(.leading)
                     .foregroundColor(
-                        musicService.isCassetteEffectEnabled ?
+                        (storeManager.membershipStatus.isActive && musicService.isCassetteEffectEnabled) ?
                         Color(musicService.currentPlayerSkin.screenTextColor) :
                         Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3)
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
                             .strokeBorder(
-                                musicService.isCassetteEffectEnabled ?
+                                (storeManager.membershipStatus.isActive && musicService.isCassetteEffectEnabled) ?
                                 Color(musicService.currentPlayerSkin.screenTextColor) :
                                 Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3),
                                 lineWidth: 1

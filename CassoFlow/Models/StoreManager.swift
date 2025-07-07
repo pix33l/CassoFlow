@@ -89,6 +89,7 @@ class StoreManager: ObservableObject {
         static let cf22 = "me.pix3l.CassoFlow.CF_22"
         static let cf504 = "me.pix3l.CassoFlow.CF_504"
         static let cfD6C = "me.pix3l.CassoFlow.CF_D6C"
+        static let cfDD9 = "me.pix3l.CassoFlow.CF_DD9"
         static let cfDT1 = "me.pix3l.CassoFlow.CF_DT1"
         
         // 磁带皮肤
@@ -100,7 +101,7 @@ class StoreManager: ObservableObject {
         // 所有产品ID
         static let allProducts = [
             lifetime, yearly, monthly,
-            cfPC13, cfM10, cfMU01, cfL2, cf2, cf22, cf504, cfD6C, cfDT1,
+            cfPC13, cfM10, cfMU01, cfL2, cf2, cf22, cf504, cfD6C, cfDD9, cfDT1,
             cftW60, cftC60, cft60CR, cftMM60
         ]
     }
@@ -263,15 +264,12 @@ class StoreManager: ObservableObject {
         switch productID {
         // 会员产品
         case ProductIDs.lifetime:
-            unlockPremiumFeatures()
             result = "永久 PRO"
             
         case ProductIDs.yearly:
-            unlockPremiumFeatures()
             result = "年度 PRO"
             
         case ProductIDs.monthly:
-            unlockPremiumFeatures()
             result = "月度 PRO"
             
         // 播放器皮肤
@@ -302,6 +300,10 @@ class StoreManager: ObservableObject {
         case ProductIDs.cf504:
             unlockPlayerSkin("CF-504")
             result = "CF-504 播放器"
+            
+        case ProductIDs.cfDD9:
+            unlockPlayerSkin("CF-DD9")
+            result = "CF-DD9 播放器"
             
         case ProductIDs.cfD6C:
             unlockPlayerSkin("CF-D6C")
@@ -338,11 +340,6 @@ class StoreManager: ObservableObject {
     }
     
     // MARK: - 解锁功能方法
-    
-    /// 解锁会员功能
-    private func unlockPremiumFeatures() {
-        // 订阅会员的状态通过 Transaction.currentEntitlements 管理
-    }
     
     /// 解锁播放器皮肤
     private func unlockPlayerSkin(_ skinName: String) {

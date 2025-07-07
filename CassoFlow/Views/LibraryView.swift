@@ -80,7 +80,7 @@ class LibraryDataManager: ObservableObject {
     private func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
         var request = MusicLibraryRequest<Album>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 50
+        request.limit = 200
         
         let response = try await request.response()
         return response.items
@@ -89,7 +89,7 @@ class LibraryDataManager: ObservableObject {
     private func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
         var request = MusicLibraryRequest<Playlist>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 50
+        request.limit = 200
         
         let response = try await request.response()
         return response.items

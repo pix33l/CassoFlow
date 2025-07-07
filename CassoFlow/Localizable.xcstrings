@@ -73,12 +73,6 @@
             "value" : "%1$lld時間%2$lld分です\n"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld小时%2$lld分钟"
-          }
-        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -99,12 +93,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld 曲です • %2$@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld首歌曲 • %2$@"
           }
         },
         "zh-Hant-TW" : {
@@ -1195,12 +1183,6 @@
             "value" : "購入項目 %1$lld 件を復元しました：%2$@"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "成功恢复 %1$lld 个购买项目：%2$@"
-          }
-        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1817,12 +1799,6 @@
             "value" : "バージョン %1$@ (%2$@)"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "版本 %1$@ (%2$@)"
-          }
-        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2028,6 +2004,9 @@
           }
         }
       }
+    },
+    "磁带播放器之王" : {
+
     },
     "磁带音效" : {
       "localizations" : {
