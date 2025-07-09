@@ -205,6 +205,7 @@ struct PayLabel: View {
                         .frame(height: 12)
                     Text(displayText)
                         .font(.caption2)
+                        .fontWeight(.bold)
                         .foregroundColor(Color.black)
                 }
                 Image(systemName: "chevron.right")
@@ -225,6 +226,18 @@ struct PayLabel: View {
             PaywallView()
                 .environmentObject(storeManager)
                 .environmentObject(musicService)
+        }
+        .onAppear {
+            // 如果产品信息还没有加载，主动获取
+            if storeManager.products.isEmpty {
+                Task {
+                    await storeManager.fetchProducts()
+                }
+            }
+        }
+        .onChange(of: storeManager.products) { _, _ in
+            // 当产品信息更新时，强制重新渲染
+            // 这里不需要做任何事，SwiftUI会自动重新计算displayText
         }
     }
 }

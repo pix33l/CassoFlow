@@ -1082,6 +1082,7 @@
       }
     },
     "您将获得" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2006,7 +2007,26 @@
       }
     },
     "磁带播放器之王" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The King of Cassette Players"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テーププレーヤーの王様です"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錄音帶播放器之王"
+          }
+        }
+      }
     },
     "磁带音效" : {
       "localizations" : {

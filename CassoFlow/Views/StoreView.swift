@@ -188,9 +188,9 @@ struct StoreView: View {
         }
         // 会员用户对于收费皮肤也显示蓝色背景
         if storeManager.membershipStatus.isActive && !isFreeSkin() {
-            return Color.blue
+            return Color.yellow
         }
-        return Color.blue
+        return Color.yellow
     }
     
     private var buttonForegroundColor: Color {
@@ -201,9 +201,9 @@ struct StoreView: View {
         }
         // 会员用户对于收费皮肤也显示白色文字
         if storeManager.membershipStatus.isActive && !isFreeSkin() {
-            return Color.white
+            return Color.black
         }
-        return Color.white
+        return Color.black
     }
     
     // MARK: - 私有方法

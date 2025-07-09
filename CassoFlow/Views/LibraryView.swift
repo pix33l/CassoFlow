@@ -363,9 +363,19 @@ struct AlbumCell: View {
             ZStack {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = album.artwork {
+                    
                     ArtworkImage(artwork, width: 160, height: 160)
                         .frame(width: 105, height: 160)
+                        .blur(radius: 8)
+                        .overlay(
+                            Color.black.opacity(0.2)
+                            )
                         .clipShape(Rectangle())
+                        
+                    ArtworkImage(artwork, width: 105, height: 105)
+                        .frame(width: 105, height: 105)
+                        .clipShape(Rectangle())
+                    
                 } else {
                     ZStack{
                         Color.black
@@ -396,7 +406,7 @@ struct AlbumCell: View {
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }
-            .padding(.top, 4)
+            .padding(.top, 2)
         }
     }
 }
@@ -410,9 +420,19 @@ struct PlaylistCell: View {
             ZStack {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = playlist.artwork {
+                    
                     ArtworkImage(artwork, width: 160, height: 160)
                         .frame(width: 105, height: 160)
+                        .blur(radius: 8)
+                        .overlay(
+                            Color.black.opacity(0.2)
+                            )
                         .clipShape(Rectangle())
+                    
+                    ArtworkImage(artwork, width: 105, height: 105)
+                        .frame(width: 105, height: 105)
+                        .clipShape(Rectangle())
+                    
                 } else {
                     ZStack{
                         Color.black
@@ -438,7 +458,7 @@ struct PlaylistCell: View {
                     .font(.footnote)
                     .lineLimit(1)
             }
-            .padding(.top, 4)
+            .padding(.top, 2)
         }
     }
 }

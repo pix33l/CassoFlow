@@ -57,6 +57,7 @@ struct FeatureRow: View {
             VStack(alignment: .leading){
                 Text(title)
                     .font(.body)
+                    .fontWeight(.bold)
                 Text(description)
                     .font(.subheadline)
                     .foregroundColor(.gray)
@@ -104,25 +105,10 @@ struct PaywallView: View {
                     .aspectRatio(contentMode: .fill)
                     .padding(.horizontal, -10)
                 
-                // 付费选项
-                VStack(spacing: 10) {
-                    ForEach(MembershipProduct.allCases, id: \.self) { plan in
-                        if let product = storeManager.getProduct(for: plan.rawValue) {
-                            PlanOptionView(
-                                product: product,
-                                plan: plan,
-                                isSelected: selectedPlan == plan
-                            ) {
-                                selectedPlan = plan
-                            }
-                        }
-                    }
-                }
-                
                 VStack {
-                    Text("您将获得")
-                        .font(.title)
-                        .fontWeight(.bold)
+//                    Text("您将获得")
+//                        .font(.title)
+//                        .fontWeight(.bold)
                     // 功能列表
                     VStack(alignment: .leading, spacing: 0) {
                         FeatureRow(
@@ -160,7 +146,21 @@ struct PaywallView: View {
                     .cornerRadius(10)
                 }
                 
-                
+                // 付费选项
+                VStack(spacing: 10) {
+                    ForEach(MembershipProduct.allCases, id: \.self) { plan in
+                        if let product = storeManager.getProduct(for: plan.rawValue) {
+                            PlanOptionView(
+                                product: product,
+                                plan: plan,
+                                isSelected: selectedPlan == plan
+                            ) {
+                                selectedPlan = plan
+                            }
+                        }
+                    }
+                }
+
                 Text("确认购买后，将通过您的 Apple 帐户收取费用。 PRO 会员订阅默认会自动续订，除非在当前订阅结束前至少提前 24 小时前往「设置 -  Apple 账户 - 订阅」关闭自动续订，否则您的 Apple 账户将在当前订阅结束前的 24 小时内被收取续订费用。试用 PRO 会员期间内，如不手动关闭自动续订，则会在试用期结束时自动开通订阅并扣取费用。免费试用机会仅在每位用户首次订阅前试用一次，购买订阅后剩余的免费试用期（如有）将自动失效。")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -196,10 +196,14 @@ struct PaywallView: View {
                         // 失败提示会通过 storeManager.showAlert 显示
                     }
                 }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
                 .foregroundColor(.primary)
                 .disabled(storeManager.isLoading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                )
                 .padding()
                 
                 Spacer()
@@ -214,12 +218,12 @@ struct PaywallView: View {
                     Image(systemName: "xmark")
                         .font(.body)
                         .foregroundColor(.primary)
-                        .padding(8)
-                        .background(
-                            Circle()
-                                .fill(Color.gray.opacity(0.25))
-                        )
                 }
+                .padding(8)
+                .background(
+                    Circle()
+                        .fill(.regularMaterial)
+                )
                 .padding()
             }
         }
@@ -260,8 +264,8 @@ struct PaywallView: View {
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(.blue)
-                        .foregroundColor(.white)
+                        .background(.yellow)
+                        .foregroundColor(.black)
                         .cornerRadius(12)
                     
                     if storeManager.isLoading {
@@ -337,7 +341,7 @@ struct PlanOptionView: View {
                     if let tag = plan.tag {
                         Text(tag)
                             .font(.footnote)
-                            .fontWeight(.medium)
+                            .fontWeight(.bold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(.yellow)

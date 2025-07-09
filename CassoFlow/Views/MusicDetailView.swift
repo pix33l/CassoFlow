@@ -70,31 +70,33 @@ struct MusicDetailView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 360)
                         //磁带封面
-                        Color.black
-                            .frame(width: 270, height: 120)
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .padding(.bottom, 37)
                         
                         if let artwork = container.artwork {
-                            ArtworkImage(artwork, width: 270, height: 270)
-                                .frame(width: 270, height: 120)
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                .padding(.bottom, 37)
-                            
+                            ZStack{
+                                ArtworkImage(artwork, width: 270, height: 270)
+                                    .frame(width: 270, height: 120)
+                                    .blur(radius: 8)
+                                    .overlay(
+                                        // 半透明遮罩确保文字清晰
+                                        Color.black.opacity(0.2)
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .padding(.bottom, 37)
+                            }
                         } else {
                             ZStack{
                                 Color.black
-                                    .frame(width: 290, height: 140)
+                                    .frame(width: 270, height: 120)
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                     .padding(.bottom, 37)
-                                
-                                Image("CASSOFLOW")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 100)
-                                    .padding(.bottom, 110)
                             }
                         }
+                        
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 100)
+                            .padding(.bottom, 110)
                         
                         Image("artwork-cassette-hole")
                             .resizable()
@@ -102,25 +104,43 @@ struct MusicDetailView: View {
                             .frame(width: 360)
                         
                         HStack{
+                            
+                            if let artwork = container.artwork {
+                                ArtworkImage(artwork, width: 60, height: 60)
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                                
+                            } else {
+                                ZStack{
+                                    Color.black
+                                        .frame(width: 60, height: 60)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    
+                                    Image("CASSOFLOW")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 50)
+                                }
+                            }
+                            
                             VStack(alignment: .leading, spacing: 0) {
                                 Text(container.title)
-                                    .font(.title3.bold())
+                                    .font(.headline.bold())
                                     .lineLimit(1)
                                 
                                 Text(container.artistName)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
+                                    .font(.callout)
                                 
                                 if let releaseDate = container.releaseDate {
                                     let genreText = container.genreNames.first ?? (isPlaylist() ? "播放列表" : "未知风格")
                                     Text("\(genreText) • \(releaseDate.formatted(.dateTime.year()))")
                                         .font(.footnote)
-                                        .foregroundColor(.secondary)
                                 }
                             }
-                            .padding(.top, 115)
+                            
                             Spacer()
                         }
+                        .padding(.top, 120)
                         .frame(width: 300)
                     }
                     

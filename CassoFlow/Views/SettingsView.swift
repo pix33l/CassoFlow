@@ -13,8 +13,8 @@ struct ProBadge: View {
             .fontWeight(.bold)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Color.blue)
-            .foregroundColor(.white)
+            .background(Color.yellow)
+            .foregroundColor(.black)
             .cornerRadius(4)
     }
 }
@@ -116,11 +116,12 @@ struct SettingsView: View {
                         if storeManager.membershipStatus.shouldShowUpgradeButton {
                             HStack {
                                 Text("立即升级")
+                                    .fontWeight(.bold)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(.white)
+                                    .background(.yellow)
                                     .foregroundColor(.black)
-                                    .cornerRadius(15)
+                                    .cornerRadius(4)
                                 
                                 Spacer()
                             }
