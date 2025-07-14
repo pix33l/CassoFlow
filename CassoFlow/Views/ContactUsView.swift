@@ -9,6 +9,13 @@ import SwiftUI
 
 struct ContactUsView: View {
     
+    @Environment(\.locale) var locale // 添加语言环境
+    
+    // 判断是否为中文环境
+    private var isChineseLocale: Bool {
+        return locale.language.languageCode?.identifier.starts(with: "zh") ?? false
+    }
+    
     var body: some View {
         List {
             Section {
@@ -37,21 +44,23 @@ struct ContactUsView: View {
                     account: "service@pix3l.me"
                 )
                 
-                ContactRow(
-                    title: String(localized: "微信"),
-                    account: String(localized: "pix3l_me（备注：CassoFlow）")
-                )
-            
-                ContactRow(
-                    title: String(localized: "抖音"),
-                    account: "pix3l_me"
-                )
-                
-                ContactRow(
-                    title: String(localized: "小红书"),
-                    account: "pix3l_me"
-                )
-                
+                if isChineseLocale {
+                    ContactRow(
+                        title: String(localized: "微信"),
+                        account: String(localized: "pix3l_me（备注：CassoFlow）")
+                    )
+                    
+                    ContactRow(
+                        title: String(localized: "抖音"),
+                        account: "pix3l_me"
+                    )
+
+                    ContactRow(
+                        title: String(localized: "小红书"),
+                        account: "pix3l_me"
+                    )
+                }
+                    
                 ContactRow(
                     title: "Instagram",
                     account: "pix3l_me"
@@ -61,6 +70,22 @@ struct ContactUsView: View {
                     title: "X(Twitter)",
                     account: "pix3l_me"
                 )
+            }
+            Section("本地化（特别感谢）") {
+                HStack {
+                    Text("繁体中文（台湾）")
+                    Spacer()
+                    Text("Kulin")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                HStack {
+                    Text("日文")
+                    Spacer()
+                    Text("JAM")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .navigationTitle("关于作者")

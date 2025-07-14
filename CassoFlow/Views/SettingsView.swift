@@ -142,7 +142,7 @@ struct SettingsView: View {
                     }
                 }
                 // 通用设置
-                Section(header: Text("通用")) {
+                Section(header: Text("特色功能")) {
                     
                     VStack(alignment: .leading, spacing: 5) {
                         HStack {
@@ -262,6 +262,32 @@ struct SettingsView: View {
                         }
                     }
                 }
+                
+                Section(header: Text("通用")) {
+                    // 语言设置选项
+                    Button {
+                        // 打开应用的语言设置
+                        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                            openURL(settingsURL)
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "globe")
+                                .font(.body)
+                                .frame(width: 20)
+                            
+                            Text("语言")
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.body)
+                                .foregroundColor(.primary.opacity(0.25))
+                        }
+                        .foregroundColor(.primary)
+                    }
+                }
+                
                 // 支持我们
                 Section(header: Text("支持我们")) {
                     LinkRow(

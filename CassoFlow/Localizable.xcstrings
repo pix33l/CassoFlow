@@ -26,6 +26,12 @@
             "value" : "%@ すべての機能とテーマを永久に利用可能"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@모든 기능 및 테마에 평생 액세스"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -51,6 +57,12 @@
             "value" : "%lld 分です"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld분"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -71,6 +83,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld時間%2$lld分です\n"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld시간%lld분"
           }
         },
         "zh-Hant-TW" : {
@@ -95,6 +113,12 @@
             "value" : "%1$lld 曲です • %2$@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld곡 • %@"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -110,6 +134,12 @@
       "shouldTranslate" : false
     },
     "100" : {
+      "shouldTranslate" : false
+    },
+    "JAM" : {
+      "shouldTranslate" : false
+    },
+    "Kulin" : {
       "shouldTranslate" : false
     },
     "PGM NO. %lld/%lld" : {
@@ -143,6 +173,12 @@
             "value" : "PIX3L DESIGN STUDIO デジタルプロダクト専門の独立スタジオ，革新的デザインでユーザーに没入型デジタル体験を提供"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO 은 디지털 제품을 전문으로 하는 독립적인 개인 스튜디오로, 혁신적인 디자인과 우수성으로 디지털 세계에서 독특한 경험을 만들어냅니다."
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -163,6 +199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "pix3l_me（付記：CassoFlow）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me（참고：CassoFlow）"
           }
         },
         "zh-Hant-TW" : {
@@ -190,6 +232,12 @@
             "value" : "PRO 限定"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO 독점"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -212,6 +260,12 @@
             "value" : "PROプラン有効期限：%@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO 멤버십은 %@ 에 만료됩니다"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -223,24 +277,30 @@
     "SOUND EFFECT" : {
       "shouldTranslate" : false
     },
-    "一次性付费，享受未来功能更新" : {
+    "一次性付费，享受永久更新" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "One-time payment, free update in the future"
+            "value" : "Pay once and enjoy permanent updates"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "買い切りで将来の機能追加無料"
+            "value" : "買い切りで恒久的なアップデートを楽しむ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한 번 결제하고 향후 기능 업데이트를 즐기세요"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一次性買斷，享未來功能免費更新"
+            "value" : "一次付費，享受永久更新"
           }
         }
       }
@@ -257,6 +317,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アルバム"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앨범"
           }
         },
         "zh-Hant-TW" : {
@@ -281,6 +347,12 @@
             "value" : "プロユーザー向けカセットプレーヤー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전문 사용자를 위한 테이프 플레이어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -301,6 +373,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "二酸化クロム素材ハイエンドテープ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이산화크롬을 소재로 한 고급 마그네틱 테이프"
           }
         },
         "zh-Hant-TW" : {
@@ -325,6 +403,12 @@
             "value" : " わずか1日 %@ "
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/일"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -347,6 +431,12 @@
             "value" : "低"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "낮음"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -355,7 +445,7 @@
         }
       }
     },
-    "低频抖动 (Flutter)" : {
+    "低频抖动" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -367,6 +457,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "低周波揺らぎ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저주파 지터"
           }
         },
         "zh-Hant-TW" : {
@@ -391,6 +487,12 @@
             "value" : "使用中"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용 중"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -411,6 +513,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "利用規約"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이용 약관"
           }
         },
         "zh-Hant-TW" : {
@@ -435,6 +543,12 @@
             "value" : "画面常時表示"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "항상 화면 잠금 해제 상태 유지"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -455,6 +569,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple Music にアクセスしてアルバムやプレイリストを見ることができます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앨범 및 재생목록을 보기 위해 Apple 음악에 대한 접근 허용하기"
           }
         },
         "zh-Hant-TW" : {
@@ -479,6 +599,12 @@
             "value" : "無料"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프리웨어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -499,6 +625,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開発者について"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저자 소개"
           }
         },
         "zh-Hant-TW" : {
@@ -523,6 +655,12 @@
             "value" : "その他"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나머지"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -543,6 +681,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最終更新日 %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막 업데이트 날짜 %@"
           }
         },
         "zh-Hant-TW" : {
@@ -567,6 +711,12 @@
             "value" : "メディアライブラリの読み込み\nに失敗します：%@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미디어 라이브러리를 로드하지 못했습니다：%@"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -587,6 +737,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PROプランで全プレミアム機能を解放"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 프리미엄 기능을 이용하려면 PRO 멤버십을 업그레이드하세요"
           }
         },
         "zh-Hant-TW" : {
@@ -611,6 +767,12 @@
             "value" : "アップグレードで全プレミアム機能を取得"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 고급 기능을 사용하려면 업그레이드하세요"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -631,6 +793,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "キヤノンブランドカセットプレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캐논 테이프 플레이어"
           }
         },
         "zh-Hant-TW" : {
@@ -655,6 +823,12 @@
             "value" : "発行日 %@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "에 게시됨 %@"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -675,6 +849,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "商品タイプ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제품 유형"
           }
         },
         "zh-Hant-TW" : {
@@ -699,6 +879,12 @@
             "value" : "ストア"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스토어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -719,6 +905,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "国宝ブランドカセットプレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "국보급 테이프 플레이어"
           }
         },
         "zh-Hant-TW" : {
@@ -743,6 +935,12 @@
             "value" : "実機操作感を再現する触覚フィードバック"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "피드백을 추가하여 물리적 조작의 느낌을 시뮬레이션하기"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -763,6 +961,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メディアライブラリ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미디어 라이브러리"
           }
         },
         "zh-Hant-TW" : {
@@ -787,6 +991,12 @@
             "value" : "メディアタイプ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미디어 유형"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -809,6 +1019,12 @@
             "value" : "永久PROメンバー様"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "권위 있는 영구 PRO 멤버십"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -826,6 +1042,12 @@
           }
         },
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "RedNote"
@@ -853,6 +1075,12 @@
             "value" : "画面常時オン"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면은 항상 켜져 있습니다"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -873,6 +1101,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピーしました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복제"
           }
         },
         "zh-Hant-TW" : {
@@ -897,6 +1131,12 @@
             "value" : "年間 PRO"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연간 PRO"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -917,6 +1157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノイズベース"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "바닥 소음"
           }
         },
         "zh-Hant-TW" : {
@@ -941,6 +1187,12 @@
             "value" : "3 日間無料トライアルを開始"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 일 무료 평가판 시작"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -961,6 +1213,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "7 日間無料トライアルを開始"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 일 무료 평가판 시작"
           }
         },
         "zh-Hant-TW" : {
@@ -985,6 +1243,12 @@
             "value" : "強度"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "해리"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -993,12 +1257,12 @@
         }
       }
     },
-    "彩虹色的录音磁带" : {
+    "彩虹条纹录音磁带" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rainbow-colored cassette"
+            "value" : "Rainbow Stripe Tape"
           }
         },
         "ja" : {
@@ -1007,10 +1271,16 @@
             "value" : "虹色録音テープ "
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무지개색 카세트 테이프"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "彩虹色錄音帶"
+            "value" : "彩虹條紋錄音帶"
           }
         }
       }
@@ -1026,7 +1296,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WeChat（ウィーチャット）"
+            "value" : "WeChat"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
           }
         },
         "zh-Hant-TW" : {
@@ -1051,6 +1327,12 @@
             "value" : "ノスタルジック"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "노스탤지어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1073,33 +1355,16 @@
             "value" : "購入を復元"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 재개"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "恢復購買"
-          }
-        }
-      }
-    },
-    "您将获得" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You will receive"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ご提供内容"
-          }
-        },
-        "zh-Hant-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "您將獲得"
           }
         }
       }
@@ -1116,6 +1381,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メディアライブラリは空です"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미디어 라이브러리가 비어 있습니다"
           }
         },
         "zh-Hant-TW" : {
@@ -1140,6 +1411,12 @@
             "value" : "フィードバック"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "피드백"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1160,6 +1437,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "成功"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "성공 사례"
           }
         },
         "zh-Hant-TW" : {
@@ -1184,6 +1467,12 @@
             "value" : "購入項目 %1$lld 件を復元しました：%2$@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 %lld 건 복구 성공："
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1204,6 +1493,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 Apple Music"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple 음악 열기"
           }
         },
         "zh-Hant-TW" : {
@@ -1228,6 +1523,12 @@
             "value" : "アプリを友達にシェアする"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "친구에게 앱 추천하기"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1241,13 +1542,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Douyin"
+            "value" : "TikTok"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "抖音"
+            "value" : "TikTok"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
           }
         },
         "zh-Hant-TW" : {
@@ -1258,24 +1565,30 @@
         }
       }
     },
-    "持续欣赏磁带转动的机械感" : {
+    "持续欣赏机械转动的美感" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enjoy the mechanical feeling of the rotating"
+            "value" : "Continuous appreciation of the beauty of mechanical rotation"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "テープ駆動のメカニカル感を没入体験"
+            "value" : "機械的な回転の美しさの継続的評価"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기계 회전의 아름다움에 대한 지속적인 감상"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "享受錄音帶轉動的機械美感"
+            "value" : "持續欣賞機械旋轉之美"
           }
         }
       }
@@ -1292,6 +1605,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクセス許可です"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인증된 액세스"
           }
         },
         "zh-Hant-TW" : {
@@ -1316,6 +1635,12 @@
             "value" : "ヒント"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주목하세요"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1336,6 +1661,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再生"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "플레이 가능"
           }
         },
         "zh-Hant-TW" : {
@@ -1360,10 +1691,72 @@
             "value" : "プレーヤー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "플레이어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "播放器"
+          }
+        }
+      }
+    },
+    "播放队列" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play queue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再生キュー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재생 대기열"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放清單"
+          }
+        }
+      }
+    },
+    "播放队列为空" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play queue is empty"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレイキューは空"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재생 대기열 비어 있음"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放清單為空"
           }
         }
       }
@@ -1380,6 +1773,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サポート"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지원"
           }
         },
         "zh-Hant-TW" : {
@@ -1404,6 +1803,12 @@
             "value" : "商品情報が見つかりません"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 제품에 대한 정보를 찾을 수 없습니다"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1412,24 +1817,58 @@
         }
       }
     },
-    "无限使用所有播放器和磁带皮肤" : {
+    "无限制使用所有播放器和磁带" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlimited use of all player and cassette skins"
+            "value" : "Unlimited use of all players and cassettes"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "全プレイヤー＆テープスキン使い放題"
+            "value" : "すべてのプレーヤーとテープが使い放題"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 플레이어 및 테이프 무제한 사용"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有播放器與錄音帶造型無限使用"
+            "value" : "無限制使用所有播放器和錄音帶"
+          }
+        }
+      }
+    },
+    "日文" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일본어(언어)"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語"
           }
         }
       }
@@ -1446,6 +1885,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "早期割引"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "얼리버드 스페셜"
           }
         },
         "zh-Hant-TW" : {
@@ -1470,6 +1915,12 @@
             "value" : "暫定価格です"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가격 없음"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1490,6 +1941,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "月額 PRO"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "월간 PRO"
           }
         },
         "zh-Hant-TW" : {
@@ -1514,6 +1971,12 @@
             "value" : "再生中の曲はありません"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재생된 노래 없음"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1536,10 +1999,44 @@
             "value" : "今後の機能アップデート"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "향후 업데이트"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "後續更新"
+          }
+        }
+      }
+    },
+    "本地化（特别感谢）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localization (special thanks)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカライゼーション（特別感謝）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "현지화(특별 감사)"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地化（特別感謝）"
           }
         }
       }
@@ -1556,6 +2053,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "標準"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표준"
           }
         },
         "zh-Hant-TW" : {
@@ -1580,6 +2083,12 @@
             "value" : "ラベル書き込み可能カラーテープ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "쓰기 가능한 라벨이 있는 컬러 테이프"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1600,6 +2109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "実体操作感インタラクションフィードバック"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "물리적 조작을 모방한 대화형 피드백"
           }
         },
         "zh-Hant-TW" : {
@@ -1624,6 +2139,12 @@
             "value" : "リアルテープサウンド再現"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실제 테이프 사운드 시뮬레이션"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1644,6 +2165,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テープノイズ＆低周波揺らぎ再現"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아날로그 테이프 노이즈 플로어 및 저주파 지터"
           }
         },
         "zh-Hant-TW" : {
@@ -1668,6 +2195,12 @@
             "value" : "プレイリスト"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "노래 목록"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1688,6 +2221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "読み込み中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로드 중..."
           }
         },
         "zh-Hant-TW" : {
@@ -1712,6 +2251,12 @@
             "value" : "永久 PRO"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영구 PRO"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1732,6 +2277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "復元可能な購入項目はありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복구 가능한 구매를 찾을 수 없습니다"
           }
         },
         "zh-Hant-TW" : {
@@ -1756,6 +2307,12 @@
             "value" : "デモ用カセットプレーヤー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데모 테이프 플레이어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1776,6 +2333,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タップで楽曲選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클릭해서 음악을 선택하다"
           }
         },
         "zh-Hant-TW" : {
@@ -1800,6 +2363,12 @@
             "value" : "バージョン %1$@ (%2$@)"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전 %@ (%@)"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1822,10 +2391,44 @@
             "value" : "お手頃価格のカセットプレーヤー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저렴한 테이프 플레이어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "平價高質感的錄音帶播放器"
+          }
+        }
+      }
+    },
+    "特色功能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Featured Functions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注目の機能"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주요 기능"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "精選功能"
           }
         }
       }
@@ -1844,6 +2447,12 @@
             "value" : "今から Apple Music に加入すると、最大 3 ヶ月間無料でお試しできます"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 Apple 음악에 가입하고 최대 3개월 무료 체험을 이용하세요"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1852,7 +2461,7 @@
         }
       }
     },
-    "瑕疵噪点 (Crackle)" : {
+    "瑕疵噪点" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1864,6 +2473,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノイズインジェクション"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결함이 있는 노이즈"
           }
         },
         "zh-Hant-TW" : {
@@ -1888,6 +2503,12 @@
             "value" : "白磁器仕様の最上級テープ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화이트 세라믹 케이스의 최고급 테이프"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1908,6 +2529,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキンデータ異常"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "피부 데이터 이상"
           }
         },
         "zh-Hant-TW" : {
@@ -1932,6 +2559,12 @@
             "value" : "確認"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정의"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1952,6 +2585,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入確認後、Appleアカウントに課金されます。PROメンバーシップは自動更新がデフォルトです。現在のサブスクリプション終了の24時間前までに「設定→Apple ID→サブスクリプション」で自動更新を解除しない場合、更新料金が課金されます。無料トライアル期間中に自動更新を解除しない場合、期間終了時に自動的に有料サブスクリプションが開始されます。無料トライアルは初回購入前に1回のみ適用され、購入後の残存期間は無効となります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매가 확인되면 Apple 계정을 통해 요금이 청구됩니다. PRO 멤버십 구독은 기본적으로 자동 갱신되며, 현재 구독이 종료되기 최소 24시간 전에 설정 - Apple 계정 - 구독으로 이동하여 자동 갱신을 해제하지 않는 한 현재 구독이 종료된 후 24시간 이내에 Apple 계정으로 갱신 요금이 청구됩니다. 평가판 PRO 멤버십 기간 동안 자동 갱신을 수동으로 해제하지 않으면 평가판 기간이 종료될 때 구독이 자동으로 활성화되고 요금이 청구됩니다. 무료 평가판 기회는 첫 번째 구독 전에 사용자당 한 번만 사용할 수 있으며, 남은 무료 평가판 기간(있는 경우)은 구독을 구매한 후 자동으로 만료됩니다."
           }
         },
         "zh-Hant-TW" : {
@@ -1976,6 +2615,12 @@
             "value" : "テープ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마그네틱 테이프"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1996,6 +2641,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テープ摩擦音"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "테이프 긁기"
           }
         },
         "zh-Hant-TW" : {
@@ -2020,6 +2671,12 @@
             "value" : "テーププレーヤーの王様です"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "테이프 플레이어의 왕"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2040,6 +2697,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カセット音響効果"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "테이프 사운드"
           }
         },
         "zh-Hant-TW" : {
@@ -2064,6 +2727,12 @@
             "value" : "即座に体験します"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 체험하기"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2084,6 +2753,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今すぐアップグレード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 업그레이드"
           }
         },
         "zh-Hant-TW" : {
@@ -2108,6 +2783,12 @@
             "value" : "すべての機能とテーマを永久に利用可能"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 기능 및 테마에 평생 액세스"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2128,6 +2809,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名作アニメ登場カセットプレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고전 애니메이션의 테이프 플레이어"
           }
         },
         "zh-Hant-TW" : {
@@ -2152,6 +2839,12 @@
             "value" : "5つ星の評価をお願いします"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "별 다섯 개를 주세요"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2174,10 +2867,44 @@
             "value" : "続ける"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음으로 진행"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "繼續"
+          }
+        }
+      }
+    },
+    "繁体中文（台湾）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traditional Chinese (Taiwan)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繁体字中国語（台湾）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중국어 번체(대만)"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繁體中文（台灣）"
           }
         }
       }
@@ -2194,6 +2921,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "公式サイト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "노드"
           }
         },
         "zh-Hant-TW" : {
@@ -2218,6 +2951,12 @@
             "value" : "連絡先"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연락처 세부 정보"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2238,6 +2977,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "時間旅行を思わせるカセットプレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시간 여행이 가능한 테이프 플레이어"
           }
         },
         "zh-Hant-TW" : {
@@ -2262,6 +3007,12 @@
             "value" : "全スキン解鎖"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 스킨 잠금 해제"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2282,6 +3033,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "触覚フィードバック"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "햅틱 피드백"
           }
         },
         "zh-Hant-TW" : {
@@ -2306,6 +3063,12 @@
             "value" : "設定"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2314,24 +3077,58 @@
         }
       }
     },
-    "请先在 Apple Music 中添加专辑和播放列表" : {
+    "语言" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please first add the albums and playlists to Apple Music"
+            "value" : "Language"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Music にアルバムとプレイリストを追加します"
+            "value" : "言語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "언어"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請先在 Apple Music 中添加專輯和播放清單"
+            "value" : "語言"
+          }
+        }
+      }
+    },
+    "请先在 Apple Music 中添加专辑或播放列表" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add an album or playlist to Apple Music first"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Musicにアルバムやプレイリストを追加しましょう"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "먼저 Apple 음악에 앨범 또는 재생목록을 추가합니다"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "先將專輯或播放清單加入 Apple Music"
           }
         }
       }
@@ -2348,6 +3145,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ネットワーク接続のチェックをお願い\nします"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도하거나 네트워크 연결을 확인하세요"
           }
         },
         "zh-Hant-TW" : {
@@ -2372,6 +3175,12 @@
             "value" : "サウンド設定調整"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사운드 매개변수 조정"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2392,6 +3201,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入に失敗しました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 실패"
           }
         },
         "zh-Hant-TW" : {
@@ -2416,6 +3231,12 @@
             "value" : "購入に失敗しました。不明なエラーが発生しました"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 실패, 알 수 없는 오류"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2436,6 +3257,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入に失敗しました：%@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 실패：%@"
           }
         },
         "zh-Hant-TW" : {
@@ -2460,6 +3287,12 @@
             "value" : "購入成功！全機能が利用可能です"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매에 성공했습니다! 잠금 해제된 콘텐츠"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2480,6 +3313,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入を処理中です。少々お待ちください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매가 처리 중입니다, 나중에 다시 확인해 주세요"
           }
         },
         "zh-Hant-TW" : {
@@ -2504,6 +3343,12 @@
             "value" : "購入処理に失敗しました。しばらくしてからもう一度お試しください"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 인증에 실패했습니다, 나중에 다시 시도하세요"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2524,6 +3369,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "軽度"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "빛"
           }
         },
         "zh-Hant-TW" : {
@@ -2548,6 +3399,12 @@
             "value" : "選択"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "옵션"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2568,6 +3425,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "透明デモテープ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "투명 데모 테이프"
           }
         },
         "zh-Hant-TW" : {
@@ -2592,6 +3455,12 @@
             "value" : "一般"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일반"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2612,6 +3481,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이메일"
           }
         },
         "zh-Hant-TW" : {
@@ -2636,6 +3511,12 @@
             "value" : "重度"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무거운"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2658,10 +3539,44 @@
             "value" : "再試行"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "重試"
+          }
+        }
+      }
+    },
+    "队列会在播放音乐时显示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The queue will be displayed while the music is playing"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キューは音楽再生中に表示されます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "음악이 재생되는 동안 대기열이 표시됩니다"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音樂播放時會顯示列隊"
           }
         }
       }
@@ -2678,6 +3593,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "期間限定50% OFF"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기간 한정 50% 할인"
           }
         },
         "zh-Hant-TW" : {
@@ -2702,6 +3623,12 @@
             "value" : "プライバシーポリシー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인정보 보호정책"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2722,6 +3649,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "シャッフル再生"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무작위 재생"
           }
         },
         "zh-Hant-TW" : {
@@ -2746,6 +3679,12 @@
             "value" : "Apple Music の登録が必要です"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용하려면 Apple 음악 구독이 필요합니다"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2766,6 +3705,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メディアライブラリへのアクセスには許可が必要です"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미디어 라이브러리에 액세스하려면 권한이 필요합니다"
           }
         },
         "zh-Hant-TW" : {
@@ -2790,6 +3735,12 @@
             "value" : "サウンド音量"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사운드 볼륨"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2810,6 +3761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サウンドプリセット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사운드 사전 설정"
           }
         },
         "zh-Hant-TW" : {
@@ -2834,6 +3791,12 @@
             "value" : "音量"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "음량"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2854,6 +3817,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "周波数"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "빈도"
           }
         },
         "zh-Hant-TW" : {
@@ -2878,6 +3847,12 @@
             "value" : "飛翔 ブランドカセットプレーヤー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "플라잉 테이프 플레이어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2898,6 +3873,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "初のポータブルカセットプレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최초의 휴대용 카세트 플레이어"
           }
         },
         "zh-Hant-TW" : {
@@ -2922,6 +3903,12 @@
             "value" : "初のフルクリアカセットプレーヤー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최초의 완전 투명 테이프 플레이어"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2944,6 +3931,12 @@
             "value" : "高"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "높은"
+          }
+        },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2964,6 +3957,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高周波ヒスノイズ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고주파 쉿하는 소리"
           }
         },
         "zh-Hant-TW" : {

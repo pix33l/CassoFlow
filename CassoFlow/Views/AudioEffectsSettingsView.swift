@@ -164,7 +164,7 @@ struct AudioEffectsSettingsView: View {
                 }
                 
                 // 抖动效果设置
-                Section(header: Text("低频抖动 (Flutter)")) {
+                Section(header: Text("低频抖动")) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("强度")
                             .font(.subheadline)
@@ -273,7 +273,7 @@ struct AudioEffectsSettingsView: View {
                 }
                 
                 // 噪点设置
-                Section(header: Text("瑕疵噪点 (Crackle)")) {
+                Section(header: Text("瑕疵噪点")) {
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("强度")

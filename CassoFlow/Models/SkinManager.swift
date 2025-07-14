@@ -263,7 +263,7 @@ struct CassetteSkin: Identifiable {
         CassetteSkin(
             name: "CFT-W60",  // 名称作为唯一标识
             year: "2022",
-            description: String(localized: "彩虹色的录音磁带"),
+            description: String(localized: "彩虹条纹录音磁带"),
             coverImage: "cover-CFT-W60",
             cassetteImage: "CFT-W60",
             cassetteHole: "holeDark",

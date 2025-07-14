@@ -114,7 +114,7 @@ struct PaywallView: View {
                         FeatureRow(
                             systemImage: "recordingtape",
                             title: String(localized: "解锁所有皮肤"),
-                            description: String(localized:"无限使用所有播放器和磁带皮肤")
+                            description: String(localized:"无限制使用所有播放器和磁带")
                         )
                         Divider()
                         FeatureRow(
@@ -132,13 +132,13 @@ struct PaywallView: View {
                         FeatureRow(
                             systemImage: "sun.max",
                             title: String(localized: "屏幕常亮"),
-                            description: String(localized:"持续欣赏磁带转动的机械感")
+                            description: String(localized:"持续欣赏机械转动的美感")
                         )
                         Divider()
                         FeatureRow(
                             systemImage: "infinity",
                             title: String(localized: "未来更新"),
-                            description: String(localized:"一次性付费，享受未来功能更新")
+                            description: String(localized:"一次性付费，享受永久更新")
                         )
                     }
                     .padding(.horizontal)

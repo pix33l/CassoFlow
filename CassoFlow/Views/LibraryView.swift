@@ -315,7 +315,7 @@ struct LibraryView: View {
         case String(localized: "需要 Apple Music 订阅才能使用"):
             return String(localized: "现在加入 Apple Music，最多可享 3 个月免费试用")
         case String(localized: "您的媒体库是空的"):
-            return String(localized: "请先在 Apple Music 中添加专辑和播放列表")
+            return String(localized: "请先在 Apple Music 中添加专辑或播放列表")
         default:
             return String(localized: "请重试或检查网络连接")
         }
