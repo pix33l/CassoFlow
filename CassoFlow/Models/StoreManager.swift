@@ -10,6 +10,10 @@ import Foundation
 
 @MainActor
 class StoreManager: ObservableObject {
+    
+    // 使用 nonisolated 标记，允许从任何线程访问
+    nonisolated static let shared = StoreManager()
+
     @Published var products: [Product] = []
     @Published var isLoading = false
     @Published var alertMessage = ""
@@ -106,17 +110,20 @@ class StoreManager: ObservableObject {
         ]
     }
     
-    init() {
-        // 先快速加载本地缓存的会员状态
-        loadMembershipFromLocal()
-        
-        // 异步进行完整的在线校验
-        Task {
-            await loadOwnedProducts()
-            await updateMembershipStatus()
+    nonisolated init() {
+        // 异步初始化，确保在主线程上执行
+        Task { @MainActor in
+            // 先快速加载本地缓存的会员状态
+            loadMembershipFromLocal()
+            
+            // 异步进行完整的在线校验
+            Task {
+                await loadOwnedProducts()
+                await updateMembershipStatus()
+            }
+            
+            startTransactionListener()
         }
-        
-        startTransactionListener()
     }
     
     private func startTransactionListener() {
@@ -418,6 +425,7 @@ class StoreManager: ObservableObject {
     func updateMembershipStatus() async {
         
         var foundActiveEntitlement = false
+        let previousStatus = membershipStatus
         
         let statusTask = Task {
             // 检查订阅状态（月度/年度会员）
@@ -474,17 +482,15 @@ class StoreManager: ObservableObject {
             if ownedProducts.contains(ProductIDs.lifetime) {
                 membershipStatus = .lifetimeMember
                 UserDefaults.standard.set(true, forKey: "isPremiumUser")
-                return
+                // 找到终身会员，直接返回，不继续检查
             }
-            
             // 如果在线验证失败，但本地有会员标记，保持会员状态
-            if UserDefaults.standard.bool(forKey: "isPremiumUser") {
+            else if UserDefaults.standard.bool(forKey: "isPremiumUser") {
                 membershipStatus = .lifetimeMember
-                return
+                // 保持现有会员状态，不继续检查
             }
-            
             // 检查本地订阅缓存
-            if let expirationDate = UserDefaults.standard.object(forKey: "subscriptionExpirationDate") as? Date,
+            else if let expirationDate = UserDefaults.standard.object(forKey: "subscriptionExpirationDate") as? Date,
                expirationDate > Date() {
                 let subscriptionType = UserDefaults.standard.string(forKey: "subscriptionType") ?? "yearly"
                 switch subscriptionType {
@@ -496,16 +502,25 @@ class StoreManager: ObservableObject {
                     membershipStatus = .yearlyMember(expiresOn: expirationDate)
                 }
                 subscriptionExpirationDate = expirationDate
-                return
+                // 保持现有订阅状态
+            }
+            // 只有在确认所有检查都失败时，才设置为非会员并清除缓存
+            else {
+                membershipStatus = .notMember
+                subscriptionExpirationDate = nil
+                // 清除过期的本地缓存
+                UserDefaults.standard.removeObject(forKey: "subscriptionExpirationDate")
+                UserDefaults.standard.removeObject(forKey: "subscriptionType")
             }
         }
         
-        // 只有在确认所有检查都失败时，才设置为非会员并清除缓存
-        if case .notMember = membershipStatus {
-            subscriptionExpirationDate = nil
-            // 清除过期的本地缓存
-            UserDefaults.standard.removeObject(forKey: "subscriptionExpirationDate")
-            UserDefaults.standard.removeObject(forKey: "subscriptionType")
+        // 检查会员状态是否从有效变为无效（只在这种情况下发送通知）
+        if previousStatus.isActive && !membershipStatus.isActive {
+            // 发送会员状态变化通知（会员过期）
+//            DispatchQueue.main.async {
+            Task { @MainActor in
+                NotificationCenter.default.post(name: NSNotification.Name("MembershipStatusChanged"), object: nil)
+            }
         }
     }
     

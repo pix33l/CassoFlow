@@ -9,6 +9,7 @@ class MusicService: ObservableObject {
     
     private let player = ApplicationMusicPlayer.shared
     private let audioEffectsManager = AudioEffectsManager.shared
+    private let storeManager = StoreManager.shared
     
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
@@ -173,10 +174,42 @@ class MusicService: ObservableObject {
         
         // 启动定时器
         startUpdateTimer()
+        
+        // 监听会员状态变化通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleMembershipStatusChanged),
+            name: NSNotification.Name("MembershipStatusChanged"),
+            object: nil
+        )
     }
     
     deinit {
         stopUpdateTimer()
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: - 会员状态变化处理
+    @objc private func handleMembershipStatusChanged() {
+        Task { @MainActor in
+            // 检查当前播放器皮肤是否仍然可用
+            if !SkinHelper.isPlayerSkinOwned(currentPlayerSkin.name, storeManager: storeManager) {
+                // 如果当前皮肤不再可用，恢复到默认皮肤
+                if let defaultSkin = PlayerSkin.playerSkin(named: "CF-DEMO") {
+                    currentPlayerSkin = defaultSkin
+                    UserDefaults.standard.set(defaultSkin.name, forKey: Self.playerSkinKey)
+                }
+            }
+            
+            // 检查当前磁带皮肤是否仍然可用
+            if !SkinHelper.isCassetteSkinOwned(currentCassetteSkin.name, storeManager: storeManager) {
+                // 如果当前皮肤不再可用，恢复到默认皮肤
+                if let defaultSkin = CassetteSkin.cassetteSkin(named: "CFT-DEMO") {
+                    currentCassetteSkin = defaultSkin
+                    UserDefaults.standard.set(defaultSkin.name, forKey: Self.cassetteSkinKey)
+                }
+            }
+        }
     }
     
     // MARK: - 定时器管理
@@ -377,6 +410,7 @@ class MusicService: ObservableObject {
             audioEffectsManager.setMusicPlayingState(true)
         }
     }
+
     /// 暂停
     func pause() async {
         player.pause()
@@ -386,14 +420,17 @@ class MusicService: ObservableObject {
             audioEffectsManager.setMusicPlayingState(false)
         }
     }
+
     /// 播放下一首
     func skipToNext() async throws {
         try await player.skipToNextEntry()
     }
+
     /// 播放上一首
     func skipToPrevious() async throws {
         try await player.skipToPreviousEntry()
     }
+
     /// 开始快退
     func startFastRewind() {
         stopSeek() // 停止任何现有的快进/快退
@@ -405,6 +442,7 @@ class MusicService: ObservableObject {
             self.player.playbackTime = newTime
         }
     }
+
     /// 开始快进
     func startFastForward() {
         stopSeek() // 停止任何现有的快进/快退
@@ -416,6 +454,7 @@ class MusicService: ObservableObject {
             self.player.playbackTime = newTime
         }
     }
+
     /// 停止快速前进或快退
     func stopSeek() {
         seekTimer?.invalidate()
@@ -427,6 +466,7 @@ class MusicService: ObservableObject {
             self.updateQueueElapsedDuration()
         }
     }
+
     // MARK: - 队列管理
     private func updateQueueElapsedDuration() {
         let entries = player.queue.entries
