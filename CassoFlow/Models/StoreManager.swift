@@ -158,10 +158,27 @@ class StoreManager: ObservableObject {
         // 检查本地保存的订阅过期时间
         if let expirationDate = UserDefaults.standard.object(forKey: "subscriptionExpirationDate") as? Date {
             if expirationDate > Date() {
-                // 这里可以根据需要设置为年度或月度，或者简单设置为年度
-                membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                let subscriptionType = UserDefaults.standard.string(forKey: "subscriptionType") ?? "yearly"
+                switch subscriptionType {
+                case "yearly":
+                    membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                case "monthly":
+                    membershipStatus = .monthlyMember(expiresOn: expirationDate)
+                default:
+                    membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                }
                 subscriptionExpirationDate = expirationDate
                 return
+            } else {
+                // 订阅过期，清除过期的订阅缓存
+                UserDefaults.standard.removeObject(forKey: "subscriptionExpirationDate")
+                UserDefaults.standard.removeObject(forKey: "subscriptionType")
+                
+                // 再次检查是否有终身会员标记
+                if UserDefaults.standard.bool(forKey: "isPremiumUser") {
+                    membershipStatus = .lifetimeMember
+                    return
+                }
             }
         }
         
@@ -399,7 +416,8 @@ class StoreManager: ObservableObject {
     }
     
     func updateMembershipStatus() async {
-        _ = membershipStatus
+        
+        var foundActiveEntitlement = false
         
         let statusTask = Task {
             // 检查订阅状态（月度/年度会员）
@@ -410,17 +428,20 @@ class StoreManager: ObservableObject {
                     // 检查订阅是否仍有效
                     if let expirationDate = transaction.expirationDate {
                         if expirationDate > Date() {
+                            foundActiveEntitlement = true
                             switch productID {
                             case ProductIDs.yearly:
                                 membershipStatus = .yearlyMember(expiresOn: expirationDate)
                                 subscriptionExpirationDate = expirationDate
                                 // 保存到本地
                                 UserDefaults.standard.set(expirationDate, forKey: "subscriptionExpirationDate")
+                                UserDefaults.standard.set("yearly", forKey: "subscriptionType")
                             case ProductIDs.monthly:
                                 membershipStatus = .monthlyMember(expiresOn: expirationDate)
                                 subscriptionExpirationDate = expirationDate
                                 // 保存到本地
                                 UserDefaults.standard.set(expirationDate, forKey: "subscriptionExpirationDate")
+                                UserDefaults.standard.set("monthly", forKey: "subscriptionType")
                             default:
                                 break
                             }
@@ -429,6 +450,7 @@ class StoreManager: ObservableObject {
                     }
                     // 检查终身会员购买记录
                     else if productID == ProductIDs.lifetime {
+                        foundActiveEntitlement = true
                         membershipStatus = .lifetimeMember
                         // 保存到本地
                         UserDefaults.standard.set(true, forKey: "isPremiumUser")
@@ -439,30 +461,51 @@ class StoreManager: ObservableObject {
         }
         
         let timeoutTask = Task {
-            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5秒超时
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 延长到10秒超时
             statusTask.cancel()
         }
         
         _ = await statusTask.value
         timeoutTask.cancel()
         
-        // 检查 ownedProducts 中的终身会员
-        if ownedProducts.contains(ProductIDs.lifetime) {
-            membershipStatus = .lifetimeMember
-            UserDefaults.standard.set(true, forKey: "isPremiumUser")
-            return
+        // 只有在成功获取到 StoreKit 数据且没有找到活跃权益时，才进行本地检查
+        if !foundActiveEntitlement {
+            // 检查 ownedProducts 中的终身会员
+            if ownedProducts.contains(ProductIDs.lifetime) {
+                membershipStatus = .lifetimeMember
+                UserDefaults.standard.set(true, forKey: "isPremiumUser")
+                return
+            }
+            
+            // 如果在线验证失败，但本地有会员标记，保持会员状态
+            if UserDefaults.standard.bool(forKey: "isPremiumUser") {
+                membershipStatus = .lifetimeMember
+                return
+            }
+            
+            // 检查本地订阅缓存
+            if let expirationDate = UserDefaults.standard.object(forKey: "subscriptionExpirationDate") as? Date,
+               expirationDate > Date() {
+                let subscriptionType = UserDefaults.standard.string(forKey: "subscriptionType") ?? "yearly"
+                switch subscriptionType {
+                case "yearly":
+                    membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                case "monthly":
+                    membershipStatus = .monthlyMember(expiresOn: expirationDate)
+                default:
+                    membershipStatus = .yearlyMember(expiresOn: expirationDate)
+                }
+                subscriptionExpirationDate = expirationDate
+                return
+            }
         }
         
-        if case .notMember = membershipStatus,
-           UserDefaults.standard.bool(forKey: "isPremiumUser") {
-            membershipStatus = .lifetimeMember
-            return
-        }
-        
+        // 只有在确认所有检查都失败时，才设置为非会员并清除缓存
         if case .notMember = membershipStatus {
             subscriptionExpirationDate = nil
-            // 清除本地缓存
+            // 清除过期的本地缓存
             UserDefaults.standard.removeObject(forKey: "subscriptionExpirationDate")
+            UserDefaults.standard.removeObject(forKey: "subscriptionType")
         }
     }
     

@@ -1,6 +1,26 @@
 import SwiftUI
 import MusicKit
 
+//// 磁带图片随机选择器
+//struct ArtworkImageHelper {
+//    // 可用的磁带图片名称数组
+//    static let artworkImages = [
+//        "artwork-cassette-01",
+//        "artwork-cassette-02",
+//        "artwork-cassette-03",
+//        "artwork-cassette-04",
+//        "artwork-cassette-05"
+//    ]
+//    
+//    // 根据ID获取稳定的随机图片名称
+//    static func getRandomCassetteImage(for id: String) -> String {
+//        // 使用ID的哈希值作为随机数种子，确保每个ID都有固定的图片选择
+//        let hash = abs(id.hashValue)
+//        let index = hash % artworkImages.count
+//        return artworkImages[index]
+//    }
+//}
+
 /// 通用的音乐详情视图，支持专辑和播放列表
 struct MusicDetailView: View {
     @EnvironmentObject private var musicService: MusicService
@@ -129,7 +149,8 @@ struct MusicDetailView: View {
                                     .lineLimit(1)
                                 
                                 Text(container.artistName)
-                                    .font(.callout)
+                                    .font(.footnote)
+                                    .padding(.top, 4)
                                 
                                 if let releaseDate = container.releaseDate {
                                     let genreText = container.genreNames.first ?? (isPlaylist() ? "播放列表" : "未知风格")

@@ -96,6 +96,31 @@ class LibraryDataManager: ObservableObject {
     }
 }
 
+// 磁带图片随机选择器
+struct CassetteImageHelper {
+    // 可用的磁带图片名称数组
+    static let cassetteImages = [
+        "package-cassette-01",
+        "package-cassette-02",
+        "package-cassette-03",
+        "package-cassette-04",
+        "package-cassette-05",
+        "package-cassette-06",
+        "package-cassette-07",
+        "package-cassette-08",
+        "package-cassette-09",
+        "package-cassette-10"
+    ]
+    
+    // 根据ID获取稳定的随机图片名称
+    static func getRandomCassetteImage(for id: String) -> String {
+        // 使用ID的哈希值作为随机数种子，确保每个ID都有固定的图片选择
+        let hash = abs(id.hashValue)
+        let index = hash % cassetteImages.count
+        return cassetteImages[index]
+    }
+}
+
 struct LibraryView: View {
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var musicService: MusicService
@@ -388,7 +413,8 @@ struct AlbumCell: View {
                     .clipShape(Rectangle())
                 }
                 
-                Image("package-cassette")
+                // 使用随机磁带图片
+                Image(CassetteImageHelper.getRandomCassetteImage(for: album.id.rawValue))
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)
@@ -445,7 +471,8 @@ struct PlaylistCell: View {
                     .clipShape(Rectangle())
                 }
                 
-                Image("package-cassette")
+                // 使用随机磁带图片
+                Image(CassetteImageHelper.getRandomCassetteImage(for: playlist.id.rawValue))
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)
