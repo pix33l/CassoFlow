@@ -446,7 +446,12 @@ struct PlaylistCell: View {
             ZStack {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = playlist.artwork {
+                    // 矩形封面
+//                    ArtworkImage(artwork, width: 160, height: 160)
+//                        .frame(width: 105, height: 160)
+//                        .clipShape(Rectangle())
                     
+                    // 方形封面
                     ArtworkImage(artwork, width: 160, height: 160)
                         .frame(width: 105, height: 160)
                         .blur(radius: 8)

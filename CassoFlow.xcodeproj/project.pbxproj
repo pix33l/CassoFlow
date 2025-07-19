@@ -109,6 +109,9 @@
 				"zh-Hant-TW",
 				ja,
 				ko,
+				ru,
+				es,
+				"pt-PT",
 			);
 			mainGroup = 6276D75F2DD1E6F900ACA539;
 			minimizedProjectReferenceProxies = 1;

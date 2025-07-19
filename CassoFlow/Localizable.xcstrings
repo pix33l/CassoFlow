@@ -20,6 +20,12 @@
             "value" : "%@ Lifetime All Functions and Themes"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Todas las funciones y temas de por vida"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -30,6 +36,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@모든 기능 및 테마에 평생 액세스"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Todas as funcionalidades e temas vitalícios"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Пожизненный доступ ко всем функциям и темам"
           }
         },
         "zh-Hant-TW" : {
@@ -51,6 +69,12 @@
             "value" : "%lld Min"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Min"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -61,6 +85,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld분"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Mínimo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld мин"
           }
         },
         "zh-Hant-TW" : {
@@ -79,6 +115,12 @@
             "value" : "%1$lld Hour %2$lld Min"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Hora %2$lld Min"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -89,6 +131,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld시간%lld분"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Hora %2$lld Min"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld час %2$lld мин"
           }
         },
         "zh-Hant-TW" : {
@@ -107,6 +161,12 @@
             "value" : "%1$lld Song • %2$@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Canción • %2$@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -117,6 +177,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld곡 • %@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Música • %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld песня • %2$@"
           }
         },
         "zh-Hant-TW" : {
@@ -167,6 +239,12 @@
             "value" : "PIX3L DESIGN STUDIO is an independent individual studio specializing in digital products. With innovative design and outstanding concepts, it creates unique experiences for users in the digital world"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO es un estudio independiente especializado en productos digitales. Con diseño innovador y conceptos excepcionales, crea experiencias únicas para usuarios en el mundo digital"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -177,6 +255,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIX3L DESIGN STUDIO 은 디지털 제품을 전문으로 하는 독립적인 개인 스튜디오로, 혁신적인 디자인과 우수성으로 디지털 세계에서 독특한 경험을 만들어냅니다."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO é um estúdio independente especializado em produtos digitais. Com design inovador e conceitos excepcionais, cria experiências únicas para usuários no mundo digital"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO - это независимая студия, специализирующаяся на цифровых продуктах. С инновационным дизайном и выдающимися концепциями создает уникальные впечатления для пользователей в цифровом мире"
           }
         },
         "zh-Hant-TW" : {
@@ -195,6 +285,12 @@
             "value" : "pix3l_me (Note: CassoFlow)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Nota: CassoFlow)"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -205,6 +301,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "pix3l_me（참고：CassoFlow）"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Nota: CassoFlow)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Примечание: CassoFlow)"
           }
         },
         "zh-Hant-TW" : {
@@ -226,6 +334,12 @@
             "value" : "PRO Only"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo PRO"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -236,6 +350,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PRO 독점"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apenas PRO"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только PRO"
           }
         },
         "zh-Hant-TW" : {
@@ -254,6 +380,12 @@
             "value" : "PRO members will expire at %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La membresía PRO vencerá el %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -264,6 +396,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PRO 멤버십은 %@ 에 만료됩니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A assinatura PRO expirará em %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO подписка истечет %@"
           }
         },
         "zh-Hant-TW" : {
@@ -285,6 +429,12 @@
             "value" : "Pay once and enjoy permanent updates"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paga una vez y disfruta de actualizaciones permanentes"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -295,6 +445,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "한 번 결제하고 향후 기능 업데이트를 즐기세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pague uma vez e aproveite atualizações permanentes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заплатите один раз и наслаждайтесь постоянными обновлениями"
           }
         },
         "zh-Hant-TW" : {
@@ -313,6 +475,12 @@
             "value" : "Album"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Álbum"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -323,6 +491,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "앨범"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Álbum"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Альбом"
           }
         },
         "zh-Hant-TW" : {
@@ -341,6 +521,12 @@
             "value" : "A cassette player designed for professional users"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un reproductor de cassettes diseñado para usuarios profesionales"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -351,6 +537,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "전문 사용자를 위한 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um reprodutor de fita cassete projetado para usuários profissionais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассетный плеер, разработанный для профессиональных пользователей"
           }
         },
         "zh-Hant-TW" : {
@@ -369,6 +567,12 @@
             "value" : "Top cassette made of chromium dioxide as the material"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette de alta gama hecho de dióxido de cromo como material"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -379,6 +583,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이산화크롬을 소재로 한 고급 마그네틱 테이프"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fita de alta qualidade feita de dióxido de cromo como material"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Высококачественная кассета из диоксида хрома"
           }
         },
         "zh-Hant-TW" : {
@@ -397,6 +613,12 @@
             "value" : "Only %@  /day"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo %@ /día"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -407,6 +629,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@/일"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apenas %@ /dia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всего %@ /день"
           }
         },
         "zh-Hant-TW" : {
@@ -425,6 +659,12 @@
             "value" : "Low"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bajo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -435,6 +675,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "낮음"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baixo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Низкий"
           }
         },
         "zh-Hant-TW" : {
@@ -453,6 +705,12 @@
             "value" : "Flutter"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fluctuación"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -463,6 +721,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "저주파 지터"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutuação"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Детонация"
           }
         },
         "zh-Hant-TW" : {
@@ -481,6 +751,12 @@
             "value" : "In use"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En uso"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -491,6 +767,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용 중"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em uso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Используется"
           }
         },
         "zh-Hant-TW" : {
@@ -509,6 +797,12 @@
             "value" : "Terms for usage"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Términos de uso"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -519,6 +813,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이용 약관"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termos de uso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Условия использования"
           }
         },
         "zh-Hant-TW" : {
@@ -537,6 +843,12 @@
             "value" : "Keep the screen from locking at all times"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener la pantalla sin bloquear en todo momento"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -547,6 +859,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "항상 화면 잠금 해제 상태 유지"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter a tela sempre sem bloqueio"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всегда держать экран разблокированным"
           }
         },
         "zh-Hant-TW" : {
@@ -565,6 +889,12 @@
             "value" : "Allow access to your Apple Music to view albums and playlists"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir el acceso a tu Apple Music para ver álbumes y listas de reproducción"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -575,6 +905,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "앨범 및 재생목록을 보기 위해 Apple 음악에 대한 접근 허용하기"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir o acesso ao seu Apple Music para ver álbuns e listas de reprodução"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешить доступ к Apple Music для просмотра альбомов и плейлистов"
           }
         },
         "zh-Hant-TW" : {
@@ -593,6 +935,12 @@
             "value" : "Free"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -603,6 +951,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "프리웨어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grátis"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бесплатно"
           }
         },
         "zh-Hant-TW" : {
@@ -621,6 +981,12 @@
             "value" : "About Developer"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca del desarrollador"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -631,6 +997,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "저자 소개"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre o desenvolvedor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О разработчике"
           }
         },
         "zh-Hant-TW" : {
@@ -649,6 +1027,12 @@
             "value" : "Other"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otros"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -659,6 +1043,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "나머지"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outros"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другое"
           }
         },
         "zh-Hant-TW" : {
@@ -677,6 +1073,12 @@
             "value" : "Last updated on %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última actualización el %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -687,6 +1089,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "마지막 업데이트 날짜 %@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última atualização em %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последнее обновление %@"
           }
         },
         "zh-Hant-TW" : {
@@ -705,6 +1119,12 @@
             "value" : "Failed to load media library: %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al cargar la biblioteca de medios: %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -715,6 +1135,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "미디어 라이브러리를 로드하지 못했습니다：%@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falha ao carregar a biblioteca de mídia: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить медиатеку: %@"
           }
         },
         "zh-Hant-TW" : {
@@ -733,6 +1165,12 @@
             "value" : "Upgrade to PRO membership to access all advanced features"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiza a la membresía PRO para acceder a todas las funciones avanzadas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -743,6 +1181,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모든 프리미엄 기능을 이용하려면 PRO 멤버십을 업그레이드하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualize para a assinatura PRO para acessar todas as funcionalidades avançadas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновите до PRO подписки для доступа ко всем расширенным функциям"
           }
         },
         "zh-Hant-TW" : {
@@ -761,6 +1211,12 @@
             "value" : "Upgrade to access all advanced features"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiza para acceder a todas las funciones avanzadas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -771,6 +1227,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모든 고급 기능을 사용하려면 업그레이드하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualize para acessar todas as funcionalidades avançadas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновите для доступа ко всем расширенным функциям"
           }
         },
         "zh-Hant-TW" : {
@@ -789,6 +1257,12 @@
             "value" : "Canon brand cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproductor de cassette marca Canon"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -799,6 +1273,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "캐논 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprodutor de fita cassete da marca Canon"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассетный плеер марки Canon"
           }
         },
         "zh-Hant-TW" : {
@@ -817,6 +1303,12 @@
             "value" : "Published on %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publicado el %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -827,6 +1319,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "에 게시됨 %@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publicado em %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Опубликовано %@"
           }
         },
         "zh-Hant-TW" : {
@@ -845,6 +1349,12 @@
             "value" : "Product Type"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de producto"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -855,6 +1365,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "제품 유형"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de produto"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип продукта"
           }
         },
         "zh-Hant-TW" : {
@@ -873,6 +1395,12 @@
             "value" : "Store"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienda"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -883,6 +1411,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "스토어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loja"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Магазин"
           }
         },
         "zh-Hant-TW" : {
@@ -901,6 +1441,12 @@
             "value" : "Animal brand cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproductor de cassette marca Animal"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -911,6 +1457,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "국보급 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprodutor de fita cassete marca Animal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассетный плеер марки Animal"
           }
         },
         "zh-Hant-TW" : {
@@ -929,6 +1487,12 @@
             "value" : "Add feedback to simulate the physical operation sensation"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir retroalimentación para simular la sensación de operación física"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -939,6 +1503,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "피드백을 추가하여 물리적 조작의 느낌을 시뮬레이션하기"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar feedback para simular a sensação de operação física"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить обратную связь для имитации ощущения физической операции"
           }
         },
         "zh-Hant-TW" : {
@@ -957,6 +1533,12 @@
             "value" : "Library"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -967,6 +1549,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "미디어 라이브러리"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Библиотека"
           }
         },
         "zh-Hant-TW" : {
@@ -985,6 +1579,12 @@
             "value" : "Media Type"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de media"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -995,6 +1595,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "미디어 유형"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo de mídia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип медиа"
           }
         },
         "zh-Hant-TW" : {
@@ -1013,6 +1625,12 @@
             "value" : "Dear Permanent PRO Member"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimado miembro PRO permanente"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1023,6 +1641,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "권위 있는 영구 PRO 멤버십"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caro membro PRO permanente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дорогой постоянный PRO участник"
           }
         },
         "zh-Hant-TW" : {
@@ -1041,6 +1671,12 @@
             "value" : "RedNote"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1048,6 +1684,18 @@
           }
         },
         "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "RedNote"
@@ -1069,6 +1717,12 @@
             "value" : "Screen always on"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pantalla siempre encendida"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1079,6 +1733,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "화면은 항상 켜져 있습니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tela sempre ligada"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экран всегда включен"
           }
         },
         "zh-Hant-TW" : {
@@ -1097,6 +1763,12 @@
             "value" : "Copied"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiado"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1107,6 +1779,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "복제"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировано"
           }
         },
         "zh-Hant-TW" : {
@@ -1125,6 +1809,12 @@
             "value" : "Yearly PRO"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO anual"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1135,6 +1825,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연간 PRO"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO anual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Годовой PRO"
           }
         },
         "zh-Hant-TW" : {
@@ -1153,6 +1855,12 @@
             "value" : "Noise"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruido"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1163,6 +1871,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "바닥 소음"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruído"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шум"
           }
         },
         "zh-Hant-TW" : {
@@ -1181,6 +1901,12 @@
             "value" : "Start 3 days free trial"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar prueba gratuita de 3 días"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1191,6 +1917,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "3 일 무료 평가판 시작"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar teste gratuito de 3 dias"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начать 3-дневную бесплатную пробную версию"
           }
         },
         "zh-Hant-TW" : {
@@ -1209,6 +1947,12 @@
             "value" : "Start 7 days free trial"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar prueba gratuita de 7 días"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1219,6 +1963,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "7 일 무료 평가판 시작"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar teste gratuito de 7 dias"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начать 7-дневную бесплатную пробную версию"
           }
         },
         "zh-Hant-TW" : {
@@ -1237,6 +1993,12 @@
             "value" : "Strength"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intensidad"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1247,6 +2009,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "해리"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intensidade"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сила"
           }
         },
         "zh-Hant-TW" : {
@@ -1265,6 +2039,12 @@
             "value" : "Rainbow Stripe Tape"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cinta de rayas arcoíris"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1275,6 +2055,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무지개색 카세트 테이프"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fita de listras arco-íris"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассета с радужными полосками"
           }
         },
         "zh-Hant-TW" : {
@@ -1293,6 +2085,12 @@
             "value" : "WeChat"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1300,6 +2098,18 @@
           }
         },
         "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "WeChat"
@@ -1321,6 +2131,12 @@
             "value" : "Nostalgia"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nostalgia"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1331,6 +2147,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "노스탤지어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nostalgia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ностальгия"
           }
         },
         "zh-Hant-TW" : {
@@ -1349,6 +2177,12 @@
             "value" : "Restore Purchase"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar compra"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1359,6 +2193,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매 재개"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar compra"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановить покупку"
           }
         },
         "zh-Hant-TW" : {
@@ -1377,6 +2223,12 @@
             "value" : "Your media library is empty"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu biblioteca de medios está vacía"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1387,6 +2239,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "미디어 라이브러리가 비어 있습니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua biblioteca de mídia está vazia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваша медиатека пуста"
           }
         },
         "zh-Hant-TW" : {
@@ -1405,6 +2269,12 @@
             "value" : "Feedback"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarios"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1415,6 +2285,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "피드백"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentários"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отзыв"
           }
         },
         "zh-Hant-TW" : {
@@ -1433,6 +2315,12 @@
             "value" : "Succeed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éxito"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1443,6 +2331,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "성공 사례"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucesso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Успех"
           }
         },
         "zh-Hant-TW" : {
@@ -1461,6 +2361,12 @@
             "value" : "Successfully restored %1$lld purchase items: %2$@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se restauraron exitosamente %1$lld elementos de compra: %2$@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1471,6 +2377,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매 %lld 건 복구 성공："
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurados com sucesso %1$lld itens de compra: %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Успешно восстановлено %1$lld покупок: %2$@"
           }
         },
         "zh-Hant-TW" : {
@@ -1489,6 +2407,12 @@
             "value" : "Open Apple Music"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Apple Music"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1499,6 +2423,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple 음악 열기"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Apple Music"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть Apple Music"
           }
         },
         "zh-Hant-TW" : {
@@ -1517,6 +2453,12 @@
             "value" : "Recommend to your friends"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendar a tus amigos"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1527,6 +2469,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "친구에게 앱 추천하기"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendar para seus amigos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рекомендовать друзьям"
           }
         },
         "zh-Hant-TW" : {
@@ -1545,6 +2499,12 @@
             "value" : "TikTok"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1552,6 +2512,18 @@
           }
         },
         "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "TikTok"
@@ -1573,6 +2545,12 @@
             "value" : "Continuous appreciation of the beauty of mechanical rotation"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apreciación continua de la belleza de la rotación mecánica"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1583,6 +2561,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "기계 회전의 아름다움에 대한 지속적인 감상"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apreciação contínua da beleza da rotação mecânica"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Постоянное восхищение красотой механического вращения"
           }
         },
         "zh-Hant-TW" : {
@@ -1601,6 +2591,12 @@
             "value" : "Authorized"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorizado"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1611,6 +2607,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "인증된 액세스"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorizado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Авторизовано"
           }
         },
         "zh-Hant-TW" : {
@@ -1629,6 +2637,12 @@
             "value" : "Reminder"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recordatorio"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1639,6 +2653,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "주목하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembrete"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напоминание"
           }
         },
         "zh-Hant-TW" : {
@@ -1657,6 +2683,12 @@
             "value" : "Play"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1667,6 +2699,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "플레이 가능"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduzir"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Воспроизвести"
           }
         },
         "zh-Hant-TW" : {
@@ -1685,6 +2729,12 @@
             "value" : "Player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproductor"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1695,6 +2745,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprodutor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Плеер"
           }
         },
         "zh-Hant-TW" : {
@@ -1713,6 +2775,12 @@
             "value" : "Play queue"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cola de reproducción"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1723,6 +2791,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "재생 대기열"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fila de reprodução"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очередь воспроизведения"
           }
         },
         "zh-Hant-TW" : {
@@ -1741,6 +2821,12 @@
             "value" : "Play queue is empty"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cola de reproducción está vacía"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1751,6 +2837,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "재생 대기열 비어 있음"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A fila de reprodução está vazia"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очередь воспроизведения пуста"
           }
         },
         "zh-Hant-TW" : {
@@ -1769,6 +2867,12 @@
             "value" : "Support us"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apóyanos"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1779,6 +2883,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "지원"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apoie-nos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поддержите нас"
           }
         },
         "zh-Hant-TW" : {
@@ -1797,6 +2913,12 @@
             "value" : "The product information cannot be found"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede encontrar la información del producto"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1807,6 +2929,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이 제품에 대한 정보를 찾을 수 없습니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível encontrar as informações do produto"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Информация о продукте не найдена"
           }
         },
         "zh-Hant-TW" : {
@@ -1825,6 +2959,12 @@
             "value" : "Unlimited use of all players and cassettes"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uso ilimitado de todos los reproductores y cassettes"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1835,6 +2975,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모든 플레이어 및 테이프 무제한 사용"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uso ilimitado de todos os reprodutores e fitas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неограниченное использование всех плееров и кассет"
           }
         },
         "zh-Hant-TW" : {
@@ -1853,6 +3005,12 @@
             "value" : "Japanese"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japonés"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1863,6 +3021,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "일본어(언어)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japonês"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Японский"
           }
         },
         "zh-Hant-TW" : {
@@ -1881,6 +3051,12 @@
             "value" : "Special Offer"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta especial"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1891,6 +3067,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "얼리버드 스페셜"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta especial"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Специальное предложение"
           }
         },
         "zh-Hant-TW" : {
@@ -1909,6 +3097,12 @@
             "value" : "No price available"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay precio disponible"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1919,6 +3113,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "가격 없음"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem preço disponível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цена недоступна"
           }
         },
         "zh-Hant-TW" : {
@@ -1937,6 +3143,12 @@
             "value" : "Monthly PRO"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO mensual"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1947,6 +3159,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "월간 PRO"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO mensal"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Месячный PRO"
           }
         },
         "zh-Hant-TW" : {
@@ -1965,6 +3189,12 @@
             "value" : "Unplayed songs"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canciones no reproducidas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1975,6 +3205,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "재생된 노래 없음"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Músicas não reproduzidas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не воспроизведенные песни"
           }
         },
         "zh-Hant-TW" : {
@@ -1993,6 +3235,12 @@
             "value" : "Future update"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización futura"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2003,6 +3251,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "향후 업데이트"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualização futura"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будущие обновления"
           }
         },
         "zh-Hant-TW" : {
@@ -2021,6 +3281,12 @@
             "value" : "Localization (special thanks)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localización (agradecimiento especial)"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2030,13 +3296,71 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "현지화(특별 감사)"
+            "value" : "현지화(特別 감사)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localização (agradecimento especial)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Локализация (особая благодарность)"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "本地化（特別感謝）"
+          }
+        }
+      }
+    },
+    "极具性价比的入门磁带播放器" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An extremely cost-effective entry-level cassette player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un reproductor de casetes básico muy rentable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "極めてコストパフォーマンスの高いエントリー・レベルのカセット・プレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "매우 경제적인 보급형 카세트 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um leitor de cassetes básico muito económico"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очень экономичный кассетный плеер начального уровня"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "極具成本效益的入門級錄音帶播放器"
           }
         }
       }
@@ -2049,6 +3373,12 @@
             "value" : "Standard"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estándar"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2059,6 +3389,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "표준"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Padrão"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стандарт"
           }
         },
         "zh-Hant-TW" : {
@@ -2077,6 +3419,12 @@
             "value" : "Colorable cassette with labels"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casete coloreable con etiquetas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2087,6 +3435,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "쓰기 가능한 라벨이 있는 컬러 테이프"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassete para colorir com etiquetas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цветная кассета с записываемыми этикетками"
           }
         },
         "zh-Hant-TW" : {
@@ -2105,6 +3465,12 @@
             "value" : "Simulate physical feedbak"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simular el feedbak físico"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2115,6 +3481,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "물리적 조작을 모방한 대화형 피드백"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simular o feedbak físico"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имитация физической обратной связи"
           }
         },
         "zh-Hant-TW" : {
@@ -2133,6 +3511,12 @@
             "value" : "Simulate the sound effect of real cassette"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simula el efecto de sonido de un casete real"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2143,6 +3527,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "실제 테이프 사운드 시뮬레이션"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simula o efeito sonoro de uma cassete real"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имитация звука реальной кассеты"
           }
         },
         "zh-Hant-TW" : {
@@ -2161,6 +3557,12 @@
             "value" : "Simulate noise and flutter effects"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulación de ruido y efectos de aleteo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2171,6 +3573,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "아날로그 테이프 노이즈 플로어 및 저주파 지터"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulação de efeitos de ruído e vibração"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имитация шумов и детонации кассеты"
           }
         },
         "zh-Hant-TW" : {
@@ -2189,6 +3603,12 @@
             "value" : "Playlist"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de reproducción"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2199,6 +3619,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "노래 목록"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de reprodução"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Плейлист"
           }
         },
         "zh-Hant-TW" : {
@@ -2217,6 +3649,12 @@
             "value" : "Loading…"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando..."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2227,6 +3665,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "로드 중..."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregando..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка..."
           }
         },
         "zh-Hant-TW" : {
@@ -2245,6 +3695,12 @@
             "value" : "Lifetime PRO"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime PRO"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2255,6 +3711,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "영구 PRO"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vida útil PRO"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожизненный PRO"
           }
         },
         "zh-Hant-TW" : {
@@ -2273,6 +3741,12 @@
             "value" : "No purchase items that can be restored were found"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han encontrado artículos de compra que puedan restaurarse"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2283,6 +3757,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "복구 가능한 구매를 찾을 수 없습니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foram encontrados itens de compra que possam ser restaurados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не найдены покупки, которые можно восстановить"
           }
         },
         "zh-Hant-TW" : {
@@ -2301,6 +3787,12 @@
             "value" : "A Demo cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un reproductor de casetes Demo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2311,6 +3803,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "데모 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um leitor de cassetes Demo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Демонстрационный кассетный плеер"
           }
         },
         "zh-Hant-TW" : {
@@ -2329,6 +3833,12 @@
             "value" : "Click here to select music"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haga clic aquí para seleccionar música"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2339,6 +3849,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "클릭해서 음악을 선택하다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clique aqui para selecionar a música"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите здесь, чтобы выбрать музыку"
           }
         },
         "zh-Hant-TW" : {
@@ -2357,6 +3879,12 @@
             "value" : "Version %1$@ (%2$@)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión %@ (%@)"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2367,6 +3895,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "버전 %@ (%@)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versão %@ (%@)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия %1$@ (%2$@)"
           }
         },
         "zh-Hant-TW" : {
@@ -2382,7 +3922,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An affordable and high-quality tape player"
+            "value" : "An affordable and high-quality cassette player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un reproductor de casetes asequible y de alta calidad"
           }
         },
         "ja" : {
@@ -2395,6 +3941,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "저렴한 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um leitor de cassetes acessível e de alta qualidade"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступный и качественный кассетный плеер"
           }
         },
         "zh-Hant-TW" : {
@@ -2413,6 +3971,12 @@
             "value" : "Featured Functions"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciones destacadas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2423,6 +3987,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "주요 기능"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destaques das funções"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Особенности"
           }
         },
         "zh-Hant-TW" : {
@@ -2441,6 +4017,12 @@
             "value" : "Now sign up for Apple Music and enjoy up to 3 months of free trial"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regístrate ahora en Apple Music y disfruta de hasta 3 meses de prueba gratis"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2451,6 +4033,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "지금 Apple 음악에 가입하고 최대 3개월 무료 체험을 이용하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscreva-se agora no Apple Music e obtenha até 3 meses de avaliação gratuita."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарегистрируйтесь в Apple Music и получите до 3 месяцев бесплатного пробного периода"
           }
         },
         "zh-Hant-TW" : {
@@ -2469,6 +4063,12 @@
             "value" : "Crackle"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crackle"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2479,6 +4079,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "결함이 있는 노이즈"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crackle"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрескивание"
           }
         },
         "zh-Hant-TW" : {
@@ -2497,6 +4109,12 @@
             "value" : "The top cassette with a white ceramic casing"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cinta de alta gama con carcasa de cerámica blanca"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2507,6 +4125,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "화이트 세라믹 케이스의 최고급 테이프"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A fita de alta qualidade com caixa de cerâmica branca"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Топовая кассета с белым керамическим корпусом"
           }
         },
         "zh-Hant-TW" : {
@@ -2525,6 +4155,12 @@
             "value" : "Abnormal skin data"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos de piel anormales"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2535,6 +4171,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "피부 데이터 이상"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dados de pele anormais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аномальные данные скина"
           }
         },
         "zh-Hant-TW" : {
@@ -2553,6 +4201,12 @@
             "value" : "OK"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2563,6 +4217,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "정의"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
           }
         },
         "zh-Hant-TW" : {
@@ -2581,6 +4247,12 @@
             "value" : "After confirming the purchase, the payment will be made through your Apple account. The PRO membership subscription will be automatically renewed by default. Unless you go to \"Settings - Apple Account - Subscriptions\" at least 24 hours before the current subscription ends to turn off the automatic renewal, your Apple account will be charged for the renewal fee 24 hours before the end of the current subscription. During the trial period of the PRO membership, if you do not manually turn off the automatic renewal, the subscription will be automatically activated and the fee will be deducted at the end of the trial period. The free trial opportunity is only available for one trial per user before the first subscription. The remaining free trial period (if any) after purchasing the subscription will automatically expire."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una vez confirmada la compra, el pago se realizará a través de su cuenta de Apple. La suscripción de membresía PRO se renovará automáticamente por defecto. A menos que vaya a \\\"Configuración - Cuenta de Apple - Suscripciones\\\" al menos 24 horas antes de que finalice la suscripción actual para desactivar la renovación automática, su cuenta de Apple se cobrará la tarifa de renovación 24 horas antes del final de la suscripción actual. Durante el período de prueba de la membresía PRO, si no desactiva manualmente la renovación automática, la suscripción se activará automáticamente y se deducirá la tarifa al final del período de prueba. La oportunidad de prueba gratuita solo está disponible para una prueba por usuario antes de la primera suscripción. El período de prueba gratuito restante (si corresponde) después de comprar la suscripción caducará automáticamente."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2590,7 +4262,19 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "구매가 확인되면 Apple 계정을 통해 요금이 청구됩니다. PRO 멤버십 구독은 기본적으로 자동 갱신되며, 현재 구독이 종료되기 최소 24시간 전에 설정 - Apple 계정 - 구독으로 이동하여 자동 갱신을 해제하지 않는 한 현재 구독이 종료된 후 24시간 이내에 Apple 계정으로 갱신 요금이 청구됩니다. 평가판 PRO 멤버십 기간 동안 자동 갱신을 수동으로 해제하지 않으면 평가판 기간이 종료될 때 구독이 자동으로 활성화되고 요금이 청구됩니다. 무료 평가판 기회는 첫 번째 구독 전에 사용자당 한 번만 사용할 수 있으며, 남은 무료 평가판 기간(있는 경우)은 구독을 구매한 후 자동으로 만료됩니다."
+            "value" : "구매가 확인되면 Apple 계정을 통해 요금이 청구됩니다. PRO 멤버십 구독은 기본적으로 자동 갱신되며, 현재 구독이 종료된 후 24시간 이내에 Apple 계정으로 갱신 요금이 청구됩니다. 평가판 PRO 멤버십 기간 동안 자동 갱신을 수동으로 해제하지 않으면 평가판 기간이 종료될 때 구독이 자동으로 활성화되고 요금이 청구됩니다. 무료 평가판 기회는 첫 번째 구독 전에 사용자당 한 번만 사용할 수 있으며, 남은 무료 평가판 기간(있는 경우)은 구독을 구매한 후 자동으로 만료됩니다."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Após confirmar a compra, o pagamento será feito por meio da sua conta Apple. A assinatura de membros PRO será renovada automaticamente por padrão. A menos que vá para \\\"Configurações - Conta Apple - Assinaturas\\\" pelo menos 24 horas antes do fim da assinatura atual para desativar a renovação automática, sua conta Apple será cobrada a taxa de renovação 24 horas antes do fim da assinatura atual. Durante o período de teste da assinatura PRO, se você não desativar manualmente a renovação automática, a assinatura será ativada automaticamente e a taxa será deduzida no final do período de teste. A oportunidade de teste gratuito está disponível apenas uma vez por usuário antes da primeira assinatura. O período de teste gratuito restante (se houver) após comprar a assinatura expirará automaticamente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "После подтверждения покупки оплата будет произведена через вашу учетную запись Apple. Подписка на членство PRO будет автоматически продлена по умолчанию. Если вы не перейдете в «Настройки - Учетная запись Apple - Подписки» не менее чем за 24 часа до окончания текущей подписки, чтобы отменить автоматическое продление, ваша учетная запись Apple будет обложена платой за продление за 24 часа до окончания текущей подписки. Во время пробного периода членства PRO, если вы не отмените автоматическое продление вручную, подписка будет автоматически активирована, и плата будет вычтена в конце пробного периода. Возможность бесплатной пробной версии доступна только один раз для каждого пользователя до первой подписки. Остальной пробный период (если таковой имеется) после покупки подписки истечет автоматически."
           }
         },
         "zh-Hant-TW" : {
@@ -2609,6 +4293,12 @@
             "value" : "Cassette"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2619,6 +4309,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "마그네틱 테이프"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fita cassete"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассета"
           }
         },
         "zh-Hant-TW" : {
@@ -2637,6 +4339,12 @@
             "value" : "Friction"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fricción"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2647,6 +4355,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "테이프 긁기"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrito"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Трение"
           }
         },
         "zh-Hant-TW" : {
@@ -2665,6 +4385,12 @@
             "value" : "The King of Cassette Players"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El rey de las grabadoras de casete"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2675,6 +4401,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "테이프 플레이어의 왕"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O rei dos toca-fitas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Король кассетных плееров"
           }
         },
         "zh-Hant-TW" : {
@@ -2693,6 +4431,12 @@
             "value" : "Cassette sound effect"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Efecto de sonido de casete"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2703,6 +4447,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "테이프 사운드"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Efeito de som de fita cassete"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Звуковой эффект кассеты"
           }
         },
         "zh-Hant-TW" : {
@@ -2721,6 +4477,12 @@
             "value" : "Try it Now"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba ahora"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2731,6 +4493,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "지금 체험하기"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tente agora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробовать сейчас"
           }
         },
         "zh-Hant-TW" : {
@@ -2749,6 +4523,12 @@
             "value" : "Upgrade Now"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar ahora"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2759,6 +4539,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "지금 업그레이드"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualize agora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить сейчас"
           }
         },
         "zh-Hant-TW" : {
@@ -2777,6 +4569,12 @@
             "value" : "Lifetime All Functions and Themes"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las funciones y temas de por vida"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2787,6 +4585,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모든 기능 및 테마에 평생 액세스"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as funcionalidades e temas vitalícios"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожизненный доступ ко всем функциям и темам"
           }
         },
         "zh-Hant-TW" : {
@@ -2805,6 +4615,12 @@
             "value" : "Classic anime cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproductor de cassette de anime clásico"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2815,6 +4631,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "고전 애니메이션의 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprodutor de fita cassete de anime clássico"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Классический аниме-магнитофон"
           }
         },
         "zh-Hant-TW" : {
@@ -2833,6 +4661,12 @@
             "value" : "Give us a five-star rating"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danos una calificación de cinco estrellas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2843,6 +4677,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "별 다섯 개를 주세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dê-nos uma classificação de cinco estrelas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оцените нас на 5 звезд"
           }
         },
         "zh-Hant-TW" : {
@@ -2861,6 +4707,12 @@
             "value" : "Next"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2871,6 +4723,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다음으로 진행"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Próximo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продолжить"
           }
         },
         "zh-Hant-TW" : {
@@ -2889,6 +4753,12 @@
             "value" : "Traditional Chinese (Taiwan)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chino tradicional (Taiwán)"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2899,6 +4769,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "중국어 번체(대만)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinês tradicional (Taiwan)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Традиционный китайский (Тайвань)"
           }
         },
         "zh-Hant-TW" : {
@@ -2917,6 +4799,12 @@
             "value" : "Website"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitio web"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2927,6 +4815,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "노드"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Site"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Веб-сайт"
           }
         },
         "zh-Hant-TW" : {
@@ -2945,6 +4845,12 @@
             "value" : "Contact information"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información de contacto"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2955,6 +4861,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연락처 세부 정보"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informações de contato"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Контактная информация"
           }
         },
         "zh-Hant-TW" : {
@@ -2973,6 +4891,12 @@
             "value" : "A time-traveling cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un reproductor de cassette que viaja en el tiempo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2983,6 +4907,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "시간 여행이 가능한 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um leitor de cassetes que viaja no tempo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассетный плеер, способный путешествовать во времени"
           }
         },
         "zh-Hant-TW" : {
@@ -3001,6 +4937,12 @@
             "value" : "Unlock all skins"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquea todas las apariencias"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3011,6 +4953,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모든 스킨 잠금 해제"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear todas as aparências"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разблокировать все скины"
           }
         },
         "zh-Hant-TW" : {
@@ -3029,6 +4983,12 @@
             "value" : "Haptic feedback"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta táctil"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3039,6 +4999,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "햅틱 피드백"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resposta tátil"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тактильная обратная связь"
           }
         },
         "zh-Hant-TW" : {
@@ -3057,6 +5029,12 @@
             "value" : "Setting"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3067,6 +5045,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuração"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка"
           }
         },
         "zh-Hant-TW" : {
@@ -3085,6 +5075,12 @@
             "value" : "Language"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3095,6 +5091,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "언어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Língua"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Язык"
           }
         },
         "zh-Hant-TW" : {
@@ -3113,6 +5121,12 @@
             "value" : "Add an album or playlist to Apple Music first"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir acceso a tu Apple Music para ver álbumes y listas de reproducción"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3123,6 +5137,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "먼저 Apple 음악에 앨범 또는 재생목록을 추가합니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir acesso ao seu Apple Music para ver álbuns e listas de reprodução"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала добавьте альбом или плейлист в Apple Music"
           }
         },
         "zh-Hant-TW" : {
@@ -3141,6 +5167,12 @@
             "value" : "Please try again or check your network connection"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, inténtelo de nuevo o compruebe su conexión de red"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3151,6 +5183,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다시 시도하거나 네트워크 연결을 확인하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tente novamente ou verifique a sua ligação de rede"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз или проверьте ваше сетевое подключение"
           }
         },
         "zh-Hant-TW" : {
@@ -3169,6 +5213,12 @@
             "value" : "Adjust the audio effect"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajusta el efecto de audio"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3179,6 +5229,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사운드 매개변수 조정"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajusta o efeito de áudio"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка аудиоэффектов"
           }
         },
         "zh-Hant-TW" : {
@@ -3197,6 +5259,12 @@
             "value" : "Purchase failed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra fallida"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3207,6 +5275,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매 실패"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra falhada"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка не удалась"
           }
         },
         "zh-Hant-TW" : {
@@ -3222,7 +5302,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Purchase failed. Unknown error"
+            "value" : "Purchase failed, Unknown error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra fallida, error desconocido"
           }
         },
         "ja" : {
@@ -3235,6 +5321,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매 실패, 알 수 없는 오류"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A compra falhou, erro desconhecido"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка не удалась. Неизвестная ошибка"
           }
         },
         "zh-Hant-TW" : {
@@ -3253,6 +5351,12 @@
             "value" : "Purchase failed: %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error en la compra: %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3263,6 +5367,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매 실패：%@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro na compra: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка не удалась: %@"
           }
         },
         "zh-Hant-TW" : {
@@ -3281,6 +5397,12 @@
             "value" : "Purchase successful! Content has been unlocked for you"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Compra realizada! El contenido ha sido desbloqueado para ti"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3291,6 +5413,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매에 성공했습니다! 잠금 해제된 콘텐츠"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A sua compra está concluída! O conteúdo foi desbloqueado para si"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка успешна! Содержимое разблокировано для вас"
           }
         },
         "zh-Hant-TW" : {
@@ -3306,7 +5440,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Purchase is in progress. Please check back later"
+            "value" : "Purchase is in progress, Please check back later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La compra está en curso, por favor vuelva más tarde"
           }
         },
         "ja" : {
@@ -3319,6 +5459,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매가 처리 중입니다, 나중에 다시 확인해 주세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A compra está em curso, por favor volte mais tarde."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка обрабатывается. Пожалуйста, проверьте позже"
           }
         },
         "zh-Hant-TW" : {
@@ -3334,7 +5486,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Purchase verification failed. Please try again later"
+            "value" : "Purchase verification failed, Please try again later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error en la verificación de la compra, inténtelo de nuevo más tarde"
           }
         },
         "ja" : {
@@ -3347,6 +5505,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "구매 인증에 실패했습니다, 나중에 다시 시도하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro ao verificar a compra, tente novamente mais tarde"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка покупки не удалась. Пожалуйста, попробуйте еще раз позже"
           }
         },
         "zh-Hant-TW" : {
@@ -3365,6 +5535,12 @@
             "value" : "Light"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "leve"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3375,6 +5551,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "빛"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligeiro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слабый"
           }
         },
         "zh-Hant-TW" : {
@@ -3393,6 +5581,12 @@
             "value" : "Select"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3403,6 +5597,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "옵션"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать"
           }
         },
         "zh-Hant-TW" : {
@@ -3421,6 +5627,12 @@
             "value" : "Transparent demo cassette"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casete de demostración transparente"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3431,6 +5643,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "투명 데모 테이프"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassete de demonstração transparente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прозрачная демонстрационная кассета"
           }
         },
         "zh-Hant-TW" : {
@@ -3449,6 +5673,12 @@
             "value" : "General"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3459,6 +5689,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "일반"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geral"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Общий"
           }
         },
         "zh-Hant-TW" : {
@@ -3477,6 +5719,12 @@
             "value" : "E-mail"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3487,6 +5735,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이메일"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correio eletrónico"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Электронная почта"
           }
         },
         "zh-Hant-TW" : {
@@ -3505,6 +5765,12 @@
             "value" : "Heavy"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serio"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3515,6 +5781,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무거운"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sério"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тяжелый"
           }
         },
         "zh-Hant-TW" : {
@@ -3533,6 +5811,12 @@
             "value" : "Try again"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3543,6 +5827,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다시 시도"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentar novamente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробовать еще раз"
           }
         },
         "zh-Hant-TW" : {
@@ -3561,6 +5857,12 @@
             "value" : "The queue will be displayed while the music is playing"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cola se mostrará mientras suena la música"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3571,6 +5873,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "음악이 재생되는 동안 대기열이 표시됩니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A fila de espera é apresentada enquanto a música está a ser reproduzida"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очередь будет отображаться во время воспроизведения музыки"
           }
         },
         "zh-Hant-TW" : {
@@ -3589,6 +5903,12 @@
             "value" : "Limited-time 50% off"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50% de descuento por tiempo limitado"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3599,6 +5919,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "기간 한정 50% 할인"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50% de desconto por tempo limitado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ограниченное время 50% скидка"
           }
         },
         "zh-Hant-TW" : {
@@ -3617,6 +5949,12 @@
             "value" : "Privacy policy"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de privacidad"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3627,6 +5965,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "개인정보 보호정책"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de privacidade"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Политика конфиденциальности"
           }
         },
         "zh-Hant-TW" : {
@@ -3645,6 +5995,12 @@
             "value" : "Shuffle play"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción aleatoria"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3655,6 +6011,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무작위 재생"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprodução aleatória"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случайное воспроизведение"
           }
         },
         "zh-Hant-TW" : {
@@ -3673,6 +6041,12 @@
             "value" : "Requires an Apple Music subscription to use"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requiere una suscripción a Apple Music para su uso"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3683,6 +6057,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용하려면 Apple 음악 구독이 필요합니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requer uma subscrição do Apple Music para ser utilizado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется подписка на Apple Music для использования"
           }
         },
         "zh-Hant-TW" : {
@@ -3701,6 +6087,12 @@
             "value" : "You need authorization to access your music library"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesitas autorización para acceder a tu biblioteca musical"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3711,6 +6103,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "미디어 라이브러리에 액세스하려면 권한이 필요합니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precisa de autorização para aceder à sua biblioteca de música"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вам требуется авторизация для доступа к вашей медиатеке"
           }
         },
         "zh-Hant-TW" : {
@@ -3729,6 +6133,12 @@
             "value" : "Sound effect volume"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volumen del efecto de sonido"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3739,6 +6149,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사운드 볼륨"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume do efeito sonoro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Громкость звука"
           }
         },
         "zh-Hant-TW" : {
@@ -3757,6 +6179,12 @@
             "value" : "Sound effect preset"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preajuste del efecto de sonido"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3767,6 +6195,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사운드 사전 설정"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predefinição de efeitos sonoros"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предустановка звукового эффекта"
           }
         },
         "zh-Hant-TW" : {
@@ -3785,6 +6225,12 @@
             "value" : "Volume"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volumen"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3795,6 +6241,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "음량"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Громкость"
           }
         },
         "zh-Hant-TW" : {
@@ -3813,6 +6271,12 @@
             "value" : "Frequency"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frecuencia"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3823,6 +6287,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "빈도"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequência"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Частота"
           }
         },
         "zh-Hant-TW" : {
@@ -3841,6 +6317,12 @@
             "value" : "Fly brand cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproductor de casetes marca Fly"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3851,6 +6333,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "플라잉 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leitor de cassetes Fly"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассетный плеер марки Fly"
           }
         },
         "zh-Hant-TW" : {
@@ -3869,6 +6363,12 @@
             "value" : "The first portable cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El primer reproductor de casetes portátil"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3879,6 +6379,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "최초의 휴대용 카세트 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O primeiro leitor de cassetes portátil"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Первый портативный кассетный плеер"
           }
         },
         "zh-Hant-TW" : {
@@ -3897,6 +6409,12 @@
             "value" : "The first fully transparent cassette player"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El primer reproductor de casetes totalmente transparente"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3907,6 +6425,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "최초의 완전 투명 테이프 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O primeiro leitor de cassetes totalmente transparente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Первый полностью прозрачный кассетный плеер"
           }
         },
         "zh-Hant-TW" : {
@@ -3925,6 +6455,12 @@
             "value" : "High"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alta"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3935,6 +6471,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "높은"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elevado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Высокий"
           }
         },
         "zh-Hant-TW" : {
@@ -3953,6 +6501,12 @@
             "value" : "High-frequency hissing"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silbido de alta frecuencia"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3963,6 +6517,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "고주파 쉿하는 소리"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assobio de alta frequência"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шипение высокой частоты"
           }
         },
         "zh-Hant-TW" : {
