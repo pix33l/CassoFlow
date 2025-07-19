@@ -62,7 +62,6 @@ struct SettingsView: View {
     @EnvironmentObject private var musicService: MusicService
     @StateObject private var storeManager = StoreManager()
 
-    @State private var closeTapped = false
     @State private var showingShareSheet = false
     @State private var showingPaywall = false
     
@@ -286,6 +285,23 @@ struct SettingsView: View {
                         }
                         .foregroundColor(.primary)
                     }
+                    
+                    NavigationLink(destination: CoverStyleSettingsView().environmentObject(musicService)) {
+                        HStack {
+                            Image(systemName: "rectangle.portrait")
+                                .font(.body)
+                                .frame(width: 20)
+                            
+                            Text("封面样式")
+                            
+                            Spacer()
+                            
+                            Text(musicService.currentCoverStyle.displayName)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                            
+                        }
+                    }
                 }
                 
                 // 支持我们
@@ -418,7 +434,6 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        closeTapped.toggle()
                         // 修复：只有会员才能使用触觉反馈
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)

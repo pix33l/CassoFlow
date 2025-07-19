@@ -3,6 +3,39 @@ import Combine
 import Foundation
 import UIKit
 
+// MARK: - 磁带封面样式枚举
+enum CoverStyle: String, CaseIterable {
+    case square = "square"
+    case rectangle = "rectangle"
+    
+    var displayName: String {
+        switch self {
+        case .square:
+            return String(localized: "方形比例")
+        case .rectangle:
+            return String(localized: "矩形比例")
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .square:
+            return String(localized: "更紧凑的方形比例，封面显示更完整")
+        case .rectangle:
+            return String(localized: "经典的磁带盒比例，封面更具真实感")
+        }
+    }
+    
+    var iconName: String {
+        switch self {
+        case .square:
+            return "square"
+        case .rectangle:
+            return "rectangle.portrait"
+        }
+    }
+}
+
 /// 音乐服务类
 class MusicService: ObservableObject {
     static let shared = MusicService()
@@ -49,12 +82,16 @@ class MusicService: ObservableObject {
         }
     }
     
+    // MARK: - 磁带封面样式属性
+    @Published var currentCoverStyle: CoverStyle = .rectangle
+    
     // MARK: - 皮肤存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
     private static let cassetteSkinKey = "SelectedCassetteSkin"
     private static let cassetteEffectKey = "CassetteEffectEnabled"
     private static let hapticFeedbackKey = "HapticFeedbackEnabled"
     private static let screenAlwaysOnKey = "ScreenAlwaysOnEnabled"
+    private static let coverStyleKey = "SelectedCoverStyle"
     
     // 缓存上一次的关键值，只对不需要频繁更新的属性使用
     private var lastTitle: String = ""
@@ -172,6 +209,15 @@ class MusicService: ObservableObject {
         // 应用屏幕常亮设置
         UIApplication.shared.isIdleTimerDisabled = isScreenAlwaysOn
         
+        // 加载磁带封面样式设置
+        let savedCoverStyle = UserDefaults.standard.string(forKey: Self.coverStyleKey)
+        if let styleString = savedCoverStyle,
+           let style = CoverStyle(rawValue: styleString) {
+            currentCoverStyle = style
+        } else {
+            currentCoverStyle = .rectangle // 默认矩形样式
+        }
+        
         // 启动定时器
         startUpdateTimer()
         
@@ -256,6 +302,12 @@ class MusicService: ObservableObject {
     func setScreenAlwaysOn(enabled: Bool) {
         isScreenAlwaysOn = enabled
         UserDefaults.standard.set(enabled, forKey: Self.screenAlwaysOnKey)
+    }
+    
+    /// 设置磁带封面样式
+    func setCoverStyle(_ style: CoverStyle) {
+        currentCoverStyle = style
+        UserDefaults.standard.set(style.rawValue, forKey: Self.coverStyleKey)
     }
 
     private func updateCurrentSongInfo() {

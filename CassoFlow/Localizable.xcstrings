@@ -1617,6 +1617,52 @@
         }
       }
     },
+    "封面样式" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cover Style"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estilo de portada"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カバースタイル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표지 스타일"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estilo da capa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стиль обложки"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "封面樣式"
+          }
+        }
+      }
+    },
     "尊贵的永久 PRO 会员" : {
       "localizations" : {
         "en" : {
@@ -2905,6 +2951,52 @@
         }
       }
     },
+    "方形比例" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Square ratio"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ratio de cuadrado"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正方形比"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사각형 비율"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rácio quadrado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Соотношение площадей"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "方形比率"
+          }
+        }
+      }
+    },
     "无法找到该产品信息" : {
       "localizations" : {
         "en" : {
@@ -3131,6 +3223,98 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暫不提供價格"
+          }
+        }
+      }
+    },
+    "更改封面样式会影响专辑和歌单的封面展示方式" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changing the cover style affects the way album and playlist covers are displayed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar el estilo de la carátula afecta a la forma en que se muestran las carátulas de los álbumes y las listas de reproducción"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カバースタイルを変更すると、アルバムとプレイリストのカバーの表示方法に影響します"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표지 스타일을 변경하면 앨범 및 재생목록 표지가 표시되는 방식에 영향을 미칩니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A alteração do estilo de capa afecta a forma como as capas dos álbuns e das listas de reprodução são apresentadas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменение стиля обложки влияет на способ отображения обложек альбомов и списков воспроизведения"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "變更封面樣式會影響專輯和播放清單封面的顯示方式"
+          }
+        }
+      }
+    },
+    "更紧凑的方形比例，封面显示更完整" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More compact square ratio with fuller cover display"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proporción cuadrada más compacta con una pantalla de cubierta más completa"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よりコンパクトな正方形比率とフルカバーディスプレイ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "더 컴팩트한 정사각형 비율과 더 꽉 찬 커버 디스플레이"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rácio quadrado mais compacto com ecrã de cobertura mais completo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Более компактное соотношение площади и более полная крышка дисплея"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更精巧的方形比例與更完整的封面顯示"
           }
         }
       }
@@ -4193,6 +4377,52 @@
         }
       }
     },
+    "矩形比例" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rectangular ratio"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relación rectangular"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "矩形比"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "직사각형 비율"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rácio retangular"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прямоугольное соотношение"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "矩形比率"
+          }
+        }
+      }
+    },
     "确定" : {
       "localizations" : {
         "en" : {
@@ -4649,6 +4879,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "經典動漫裡的錄音帶播放器"
+          }
+        }
+      }
+    },
+    "经典的磁带盒比例，封面更具真实感" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic cassette packaging ratio with a more authentic feel to the cover"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clásica relación de embalaje de casete con una carátula más auténtica"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クラシックなカセット・パッケージの比率と、よりオーセンティックな雰囲気のジャケット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클래식한 카세트 포장 비율과 더욱 사실적인 느낌의 표지 디자인"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relação clássica da embalagem da cassete com um toque mais autêntico na capa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Классическая упаковка кассет с более аутентичной обложкой"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "經典錄音帶包裝比例，封面更具真實感"
           }
         }
       }

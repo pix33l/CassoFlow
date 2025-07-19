@@ -381,25 +381,33 @@ struct LibraryView: View {
 
 struct AlbumCell: View {
     let album: Album
+    @EnvironmentObject private var musicService: MusicService
     
     var body: some View {
         VStack(alignment: .leading) {
-            // 专辑封面
+            // 专辑封面 - 根据用户选择的样式显示
             ZStack {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = album.artwork {
                     
-                    ArtworkImage(artwork, width: 160, height: 160)
-                        .frame(width: 105, height: 160)
-                        .blur(radius: 8)
-                        .overlay(
-                            Color.black.opacity(0.2)
+                    if musicService.currentCoverStyle == .rectangle {
+                        // 矩形封面样式
+                        ArtworkImage(artwork, width: 160, height: 160)
+                            .frame(width: 105, height: 160)
+                            .clipShape(Rectangle())
+                    } else {
+                        ArtworkImage(artwork, width: 160, height: 160)
+                            .frame(width: 105, height: 160)
+                            .blur(radius: 8)
+                            .overlay(
+                                Color.black.opacity(0.2)
                             )
-                        .clipShape(Rectangle())
+                            .clipShape(Rectangle())
                         
-                    ArtworkImage(artwork, width: 105, height: 105)
-                        .frame(width: 105, height: 105)
-                        .clipShape(Rectangle())
+                        ArtworkImage(artwork, width: 105, height: 105)
+                            .frame(width: 105, height: 105)
+                            .clipShape(Rectangle())
+                    }
                     
                 } else {
                     ZStack{
@@ -439,31 +447,33 @@ struct AlbumCell: View {
 
 struct PlaylistCell: View {
     let playlist: Playlist
+    @EnvironmentObject private var musicService: MusicService
     
     var body: some View {
         VStack(alignment: .leading) {
-            // 歌单封面
+            // 歌单封面 - 根据用户选择的样式显示
             ZStack {
                 // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
                 if let artwork = playlist.artwork {
-                    // 矩形封面
-//                    ArtworkImage(artwork, width: 160, height: 160)
-//                        .frame(width: 105, height: 160)
-//                        .clipShape(Rectangle())
-                    
-                    // 方形封面
-                    ArtworkImage(artwork, width: 160, height: 160)
-                        .frame(width: 105, height: 160)
-                        .blur(radius: 8)
-                        .overlay(
-                            Color.black.opacity(0.2)
+                    if musicService.currentCoverStyle == .rectangle {
+                        // 矩形封面
+                        ArtworkImage(artwork, width: 160, height: 160)
+                            .frame(width: 105, height: 160)
+                            .clipShape(Rectangle())
+                    } else {
+                        // 方形封面
+                        ArtworkImage(artwork, width: 160, height: 160)
+                            .frame(width: 105, height: 160)
+                            .blur(radius: 8)
+                            .overlay(
+                                Color.black.opacity(0.2)
                             )
-                        .clipShape(Rectangle())
-                    
-                    ArtworkImage(artwork, width: 105, height: 105)
-                        .frame(width: 105, height: 105)
-                        .clipShape(Rectangle())
-                    
+                            .clipShape(Rectangle())
+                        
+                        ArtworkImage(artwork, width: 105, height: 105)
+                            .frame(width: 105, height: 105)
+                            .clipShape(Rectangle())
+                    }
                 } else {
                     ZStack{
                         Color.black

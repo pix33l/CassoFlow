@@ -73,7 +73,7 @@ struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var storeManager: StoreManager
     @EnvironmentObject private var musicService: MusicService
-    @State private var selectedPlan: MembershipProduct = .monthly
+    @State private var selectedPlan: MembershipProduct = .lifetime
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var showSuccessAlert = false
