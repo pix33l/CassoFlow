@@ -133,7 +133,31 @@ struct LibraryView: View {
     // 选中的分段
     @State private var selectedSegment = 0
     @State private var showSubscriptionOffer = false
+    @State private var albumSearchText = ""
+    @State private var playlistSearchText = ""
     
+    // 过滤后的数据
+    private var filteredAlbums: MusicItemCollection<Album> {
+        if albumSearchText.isEmpty {
+            return libraryData.userAlbums
+        } else {
+            return MusicItemCollection(libraryData.userAlbums.filter { album in
+                album.title.localizedCaseInsensitiveContains(albumSearchText) ||
+                album.artistName.localizedCaseInsensitiveContains(albumSearchText)
+            })
+        }
+    }
+    
+    private var filteredPlaylists: MusicItemCollection<Playlist> {
+        if playlistSearchText.isEmpty {
+            return libraryData.userPlaylists
+        } else {
+            return MusicItemCollection(libraryData.userPlaylists.filter { playlist in
+                playlist.name.localizedCaseInsensitiveContains(playlistSearchText)
+            })
+        }
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -190,15 +214,13 @@ struct LibraryView: View {
                 .padding(.bottom, 10)
             
             Text(message)
-                .font(.title2)
+                .font(.title3)
                 .foregroundColor(.primary)
-                .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
                 
             Text(getErrorDescription(for: message))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
             
             Button {
                 if musicService.isHapticFeedbackEnabled {
@@ -219,7 +241,9 @@ struct LibraryView: View {
             }
             .padding(.top, 20)
         }
+        .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal)
     }
     
     private var contentView: some View {
@@ -243,50 +267,167 @@ struct LibraryView: View {
             // 滚动内容区域 - 为每个分段使用独立的视图
             TabView(selection: $selectedSegment) {
                 // 专辑视图
-                ScrollView {
-                    
-                    if !storeManager.membershipStatus.isActive {
-                        PayLabel()
-                            .environmentObject(storeManager)
-                            .padding(.top, 20)
-                    }
-                    
-                    LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
-                        spacing: 20
-                    ) {
-                        ForEach(libraryData.userAlbums, id: \.id) { album in
-                            NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
-                                AlbumCell(album: album)
+                VStack(spacing: 0) {
+                    ScrollView {
+                        // 专辑搜索框
+                        HStack {
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(.secondary)
+                                    .font(.body)
+                                
+                                TextField("搜索专辑或艺术家", text: $albumSearchText)
+                                    .textFieldStyle(PlainTextFieldStyle())
+                                    .font(.body)
+                                
+                                if !albumSearchText.isEmpty {
+                                    Button {
+                                        albumSearchText = ""
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.secondary)
+                                            .font(.body)
+                                    }
+                                }
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 8)
+                            .background(Color(.systemGray5))
+                            .cornerRadius(10)
+                            if !albumSearchText.isEmpty {
+                                Button("取消") {
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    albumSearchText = ""
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                        
+                        if !storeManager.membershipStatus.isActive {
+                            PayLabel()
+                                .environmentObject(storeManager)
+                                .padding(.top, 8)
+                        }
+                        
+                        if filteredAlbums.isEmpty && !albumSearchText.isEmpty {
+                            // 搜索无结果提示
+                            VStack(spacing: 16) {
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.red)
+                                
+                                Text("未找到匹配的专辑或艺术家")
+                                    .font(.title3)
+                                    .foregroundColor(.primary)
+                                
+                                Text("请尝试使用不同的关键词搜索")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 60)
+                            .padding(.horizontal)
+                        } else {
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
+                                spacing: 20
+                            ) {
+                                ForEach(filteredAlbums, id: \.id) { album in
+                                    NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
+                                        AlbumCell(album: album)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
                         }
                     }
-                    .padding()
                 }
                 .tag(0)
                 
                 // 播放列表视图
-                ScrollView {
-                    
-                    if !storeManager.membershipStatus.isActive {
-                        PayLabel()
-                            .environmentObject(storeManager)
-                            .padding(.top, 20)
-                    }
-                    
-                    LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
-                        spacing: 20
-                    ) {
-                        ForEach(libraryData.userPlaylists, id: \.id) { playlist in
-                                NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
-                                    PlaylistCell(playlist: playlist)
+                VStack(spacing: 0) {
+                    ScrollView {
+                        
+                        // 播放列表搜索框
+                        HStack {
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(.secondary)
+                                    .font(.body)
+                                
+                                TextField("搜索歌单", text: $playlistSearchText)
+                                    .textFieldStyle(PlainTextFieldStyle())
+                                    .font(.body)
+                                
+                                if !playlistSearchText.isEmpty {
+                                    Button {
+                                        playlistSearchText = ""
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.secondary)
+                                            .font(.body)
+                                    }
+                                }
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 8)
+                            .background(Color(.systemGray5))
+                            .cornerRadius(10)
+                            if !playlistSearchText.isEmpty {
+                                Button("取消") {
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    playlistSearchText = ""
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                        
+                        if !storeManager.membershipStatus.isActive {
+                            PayLabel()
+                                .environmentObject(storeManager)
+                                .padding(.top, 8)
+                        }
+                        
+                        if filteredPlaylists.isEmpty && !playlistSearchText.isEmpty {
+                            // 搜索无结果提示
+                            VStack(spacing: 16) {
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.red)
+                                
+                                Text("未找到匹配的歌单")
+                                    .font(.title3)
+                                    .foregroundColor(.primary)
+                                
+                                Text("请尝试使用不同的关键词搜索")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 60)
+                            .padding(.horizontal)
+                        } else {
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
+                                spacing: 20
+                            ) {
+                                ForEach(filteredPlaylists, id: \.id) { playlist in
+                                    NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
+                                        PlaylistCell(playlist: playlist)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
                         }
                     }
-                    .padding()
                 }
                 .tag(1)
             }

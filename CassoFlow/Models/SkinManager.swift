@@ -229,7 +229,7 @@ struct PlayerSkin: Identifiable {
             panelColor: .clear,
             panelOutlineColor: .clear,
             buttonColor: Color("button-orange"),
-            buttonTextColor: .black.opacity(0.35),
+            buttonTextColor: .black.opacity(0.5),
             buttonShadowColor: Color("shadow-button-orange"),
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
