@@ -121,6 +121,13 @@ struct PlayerView: View {
                 handlePaywallDismissed()
             }
         }
+        .onChange(of: musicService.shouldCloseLibrary) { _, shouldClose in
+            if shouldClose && showLibraryView {
+                showLibraryView = false
+                // 重置状态
+                musicService.resetLibraryCloseState()
+            }
+        }
     }
     
     private func startRotation() {

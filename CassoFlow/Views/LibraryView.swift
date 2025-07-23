@@ -121,6 +121,30 @@ struct CassetteImageHelper {
     }
 }
 
+struct ListCassetteImageHelper {
+    // 可用的磁带图片名称数组
+    static let cassetteImages = [
+        "package-list-cassette-01",
+        "package-list-cassette-02",
+        "package-list-cassette-03",
+        "package-list-cassette-04",
+        "package-list-cassette-05",
+        "package-list-cassette-06",
+        "package-list-cassette-07",
+        "package-list-cassette-08",
+        "package-list-cassette-09",
+        "package-list-cassette-10"
+    ]
+    
+    // 根据ID获取稳定的随机图片名称
+    static func getRandomCassetteImage(for id: String) -> String {
+        // 使用ID的哈希值作为随机数种子，确保每个ID都有固定的图片选择
+        let hash = abs(id.hashValue)
+        let index = hash % cassetteImages.count
+        return cassetteImages[index]
+    }
+}
+
 struct LibraryView: View {
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var musicService: MusicService
@@ -133,6 +157,7 @@ struct LibraryView: View {
     // 选中的分段
     @State private var selectedSegment = 0
     @State private var showSubscriptionOffer = false
+    @State private var isGirdMode = true
     @State private var albumSearchText = ""
     @State private var playlistSearchText = ""
     
@@ -248,21 +273,57 @@ struct LibraryView: View {
     
     private var contentView: some View {
         VStack(spacing: 0) {
-            // 分段控制器 - 固定在顶部
-            Picker("媒体类型", selection: $selectedSegment) {
-                Text("专辑").tag(0)
-                Text("歌单").tag(1)
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.regularMaterial)
-            .onChange(of: selectedSegment) { _, _ in
-                if musicService.isHapticFeedbackEnabled {
-                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                    impactFeedback.impactOccurred()
+            
+            HStack{
+                
+                Image(systemName: "arrow.up.arrow.down")
+                    .foregroundColor(.secondary)
+                    .font(.body)
+                    .padding(8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.gray.opacity(0.2))
+                    )
+                    .padding(.horizontal)
+                
+                // 分段控制器 - 固定在顶部
+                Picker("媒体类型", selection: $selectedSegment) {
+                    Text("专辑").tag(0)
+                    Text("歌单").tag(1)
                 }
+                .pickerStyle(.segmented)
+//                .padding(.horizontal)
+                .padding(.vertical, 8)
+//                .background(.regularMaterial)
+                .onChange(of: selectedSegment) { _, _ in
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                }
+                
+                Button {
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isGirdMode.toggle()
+                    }
+                } label: {
+                    Image(systemName: isGirdMode ? "rectangle.grid.3x2" : "rectangle.grid.1x2")
+                        .foregroundColor(.secondary)
+                        .font(.body)
+                        .padding(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.gray.opacity(0.2))
+                        )
+                        .padding(.horizontal)
+                }
+
             }
+            .background(.regularMaterial)
             
             // 滚动内容区域 - 为每个分段使用独立的视图
             TabView(selection: $selectedSegment) {
@@ -330,19 +391,35 @@ struct LibraryView: View {
                             .padding(.top, 60)
                             .padding(.horizontal)
                         } else {
-                            LazyVGrid(
-                                columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
-                                spacing: 20
-                            ) {
-                                ForEach(filteredAlbums, id: \.id) { album in
-                                    NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
-                                        AlbumCell(album: album)
+                            if isGirdMode {
+                                LazyVGrid(
+                                    columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
+                                    spacing: 20
+                                ) {
+                                    ForEach(filteredAlbums, id: \.id) { album in
+                                        NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
+                                            GirdAlbumCell(album: album)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
                                     }
-                                    .buttonStyle(PlainButtonStyle())
                                 }
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                            } else {
+                                LazyVGrid(
+                                    columns: [GridItem(.adaptive(minimum: 360))],
+                                    spacing: 16
+                                ) {
+                                    ForEach(filteredAlbums, id: \.id) { album in
+                                        NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
+                                            ListAlbumCell(album: album)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
                         }
                     }
                 }
@@ -413,19 +490,39 @@ struct LibraryView: View {
                             .padding(.top, 60)
                             .padding(.horizontal)
                         } else {
-                            LazyVGrid(
-                                columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
-                                spacing: 20
-                            ) {
-                                ForEach(filteredPlaylists, id: \.id) { playlist in
-                                    NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
-                                        PlaylistCell(playlist: playlist)
+                            if isGirdMode {
+                                // 网格模式
+                                LazyVGrid(
+                                    columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
+                                    spacing: 16
+                                ) {
+                                    ForEach(filteredPlaylists, id: \.id) { playlist in
+                                        NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
+                                            GridPlaylistCell(playlist: playlist)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
                                     }
-                                    .buttonStyle(PlainButtonStyle())
                                 }
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                                
+                            } else {
+                                // 列表模式
+                                LazyVGrid(
+                                    columns: [GridItem(.adaptive(minimum: 360))],
+                                    spacing: 20
+                                ) {
+                                    ForEach(filteredPlaylists, id: \.id) { playlist in
+                                        NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
+                                            ListPlaylistCell(playlist: playlist)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                                
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
                         }
                     }
                 }
@@ -520,7 +617,7 @@ struct LibraryView: View {
     }
 }
 
-struct AlbumCell: View {
+struct GirdAlbumCell: View {
     let album: Album
     @EnvironmentObject private var musicService: MusicService
     
@@ -533,20 +630,22 @@ struct AlbumCell: View {
                     
                     if musicService.currentCoverStyle == .rectangle {
                         // 矩形封面样式
-                        ArtworkImage(artwork, width: 160, height: 160)
-                            .frame(width: 105, height: 160)
+                        ArtworkImage(artwork, width: 170, height: 170)
+                            .frame(width: 110, height: 170)
                             .clipShape(Rectangle())
+                            .contentShape(Rectangle())
                     } else {
-                        ArtworkImage(artwork, width: 160, height: 160)
-                            .frame(width: 105, height: 160)
+                        ArtworkImage(artwork, width: 170, height: 170)
+                            .frame(width: 110, height: 170)
                             .blur(radius: 8)
                             .overlay(
-                                Color.black.opacity(0.2)
+                                Color.black.opacity(0.3)
                             )
                             .clipShape(Rectangle())
+                            .contentShape(Rectangle())
                         
-                        ArtworkImage(artwork, width: 105, height: 105)
-                            .frame(width: 105, height: 105)
+                        ArtworkImage(artwork, width: 110, height: 110)
+                            .frame(width: 110, height: 110)
                             .clipShape(Rectangle())
                     }
                     
@@ -558,7 +657,7 @@ struct AlbumCell: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 75)
                     }
-                    .frame(width: 105, height: 160)
+                    .frame(width: 110, height: 170)
                     .clipShape(Rectangle())
                 }
                 
@@ -567,7 +666,7 @@ struct AlbumCell: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+//                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
             // 专辑信息
             VStack(alignment: .leading, spacing: 4) {
@@ -586,7 +685,7 @@ struct AlbumCell: View {
     }
 }
 
-struct PlaylistCell: View {
+struct GridPlaylistCell: View {
     let playlist: Playlist
     @EnvironmentObject private var musicService: MusicService
     
@@ -598,21 +697,23 @@ struct PlaylistCell: View {
                 if let artwork = playlist.artwork {
                     if musicService.currentCoverStyle == .rectangle {
                         // 矩形封面
-                        ArtworkImage(artwork, width: 160, height: 160)
-                            .frame(width: 105, height: 160)
+                        ArtworkImage(artwork, width: 170, height: 170)
+                            .frame(width: 110, height: 170)
                             .clipShape(Rectangle())
+                            .contentShape(Rectangle())
                     } else {
                         // 方形封面
-                        ArtworkImage(artwork, width: 160, height: 160)
-                            .frame(width: 105, height: 160)
+                        ArtworkImage(artwork, width: 170, height: 170)
+                            .frame(width: 110, height: 170)
                             .blur(radius: 8)
                             .overlay(
-                                Color.black.opacity(0.2)
+                                Color.black.opacity(0.3)
                             )
                             .clipShape(Rectangle())
+                            .contentShape(Rectangle())
                         
-                        ArtworkImage(artwork, width: 105, height: 105)
-                            .frame(width: 105, height: 105)
+                        ArtworkImage(artwork, width: 110, height: 110)
+                            .frame(width: 110, height: 110)
                             .clipShape(Rectangle())
                     }
                 } else {
@@ -623,7 +724,7 @@ struct PlaylistCell: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 75)
                     }
-                    .frame(width: 105, height: 160)
+                    .frame(width: 110, height: 170)
                     .clipShape(Rectangle())
                 }
                 
@@ -632,7 +733,7 @@ struct PlaylistCell: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+//                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
             // 歌单信息
             VStack(alignment: .leading, spacing: 4) {
@@ -646,6 +747,154 @@ struct PlaylistCell: View {
     }
 }
 
+struct ListAlbumCell: View {
+    let album: Album
+    @EnvironmentObject private var musicService: MusicService
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            // 专辑封面 - 根据用户选择的样式显示
+            ZStack {
+                // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
+                if let artwork = album.artwork {
+                    
+                    ArtworkImage(artwork, width: 360, height: 360)
+                        .frame(width: 360, height: 48)
+                        .blur(radius: 8)
+                        .overlay(
+                            Color.black.opacity(0.3)
+                        )
+                        .clipShape(Rectangle())
+                        .contentShape(Rectangle())
+                
+                } else {
+                    ZStack{
+                        Color.black
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 75)
+                    }
+                    .frame(width: 360, height: 48)
+                    .clipShape(Rectangle())
+                }
+                
+                HStack(spacing: 16){
+                    if let artwork = album.artwork {
+                        ArtworkImage(artwork, width: 40, height: 40)
+                            .frame(width: 40, height: 40)
+                            .clipShape(Rectangle())
+                    } else {
+                        ZStack{
+                            Color.black
+                            Image("CASSOFLOW")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20)
+                        }
+                        .frame(width: 40, height: 40)
+                        .clipShape(Rectangle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text(album.title)
+                            .font(.subheadline.bold())
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                        
+                        Text(album.artistName)
+                            .font(.footnote)
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 5)
+                
+                Image(ListCassetteImageHelper.getRandomCassetteImage(for: album.id.rawValue))
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 360, height: 48)
+            }
+        }
+    }
+}
+
+struct ListPlaylistCell: View {
+    let playlist: Playlist
+    @EnvironmentObject private var musicService: MusicService
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            // 歌单封面 - 根据用户选择的样式显示
+            ZStack {
+                // 使用 MusicKit 的 ArtworkImage 替代 AsyncImage
+                if let artwork = playlist.artwork {
+
+                        ArtworkImage(artwork, width: 360, height: 360)
+                            .frame(width: 360, height: 48)
+                            .blur(radius: 8)
+                            .overlay(
+                                Color.black.opacity(0.3)
+                            )
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                    
+                } else {
+                    ZStack{
+                        Color.black
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 75)
+                    }
+                    .frame(width: 360, height: 48)
+                    .clipShape(Rectangle())
+                }
+                
+                HStack(spacing: 16){
+                    if let artwork = playlist.artwork {
+                        ArtworkImage(artwork, width: 40, height: 40)
+                            .frame(width: 40, height: 40)
+                            .clipShape(Rectangle())
+                    } else {
+                        ZStack{
+                            Color.black
+                            Image("CASSOFLOW")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20)
+                        }
+                        .frame(width: 40, height: 40)
+                        .clipShape(Rectangle())
+                    }
+                    
+                    Text(playlist.name)
+                        .font(.subheadline.bold())
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 6)
+                
+//                Image("package-list-cassette-01")
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fill)
+//                    .frame(width: 360, height: 48)
+//                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                
+                // 使用随机磁带图片
+                Image(ListCassetteImageHelper.getRandomCassetteImage(for: playlist.id.rawValue))
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 360, height: 48)
+                
+            }
+        }
+    }
+}
+
 #Preview("成功状态") {
     let musicService = MusicService.shared
     
@@ -655,7 +904,7 @@ struct PlaylistCell: View {
         @State private var userAlbums: [MockAlbum] = [
             MockAlbum(id: "1", title: "Folklore", artistName: "Taylor Swift"),
             MockAlbum(id: "2", title: "Blinding Lights", artistName: "The Weeknd"),
-            MockAlbum(id: "3", title: "好想爱这个世界啊好想爱这个世界啊", artistName: "华晨宇好想爱这个世界啊"),
+            MockAlbum(id: "3", title: "好想爱这个世界啊", artistName: "华晨宇"),
             MockAlbum(id: "4", title: "七里香", artistName: "周杰伦"),
             MockAlbum(id: "5", title: "千与千寻", artistName: "久石让"),
             MockAlbum(id: "6", title: "Bad Habits", artistName: "Ed Sheeran")
@@ -673,17 +922,39 @@ struct PlaylistCell: View {
             NavigationStack {
                 VStack(spacing: 0) {
                     ScrollView {
-                        // 分段控制器
-                        Picker("媒体类型", selection: $selectedSegment) {
-                            Text("专辑").tag(0)
-                            Text("歌单").tag(1)
-                        }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal)
                         
-                        LazyVGrid(columns: [
-                            GridItem(.adaptive(minimum: 110), spacing: 5)
-                        ], spacing: 20) {
+                        HStack{
+                            
+                            Image(systemName: "arrow.up.arrow.down")
+                                .foregroundColor(.secondary)
+                                .font(.body)
+                                .padding(8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.gray.opacity(0.2))
+                                )
+                            
+                            // 分段控制器
+                            Picker("媒体类型", selection: $selectedSegment) {
+                                Text("专辑").tag(0)
+                                Text("歌单").tag(1)
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal)
+                            
+                            Image(systemName: "rectangle.grid.1x2")
+                                .foregroundColor(.secondary)
+                                .font(.body)
+                                .padding(8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.gray.opacity(0.2))
+                                )
+                        }
+                        
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 330))],
+                            spacing: 15) {
                             if selectedSegment == 0 {
                                 ForEach(userAlbums, id: \.id) { album in
                                     MockAlbumCell(album: album)
@@ -740,34 +1011,42 @@ struct PlaylistCell: View {
                 // 专辑封面
                 ZStack {
                     ZStack{
-                        Color.black
-                        Image("CASSOFLOW")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 75)
+                        Color.gray
+//                        Image("CASSOFLOW")
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fit)
+//                            .frame(width: 75)
                     }
-                    .frame(width: 100, height: 160)
+                    .frame(width: 360, height: 60)
                     .clipShape(Rectangle())
                     
                     Image("cover-cassette")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: 110, height: 170)
+                        .frame(width: 360, height: 60)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                }
-                // 专辑信息
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(album.title)
-                        .font(.footnote)
-                        .foregroundColor(.primary)
-                        .lineLimit(1)
                     
-                    Text(album.artistName)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
+                    HStack(spacing: 16) {
+                        
+                        Color.yellow
+                            .frame(width: 40, height: 40)
+                            .clipShape(Rectangle())
+                        
+                        HStack(spacing: 8){
+                            Text(album.title)
+                                .font(.footnote)
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
+                            
+                            Text(album.artistName)
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                        
+                        Spacer()
+                    }
                 }
-                .padding(.top, 4)
             }
         }
     }

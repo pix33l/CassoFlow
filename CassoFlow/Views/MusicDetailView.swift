@@ -98,7 +98,7 @@ struct MusicDetailView: View {
                                     .blur(radius: 8)
                                     .overlay(
                                         // 半透明遮罩确保文字清晰
-                                        Color.black.opacity(0.2)
+                                        Color.black.opacity(0.3)
                                     )
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                     .padding(.bottom, 37)

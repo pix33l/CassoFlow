@@ -85,6 +85,9 @@ class MusicService: ObservableObject {
     // MARK: - 磁带封面样式属性
     @Published var currentCoverStyle: CoverStyle = .rectangle
     
+    // MARK: - 库视图控制
+    @Published var shouldCloseLibrary: Bool = false
+    
     // MARK: - 皮肤存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
     private static let cassetteSkinKey = "SelectedCassetteSkin"
@@ -141,6 +144,11 @@ class MusicService: ObservableObject {
         
         player.queue = .init(for: songs, startingAt: songs[index])
         try await player.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
     }
     
     /// 播放播放列表中的特定歌曲
@@ -150,6 +158,11 @@ class MusicService: ObservableObject {
         
         player.queue = .init(for: songs, startingAt: songs[index])
         try await player.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
     }
     
     /// 播放专辑（可选择随机播放）
@@ -160,9 +173,14 @@ class MusicService: ObservableObject {
         }
         player.queue = .init(for: songs, startingAt: nil)
         try await player.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
     }
     
-    /// 播放专辑（可选择随机播放）
+    /// 播放播放列表（可选择随机播放）
     func playPlaylist(_ playlist: Playlist, shuffled: Bool = false) async throws {
         let songs = try await playlist.with([.tracks]).tracks ?? []
         if shuffled {
@@ -170,6 +188,16 @@ class MusicService: ObservableObject {
         }
         player.queue = .init(for: songs, startingAt: nil)
         try await player.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+    }
+    
+    /// 重置库视图关闭状态
+    func resetLibraryCloseState() {
+        shouldCloseLibrary = false
     }
     
     init() {
