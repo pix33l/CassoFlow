@@ -1,6 +1,52 @@
 import SwiftUI
 import MusicKit
 
+// 排序类型枚举
+enum SortType: String, CaseIterable {
+    case recentlyAdded = "recentlyAdded"
+    case albumTitle = "albumTitle"
+    case artistName = "artistName"
+    
+    var localizedName: String {
+        switch self {
+        case .recentlyAdded:
+            return String(localized: "最近添加")
+        case .albumTitle:
+            return String(localized: "专辑")
+        case .artistName:
+            return String(localized: "艺术家")
+        }
+    }
+}
+
+// 用户偏好设置管理器
+class LibraryPreferences: ObservableObject {
+    // UserDefaults 键名
+    private let sortTypeKey = "LibrarySortType"
+    private let displayModeKey = "LibraryDisplayMode"
+    
+    @Published var currentSortType: SortType {
+        didSet {
+            UserDefaults.standard.set(currentSortType.rawValue, forKey: sortTypeKey)
+        }
+    }
+    
+    @Published var isGridMode: Bool {
+        didSet {
+            UserDefaults.standard.set(isGridMode, forKey: displayModeKey)
+        }
+    }
+    
+    init() {
+        // 从 UserDefaults 读取保存的排序方式
+        let savedSortType = UserDefaults.standard.string(forKey: sortTypeKey) ?? SortType.recentlyAdded.rawValue
+        self.currentSortType = SortType(rawValue: savedSortType) ?? .recentlyAdded
+        
+        // 从 UserDefaults 读取保存的显示模式，默认为网格模式
+        self.isGridMode = UserDefaults.standard.object(forKey: displayModeKey) as? Bool ?? true
+    }
+}
+
 // 独立的媒体库数据管理器，避免与播放器状态混淆
 class LibraryDataManager: ObservableObject {
     @Published var userAlbums: MusicItemCollection<Album> = []
@@ -11,7 +57,10 @@ class LibraryDataManager: ObservableObject {
     
     @Published var hasLoaded = false
     
-    func loadUserLibraryIfNeeded() async {
+    // 添加对偏好设置的引用
+    var preferences: LibraryPreferences?
+    
+    func loadUserLibraryIfNeeded(with sortType: SortType = .recentlyAdded) async {
         guard !hasLoaded else { return }
         
         await MainActor.run {
@@ -41,8 +90,8 @@ class LibraryDataManager: ObservableObject {
         }
         
         // 并行加载专辑和歌单
-        async let albums = fetchUserLibraryAlbums()
-        async let playlists = fetchUserLibraryPlaylists()
+        async let albums = fetchUserLibraryAlbumsWithSort(sortType)
+        async let playlists = fetchUserLibraryPlaylistsWithSort(sortType)
         
         do {
             let (albumsResult, playlistsResult) = try await (albums, playlists)
@@ -65,6 +114,32 @@ class LibraryDataManager: ObservableObject {
             }
         }
     }
+    
+    // 重新排序现有数据
+    func applySorting(_ sortType: SortType) async {
+        await MainActor.run {
+            isLoading = true
+        }
+        
+        // 重新获取排序后的数据
+        async let albums = fetchUserLibraryAlbumsWithSort(sortType)
+        async let playlists = fetchUserLibraryPlaylistsWithSort(sortType)
+        
+        do {
+            let (albumsResult, playlistsResult) = try await (albums, playlists)
+            
+            await MainActor.run {
+                userAlbums = albumsResult
+                userPlaylists = playlistsResult
+                isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = String(localized: "重新排序失败: \(error.localizedDescription)")
+                isLoading = false
+            }
+        }
+    }
 
     private func checkSubscriptionStatus() async {
         do {
@@ -77,22 +152,46 @@ class LibraryDataManager: ObservableObject {
         }
     }
     
-    private func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
+    private func fetchUserLibraryAlbumsWithSort(_ sortType: SortType) async throws -> MusicItemCollection<Album> {
         var request = MusicLibraryRequest<Album>()
-        request.sort(by: \.libraryAddedDate, ascending: false)
+        
+        switch sortType {
+        case .recentlyAdded:
+            request.sort(by: \.libraryAddedDate, ascending: false)
+        case .albumTitle:
+            request.sort(by: \.title, ascending: true)
+        case .artistName:
+            request.sort(by: \.artistName, ascending: true)
+        }
+        
         request.limit = 200
         
         let response = try await request.response()
         return response.items
     }
 
-    private func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
+    private func fetchUserLibraryPlaylistsWithSort(_ sortType: SortType) async throws -> MusicItemCollection<Playlist> {
         var request = MusicLibraryRequest<Playlist>()
-        request.sort(by: \.libraryAddedDate, ascending: false)
+        
+        switch sortType {
+        case .recentlyAdded:
+            request.sort(by: \.libraryAddedDate, ascending: false)
+        case .albumTitle, .artistName:
+            request.sort(by: \.name, ascending: true)
+        }
+        
         request.limit = 200
         
         let response = try await request.response()
         return response.items
+    }
+    
+    private func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
+        return try await fetchUserLibraryAlbumsWithSort(preferences?.currentSortType ?? .recentlyAdded)
+    }
+
+    private func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
+        return try await fetchUserLibraryPlaylistsWithSort(preferences?.currentSortType ?? .recentlyAdded)
     }
 }
 
@@ -153,11 +252,12 @@ struct LibraryView: View {
     
     // 使用独立的数据管理器
     @StateObject private var libraryData = LibraryDataManager()
+    // 用户偏好设置
+    @StateObject private var preferences = LibraryPreferences()
     
     // 选中的分段
     @State private var selectedSegment = 0
     @State private var showSubscriptionOffer = false
-    @State private var isGirdMode = true
     @State private var albumSearchText = ""
     @State private var playlistSearchText = ""
     
@@ -218,8 +318,12 @@ struct LibraryView: View {
                     }
                 }
             }
+            .onAppear {
+                // 设置数据管理器的偏好设置引用
+                libraryData.preferences = preferences
+            }
             .task {
-                await libraryData.loadUserLibraryIfNeeded()
+                await libraryData.loadUserLibraryIfNeeded(with: preferences.currentSortType)
             }
             .musicSubscriptionOffer(
                 isPresented: $showSubscriptionOffer,
@@ -276,15 +380,38 @@ struct LibraryView: View {
             
             HStack{
                 
-                Image(systemName: "arrow.up.arrow.down")
-                    .foregroundColor(.secondary)
-                    .font(.body)
+                Menu {
+                    ForEach(SortType.allCases, id: \.self) { sortType in
+                        Button {
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
+                            preferences.currentSortType = sortType
+                            Task {
+                                await libraryData.applySorting(sortType)
+                            }
+                        } label: {
+                            if preferences.currentSortType == sortType {
+                                Label(sortType.localizedName, systemImage: "checkmark")
+                            } else {
+                                Text(sortType.localizedName)
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.up.arrow.down")
+                            .foregroundColor(.secondary)
+                            .font(.body)
+                    }
                     .padding(8)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.gray.opacity(0.2))
                     )
                     .padding(.horizontal)
+                }
                 
                 // 分段控制器 - 固定在顶部
                 Picker("媒体类型", selection: $selectedSegment) {
@@ -308,10 +435,10 @@ struct LibraryView: View {
                         impactFeedback.impactOccurred()
                     }
                     withAnimation(.easeInOut(duration: 0.3)) {
-                        isGirdMode.toggle()
+                        preferences.isGridMode.toggle()
                     }
                 } label: {
-                    Image(systemName: isGirdMode ? "rectangle.grid.3x2" : "rectangle.grid.1x2")
+                    Image(systemName: preferences.isGridMode ? "rectangle.grid.3x2" : "rectangle.grid.1x2")
                         .foregroundColor(.secondary)
                         .font(.body)
                         .padding(8)
@@ -391,7 +518,7 @@ struct LibraryView: View {
                             .padding(.top, 60)
                             .padding(.horizontal)
                         } else {
-                            if isGirdMode {
+                            if preferences.isGridMode {
                                 LazyVGrid(
                                     columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
                                     spacing: 20
@@ -408,7 +535,7 @@ struct LibraryView: View {
                             } else {
                                 LazyVGrid(
                                     columns: [GridItem(.adaptive(minimum: 360))],
-                                    spacing: 16
+                                    spacing: 12
                                 ) {
                                     ForEach(filteredAlbums, id: \.id) { album in
                                         NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
@@ -490,7 +617,7 @@ struct LibraryView: View {
                             .padding(.top, 60)
                             .padding(.horizontal)
                         } else {
-                            if isGirdMode {
+                            if preferences.isGridMode {
                                 // 网格模式
                                 LazyVGrid(
                                     columns: [GridItem(.adaptive(minimum: 110), spacing: 5)],
@@ -510,7 +637,7 @@ struct LibraryView: View {
                                 // 列表模式
                                 LazyVGrid(
                                     columns: [GridItem(.adaptive(minimum: 360))],
-                                    spacing: 20
+                                    spacing: 12
                                 ) {
                                     ForEach(filteredPlaylists, id: \.id) { playlist in
                                         NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
@@ -584,7 +711,7 @@ struct LibraryView: View {
             openAppleMusic()
         default:
             Task {
-                await libraryData.loadUserLibraryIfNeeded()
+                await libraryData.loadUserLibraryIfNeeded(with: preferences.currentSortType)
             }
         }
     }
@@ -592,7 +719,7 @@ struct LibraryView: View {
     private func requestAuthorizationAndReload() async {
         let status = await MusicAuthorization.request()
         if status == .authorized {
-            await libraryData.loadUserLibraryIfNeeded()
+            await libraryData.loadUserLibraryIfNeeded(with: preferences.currentSortType)
         } else {
             await MainActor.run {
                 openAppSettings()

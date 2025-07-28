@@ -14,6 +14,12 @@
     },
     "%@ 终身使用所有功能和主题" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Lifetime Alle Funktionen und Themen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24,6 +30,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ Todas las funciones y temas de por vida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Durée de vie Toutes les fonctions et tous les thèmes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Lifetime Tutte le funzioni e i temi"
           }
         },
         "ja" : {
@@ -63,6 +81,12 @@
     },
     "%lld分钟" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Min"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -70,6 +94,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Min"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Min"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld Min"
@@ -109,6 +145,12 @@
     },
     "%lld小时%lld分钟" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Stunde %2$lld Min"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -119,6 +161,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld Hora %2$lld Min"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Hour %2$lld Min"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Ora %2$lld Min"
           }
         },
         "ja" : {
@@ -155,6 +209,12 @@
     },
     "%lld首歌曲 • %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Song - %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -165,6 +225,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld Canción • %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Song - %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Canzone - %2$@"
           }
         },
         "ja" : {
@@ -233,6 +305,12 @@
     },
     "PIX3L DESIGN STUDIO 是专注数字产品的独立个人工作室，以创新设计与卓越理念，为用户打造数字世界的独特体验" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO ist ein unabhängiges Einzelstudio, das sich auf digitale Produkte spezialisiert hat. Mit innovativem Design und herausragenden Konzepten schafft es einzigartige Erlebnisse für Nutzer in der digitalen Welt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -243,6 +321,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIX3L DESIGN STUDIO es un estudio independiente especializado en productos digitales. Con diseño innovador y conceptos excepcionales, crea experiencias únicas para usuarios en el mundo digital"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO est un studio individuel indépendant spécialisé dans les produits numériques. Avec un design innovant et des concepts remarquables, il crée des expériences uniques pour les utilisateurs dans le monde numérique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIX3L DESIGN STUDIO è uno studio indipendente specializzato in prodotti digitali. Con un design innovativo e concetti eccezionali, crea esperienze uniche per gli utenti nel mondo digitale"
           }
         },
         "ja" : {
@@ -279,6 +369,12 @@
     },
     "pix3l_me（备注：CassoFlow）" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Hinweis: CassoFlow)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -286,6 +382,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Nota: CassoFlow)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pix3l_me (Note : CassoFlow)"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "pix3l_me (Nota: CassoFlow)"
@@ -328,6 +436,12 @@
     },
     "PRO 专享" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur PRO"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -335,6 +449,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo PRO"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO uniquement"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solo PRO"
@@ -374,6 +500,12 @@
     },
     "PRO 会员将在%@到期" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO-Mitglieder werden bei %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -384,6 +516,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La membresía PRO vencerá el %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les membres PRO expireront à %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I membri PRO scadranno al %@"
           }
         },
         "ja" : {
@@ -423,6 +567,12 @@
     },
     "一次性付费，享受永久更新" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal bezahlen und permanente Updates genießen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -433,6 +583,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paga una vez y disfruta de actualizaciones permanentes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payez une fois et profitez de mises à jour permanentes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paga una volta e usufruisci degli aggiornamenti permanenti"
           }
         },
         "ja" : {
@@ -469,6 +631,12 @@
     },
     "专辑" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -479,6 +647,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Álbum"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
           }
         },
         "ja" : {
@@ -515,6 +695,12 @@
     },
     "为专业用户生产的磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Kassettenspieler für professionelle Anwender"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -525,6 +711,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un reproductor de cassettes diseñado para usuarios profesionales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lecteur de cassettes conçu pour les utilisateurs professionnels"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lettore di cassette progettato per gli utenti professionali"
           }
         },
         "ja" : {
@@ -561,6 +759,12 @@
     },
     "二氧化铬作为材料的高端磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top-Kassette aus Chromdioxid als Material"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -571,6 +775,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cassette de alta gama hecho de dióxido de cromo como material"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette supérieure fabriquée à partir de dioxyde de chrome comme matériau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassetta superiore realizzata in biossido di cromo come materiale"
           }
         },
         "ja" : {
@@ -607,6 +823,12 @@
     },
     "仅 %@ /天" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur %@ /Tag"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -617,6 +839,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solo %@ /día"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seulement %@ /jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo %@ al giorno"
           }
         },
         "ja" : {
@@ -653,6 +887,12 @@
     },
     "低" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niedrig"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -663,6 +903,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bajo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basso"
           }
         },
         "ja" : {
@@ -699,6 +951,12 @@
     },
     "低频抖动" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flattert"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -709,6 +967,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fluctuación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flutter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fluttuazione"
           }
         },
         "ja" : {
@@ -745,6 +1015,12 @@
     },
     "使用中" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Einsatz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -755,6 +1031,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "En uso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En cours d'utilisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In uso"
           }
         },
         "ja" : {
@@ -791,6 +1079,12 @@
     },
     "使用条款" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzungsbedingungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -801,6 +1095,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Términos de uso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conditions d'utilisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Condizioni d'uso"
           }
         },
         "ja" : {
@@ -837,6 +1143,12 @@
     },
     "保持屏幕一直不锁屏" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit der Bildschirm nicht ständig gesperrt ist"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -847,6 +1159,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mantener la pantalla sin bloquear en todo momento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empêchez l'écran de se verrouiller à tout moment"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evita che lo schermo si blocchi in ogni momento"
           }
         },
         "ja" : {
@@ -883,6 +1207,12 @@
     },
     "允许访问您的 Apple Music 以查看专辑和播放列表" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff auf Apple Music ermöglichen, um Alben und Wiedergabelisten anzusehen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -893,6 +1223,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Permitir el acceso a tu Apple Music para ver álbumes y listas de reproducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permet d'accéder à votre Apple Music pour consulter les albums et les listes de lecture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consentire l'accesso ad Apple Music per visualizzare album e playlist"
           }
         },
         "ja" : {
@@ -929,6 +1271,12 @@
     },
     "免费" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlos"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -939,6 +1287,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gratis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuit"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuito"
           }
         },
         "ja" : {
@@ -975,6 +1335,12 @@
     },
     "关于作者" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über den Entwickler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -985,6 +1351,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Acerca del desarrollador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos du développeur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informazioni sullo sviluppatore"
           }
         },
         "ja" : {
@@ -1021,6 +1399,12 @@
     },
     "其他" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1031,6 +1415,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otros"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altro"
           }
         },
         "ja" : {
@@ -1067,6 +1463,12 @@
     },
     "最后更新于 %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt aktualisiert am %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1077,6 +1479,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Última actualización el %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière mise à jour le %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultimo aggiornamento il %@"
           }
         },
         "ja" : {
@@ -1111,8 +1525,78 @@
         }
       }
     },
+    "最近添加" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich hinzugefügt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently added"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadido recientemente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récemment ajouté"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiunti di recente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近追加された記事"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 추가됨"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionado recentemente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недавно добавленные"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近新增"
+          }
+        }
+      }
+    },
     "加载媒体库失败: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medienbibliothek konnte nicht geladen werden: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1123,6 +1607,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error al cargar la biblioteca de medios: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du chargement de la médiathèque : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load media library: %@"
           }
         },
         "ja" : {
@@ -1159,6 +1655,12 @@
     },
     "升级 PRO 会员，获取全部高级功能" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade auf die PRO-Mitgliedschaft für den Zugriff auf alle erweiterten Funktionen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1169,6 +1671,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualiza a la membresía PRO para acceder a todas las funciones avanzadas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passez à l'abonnement PRO pour accéder à toutes les fonctionnalités avancées"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento all'iscrizione PRO per accedere a tutte le funzioni avanzate"
           }
         },
         "ja" : {
@@ -1205,6 +1719,12 @@
     },
     "升级获取全部高级功能" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade für den Zugriff auf alle erweiterten Funktionen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1215,6 +1735,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualiza para acceder a todas las funciones avanzadas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à niveau pour accéder à toutes les fonctions avancées"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento per accedere a tutte le funzioni avanzate"
           }
         },
         "ja" : {
@@ -1251,6 +1783,12 @@
     },
     "卡农牌磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kassettenspieler der Marke Canon"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1261,6 +1799,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproductor de cassette marca Canon"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecteur de cassettes de marque Canon"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lettore di cassette di marca Canon"
           }
         },
         "ja" : {
@@ -1297,6 +1847,12 @@
     },
     "发布于 %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veröffentlicht am %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1307,6 +1863,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Publicado el %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publié le %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pubblicato su %@"
           }
         },
         "ja" : {
@@ -1343,6 +1911,12 @@
     },
     "取消" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1353,6 +1927,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulla"
           }
         },
         "ja" : {
@@ -1389,6 +1975,12 @@
     },
     "商品类型" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Produkttyp"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1399,6 +1991,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tipo de producto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de produit"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo di prodotto"
           }
         },
         "ja" : {
@@ -1435,6 +2039,12 @@
     },
     "商店" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden Sie"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1445,6 +2055,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tienda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boutique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Negozio"
           }
         },
         "ja" : {
@@ -1481,6 +2103,12 @@
     },
     "国宝牌磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kassettenspieler der Marke Animal"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1491,6 +2119,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproductor de cassette marca Animal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecteur de cassettes de marque animale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lettore di cassette di marca animale"
           }
         },
         "ja" : {
@@ -1527,6 +2167,12 @@
     },
     "增加反馈来模拟实体操作感" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen von Rückmeldungen zur Simulation des physikalischen Betriebsgefühls"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1537,6 +2183,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añadir retroalimentación para simular la sensación de operación física"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute un feedback pour simuler la sensation physique d'utilisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungere feedback per simulare la sensazione di funzionamento fisico"
           }
         },
         "ja" : {
@@ -1573,6 +2231,12 @@
     },
     "媒体库" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bibliothek"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1583,6 +2247,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Biblioteca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bibliothèque"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libreria"
           }
         },
         "ja" : {
@@ -1619,6 +2295,12 @@
     },
     "媒体类型" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medientyp"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1629,6 +2311,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tipo de media"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de média"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo di media"
           }
         },
         "ja" : {
@@ -1665,6 +2359,12 @@
     },
     "封面样式" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cover-Stil"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1675,6 +2375,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estilo de portada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style de couverture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stile della copertina"
           }
         },
         "ja" : {
@@ -1711,6 +2423,12 @@
     },
     "尊贵的永久 PRO 会员" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sehr geehrtes PRO-Dauermitglied"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1721,6 +2439,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estimado miembro PRO permanente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cher membre PRO permanent"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gentile membro permanente PRO"
           }
         },
         "ja" : {
@@ -1757,6 +2487,12 @@
     },
     "小红书" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1764,6 +2500,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RedNote"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "RedNote"
@@ -1803,6 +2551,12 @@
     },
     "屏幕常亮" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirm immer an"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1813,6 +2567,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pantalla siempre encendida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écran toujours allumé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schermo sempre acceso"
           }
         },
         "ja" : {
@@ -1849,6 +2615,12 @@
     },
     "已复制" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1859,6 +2631,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copiado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copié"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiato"
           }
         },
         "ja" : {
@@ -1895,6 +2679,12 @@
     },
     "年度 PRO" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jährlich PRO"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1905,6 +2695,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PRO anual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRO annuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuale PRO"
           }
         },
         "ja" : {
@@ -1941,6 +2743,12 @@
     },
     "底噪" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lärm"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1951,6 +2759,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ruido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bruit"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rumore"
           }
         },
         "ja" : {
@@ -1987,6 +2807,12 @@
     },
     "开始 3 天免费试用" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Tage kostenlos testen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1997,6 +2823,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Iniciar prueba gratuita de 3 días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essai gratuit pendant 3 jours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniziare la prova gratuita per 3 giorni"
           }
         },
         "ja" : {
@@ -2033,6 +2871,12 @@
     },
     "开始 7 天免费试用" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 Tage kostenlos testen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2043,6 +2887,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Iniciar prueba gratuita de 7 días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essai gratuit pendant 7 jours"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniziare la prova gratuita per 7 giorni"
           }
         },
         "ja" : {
@@ -2079,6 +2935,12 @@
     },
     "强度" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stärke"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2089,6 +2951,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Intensidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forza"
           }
         },
         "ja" : {
@@ -2125,6 +2999,12 @@
     },
     "彩虹条纹录音磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regenbogen-Streifen-Band"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2135,6 +3015,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cinta de rayas arcoíris"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bande à rayures arc-en-ciel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastro a strisce arcobaleno"
           }
         },
         "ja" : {
@@ -2171,6 +3063,12 @@
     },
     "微信" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2178,6 +3076,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WeChat"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "WeChat"
@@ -2217,6 +3127,12 @@
     },
     "怀旧" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nostalgie"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2224,6 +3140,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nostalgia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nostalgie"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nostalgia"
@@ -2263,6 +3191,12 @@
     },
     "恢复购买" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf wiederherstellen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2273,6 +3207,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Restaurar compra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer l'achat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristina l'acquisto"
           }
         },
         "ja" : {
@@ -2309,6 +3255,12 @@
     },
     "您的媒体库是空的" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Mediathek ist leer"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2319,6 +3271,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu biblioteca de medios está vacía"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre bibliothèque de médias est vide"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua libreria multimediale è vuota"
           }
         },
         "ja" : {
@@ -2355,6 +3319,12 @@
     },
     "意见反馈" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rückmeldung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2365,6 +3335,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comentarios"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commentaires"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
           }
         },
         "ja" : {
@@ -2401,6 +3383,12 @@
     },
     "成功" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolgreich"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2411,6 +3399,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Éxito"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réussir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il successo"
           }
         },
         "ja" : {
@@ -2447,6 +3447,12 @@
     },
     "成功恢复 %lld 个购买项目：%@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolgreich wiederhergestellt %1$lld Kaufartikel: %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2457,6 +3463,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se restauraron exitosamente %1$lld elementos de compra: %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successfully restored %1$lld purchase items : %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristinato con successo %1$lld articoli acquistati: %2$@"
           }
         },
         "ja" : {
@@ -2493,6 +3511,12 @@
     },
     "打开 Apple Music" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie Apple Music"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2503,6 +3527,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrir Apple Music"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez Apple Music"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprire Apple Music"
           }
         },
         "ja" : {
@@ -2539,6 +3575,12 @@
     },
     "把应用推荐给朋友" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfehlen Sie Ihren Freunden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2549,6 +3591,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recomendar a tus amigos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommandez à vos amis"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consiglia ai tuoi amici"
           }
         },
         "ja" : {
@@ -2585,6 +3639,12 @@
     },
     "抖音" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2592,6 +3652,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TikTok"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "TikTok"
@@ -2631,6 +3703,12 @@
     },
     "持续欣赏机械转动的美感" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontinuierliche Würdigung der Schönheit der mechanischen Rotation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2641,6 +3719,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apreciación continua de la belleza de la rotación mecánica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appréciation continue de la beauté de la rotation mécanique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apprezzamento continuo della bellezza della rotazione meccanica"
           }
         },
         "ja" : {
@@ -2677,6 +3767,12 @@
     },
     "授权访问" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisiert"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2687,6 +3783,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autorizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorizzato"
           }
         },
         "ja" : {
@@ -2723,6 +3831,12 @@
     },
     "提示" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2733,6 +3847,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recordatorio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Promemoria"
           }
         },
         "ja" : {
@@ -2769,6 +3895,12 @@
     },
     "搜索专辑或艺术家" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alben oder Interpreten suchen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2779,6 +3911,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buscar álbumes o artistas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche d'albums ou d'artistes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca Album o Artisti"
           }
         },
         "ja" : {
@@ -2815,6 +3959,12 @@
     },
     "搜索歌单" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiedergabelisten suchen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2825,6 +3975,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buscar listas de reproducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche de listes de lecture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca Playlist"
           }
         },
         "ja" : {
@@ -2861,6 +4023,12 @@
     },
     "播放" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abspielen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2871,6 +4039,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproducir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduci"
           }
         },
         "ja" : {
@@ -2907,6 +4087,12 @@
     },
     "播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spieler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2917,6 +4103,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproductor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecteur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lettore"
           }
         },
         "ja" : {
@@ -2953,6 +4151,12 @@
     },
     "播放队列" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abspielwarteschlange"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2963,6 +4167,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cola de reproducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File d'attente de lecture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coda di riproduzione"
           }
         },
         "ja" : {
@@ -2999,6 +4215,12 @@
     },
     "播放队列为空" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abspielwarteschlange ist leer"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3009,6 +4231,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cola de reproducción está vacía"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File d'attente de lecture vide"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coda di riproduzione vuota"
           }
         },
         "ja" : {
@@ -3045,6 +4279,12 @@
     },
     "支持我们" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterstützen Sie uns"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3055,6 +4295,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apóyanos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contactez-nous"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support us"
           }
         },
         "ja" : {
@@ -3091,6 +4343,12 @@
     },
     "方形比例" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quadratisches Verhältnis"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3101,6 +4359,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ratio de cuadrado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapport carré"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapporto quadrato"
           }
         },
         "ja" : {
@@ -3137,6 +4407,12 @@
     },
     "无法找到该产品信息" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Produktinformationen können nicht gefunden werden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3147,6 +4423,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se puede encontrar la información del producto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les informations sur le produit sont introuvables"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le informazioni sul prodotto non possono essere trovate"
           }
         },
         "ja" : {
@@ -3183,6 +4471,12 @@
     },
     "无限制使用所有播放器和磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbegrenzte Nutzung aller Player und Kassetten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3193,6 +4487,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uso ilimitado de todos los reproductores y cassettes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisation illimitée de tous les lecteurs et cassettes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uso illimitato di tutti i lettori e cassette"
           }
         },
         "ja" : {
@@ -3229,6 +4535,12 @@
     },
     "日文" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanisch"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3239,6 +4551,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Japonés"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japonais"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giapponese"
           }
         },
         "ja" : {
@@ -3275,6 +4599,12 @@
     },
     "早鸟特惠" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonderangebot"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3285,6 +4615,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oferta especial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offre spéciale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offerta speciale"
           }
         },
         "ja" : {
@@ -3321,6 +4663,12 @@
     },
     "暂无价格" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Preis verfügbar"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3331,6 +4679,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No hay precio disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de prix disponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun prezzo disponibile"
           }
         },
         "ja" : {
@@ -3367,6 +4727,12 @@
     },
     "更改封面样式会影响专辑和歌单的封面展示方式" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ändern des Cover-Stils wirkt sich auf die Art und Weise aus, wie Album- und Wiedergabelisten-Cover angezeigt werden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3377,6 +4743,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cambiar el estilo de la carátula afecta a la forma en que se muestran las carátulas de los álbumes y las listas de reproducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le changement de style de couverture affecte l'affichage des couvertures d'albums et de listes de lecture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La modifica dello stile della copertina influisce sul modo in cui vengono visualizzate le copertine degli album e delle playlist"
           }
         },
         "ja" : {
@@ -3413,6 +4791,12 @@
     },
     "更紧凑的方形比例，封面显示更完整" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kompakteres quadratisches Verhältnis mit vollständigerer Coveranzeige"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3423,6 +4807,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Proporción cuadrada más compacta con una pantalla de cubierta más completa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapport carré plus compact avec affichage plus complet de la couverture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapporto quadrato più compatto con visualizzazione della copertina più completa"
           }
         },
         "ja" : {
@@ -3459,6 +4855,12 @@
     },
     "月度 PRO" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monatlich PRO"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3469,6 +4871,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PRO mensual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly PRO"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly PRO"
           }
         },
         "ja" : {
@@ -3505,6 +4919,12 @@
     },
     "未找到匹配的专辑或艺术家" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passenden Alben oder Interpreten gefunden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3515,6 +4935,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se han encontrado álbumes o artistas coincidentes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun album ou artiste trouvé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono stati trovati album o artisti corrispondenti"
           }
         },
         "ja" : {
@@ -3551,6 +4983,12 @@
     },
     "未找到匹配的歌单" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passenden Wiedergabelisten gefunden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3561,6 +4999,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se han encontrado listas de reproducción coincidentes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune liste de lecture trouvée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono state trovate playlist corrispondenti"
           }
         },
         "ja" : {
@@ -3597,6 +5047,12 @@
     },
     "未播放歌曲" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungespielte Lieder"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3607,6 +5063,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Canciones no reproducidas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morceaux non lus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brani non riprodotti"
           }
         },
         "ja" : {
@@ -3643,6 +5111,12 @@
     },
     "未来更新" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zukünftiges Update"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3653,6 +5127,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualización futura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à jour future"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento futuro"
           }
         },
         "ja" : {
@@ -3689,6 +5175,12 @@
     },
     "本地化（特别感谢）" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokalisierung (besonderer Dank)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3699,6 +5191,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Localización (agradecimiento especial)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localisation (remerciements spéciaux)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localizzazione (ringraziamenti speciali)"
           }
         },
         "ja" : {
@@ -3735,6 +5239,12 @@
     },
     "极具性价比的入门磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein extrem kostengünstiger Kassettenspieler der Einstiegsklasse"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3745,6 +5255,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un reproductor de casetes básico muy rentable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lecteur de cassettes d'entrée de gamme extrêmement rentable"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lettore di cassette entry-level estremamente conveniente"
           }
         },
         "ja" : {
@@ -3781,6 +5303,12 @@
     },
     "标准" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3791,6 +5319,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
           }
         },
         "ja" : {
@@ -3827,6 +5367,12 @@
     },
     "标签可写的彩色磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbige Kassette mit Etiketten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3837,6 +5383,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Casete coloreable con etiquetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette colorable avec étiquettes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassetta colorata con etichette"
           }
         },
         "ja" : {
@@ -3873,6 +5431,12 @@
     },
     "模拟实体操作的交互反馈" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulieren Sie physikalische Feedbak"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3883,6 +5447,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Simular el feedbak físico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simuler un feedbak physique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simula feedbak fisico"
           }
         },
         "ja" : {
@@ -3919,6 +5495,12 @@
     },
     "模拟真实磁带音效" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulieren Sie den Soundeffekt einer echten Kassette"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3929,6 +5511,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Simula el efecto de sonido de un casete real"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simuler l'effet sonore d'une vraie cassette"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simula l'effetto sonoro di una cassetta reale"
           }
         },
         "ja" : {
@@ -3965,6 +5559,12 @@
     },
     "模拟磁带底噪和低频抖动" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simulieren Sie Rausch- und Flattereffekte"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3975,6 +5575,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Simulación de ruido y efectos de aleteo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simuler des effets de bruit et de flottement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simula effetti di rumore e flutter"
           }
         },
         "ja" : {
@@ -4011,6 +5623,12 @@
     },
     "歌单" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiedergabeliste"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4021,6 +5639,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lista de reproducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste de lecture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist"
           }
         },
         "ja" : {
@@ -4057,6 +5687,12 @@
     },
     "正在加载..." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4067,6 +5703,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cargando..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement..."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caricamento..."
           }
         },
         "ja" : {
@@ -4103,6 +5751,12 @@
     },
     "永久 PRO" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lebenslang PRO"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4110,6 +5764,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime PRO"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime PRO"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lifetime PRO"
@@ -4149,6 +5815,12 @@
     },
     "没有找到可恢复的购买项目" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wurden keine Kaufartikel gefunden, die wiederhergestellt werden können"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4159,6 +5831,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se han encontrado artículos de compra que puedan restaurarse"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun élément d'achat pouvant être restauré n'a été trouvé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono stati trovati elementi di acquisto che possono essere ripristinati"
           }
         },
         "ja" : {
@@ -4195,6 +5879,12 @@
     },
     "演示用磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Demo-Kassettenplayer"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4205,6 +5895,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un reproductor de casetes Demo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lecteur de cassettes Demo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lettore di cassette demo"
           }
         },
         "ja" : {
@@ -4241,6 +5943,12 @@
     },
     "点此选择音乐" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken Sie hier, um Musik auszuwählen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4251,6 +5959,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Haga clic aquí para seleccionar música"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez ici pour sélectionner la musique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fare clic qui per selezionare la musica"
           }
         },
         "ja" : {
@@ -4287,6 +6007,12 @@
     },
     "版本 %@ (%@)" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@ (%2$@)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4297,6 +6023,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versión %@ (%@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$@ (%2$@)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versione %1$@ (%2$@)"
           }
         },
         "ja" : {
@@ -4333,6 +6071,12 @@
     },
     "物美价廉的磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein preiswerter und hochwertiger Kassettenplayer"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4343,6 +6087,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un reproductor de casetes asequible y de alta calidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lecteur de cassettes abordable et de haute qualité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lettore di cassette conveniente e di alta qualità"
           }
         },
         "ja" : {
@@ -4379,6 +6135,12 @@
     },
     "特色功能" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hauptfunktionen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4389,6 +6151,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Funciones destacadas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctions vedettes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funzioni in primo piano"
           }
         },
         "ja" : {
@@ -4425,6 +6199,12 @@
     },
     "现在加入 Apple Music，最多可享 3 个月免费试用" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt bei Apple Music anmelden und bis zu 3 Monate kostenlos testen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4435,6 +6215,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Regístrate ahora en Apple Music y disfruta de hasta 3 meses de prueba gratis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscrivez-vous maintenant à Apple Music et profitez de jusqu'à 3 mois d'essai gratuit"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iscriviti ora ad Apple Music e usufruisci fino a 3 mesi di prova gratuita"
           }
         },
         "ja" : {
@@ -4471,6 +6263,12 @@
     },
     "瑕疵噪点" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knistern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4481,6 +6279,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Crackle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Craquement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crepitio"
           }
         },
         "ja" : {
@@ -4517,6 +6327,12 @@
     },
     "白色陶瓷外壳的顶级磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Top-Kassette mit weißem Keramikgehäuse"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4527,6 +6343,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cinta de alta gama con carcasa de cerámica blanca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassette supérieure avec un boîtier en céramique blanche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cassetta superiore con involucro in ceramica bianca"
           }
         },
         "ja" : {
@@ -4563,6 +6391,12 @@
     },
     "皮肤数据异常" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungewöhnliche Skin-Daten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4573,6 +6407,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Datos de piel anormales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données anormales sur la peau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dati della pelle anomali"
           }
         },
         "ja" : {
@@ -4609,6 +6455,12 @@
     },
     "矩形比例" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechteckiges Verhältnis"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4619,6 +6471,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Relación rectangular"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapport rectangulaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapporto rettangolare"
           }
         },
         "ja" : {
@@ -4655,6 +6519,12 @@
     },
     "确定" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4665,6 +6535,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aceptar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
         "ja" : {
@@ -4701,6 +6583,12 @@
     },
     "确认购买后，将通过您的 Apple 帐户收取费用。 PRO 会员订阅默认会自动续订，除非在当前订阅结束前至少提前 24 小时前往「设置 -  Apple 账户 - 订阅」关闭自动续订，否则您的 Apple 账户将在当前订阅结束前的 24 小时内被收取续订费用。试用 PRO 会员期间内，如不手动关闭自动续订，则会在试用期结束时自动开通订阅并扣取费用。免费试用机会仅在每位用户首次订阅前试用一次，购买订阅后剩余的免费试用期（如有）将自动失效。" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachdem Sie den Kauf bestätigt haben, wird die Zahlung über Ihr Apple-Konto abgewickelt. Das PRO-Abonnement wird standardmäßig automatisch verlängert. Wenn Sie nicht mindestens 24 Stunden vor Ablauf des aktuellen Abonnements zu \"Einstellungen - Apple-Konto - Abonnements\" gehen, um die automatische Verlängerung zu deaktivieren, wird Ihr Apple-Konto 24 Stunden vor Ablauf des aktuellen Abonnements mit der Verlängerungsgebühr belastet. Wenn Sie während des Testzeitraums der PRO-Mitgliedschaft die automatische Verlängerung nicht manuell deaktivieren, wird das Abonnement automatisch aktiviert und die Gebühr wird am Ende des Testzeitraums abgebucht. Die kostenlose Testphase kann nur einmal pro Nutzer vor dem ersten Abonnement durchgeführt werden. Der verbleibende kostenlose Testzeitraum (falls vorhanden) nach dem Kauf des Abonnements läuft automatisch ab."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4711,6 +6599,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Una vez confirmada la compra, el pago se realizará a través de su cuenta de Apple. La suscripción de membresía PRO se renovará automáticamente por defecto. A menos que vaya a \\\"Configuración - Cuenta de Apple - Suscripciones\\\" al menos 24 horas antes de que finalice la suscripción actual para desactivar la renovación automática, su cuenta de Apple se cobrará la tarifa de renovación 24 horas antes del final de la suscripción actual. Durante el período de prueba de la membresía PRO, si no desactiva manualmente la renovación automática, la suscripción se activará automáticamente y se deducirá la tarifa al final del período de prueba. La oportunidad de prueba gratuita solo está disponible para una prueba por usuario antes de la primera suscripción. El período de prueba gratuito restante (si corresponde) después de comprar la suscripción caducará automáticamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après avoir confirmé l'achat, le paiement sera effectué par l'intermédiaire de votre compte Apple. L'abonnement PRO sera automatiquement renouvelé par défaut. À moins que vous n'alliez dans \"Réglages - Compte Apple - Abonnements\" au moins 24 heures avant la fin de l'abonnement en cours pour désactiver le renouvellement automatique, votre compte Apple sera débité des frais de renouvellement 24 heures avant la fin de l'abonnement en cours. Pendant la période d'essai de l'abonnement PRO, si vous ne désactivez pas manuellement le renouvellement automatique, l'abonnement sera automatiquement activé et les frais seront déduits à la fin de la période d'essai. La possibilité d'essai gratuit n'est disponible que pour un essai par utilisateur avant le premier abonnement. La période d'essai gratuite restante (le cas échéant) après l'achat de l'abonnement expirera automatiquement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dopo aver confermato l'acquisto, il pagamento verrà effettuato tramite il vostro account Apple. L'abbonamento PRO si rinnova automaticamente per impostazione predefinita. A meno che non si acceda a “Impostazioni - Account Apple - Abbonamenti” almeno 24 ore prima della scadenza dell'abbonamento in corso per disattivare il rinnovo automatico, il costo del rinnovo verrà addebitato sul proprio account Apple 24 ore prima della scadenza dell'abbonamento in corso. Durante il periodo di prova dell'abbonamento PRO, se non si disattiva manualmente il rinnovo automatico, l'abbonamento verrà attivato automaticamente e la tariffa verrà detratta al termine del periodo di prova. L'opportunità di prova gratuita è disponibile solo per una prova per utente prima del primo abbonamento. L'eventuale periodo di prova gratuito rimanente dopo l'acquisto dell'abbonamento scadrà automaticamente."
           }
         },
         "ja" : {
@@ -4747,6 +6647,12 @@
     },
     "磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kassette"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4757,6 +6663,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cassette"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassetta"
           }
         },
         "ja" : {
@@ -4793,6 +6711,12 @@
     },
     "磁带摩擦声" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reibung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4803,6 +6727,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fricción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friction"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attrito"
           }
         },
         "ja" : {
@@ -4839,6 +6775,12 @@
     },
     "磁带播放器之王" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der König der Kassettenspieler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4849,6 +6791,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El rey de las grabadoras de casete"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le roi des lecteurs de cassettes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il re dei lettori di cassette"
           }
         },
         "ja" : {
@@ -4885,6 +6839,12 @@
     },
     "磁带音效" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kassetten-Soundeffekt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4895,6 +6855,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Efecto de sonido de casete"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effet sonore de cassette"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effetto sonoro della cassetta"
           }
         },
         "ja" : {
@@ -4931,6 +6903,12 @@
     },
     "立即体验" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt ausprobieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4941,6 +6919,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prueba ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayer maintenant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova ora"
           }
         },
         "ja" : {
@@ -4977,6 +6967,12 @@
     },
     "立即升级" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt aktualisieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4987,6 +6983,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualizar ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à niveau maintenant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornare ora"
           }
         },
         "ja" : {
@@ -5023,6 +7031,12 @@
     },
     "终身使用所有功能和主题" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lebenszeit Alle Funktionen und Themen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5033,6 +7047,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Todas las funciones y temas de por vida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime Toutes les fonctions et tous les thèmes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime Tutte le funzioni e i temi"
           }
         },
         "ja" : {
@@ -5069,6 +7095,12 @@
     },
     "经典动漫中的磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klassischer Anime-Kassettenspieler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5079,6 +7111,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproductor de cassette de anime clásico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecteur de cassettes animé classique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classico lettore di cassette anime"
           }
         },
         "ja" : {
@@ -5115,6 +7159,12 @@
     },
     "经典的磁带盒比例，封面更具真实感" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klassisches Kassettenverpackungsverhältnis mit einem authentischeren Gefühl für das Cover"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5125,6 +7175,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La clásica relación de embalaje de casete con una carátula más auténtica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ratio d'emballage de cassette classique avec une impression plus authentique de la couverture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classico rapporto di confezionamento delle cassette con una sensazione più autentica della copertina"
           }
         },
         "ja" : {
@@ -5161,6 +7223,12 @@
     },
     "给我们五星好评" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie uns eine Fünf-Sterne-Bewertung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5171,6 +7239,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Danos una calificación de cinco estrellas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donnez-nous une note de cinq étoiles"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dacci una valutazione a cinque stelle"
           }
         },
         "ja" : {
@@ -5207,6 +7287,12 @@
     },
     "继续" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5217,6 +7303,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Siguiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successivo"
           }
         },
         "ja" : {
@@ -5253,6 +7351,12 @@
     },
     "繁体中文（台湾）" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traditionelles Chinesisch (Taiwan)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5263,6 +7367,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chino tradicional (Taiwán)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinois traditionnel (Taïwan)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cinese tradizionale (Taiwan)"
           }
         },
         "ja" : {
@@ -5299,6 +7415,12 @@
     },
     "网站" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5309,6 +7431,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sitio web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Site web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sito web"
           }
         },
         "ja" : {
@@ -5345,6 +7479,12 @@
     },
     "联系方式" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontaktinformationen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5355,6 +7495,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Información de contacto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informations de contact"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informazioni di contatto"
           }
         },
         "ja" : {
@@ -5391,6 +7543,12 @@
     },
     "能时间旅行的磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein zeitreisender Kassettenspieler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5401,6 +7559,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un reproductor de cassette que viaja en el tiempo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lecteur de cassettes qui voyage dans le temps"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lettore di cassette che viaggia nel tempo"
           }
         },
         "ja" : {
@@ -5435,54 +7605,142 @@
         }
       }
     },
-    "解锁所有皮肤" : {
+    "艺术家" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Künstler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlock all skins"
+            "value" : "Artist"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquea todas las apariencias"
+            "value" : "Artista"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artiste"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artista"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "全スキン解鎖"
+            "value" : "アーティスト"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "모든 스킨 잠금 해제"
+            "value" : "아티스트"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquear todas as aparências"
+            "value" : "Artista"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Разблокировать все скины"
+            "value" : "Художник"
           }
         },
         "zh-Hant-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解鎖所有造型"
+            "value" : "藝術家"
+          }
+        }
+      }
+    },
+    "解锁所有主题" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Themen freischalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock all themes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquea todos los temas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débloquez tous les thèmes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sblocca tutti i temi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのテーマを解除する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 테마를 잠금 해제하세요"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloqueie todos os temas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разблокировать все темы"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "解鎖所有主題"
           }
         }
       }
     },
     "触觉反馈" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haptisches Feedback"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5493,6 +7751,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Respuesta táctil"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour haptique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback aptico"
           }
         },
         "ja" : {
@@ -5529,6 +7799,12 @@
     },
     "设置" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5539,6 +7815,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglage"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazione"
           }
         },
         "ja" : {
@@ -5575,6 +7863,12 @@
     },
     "语言" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprache"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5585,6 +7879,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Idioma"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lingua"
           }
         },
         "ja" : {
@@ -5621,6 +7927,12 @@
     },
     "请先在 Apple Music 中添加专辑或播放列表" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügen Sie zuerst ein Album oder eine Wiedergabeliste zu Apple Music hinzu"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5631,6 +7943,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Permitir acceso a tu Apple Music para ver álbumes y listas de reproducción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter d'abord un album ou une liste de lecture à Apple Music"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi prima un album o una playlist ad Apple Music"
           }
         },
         "ja" : {
@@ -5667,6 +7991,12 @@
     },
     "请尝试使用不同的关键词搜索" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte versuchen Sie, mit anderen Stichwörtern zu suchen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5677,6 +8007,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Intente buscar con otras palabras clave"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez essayer de chercher avec d'autres mots-clés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova a cercare con parole chiave diverse"
           }
         },
         "ja" : {
@@ -5713,6 +8055,12 @@
     },
     "请重试或检查网络连接" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte versuchen Sie es erneut oder überprüfen Sie Ihre Netzwerkverbindung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5723,6 +8071,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Por favor, inténtelo de nuevo o compruebe su conexión de red"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez réessayer ou vérifier votre connexion réseau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova o controlla la connessione di rete"
           }
         },
         "ja" : {
@@ -5759,6 +8119,12 @@
     },
     "调节音效参数" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passen Sie den Audio-Effekt an"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5769,6 +8135,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajusta el efecto de audio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Régler l'effet audio"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regolare l'effetto audio"
           }
         },
         "ja" : {
@@ -5805,6 +8183,12 @@
     },
     "购买失败" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf fehlgeschlagen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5815,6 +8199,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compra fallida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'achat a échoué"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acquisto fallito"
           }
         },
         "ja" : {
@@ -5851,6 +8247,12 @@
     },
     "购买失败，未知错误" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf fehlgeschlagen, Unbekannter Fehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5861,6 +8263,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compra fallida, error desconocido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'achat a échoué, erreur inconnue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acquisto fallito, errore sconosciuto"
           }
         },
         "ja" : {
@@ -5897,6 +8311,12 @@
     },
     "购买失败：%@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf fehlgeschlagen: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5907,6 +8327,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error en la compra: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'achat a échoué : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acquisto fallito: %@"
           }
         },
         "ja" : {
@@ -5943,6 +8375,12 @@
     },
     "购买成功！已为您解锁内容" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf erfolgreich! Der Inhalt wurde für Sie freigeschaltet"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5953,6 +8391,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¡Compra realizada! El contenido ha sido desbloqueado para ti"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat réussi ! Le contenu a été débloqué pour vous"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acquisto riuscito! Il contenuto è stato sbloccato per te"
           }
         },
         "ja" : {
@@ -5989,6 +8439,12 @@
     },
     "购买正在处理中，请稍后查看" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf läuft, Bitte schauen Sie später wieder vorbei"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5999,6 +8455,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La compra está en curso, por favor vuelva más tarde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'achat est en cours, veuillez revenir plus tard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'acquisto è in corso, controllare più tardi"
           }
         },
         "ja" : {
@@ -6035,6 +8503,12 @@
     },
     "购买验证失败，请稍后重试" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaufverifizierung fehlgeschlagen, Bitte versuchen Sie es später noch einmal"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6045,6 +8519,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error en la verificación de la compra, inténtelo de nuevo más tarde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La vérification de l'achat a échoué, veuillez réessayer plus tard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifica dell'acquisto fallita, riprovare più tardi"
           }
         },
         "ja" : {
@@ -6081,16 +8567,34 @@
     },
     "轻度" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mild"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Light"
+            "value" : "Mildly"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "leve"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Légèrement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lievemente"
           }
         },
         "ja" : {
@@ -6127,6 +8631,12 @@
     },
     "选择" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6137,6 +8647,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seleccione"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleziona"
           }
         },
         "ja" : {
@@ -6173,6 +8695,12 @@
     },
     "透明演示磁带" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transparente Demokassette"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6183,6 +8711,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Casete de demostración transparente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette de démonstration transparente"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassetta demo trasparente"
           }
         },
         "ja" : {
@@ -6219,6 +8759,12 @@
     },
     "通用" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6229,6 +8775,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "General"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generale"
           }
         },
         "ja" : {
@@ -6265,6 +8823,12 @@
     },
     "邮箱" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6272,6 +8836,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "E-mail"
@@ -6311,6 +8887,12 @@
     },
     "重度" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwer"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6321,6 +8903,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Serio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lourd"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesante"
           }
         },
         "ja" : {
@@ -6355,8 +8949,78 @@
         }
       }
     },
+    "重新排序失败: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuordnung fehlgeschlagen: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reordering failed: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error en la reordenación: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La réorganisation a échoué : %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reordering failed: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並べ替えに失敗しました: %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재주문 실패: %@"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A reordenação falhou: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упорядочивание не удалось: %@"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新排序失敗：%@"
+          }
+        }
+      }
+    },
     "重试" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuchen Sie es erneut"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6367,6 +9031,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inténtalo de nuevo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayez"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova"
           }
         },
         "ja" : {
@@ -6403,6 +9079,12 @@
     },
     "队列会在播放音乐时显示" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Warteschlange wird angezeigt, während die Musik spielt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6413,6 +9095,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cola se mostrará mientras suena la música"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La file d'attente s'affichera pendant la lecture de la musique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La coda verrà visualizzata durante la riproduzione della musica"
           }
         },
         "ja" : {
@@ -6449,6 +9143,12 @@
     },
     "限时 5 折优惠" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitlich begrenztes Angebot von 50 %"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6459,6 +9159,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "50% de descuento por tiempo limitado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50% de réduction en temps limité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sconto limitato del 50%"
           }
         },
         "ja" : {
@@ -6495,6 +9207,12 @@
     },
     "隐私政策" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6505,6 +9223,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Política de privacidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Politique de confidentialité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informativa sulla privacy"
           }
         },
         "ja" : {
@@ -6541,6 +9271,12 @@
     },
     "随机播放" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zufallswiedergabe"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6551,6 +9287,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproducción aleatoria"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture aléatoire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione casuale"
           }
         },
         "ja" : {
@@ -6587,6 +9335,12 @@
     },
     "需要 Apple Music 订阅才能使用" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für die Nutzung ist ein Apple Music-Abonnement erforderlich"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6597,6 +9351,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Requiere una suscripción a Apple Music para su uso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nécessite un abonnement Apple Music pour être utilisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiede un abbonamento ad Apple Music per essere utilizzato"
           }
         },
         "ja" : {
@@ -6633,6 +9399,12 @@
     },
     "需要授权才能访问您的媒体库" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für die Nutzung ist ein Apple Music-Abonnement erforderlich"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6643,6 +9415,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Necesitas autorización para acceder a tu biblioteca musical"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nécessite un abonnement Apple Music pour être utilisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiede un abbonamento ad Apple Music per essere utilizzato"
           }
         },
         "ja" : {
@@ -6679,6 +9463,12 @@
     },
     "音效音量" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soundeffekt-Lautstärke"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6689,6 +9479,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volumen del efecto de sonido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume de l'effet sonore"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume dell'effetto sonoro"
           }
         },
         "ja" : {
@@ -6725,6 +9527,12 @@
     },
     "音效预设" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soundeffekt-Voreinstellung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6735,6 +9543,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preajuste del efecto de sonido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préréglage de l'effet sonore"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset dell'effetto sonoro"
           }
         },
         "ja" : {
@@ -6771,6 +9591,12 @@
     },
     "音量" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lautstärke"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6781,6 +9607,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volumen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
           }
         },
         "ja" : {
@@ -6817,6 +9655,12 @@
     },
     "频率" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequenz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6827,6 +9671,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frecuencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fréquence"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequenza"
           }
         },
         "ja" : {
@@ -6863,6 +9719,12 @@
     },
     "飞翔牌磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kassettenspieler der Marke Fly"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6873,6 +9735,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reproductor de casetes marca Fly"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecteur de cassettes de la marque Fly"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lettore di cassette di marca Fly"
           }
         },
         "ja" : {
@@ -6909,6 +9783,12 @@
     },
     "首款便携式磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der erste tragbare Kassettenspieler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6919,6 +9799,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El primer reproductor de casetes portátil"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le premier lecteur de cassettes portable"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il primo lettore di cassette portatile"
           }
         },
         "ja" : {
@@ -6955,6 +9847,12 @@
     },
     "首款全透明磁带播放器" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der erste vollständig transparente Kassettenspieler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6965,6 +9863,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El primer reproductor de casetes totalmente transparente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le premier lecteur de cassettes entièrement transparent"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il primo lettore di cassette completamente trasparente"
           }
         },
         "ja" : {
@@ -7001,6 +9911,12 @@
     },
     "高" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoch"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7011,6 +9927,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haut"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alto"
           }
         },
         "ja" : {
@@ -7047,6 +9975,12 @@
     },
     "高频嘶嘶声" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hochfrequentes Rauschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7057,6 +9991,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Silbido de alta frecuencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sifflement à haute fréquence"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sibilo ad alta frequenza"
           }
         },
         "ja" : {

@@ -113,7 +113,7 @@ struct PaywallView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         FeatureRow(
                             systemImage: "recordingtape",
-                            title: String(localized: "解锁所有皮肤"),
+                            title: String(localized: "解锁所有主题"),
                             description: String(localized:"无限制使用所有播放器和磁带")
                         )
                         Divider()
