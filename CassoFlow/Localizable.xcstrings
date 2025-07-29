@@ -4346,31 +4346,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quadratisches Verhältnis"
+            "value" : "Quadratisches"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Square ratio"
+            "value" : "Square"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ratio de cuadrado"
+            "value" : "Recuadro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapport carré"
+            "value" : "Carré"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapporto quadrato"
+            "value" : "Quadrato"
           }
         },
         "ja" : {
@@ -4388,13 +4388,13 @@
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rácio quadrado"
+            "value" : "Quadrado"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Соотношение площадей"
+            "value" : "квадратн"
           }
         },
         "zh-Hant-TW" : {
@@ -5300,6 +5300,9 @@
           }
         }
       }
+    },
+    "极具未来感的磁带播放器" : {
+
     },
     "标准" : {
       "localizations" : {
@@ -6458,31 +6461,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rechteckiges Verhältnis"
+            "value" : "Rechteckiges"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rectangular ratio"
+            "value" : "Rectangular"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Relación rectangular"
+            "value" : "Rectángulo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapport rectangulaire"
+            "value" : "Rectangulaire"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapporto rettangolare"
+            "value" : "Rettangolare"
           }
         },
         "ja" : {
@@ -6500,13 +6503,13 @@
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rácio retangular"
+            "value" : "Retângulo"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прямоугольное соотношение"
+            "value" : "Прямоугольное"
           }
         },
         "zh-Hant-TW" : {
@@ -9286,19 +9289,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reproducción aleatoria"
+            "value" : "Aleatoria"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lecture aléatoire"
+            "value" : "Aléatoire"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Riproduzione casuale"
+            "value" : "Casuale"
           }
         },
         "ja" : {
@@ -9316,13 +9319,13 @@
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reprodução aleatória"
+            "value" : "Aleatória"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Случайное воспроизведение"
+            "value" : "Случайное"
           }
         },
         "zh-Hant-TW" : {

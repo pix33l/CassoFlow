@@ -238,6 +238,24 @@ struct PlayerSkin: Identifiable {
             cassetteBgImage: "bg-cassette",
             buttonCornerRadius: 25,
             buttonHeight: 50
+        ),
+        PlayerSkin(
+            name: "CF-NT",  // 名称作为唯一标识
+            year: "2025",
+            description: String(localized: "极具未来感的磁带播放器"),
+            coverImage: "cover-CF-NT",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .white.opacity(0.5),
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-blue"),
+            screenTextColor: Color("text-screen-blue"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-NT",
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 25,
+            buttonHeight: 50
         )
     ]
     
@@ -252,7 +270,7 @@ struct PlayerSkin: Identifiable {
     }
     
     func isMemberExclusiveSkin() -> Bool {
-        return ["CF-PC13", "CF-M10", "CF-MU01", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DD9", "CF-DT1", "CF-CW5"].contains(self.name)
+        return ["CF-PC13", "CF-M10", "CF-MU01", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DD9", "CF-DT1", "CF-CW5", "CF-NT"].contains(self.name)
     }
 }
 

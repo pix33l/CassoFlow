@@ -150,6 +150,7 @@ struct MusicDetailView: View {
                                 
                                 Text(container.artistName)
                                     .font(.footnote)
+                                    .lineLimit(1)
                                     .padding(.top, 4)
                                 
                                 if let releaseDate = container.releaseDate {
@@ -201,6 +202,7 @@ struct MusicDetailView: View {
                             HStack {
                                 Image(systemName: "play.fill")
                                 Text("播放")
+                                    .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -222,6 +224,7 @@ struct MusicDetailView: View {
                             HStack {
                                 Image(systemName: "shuffle")
                                 Text("随机播放")
+                                    .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
                             .padding()

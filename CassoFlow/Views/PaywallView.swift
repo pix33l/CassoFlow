@@ -98,6 +98,7 @@ struct PaywallView: View {
                     Text("升级获取全部高级功能")
                         .font(.title)
                         .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
                 }
                 
                 Image("paywall-cassette")
