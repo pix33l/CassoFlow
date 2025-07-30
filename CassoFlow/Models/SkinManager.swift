@@ -242,7 +242,7 @@ struct PlayerSkin: Identifiable {
         PlayerSkin(
             name: "CF-NT",  // 名称作为唯一标识
             year: "2025",
-            description: String(localized: "极具未来感的磁带播放器"),
+            description: String(localized: "没有什么比这磁带播放器更具未来感"),
             coverImage: "cover-CF-NT",
             panelColor: .clear,
             panelOutlineColor: .clear,

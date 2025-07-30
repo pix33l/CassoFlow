@@ -5301,9 +5301,6 @@
         }
       }
     },
-    "极具未来感的磁带播放器" : {
-
-    },
     "标准" : {
       "localizations" : {
         "de" : {
@@ -5812,6 +5809,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "永久 PRO"
+          }
+        }
+      }
+    },
+    "没有什么比这磁带播放器更具未来感" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts könnte futuristischer sein als dieser Kassettenrekorder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing could be more futuristic than this cassette player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada podría ser más futurista que este reproductor de casetes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien n'est plus futuriste que ce lecteur de cassettes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niente potrebbe essere più futuristico di questo lettore di cassette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これほど未来的なカセットプレーヤーは存在しない"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 카세트 플레이어보다 더 미래지향적인 것은 없을 것입니다"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada poderia ser mais futurista do que este leitor de cassetes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ничто не может быть более футуристичным, чем этот кассетный плеер"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有什麼比這款錄音帶播放器更有未來感了"
           }
         }
       }

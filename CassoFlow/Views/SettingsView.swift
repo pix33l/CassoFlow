@@ -1,8 +1,8 @@
 import SwiftUI
 
 enum WebLink: String {
-    case privacyPolicy = "https://pix3l.me/cf-privacy-policy"
-    case termsOfUse = "https://pix3l.me/cf-terms-of-use"
+    case privacyPolicy = "https://pix3l.me/cf-privacy-policy-en"
+    case termsOfUse = "https://pix3l.me/cf-terms-of-use-en"
     case appStoreReview = "https://apps.apple.com/app/id6746403175?action=write-review"
 }
 
