@@ -140,6 +140,23 @@ class LibraryDataManager: ObservableObject {
             }
         }
     }
+    
+    // 添加专辑到媒体库
+    func addAlbumToLibrary(_ album: Album) async {
+        do {
+            try await MusicLibrary.shared.add(album)
+            
+            // 重新加载媒体库以包含新添加的专辑
+            await MainActor.run {
+                hasLoaded = false
+            }
+            await loadUserLibraryIfNeeded(with: preferences?.currentSortType ?? .recentlyAdded)
+        } catch {
+            await MainActor.run {
+                errorMessage = String(localized: "添加专辑到媒体库失败: \(error.localizedDescription)")
+            }
+        }
+    }
 
     private func checkSubscriptionStatus() async {
         do {
@@ -261,6 +278,12 @@ struct LibraryView: View {
     @State private var albumSearchText = ""
     @State private var playlistSearchText = ""
     
+    // 条形码扫描相关状态
+    @State private var showBarcodeScanningView = false
+    @State private var detectedBarcode = ""
+    @State private var showAddAlbumSuccess = false
+    @State private var addedAlbumTitle = ""
+    
     // 过滤后的数据
     private var filteredAlbums: MusicItemCollection<Album> {
         if albumSearchText.isEmpty {
@@ -299,6 +322,20 @@ struct LibraryView: View {
             .navigationTitle("媒体库")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
+                        showBarcodeScanningView = true
+                    } label: {
+                        Image(systemName: "barcode.viewfinder")
+                            .font(.body)
+                            .foregroundColor(.primary)
+                            .padding(8)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         if musicService.isHapticFeedbackEnabled {
@@ -331,8 +368,46 @@ struct LibraryView: View {
             ) { result in
                 // 订阅结果处理
             }
+            .fullScreenCover(isPresented: $showBarcodeScanningView) {
+                BarcodeScanningView(
+                    detectedBarcode: $detectedBarcode,
+                    onAlbumFound: { album in
+                        Task {
+                            await handleFoundAlbum(album)
+                        }
+                    },
+                    onDismiss: {
+                        showBarcodeScanningView = false
+                    }
+                )
+            }
+            .alert("专辑已添加", isPresented: $showAddAlbumSuccess) {
+                Button("确定", role: .cancel) { }
+            } message: {
+                Text("专辑「\(addedAlbumTitle)」已成功添加到您的媒体库中。")
+            }
         }
         .navigationViewStyle(.stack) // 确保使用栈式导航
+    }
+    
+    // MARK: - 处理找到的专辑
+    
+    @MainActor
+    private func handleFoundAlbum(_ album: Album) async {
+        // 触觉反馈
+        if musicService.isHapticFeedbackEnabled {
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+        }
+        
+        // 保存专辑标题用于显示
+        addedAlbumTitle = album.title
+        
+        // 添加专辑到媒体库
+        await libraryData.addAlbumToLibrary(album)
+        
+        // 显示成功提示
+        showAddAlbumSuccess = true
     }
 
     private func errorView(message: String) -> some View {
