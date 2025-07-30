@@ -279,10 +279,11 @@ struct LibraryView: View {
     @State private var playlistSearchText = ""
     
     // 条形码扫描相关状态
-    @State private var showBarcodeScanningView = false
+    @State private var showBarcodeScannerView = false
     @State private var detectedBarcode = ""
     @State private var showAddAlbumSuccess = false
     @State private var addedAlbumTitle = ""
+    @State private var showPaywall = false
     
     // 过滤后的数据
     private var filteredAlbums: MusicItemCollection<Album> {
@@ -328,7 +329,13 @@ struct LibraryView: View {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                             impactFeedback.impactOccurred()
                         }
-                        showBarcodeScanningView = true
+                        
+                        // 检查会员状态
+                        if storeManager.membershipStatus.isActive {
+                            showBarcodeScannerView = true
+                        } else {
+                            showPaywall = true
+                        }
                     } label: {
                         Image(systemName: "barcode.viewfinder")
                             .font(.body)
@@ -368,8 +375,8 @@ struct LibraryView: View {
             ) { result in
                 // 订阅结果处理
             }
-            .fullScreenCover(isPresented: $showBarcodeScanningView) {
-                BarcodeScanningView(
+            .fullScreenCover(isPresented: $showBarcodeScannerView) {
+                BarcodeScannerView(
                     detectedBarcode: $detectedBarcode,
                     onAlbumFound: { album in
                         Task {
@@ -377,14 +384,18 @@ struct LibraryView: View {
                         }
                     },
                     onDismiss: {
-                        showBarcodeScanningView = false
+                        showBarcodeScannerView = false
                     }
                 )
+            }
+            .fullScreenCover(isPresented: $showPaywall) {
+                PaywallView()
+                    .environmentObject(storeManager)
             }
             .alert("专辑已添加", isPresented: $showAddAlbumSuccess) {
                 Button("确定", role: .cancel) { }
             } message: {
-                Text("专辑「\(addedAlbumTitle)」已成功添加到您的媒体库中。")
+                Text("专辑「\(addedAlbumTitle)」已成功添加到您的媒体库中")
             }
         }
         .navigationViewStyle(.stack) // 确保使用栈式导航
