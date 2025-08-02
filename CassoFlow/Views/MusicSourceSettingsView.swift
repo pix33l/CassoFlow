@@ -6,26 +6,6 @@ struct MusicSourceSettingsView: View {
     
     var body: some View {
         List {
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Image(systemName: "music.quarternote.3")
-                            .foregroundColor(.blue)
-                            .font(.title2)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("音乐数据源")
-                                .font(.headline)
-                            Text("选择您的音乐服务提供商")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                .padding(.vertical, 8)
-            } header: {
-                Text("当前数据源")
-            }
             
             Section {
                 // Apple Music 选项
@@ -43,6 +23,37 @@ struct MusicSourceSettingsView: View {
                                 .foregroundColor(.primary)
                             
                             Text("使用您的 Apple Music 资料库")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        if musicService.currentDataSource == .musicKit {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.blue)
+                        } else {
+                            Image(systemName: "circle")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
+                Button(action: {
+                    musicService.currentDataSource = .musicKit
+                }) {
+                    HStack {
+                        Image(systemName: "music.note")
+                            .foregroundColor(.green)
+                            .frame(width: 24, height: 24)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Spotify")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Text("使用您的 Spotify 资料库")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -92,9 +103,9 @@ struct MusicSourceSettingsView: View {
                     .padding(.vertical, 4)
                 }
             } header: {
-                Text("可用的音乐源")
+                Text("音乐数据源")
             } footer: {
-                Text("选择您希望使用的音乐服务。切换数据源会停止当前播放。")
+                Text("选择您希望使用的音乐服务。")
             }
             
             // Subsonic 配置部分
@@ -152,49 +163,6 @@ struct MusicSourceSettingsView: View {
                     Text("配置您的 Subsonic 服务器连接信息。需要有效的服务器地址、用户名和密码。")
                 }
             }
-            
-            // 数据源功能对比
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    FeatureRow(
-                        feature: "音乐资料库",
-                        appleMusicSupported: true,
-                        subsonicSupported: true
-                    )
-                    
-                    FeatureRow(
-                        feature: "播放列表",
-                        appleMusicSupported: true,
-                        subsonicSupported: true
-                    )
-                    
-                    FeatureRow(
-                        feature: "搜索功能",
-                        appleMusicSupported: true,
-                        subsonicSupported: true
-                    )
-                    
-                    FeatureRow(
-                        feature: "离线播放",
-                        appleMusicSupported: true,
-                        subsonicSupported: false
-                    )
-                    
-                    FeatureRow(
-                        feature: "自托管服务器",
-                        appleMusicSupported: false,
-                        subsonicSupported: true
-                    )
-                    
-                    FeatureRow(
-                        feature: "无月费订阅",
-                        appleMusicSupported: false,
-                        subsonicSupported: true
-                    )
-                }
-            } header: {
-                Text("功能对比")
-            }
         }
         .navigationTitle("音乐服务商")
         .navigationBarTitleDisplayMode(.inline)
@@ -204,46 +172,6 @@ struct MusicSourceSettingsView: View {
     }
 }
 
-// MARK: - 功能对比行
-
-struct FeatureRow: View {
-    let feature: String
-    let appleMusicSupported: Bool
-    let subsonicSupported: Bool
-    
-    var body: some View {
-        HStack {
-            Text(feature)
-                .font(.body)
-            
-            Spacer()
-            
-            // Apple Music 支持状态
-            VStack(alignment: .center, spacing: 2) {
-                Image(systemName: appleMusicSupported ? "checkmark" : "xmark")
-                    .font(.caption)
-                    .foregroundColor(appleMusicSupported ? .green : .red)
-                
-                Text("Apple")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            .frame(width: 50)
-            
-            // Subsonic 支持状态
-            VStack(alignment: .center, spacing: 2) {
-                Image(systemName: subsonicSupported ? "checkmark" : "xmark")
-                    .font(.caption)
-                    .foregroundColor(subsonicSupported ? .green : .red)
-                
-                Text("Subsonic")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            .frame(width: 60)
-        }
-    }
-}
 
 // MARK: - 预览
 

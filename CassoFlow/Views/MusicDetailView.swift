@@ -40,10 +40,10 @@ struct MusicDetailView: View {
     /// 判断当前是否正在播放指定歌曲
     private func isPlaying(_ track: Track) -> Bool {
         
-        // 方法1: 尝试ID匹配（如果相同则最准确）
-        if musicService.currentTrackID == track.id {
-            return true
-        }
+//        // 方法1: 尝试ID匹配（如果相同则最准确）
+//        if musicService.currentTrackID == track.id {
+//            return true
+//        }
         
         // 方法2: 元数据匹配（处理ID不匹配的情况）
         let (trackTitle, trackArtist) = getTrackInfo(track)
