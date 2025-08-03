@@ -67,19 +67,10 @@ struct UniversalPlaylist: Identifiable {
 
 enum MusicDataSourceType: String, CaseIterable {
     case musicKit = "Apple Music"
-    case subsonic = "Subsonic"
+    case subsonic = "Navidrome"
     
     var displayName: String {
         rawValue
-    }
-    
-    var iconName: String {
-        switch self {
-        case .musicKit:
-            return "music.note"
-        case .subsonic:
-            return "server.rack"
-        }
     }
 }
 

@@ -270,18 +270,14 @@ struct SettingsView: View {
                                 .font(.body)
                                 .frame(width: 20)
                             
-                            Text("音乐服务商")
+                            Text("音乐提供商")
                             
                             Spacer()
                             
                             // 显示当前选择的数据源
-                            HStack(spacing: 4) {
-                                Image(systemName: musicService.currentDataSource.iconName)
-                                    .font(.caption)
-                                Text(musicService.currentDataSource.displayName)
-                                    .font(.body)
-                            }
-                            .foregroundColor(.secondary)
+                            Text(musicService.currentDataSource.displayName)
+                                .font(.body)
+                                .foregroundColor(.secondary)
                         }
                     }
                     

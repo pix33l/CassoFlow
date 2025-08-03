@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SubsonicSettingsView: View {
     @StateObject private var apiClient = SubsonicAPIClient()
+    @EnvironmentObject private var musicService: MusicService
+    @Environment(\.dismiss) private var dismiss
     @State private var isConnecting = false
     @State private var connectionStatus: ConnectionStatus = .notTested
     @State private var showPassword = false
@@ -216,8 +218,21 @@ struct SubsonicSettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("完成") {
-                        // 关闭视图的逻辑
+                    Button {
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.caption)
+                            .foregroundColor(.primary)
+                            .padding(8)
+                            .background(
+                                Circle()
+                                    .fill(Color.gray.opacity(0.15))
+                            )
                     }
                 }
             }

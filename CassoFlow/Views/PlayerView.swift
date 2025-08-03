@@ -106,10 +106,10 @@ struct PlayerView: View {
             stopRotation()
             stopPlaybackTracking()
         }
-        .sheet(isPresented: $showLibraryView) { LibraryView() }
+        .sheet(isPresented: $showLibraryView) { UniversalLibraryView() }
         .sheet(isPresented: $showSettingsView) { SettingsView() }
         .sheet(isPresented: $showStoreView) { StoreView() }
-        .sheet(isPresented: $showQueueView) { QueueView() }
+        .sheet(isPresented: $showQueueView) { UniversalQueueView() }
         .fullScreenCover(isPresented: $showPaywallForLimit) {
             PaywallView()
                 .environmentObject(storeManager)

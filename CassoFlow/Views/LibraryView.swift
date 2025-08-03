@@ -610,7 +610,7 @@ struct LibraryView: View {
                                     spacing: 20
                                 ) {
                                     ForEach(filteredAlbums, id: \.id) { album in
-                                        NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
+                                        NavigationLink(destination: UniversalMusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
                                             GirdAlbumCell(album: album)
                                         }
                                         .buttonStyle(PlainButtonStyle())
@@ -624,7 +624,7 @@ struct LibraryView: View {
                                     spacing: 12
                                 ) {
                                     ForEach(filteredAlbums, id: \.id) { album in
-                                        NavigationLink(destination: MusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
+                                        NavigationLink(destination: UniversalMusicDetailView(containerType: .album(album)).environmentObject(musicService)) {
                                             ListAlbumCell(album: album)
                                         }
                                         .buttonStyle(PlainButtonStyle())
@@ -710,7 +710,7 @@ struct LibraryView: View {
                                     spacing: 16
                                 ) {
                                     ForEach(filteredPlaylists, id: \.id) { playlist in
-                                        NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
+                                        NavigationLink(destination: UniversalMusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
                                             GridPlaylistCell(playlist: playlist)
                                         }
                                         .buttonStyle(PlainButtonStyle())
@@ -726,7 +726,7 @@ struct LibraryView: View {
                                     spacing: 12
                                 ) {
                                     ForEach(filteredPlaylists, id: \.id) { playlist in
-                                        NavigationLink(destination: MusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
+                                        NavigationLink(destination: UniversalMusicDetailView(containerType: .playlist(playlist)).environmentObject(musicService)) {
                                             ListPlaylistCell(playlist: playlist)
                                         }
                                         .buttonStyle(PlainButtonStyle())

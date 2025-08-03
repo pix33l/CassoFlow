@@ -13,7 +13,7 @@ struct MusicSourceSettingsView: View {
                     musicService.currentDataSource = .musicKit
                 }) {
                     HStack {
-                        Image(systemName: "music.note")
+                        Image(systemName: "apple.logo")
                             .foregroundColor(.red)
                             .frame(width: 24, height: 24)
                         
@@ -22,7 +22,7 @@ struct MusicSourceSettingsView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
-                            Text("使用您的 Apple Music 资料库")
+                            Text("使用您的 Apple Music 媒体库")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -31,38 +31,7 @@ struct MusicSourceSettingsView: View {
                         
                         if musicService.currentDataSource == .musicKit {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.blue)
-                        } else {
-                            Image(systemName: "circle")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                
-                Button(action: {
-                    musicService.currentDataSource = .musicKit
-                }) {
-                    HStack {
-                        Image(systemName: "music.note")
-                            .foregroundColor(.green)
-                            .frame(width: 24, height: 24)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Spotify")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            Text("使用您的 Spotify 资料库")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        if musicService.currentDataSource == .musicKit {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.yellow)
                         } else {
                             Image(systemName: "circle")
                                 .foregroundColor(.secondary)
@@ -76,16 +45,19 @@ struct MusicSourceSettingsView: View {
                     musicService.currentDataSource = .subsonic
                 }) {
                     HStack {
-                        Image(systemName: "server.rack")
-                            .foregroundColor(.orange)
+                        
+                        Image("Navidrome")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
                             .frame(width: 24, height: 24)
+
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Subsonic")
+                            Text("Navidrome")
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
-                            Text("连接到您的个人音乐服务器")
+                            Text("连接到您的个人音乐服务器（Subsonic API），如 Subsonic、Navidrome、Airsonic、Madsonic等")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -94,18 +66,17 @@ struct MusicSourceSettingsView: View {
                         
                         if musicService.currentDataSource == .subsonic {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.yellow)
                         } else {
                             Image(systemName: "circle")
                                 .foregroundColor(.secondary)
                         }
+
                     }
                     .padding(.vertical, 4)
                 }
             } header: {
-                Text("音乐数据源")
-            } footer: {
-                Text("选择您希望使用的音乐服务。")
+                Text("请选择您希望使用的音乐提供商")
             }
             
             // Subsonic 配置部分
