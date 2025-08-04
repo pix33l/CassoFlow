@@ -32,6 +32,9 @@ struct PlayerView: View {
     @State private var showPaywallForLimit = false
     @State private var showQueueView = false  // 新增：显示播放队列视图
     
+    // 新增：应用状态监听
+    @Environment(\.scenePhase) private var scenePhase
+    
     // 计算属性：当前播放进度
     private var progress: CGFloat {
         guard musicService.totalDuration > 0 else { return 0 }
@@ -64,43 +67,31 @@ struct PlayerView: View {
             }
         }
         .onAppear {
+
             if musicService.isPlaying {
                 startRotation()
                 startPlaybackTracking()
             }
         }
         .onChange(of: musicService.isPlaying) { _, isPlaying in
-            if isPlaying {
-                startRotation()
-                startPlaybackTracking()
-            } else {
-                stopRotation()
-                stopPlaybackTracking()
-            }
+            // 合并所有播放状态相关的逻辑
+            handlePlayingStateChange(isPlaying)
         }
-        .onChange(of: musicService.isFastForwarding) { _, newValue in
-            if musicService.isPlaying || newValue {
-                startRotation()
-            }
-        }
-        .onChange(of: musicService.isFastRewinding) { _, newValue in
-            if musicService.isPlaying || newValue {
-                startRotation()
-            }
+        .onChange(of: [musicService.isFastForwarding, musicService.isFastRewinding]) { 
+            // 快进/快退状态变化时，重新评估旋转需求
+            startRotation()
         }
         .onChange(of: storeManager.membershipStatus.isActive) { _, isActive in
             if isActive {
                 // 用户升级为会员，重置播放时间限制
                 resetPlaybackTimer()
-                print("🎵 用户已升级为会员，移除播放时间限制")
             }
         }
-        .onChange(of: musicService.currentPlayerSkin.name) { _, skinName in
-            if skinName != "CF-DEMO" {
-                // 用户切换到非默认皮肤，重置播放时间限制
-                resetPlaybackTimer()
-                print("🎵 用户切换到非默认皮肤(\(skinName))，移除播放时间限制")
-            }
+        // 新增：应用状态变化监听
+        .onChange(of: scenePhase) { _, newPhase in
+            handleScenePhaseChange(newPhase)
+            // 同时通知AudioEffectsManager场景变化
+            AudioEffectsManager.shared.handleScenePhaseChangeFromPlayerView(newPhase)
         }
         .onDisappear {
             stopRotation()
@@ -130,28 +121,86 @@ struct PlayerView: View {
         }
     }
     
+    // 新增：处理应用状态变化
+    private func handleScenePhaseChange(_ phase: ScenePhase) {
+        switch phase {
+        case .active:
+            // 应用进入前台，根据播放状态智能恢复Timer
+            if musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding {
+                startRotation()
+            }
+            
+            // 只在需要时启动播放追踪
+            if musicService.isPlaying && !storeManager.membershipStatus.isActive {
+                startPlaybackTracking()
+            }
+            
+        case .inactive, .background:
+            // 应用进入后台，停止所有UI相关Timer
+            stopRotation()
+            stopPlaybackTracking()
+            
+        @unknown default:
+            break
+        }
+    }
+    
     private func startRotation() {
+        // 只有在真正需要旋转时才启动Timer
+        guard shouldStartRotation() else {
+            stopRotation()
+            return
+        }
+        
         stopRotation()
         isRotating = true
         
         let (interval, angleIncrement) = getRotationParameters()
         
         rotationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
-            withAnimation(.linear(duration: interval)) {
+            // 动态检查是否还需要继续旋转
+            if !self.shouldStartRotation() {
+                self.stopRotation()
+                return
+            }
+            
+            // 快进快退时移除动画，直接更新角度避免卡顿
+            if self.musicService.isFastForwarding || self.musicService.isFastRewinding {
                 self.rotationAngle += angleIncrement
+            } else {
+                // 正常播放时保持平滑动画
+                withAnimation(.linear(duration: interval)) {
+                    self.rotationAngle += angleIncrement
+                }
             }
         }
     }
     
+    /// 判断是否需要启动旋转动画
+    private func shouldStartRotation() -> Bool {
+        // 快进快退时需要旋转
+        if musicService.isFastForwarding || musicService.isFastRewinding {
+            return true
+        }
+        
+        // 正在播放时需要旋转
+        if musicService.isPlaying {
+            return true
+        }
+        
+        // 其他情况（暂停、停止）不需要旋转
+        return false
+    }
+    
     private func getRotationParameters() -> (TimeInterval, Double) {
         if musicService.isFastForwarding {
-            return (0.01, 8.0) // 提高频率，减少每次角度增量
+            return (0.03, 20.0) // 提高频率，减少每次角度增量
         } else if musicService.isFastRewinding {
-            return (0.01, -8.0) // 提高频率，减少每次角度增量
+            return (0.03, -20.0) // 提高频率，减少每次角度增量
         } else if musicService.isPlaying {
-            return (0.03, 3.0) // 正常播放也稍微提高频率
+            return (0.05, 3.0) // 正常播放也稍微提高频率
         } else {
-            return (0.03, 3.0)
+            return (0.05, 3.0)
         }
     }
     
@@ -161,16 +210,16 @@ struct PlayerView: View {
         isRotating = false
     }
     
-    // MARK: - ADD: 播放时间追踪方法
+    // MARK: - 播放时间追踪方法（优化后台耗电）
     
-    /// 开始追踪播放时间（仅针对非会员用户）
+    /// 开始追踪播放时间（智能化管理）
     private func startPlaybackTracking() {
-        guard !storeManager.membershipStatus.isActive && musicService.currentPlayerSkin.name == "CF-DEMO" else {
-            if storeManager.membershipStatus.isActive {
-                print("用户是会员，跳过播放时间限制")
-            } else {
-                print("用户使用非默认皮肤(\(musicService.currentPlayerSkin.name))，跳过播放时间限制")
-            }
+        // 多重条件检查
+        guard !storeManager.membershipStatus.isActive,  // 非会员
+              musicService.isPlaying,                    // 正在播放
+              scenePhase == .active                      // 应用在前台
+        else {
+            stopPlaybackTracking()
             return
         }
         
@@ -178,18 +227,22 @@ struct PlayerView: View {
         stopPlaybackTracking()
         
         playbackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            accumulatedPlaybackTime += 1.0
-            
-            // 每30秒输出一次日志，避免过多输出
-            if Int(accumulatedPlaybackTime) % 30 == 0 {
-                // 更新日志显示为10分钟限制
-                let remainingTime = 300 - accumulatedPlaybackTime
-                print("非会员播放时间: \(accumulatedPlaybackTime)秒, 剩余: \(remainingTime)秒")
-            }
-            
-            // 检查是否达到10分钟限制（600秒）
-            if accumulatedPlaybackTime >= 300 {
-                showPlaybackLimitReached()
+            // 🔑 使用 DispatchQueue.main.async 处理主线程属性访问
+            DispatchQueue.main.async {
+                // 在Timer运行过程中再次检查条件
+                guard !self.storeManager.membershipStatus.isActive,
+                      self.musicService.isPlaying,
+                      self.scenePhase == .active else {
+                    self.stopPlaybackTracking()
+                    return
+                }
+                
+                self.accumulatedPlaybackTime += 1.0
+                
+                // 检查是否达到3分钟限制（180秒）
+                if self.accumulatedPlaybackTime >= 180 {
+                    self.showPlaybackLimitReached()
+                }
             }
         }
     }
@@ -202,12 +255,7 @@ struct PlayerView: View {
     
     /// 播放时间限制达到时的处理
     private func showPlaybackLimitReached() {
-        guard !storeManager.membershipStatus.isActive && musicService.currentPlayerSkin.name == "CF-DEMO" else {
-            if storeManager.membershipStatus.isActive {
-                print("🎵 检测到用户是会员，取消限制弹窗")
-            } else {
-                print("🎵 检测到用户使用非默认皮肤，取消限制弹窗")
-            }
+        guard !storeManager.membershipStatus.isActive else {
             stopPlaybackTracking()
             resetPlaybackTimer()
             return
@@ -242,10 +290,27 @@ struct PlayerView: View {
             // 用户依然是非会员，重置计时器让用户可以继续播放10分钟
             accumulatedPlaybackTime = 0
             
-            // 如果音乐正在播放，重新开始追踪
-            if musicService.isPlaying {
+            // 如果音乐正在播放且应用在前台，重新开始追踪
+            if musicService.isPlaying && scenePhase == .active {
                 startPlaybackTracking()
             }
+        }
+    }
+    
+    // 新增：统一处理播放状态变化
+    private func handlePlayingStateChange(_ isPlaying: Bool) {
+        if isPlaying {
+            // 播放时：智能启动旋转Timer
+            startRotation()
+            // 只在需要时启动播放追踪（后台时不启动）
+            if scenePhase == .active && !storeManager.membershipStatus.isActive {
+                startPlaybackTracking()
+            }
+        } else {
+            // 暂停时：立即停止旋转Timer
+            stopRotation()
+            // 停止播放追踪
+            stopPlaybackTracking()
         }
     }
 }
@@ -795,8 +860,8 @@ struct ControlButton: View {
                             action()
                         }
                         .onLongPressGesture(
-                            minimumDuration: 0.5,
-                            maximumDistance: 50,
+                            minimumDuration: 0.8,
+                            maximumDistance: 30,
                             perform: {
                                 longPressAction?()
                             },
@@ -838,7 +903,7 @@ struct CassetteHole: View {
     // 使用播放队列的总时长
     private var queueTotalDuration: TimeInterval {
         let duration = musicService.queueTotalDuration > 0 ? musicService.queueTotalDuration : 180.0
-        print("CassetteHole - shouldGrow: \(shouldGrow), queueTotalDuration: \(duration)秒")
+//        print("CassetteHole - shouldGrow: \(shouldGrow), queueTotalDuration: \(duration)秒")
         return duration
     }
     
@@ -850,7 +915,7 @@ struct CassetteHole: View {
         let progress = musicService.queueElapsedDuration / queueTotalDuration
         let clampedProgress = min(max(progress, 0.0), 1.0) // 确保进度在0-1之间
         
-        print("播放进度计算 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
+//        print("播放进度计算 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
         
         if shouldGrow {
             // 从200变到100
@@ -890,11 +955,6 @@ struct CassetteHole: View {
             if musicService.isPlaying || musicService.isFastForwarding || musicService.isFastRewinding {
                 // 直接使用原始角度，不进行标准化
                 currentRotationAngle = newValue
-                
-                // 大幅减少日志输出频率 - 每3600度（20圈）输出一次
-                if Int(newValue) % 3600 == 0 {
-                    print("旋转角度更新 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 完整角度: \(newValue)")
-                }
             }
         }
         .onChange(of: isRotating) { _, newValue in
@@ -911,7 +971,7 @@ struct CassetteHole: View {
         // 监听队列累计播放时长变化
         .onChange(of: musicService.queueElapsedDuration) { oldValue, newValue in
             // 只有当变化超过阈值时才更新和输出日志
-            guard abs(oldValue - newValue) > 0.5 else { return }
+            guard abs(oldValue - newValue) > 1.0 else { return }
             
             let newSize = currentProgressSize
             
@@ -949,18 +1009,15 @@ struct CassetteHole: View {
         // 使用当前播放进度来设置初始尺寸
         circleSize = currentProgressSize
         animationStarted = false
-        print("初始尺寸设置 - shouldGrow: \(shouldGrow), circleSize: \(circleSize)")
     }
     
     // 修正尺寸动画逻辑
     private func startSizeAnimation() {
         guard !animationStarted else {
-            print("动画已经开始，跳过重复调用")
             return
         }
         
         animationStarted = true
-        print("开始尺寸动画 - shouldGrow: \(shouldGrow), 当前尺寸: \(circleSize), 队列总时长: \(queueTotalDuration)秒")
         
         // 从当前队列进度对应的尺寸开始，动画到最终尺寸
         let startSize = currentProgressSize

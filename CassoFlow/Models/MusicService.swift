@@ -63,6 +63,15 @@ class MusicService: ObservableObject {
     private var seekTimer: Timer?
     private var updateTimer: Timer?
     
+    // 新增：后台状态监听Timer
+    private var backgroundStatusTimer: Timer?
+    
+    // 应用状态管理
+    private var isAppInBackground = false
+    
+    // 缓存上次的播放状态，用于后台状态检测
+    private var lastPlayingState: Bool = false
+
     // MARK: - 磁带音效属性
     @Published var isCassetteEffectEnabled: Bool = false {
         didSet {
@@ -149,6 +158,10 @@ class MusicService: ObservableObject {
         await MainActor.run {
             shouldCloseLibrary = true
         }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表中的特定歌曲
@@ -163,6 +176,10 @@ class MusicService: ObservableObject {
         await MainActor.run {
             shouldCloseLibrary = true
         }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
     
     /// 播放专辑（可选择随机播放）
@@ -178,6 +195,10 @@ class MusicService: ObservableObject {
         await MainActor.run {
             shouldCloseLibrary = true
         }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表（可选择随机播放）
@@ -193,6 +214,10 @@ class MusicService: ObservableObject {
         await MainActor.run {
             shouldCloseLibrary = true
         }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
     
     /// 重置库视图关闭状态
@@ -201,6 +226,18 @@ class MusicService: ObservableObject {
     }
     
     init() {
+        // 设置默认的显示状态
+        self.currentTitle = String(localized: "未播放歌曲")
+        self.currentArtist = String(localized: "点此选择音乐")
+        self.currentDuration = 0
+        self.totalDuration = 0
+        self.isPlaying = false
+        self.currentTrackID = nil
+        self.currentTrackIndex = nil
+        self.totalTracksInQueue = 0
+        self.queueTotalDuration = 0
+        self.queueElapsedDuration = 0
+        
         // 从 UserDefaults 加载保存的皮肤，如果没有则使用默认值
         let savedPlayerSkinName = UserDefaults.standard.string(forKey: Self.playerSkinKey)
         if let skinName = savedPlayerSkinName,
@@ -246,7 +283,7 @@ class MusicService: ObservableObject {
             currentCoverStyle = .rectangle // 默认矩形样式
         }
         
-        // 启动定时器
+        // 🔑 智能启动Timer - 只在需要时启动
         startUpdateTimer()
         
         // 监听会员状态变化通知
@@ -256,11 +293,127 @@ class MusicService: ObservableObject {
             name: NSNotification.Name("MembershipStatusChanged"),
             object: nil
         )
+        
+        // 监听应用状态变化
+        setupAppStateNotifications()
     }
     
     deinit {
-        stopUpdateTimer()
+        stopAllTimers()
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    // 设置应用状态通知监听
+    private func setupAppStateNotifications() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppEnterBackground()
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppEnterForeground()
+        }
+    }
+    
+    // 处理应用进入后台
+    private func handleAppEnterBackground() {
+        isAppInBackground = true
+        lastPlayingState = isPlaying
+        
+        // 临时关闭屏幕常亮以节省电量
+        if isScreenAlwaysOn {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+        
+        // 智能管理后台Timer：只在播放音乐时启动
+        if isPlaying {
+            startBackgroundStatusTimer()
+        } else {
+            stopBackgroundStatusTimer()
+        }
+    }
+    
+    // 处理应用回到前台
+    private func handleAppEnterForeground() {
+        isAppInBackground = false
+        
+        // 恢复屏幕常亮设置
+        UIApplication.shared.isIdleTimerDisabled = isScreenAlwaysOn
+
+        // 停止后台状态监听Timer，恢复前台更新Timer
+        stopBackgroundStatusTimer()
+        startUpdateTimer()
+        
+        // 回到前台时立即同步一次播放进度
+        syncPlaybackProgress()
+    }
+    
+    // 新增：启动后台状态监听Timer
+    private func startBackgroundStatusTimer() {
+        
+        // 只有在后台且音乐播放时才启动
+        guard isAppInBackground && isPlaying else {
+            return
+        }
+        
+        stopBackgroundStatusTimer() // 确保没有重复的定时器
+        
+        backgroundStatusTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            self?.updateBackgroundMusicStatus()
+        }
+    }
+    
+    // 新增：停止后台状态监听Timer
+    private func stopBackgroundStatusTimer() {
+        backgroundStatusTimer?.invalidate()
+        backgroundStatusTimer = nil
+    }
+    
+    // 新增：后台状态更新 - 仅检查关键状态变化
+    private func updateBackgroundMusicStatus() {
+        let currentPlayingState = player.state.playbackStatus == .playing
+        
+        // 只在播放状态发生变化时才更新和通知
+        if currentPlayingState != lastPlayingState {
+            DispatchQueue.main.async {
+                self.isPlaying = currentPlayingState
+                // 立即通知AudioEffectsManager状态变化
+                self.audioEffectsManager.setMusicPlayingState(currentPlayingState)
+            }
+            
+            lastPlayingState = currentPlayingState
+        }
+    }
+    
+    // 新增：停止所有Timer
+    private func stopAllTimers() {
+        stopUpdateTimer()
+        stopBackgroundStatusTimer()
+    }
+    
+    // 同步播放进度（解决后台播放进度不同步问题）
+    private func syncPlaybackProgress() {
+        // 强制立即更新一次播放信息，确保磁带进度正确
+        updateCurrentSongInfo()
+    }
+    
+    // 🔑 新增：强制同步播放状态（解决首次播放显示问题）
+    private func forceSyncPlaybackStatus() async {
+        await MainActor.run {
+            updateCurrentSongInfo()
+            
+            // 如果状态同步成功且正在播放，确保Timer运行
+            if isPlaying {
+                startUpdateTimer()
+            }
+        }
     }
     
     // MARK: - 会员状态变化处理
@@ -286,13 +439,43 @@ class MusicService: ObservableObject {
         }
     }
     
-    // MARK: - 定时器管理
+    // MARK: - 定时器管理（优化后台耗电）
     
     private func startUpdateTimer() {
+        // 🔑 总是先执行一次更新，确保歌曲信息和磁带显示正确
+        updateCurrentSongInfo()
+        
+        // 只有在需要动态更新时才启动Timer
+        guard shouldRunDynamicUpdates() else {
+            stopUpdateTimer()
+            return
+        }
+        
         stopUpdateTimer() // 确保没有重复的定时器
         updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateCurrentSongInfo()
+            
+            // 动态检查是否还需要继续运行Timer
+            if !(self?.shouldRunDynamicUpdates() ?? false) {
+                self?.stopUpdateTimer()
+            }
         }
+    }
+    
+    /// 判断是否需要运行动态更新Timer
+    private func shouldRunDynamicUpdates() -> Bool {
+        // 快进/快退时必须运行Timer
+        if isFastForwarding || isFastRewinding {
+            return true
+        }
+        
+        // 正在播放时需要更新进度
+        if isPlaying {
+            return true
+        }
+        
+        // 其他情况（暂停、停止、无播放队列）不需要Timer
+        return false
     }
     
     private func stopUpdateTimer() {
@@ -426,7 +609,7 @@ class MusicService: ObservableObject {
             self.isPlaying = playbackStatus
             self.currentDuration = self.player.playbackTime
             
-            // 更新队列累计时长
+            // 重要：即使在后台也要更新队列累计时长，确保磁带进度正确
             let elapsedQueueDuration = self.calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
             self.queueElapsedDuration = elapsedQueueDuration
             
@@ -488,7 +671,13 @@ class MusicService: ObservableObject {
             isPlaying = true
             // 同步播放状态到音频效果管理器
             audioEffectsManager.setMusicPlayingState(true)
+            // 🔑 开始播放时启动Timer
+            startUpdateTimer()
         }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
 
     /// 暂停
@@ -498,17 +687,33 @@ class MusicService: ObservableObject {
             isPlaying = false
             // 同步播放状态到音频效果管理器
             audioEffectsManager.setMusicPlayingState(false)
+            // 🔑 暂停时直接停止Timer，不重新启动
+            stopUpdateTimer()
         }
     }
 
     /// 播放下一首
     func skipToNext() async throws {
         try await player.skipToNextEntry()
+        // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
+        Task {
+            try await Task.sleep(nanoseconds: 300_000_000) // 0.3秒延迟
+            await MainActor.run {
+                self.updateCurrentSongInfo()
+            }
+        }
     }
 
     /// 播放上一首
     func skipToPrevious() async throws {
         try await player.skipToPreviousEntry()
+        // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
+        Task {
+            try await Task.sleep(nanoseconds: 300_000_000) // 0.3秒延迟
+            await MainActor.run {
+                self.updateCurrentSongInfo()
+            }
+        }
     }
 
     /// 开始快退
@@ -516,9 +721,12 @@ class MusicService: ObservableObject {
         stopSeek() // 停止任何现有的快进/快退
         isFastRewinding = true
         
+        // 🔑 快进/快退时确保Timer运行
+        startUpdateTimer()
+        
         seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            let newTime = max(0, self.player.playbackTime - 5.0) // 每0.1秒后退5秒
+            let newTime = max(0, self.player.playbackTime - 6.0) // 每0.1秒后退6秒
             self.player.playbackTime = newTime
         }
     }
@@ -528,9 +736,12 @@ class MusicService: ObservableObject {
         stopSeek() // 停止任何现有的快进/快退
         isFastForwarding = true
         
+        // 🔑 快进/快退时确保Timer运行
+        startUpdateTimer()
+        
         seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            let newTime = min(self.totalDuration, self.player.playbackTime + 5.0) // 每0.1秒前进5秒
+            let newTime = min(self.totalDuration, self.player.playbackTime + 6.0) // 每0.1秒前进6秒
             self.player.playbackTime = newTime
         }
     }
@@ -539,8 +750,11 @@ class MusicService: ObservableObject {
     func stopSeek() {
         seekTimer?.invalidate()
         seekTimer = nil
-        isFastForwarding = false
         isFastRewinding = false
+        isFastForwarding = false
+        
+        // 🔑 停止快进/快退后重新评估Timer需求
+        startUpdateTimer()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.updateQueueElapsedDuration()

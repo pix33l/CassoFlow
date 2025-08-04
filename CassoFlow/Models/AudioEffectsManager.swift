@@ -1,6 +1,7 @@
 import AVFoundation
 import Combine
 import Foundation
+import SwiftUI // 使用SwiftUI而不是UIKit
 
 /// 音频效果管理器
 class AudioEffectsManager: ObservableObject {
@@ -20,6 +21,10 @@ class AudioEffectsManager: ObservableObject {
     // 磁带音效音频文件
     private var cassetteNoiseBuffer: AVAudioPCMBuffer?
     
+    // 应用状态管理
+    private var isAppInBackground: Bool = false
+    private var wasEngineRunningBeforeBackground: Bool = false
+    
     private init() {
         audioEngine = AVAudioEngine()
         noisePlayer = AVAudioPlayerNode()
@@ -32,6 +37,76 @@ class AudioEffectsManager: ObservableObject {
         setupAudioEngineObservers()
     }
     
+    // 修改：直接接收场景阶段变化的方法（由PlayerView调用）
+    func handleScenePhaseChangeFromPlayerView(_ phase: ScenePhase) {
+        switch phase {
+        case .active:
+            handleAppEnterForeground()
+            
+        case .inactive, .background:
+            handleAppEnterBackground()
+            
+        @unknown default:
+            break
+        }
+    }
+    
+    // 处理应用进入后台 - 智能判断是否需要保持音频引擎运行
+    private func handleAppEnterBackground() {
+        isAppInBackground = true
+        wasEngineRunningBeforeBackground = audioEngine.isRunning
+        
+        // 关键修正：只有在播放音乐且启用磁带音效时才保持音频引擎运行
+        let shouldKeepEngineRunning = isMusicPlaying && isCassetteEffectEnabled
+        
+        if shouldKeepEngineRunning {
+            // 保持音频引擎运行，但可以降低更新频率或优化性能
+        } else {
+            // 停止音频引擎以节省电量
+            if audioEngine.isRunning {
+                stopCassetteEffect()
+                audioEngine.stop()
+            }
+            
+            // 暂停音频会话（如果没有音乐在播放）
+            if !isMusicPlaying {
+                deactivateAudioSession()
+            }
+        }
+    }
+    
+    // 处理应用回到前台
+    private func handleAppEnterForeground() {
+        isAppInBackground = false
+        
+        // 重新激活音频会话
+        setupAudioSession()
+        
+        // 如果之前引擎在运行但现在停止了，重新启动
+        if wasEngineRunningBeforeBackground && !audioEngine.isRunning {
+            do {
+                try audioEngine.start()
+                
+                // 如果需要播放磁带音效，重新开始
+                if isCassetteEffectEnabled && isMusicPlaying {
+                    startCassetteEffect()
+                }
+            } catch {
+                // 音频引擎恢复失败
+            }
+        }
+    }
+    
+    // 暂停音频会话
+    private func deactivateAudioSession() {
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            // 暂停音频会话失败
+        }
+    }
+    
     /// 配置音频会话以允许与 MusicKit 共存
     private func setupAudioSession() {
         do {
@@ -40,7 +115,7 @@ class AudioEffectsManager: ObservableObject {
             try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try audioSession.setActive(true)
         } catch {
-            // 音频会话配置失败，静默处理
+            // 音频会话配置失败
         }
     }
     
@@ -64,7 +139,12 @@ class AudioEffectsManager: ObservableObject {
     }
     
     @objc private func handleConfigurationChange() {
-        restartAudioEngine()
+        // 如果应用在后台且不需要音效，不重启引擎以节省电量
+        let shouldRestartEngine = !isAppInBackground || (isMusicPlaying && isCassetteEffectEnabled)
+        
+        if shouldRestartEngine {
+            restartAudioEngine()
+        }
     }
     
     @objc private func handleInterruption(notification: Notification) {
@@ -81,7 +161,11 @@ class AudioEffectsManager: ObservableObject {
             if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
                 let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
                 if options.contains(.shouldResume) {
-                    restartAudioEngine()
+                    // 只有在需要音效时才重启
+                    let shouldRestartEngine = !isAppInBackground || (isMusicPlaying && isCassetteEffectEnabled)
+                    if shouldRestartEngine {
+                        restartAudioEngine()
+                    }
                 }
             }
         @unknown default:
@@ -102,7 +186,7 @@ class AudioEffectsManager: ObservableObject {
                     self.startCassetteEffect()
                 }
             } catch {
-                // 音频引擎重新启动失败，静默处理
+                // 音频引擎重新启动失败
             }
         }
     }
@@ -129,7 +213,7 @@ class AudioEffectsManager: ObservableObject {
         do {
             try audioEngine.start()
         } catch {
-            // 音频引擎启动失败，静默处理
+            // 音频引擎启动失败
         }
     }
     
@@ -211,16 +295,28 @@ class AudioEffectsManager: ObservableObject {
         regenerateCassetteNoise()
     }
     
-    /// 更新磁带效果
+    /// 修正：更新磁带效果 - 精确处理后台播放状态
     private func updateCassetteEffect() {
-        // 确定目标状态
+        // 确定目标状态：只有音效开启且音乐正在播放时才应该播放音效
         let shouldPlay = isCassetteEffectEnabled && isMusicPlaying
         
-        // 只有当磁带音效开启且音乐正在播放时才播放噪音
         if shouldPlay {
             startCassetteEffect()
         } else {
             stopCassetteEffect()
+            
+            // 修正：任何时候音乐停止或音效关闭，都要考虑停止音频引擎以节省电量
+            // 特别是在后台时更加严格
+            if isAppInBackground {
+                if audioEngine.isRunning {
+                    audioEngine.stop()
+                }
+            } else {
+                // 前台时，如果音乐不在播放且音效不需要，也停止引擎
+                if !isMusicPlaying && audioEngine.isRunning {
+                    audioEngine.stop()
+                }
+            }
         }
     }
     
@@ -273,11 +369,27 @@ class AudioEffectsManager: ObservableObject {
         updateCassetteEffect()
     }
     
-    /// 设置音乐播放状态
+    /// 修正：设置音乐播放状态 - 智能管理音频引擎
     func setMusicPlayingState(_ isPlaying: Bool) {
         guard isMusicPlaying != isPlaying else { return }
         
         isMusicPlaying = isPlaying
+        
+        // 智能管理音频引擎状态
+        if isAppInBackground {
+            if isPlaying && isCassetteEffectEnabled && !audioEngine.isRunning {
+                // 后台开始播放音乐且需要音效，启动音频引擎
+                do {
+                    try audioEngine.start()
+                } catch {
+                    // 后台启动音频引擎失败
+                }
+            } else if !isPlaying && audioEngine.isRunning {
+                // 修正：后台音乐停止时，无论音效是否开启都停止音频引擎
+                audioEngine.stop()
+            }
+        }
+        // 前台的状态变化已经由updateCassetteEffect()处理
     }
     
     /// 调整磁带噪音音量
@@ -292,6 +404,8 @@ class AudioEffectsManager: ObservableObject {
     /// 清理资源
     deinit {
         NotificationCenter.default.removeObserver(self)
-        audioEngine.stop()
+        if audioEngine.isRunning {
+            audioEngine.stop()
+        }
     }
 }
