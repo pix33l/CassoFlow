@@ -40,18 +40,20 @@ enum CoverStyle: String, CaseIterable {
 class MusicService: ObservableObject {
     static let shared = MusicService()
     
-    private let player = ApplicationMusicPlayer.shared
+    // MARK: - 核心组件
+    private let musicKitPlayer = ApplicationMusicPlayer.shared
+    private let subsonicService = SubsonicMusicService.shared
+    private let coordinator = MusicServiceCoordinator()
     private let audioEffectsManager = AudioEffectsManager.shared
     private let storeManager = StoreManager.shared
     
+    // MARK: - 播放状态
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
     @Published var currentDuration: TimeInterval = 0
     @Published var totalDuration: TimeInterval = 0
     @Published var isPlaying: Bool = false
     @Published var currentTrackID: MusicItemID?
-    @Published var currentPlayerSkin: PlayerSkin
-    @Published var currentCassetteSkin: CassetteSkin
     @Published var currentTrackIndex: Int? = nil
     @Published var totalTracksInQueue: Int = 0
     
@@ -63,14 +65,12 @@ class MusicService: ObservableObject {
     private var seekTimer: Timer?
     private var updateTimer: Timer?
     
-    // 新增：后台状态监听Timer
-    private var backgroundStatusTimer: Timer?
-    
-    // 应用状态管理
-    private var isAppInBackground = false
-    
-    // 缓存上次的播放状态，用于后台状态检测
-    private var lastPlayingState: Bool = false
+    // MARK: - 皮肤和设置
+    @Published var currentPlayerSkin: PlayerSkin
+    @Published var currentCassetteSkin: CassetteSkin
+    @Published var currentCoverStyle: CoverStyle = .rectangle
+
+
 
     // MARK: - 磁带音效属性
     @Published var isCassetteEffectEnabled: Bool = false {
@@ -79,6 +79,7 @@ class MusicService: ObservableObject {
         }
     }
     
+    // MARK: - 触觉反馈属性
     @Published var isHapticFeedbackEnabled: Bool = false
 
     // MARK: - 屏幕常亮属性
@@ -91,11 +92,15 @@ class MusicService: ObservableObject {
         }
     }
     
-    // MARK: - 磁带封面样式属性
-    @Published var currentCoverStyle: CoverStyle = .rectangle
-    
     // MARK: - 库视图控制
     @Published var shouldCloseLibrary: Bool = false
+    
+    // MARK: - 数据源管理
+    
+    var currentDataSource: MusicDataSourceType {
+        get { coordinator.currentDataSource }
+        set { coordinator.currentDataSource = newValue }
+    }
     
     // MARK: - 皮肤存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
@@ -105,6 +110,15 @@ class MusicService: ObservableObject {
     private static let screenAlwaysOnKey = "ScreenAlwaysOnEnabled"
     private static let coverStyleKey = "SelectedCoverStyle"
     
+    // 新增：后台状态监听Timer
+    private var backgroundStatusTimer: Timer?
+    
+    // 应用状态管理
+    private var isAppInBackground = false
+    
+    // 缓存上次的播放状态，用于后台状态检测
+    private var lastPlayingState: Bool = false
+    
     // 缓存上一次的关键值，只对不需要频繁更新的属性使用
     private var lastTitle: String = ""
     private var lastArtist: String = ""
@@ -112,14 +126,16 @@ class MusicService: ObservableObject {
     private var lastTrackIndex: Int? = nil
     private var lastTotalTracks: Int = 0
     
+    // 循环播放
     var repeatMode: MusicPlayer.RepeatMode {
-        get { player.state.repeatMode ?? .none }
-        set { player.state.repeatMode = newValue }
+        get { musicKitPlayer.state.repeatMode ?? .none }
+        set { musicKitPlayer.state.repeatMode = newValue }
     }
     
+    // 随机播放
     var shuffleMode: MusicPlayer.ShuffleMode {
-        get { player.state.shuffleMode ?? .off }
-        set { player.state.shuffleMode = newValue }
+        get { musicKitPlayer.state.shuffleMode ?? .off }
+        set { musicKitPlayer.state.shuffleMode = newValue }
     }
     
     /// 请求音乐授权
@@ -146,84 +162,12 @@ class MusicService: ObservableObject {
         }
     }
     
-    /// 播放专辑中的特定歌曲
-    func playTrack(_ track: Track, in album: Album) async throws {
-        let songs = try await album.with([.tracks]).tracks ?? []
-        guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
-        
-        player.queue = .init(for: songs, startingAt: songs[index])
-        try await player.play()
-        
-        // 播放成功后触发关闭库视图
-        await MainActor.run {
-            shouldCloseLibrary = true
-        }
-        
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
-        await forceSyncPlaybackStatus()
-    }
-    
-    /// 播放播放列表中的特定歌曲
-    func playTrack(_ track: Track, in playlist: Playlist) async throws {
-        let songs = try await playlist.with([.tracks]).tracks ?? []
-        guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
-        
-        player.queue = .init(for: songs, startingAt: songs[index])
-        try await player.play()
-        
-        // 播放成功后触发关闭库视图
-        await MainActor.run {
-            shouldCloseLibrary = true
-        }
-        
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
-        await forceSyncPlaybackStatus()
-    }
-    
-    /// 播放专辑（可选择随机播放）
-    func playAlbum(_ album: Album, shuffled: Bool = false) async throws {
-        let songs = try await album.with([.tracks]).tracks ?? []
-        if shuffled {
-            player.state.shuffleMode = .songs
-        }
-        player.queue = .init(for: songs, startingAt: nil)
-        try await player.play()
-        
-        // 播放成功后触发关闭库视图
-        await MainActor.run {
-            shouldCloseLibrary = true
-        }
-        
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
-        await forceSyncPlaybackStatus()
-    }
-    
-    /// 播放播放列表（可选择随机播放）
-    func playPlaylist(_ playlist: Playlist, shuffled: Bool = false) async throws {
-        let songs = try await playlist.with([.tracks]).tracks ?? []
-        if shuffled {
-            player.state.shuffleMode = .songs
-        }
-        player.queue = .init(for: songs, startingAt: nil)
-        try await player.play()
-        
-        // 播放成功后触发关闭库视图
-        await MainActor.run {
-            shouldCloseLibrary = true
-        }
-        
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
-        await forceSyncPlaybackStatus()
-    }
-    
     /// 重置库视图关闭状态
     func resetLibraryCloseState() {
         shouldCloseLibrary = false
     }
+    
+    // MARK: - 初始化
     
     init() {
         // 设置默认的显示状态
@@ -352,7 +296,7 @@ class MusicService: ObservableObject {
         startUpdateTimer()
         
         // 回到前台时立即同步一次播放进度
-        syncPlaybackProgress()
+        updateCurrentSongInfo()
     }
     
     // 新增：启动后台状态监听Timer
@@ -378,7 +322,7 @@ class MusicService: ObservableObject {
     
     // 新增：后台状态更新 - 仅检查关键状态变化
     private func updateBackgroundMusicStatus() {
-        let currentPlayingState = player.state.playbackStatus == .playing
+        let currentPlayingState = musicKitPlayer.state.playbackStatus == .playing
         
         // 只在播放状态发生变化时才更新和通知
         if currentPlayingState != lastPlayingState {
@@ -398,12 +342,6 @@ class MusicService: ObservableObject {
         stopBackgroundStatusTimer()
     }
     
-    // 同步播放进度（解决后台播放进度不同步问题）
-    private func syncPlaybackProgress() {
-        // 强制立即更新一次播放信息，确保磁带进度正确
-        updateCurrentSongInfo()
-    }
-    
     // 🔑 新增：强制同步播放状态（解决首次播放显示问题）
     private func forceSyncPlaybackStatus() async {
         await MainActor.run {
@@ -414,6 +352,18 @@ class MusicService: ObservableObject {
                 startUpdateTimer()
             }
         }
+    }
+    
+    // MARK: - 数据获取方法（委托给协调器）
+    
+    /// 获取Subsonic服务（用于配置）
+    func getSubsonicService() -> SubsonicMusicService {
+        return subsonicService
+    }
+    
+    /// 获取音乐服务协调器
+    func getCoordinator() -> MusicServiceCoordinator {
+        return coordinator
     }
     
     // MARK: - 会员状态变化处理
@@ -522,7 +472,7 @@ class MusicService: ObservableObject {
     }
 
     private func updateCurrentSongInfo() {
-        guard let entry = player.queue.currentEntry else {
+        guard let entry = musicKitPlayer.queue.currentEntry else {
             DispatchQueue.main.async {
                 self.currentTitle = String(localized: "未播放歌曲")
                 self.currentArtist = String(localized: "点此选择音乐")
@@ -566,9 +516,9 @@ class MusicService: ObservableObject {
             trackID = nil
         }
         
-        let entries = player.queue.entries
+        let entries = musicKitPlayer.queue.entries
         let trackIndex = entries.firstIndex(where: { $0.id == entry.id })
-        let playbackStatus = player.state.playbackStatus == .playing
+        let playbackStatus = musicKitPlayer.state.playbackStatus == .playing
         
         let newTitle = entry.title
         let newArtist = entry.subtitle ?? ""
@@ -607,7 +557,7 @@ class MusicService: ObservableObject {
         DispatchQueue.main.async {
             // 播放状态和时间需要实时更新
             self.isPlaying = playbackStatus
-            self.currentDuration = self.player.playbackTime
+            self.currentDuration = self.musicKitPlayer.playbackTime
             
             // 重要：即使在后台也要更新队列累计时长，确保磁带进度正确
             let elapsedQueueDuration = self.calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
@@ -617,6 +567,8 @@ class MusicService: ObservableObject {
             self.audioEffectsManager.setMusicPlayingState(playbackStatus)
         }
     }
+    
+    // MARK: - 播放时长计算方法
 /// 计算队列中所有歌曲的总时长
     private func calculateQueueTotalDuration(entries: ApplicationMusicPlayer.Queue.Entries) -> TimeInterval {
         var totalDuration: TimeInterval = 0
@@ -659,14 +611,136 @@ class MusicService: ObservableObject {
         }
         
         // 加上当前歌曲的播放时长
-        elapsedDuration += player.playbackTime
+        elapsedDuration += musicKitPlayer.playbackTime
         
         return elapsedDuration
+    }
+    
+    // MARK: - 播放控制方法
+    
+    /// 播放 MusicKit 专辑中的特定歌曲
+    func playTrack(_ track: Track, in album: Album) async throws {
+        let songs = try await album.with([.tracks]).tracks ?? []
+        guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
+        
+        musicKitPlayer.queue = .init(for: songs, startingAt: songs[index])
+        try await musicKitPlayer.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
+    }
+    
+    /// 播放 MusicKit 播放列表中的特定歌曲
+    func playTrack(_ track: Track, in playlist: Playlist) async throws {
+        let songs = try await playlist.with([.tracks]).tracks ?? []
+        guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
+        
+        musicKitPlayer.queue = .init(for: songs, startingAt: songs[index])
+        try await musicKitPlayer.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
+    }
+    
+    /// 播放 MusicKit 播放专辑（可选择随机播放）
+    func playAlbum(_ album: Album, shuffled: Bool = false) async throws {
+        let songs = try await album.with([.tracks]).tracks ?? []
+        if shuffled {
+            musicKitPlayer.state.shuffleMode = .songs
+        }
+        musicKitPlayer.queue = .init(for: songs, startingAt: nil)
+        try await musicKitPlayer.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
+    }
+    
+    /// 播放 MusicKit 播放播放列表（可选择随机播放）
+    func playPlaylist(_ playlist: Playlist, shuffled: Bool = false) async throws {
+        let songs = try await playlist.with([.tracks]).tracks ?? []
+        if shuffled {
+            musicKitPlayer.state.shuffleMode = .songs
+        }
+        musicKitPlayer.queue = .init(for: songs, startingAt: nil)
+        try await musicKitPlayer.play()
+        
+        // 播放成功后触发关闭库视图
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
+    }
+    
+    /// 播放通用歌曲队列
+    func playUniversalSongs(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
+        switch currentDataSource {
+        case .musicKit:
+            try await playMusicKitSongs(songs, startingAt: index)
+        case .subsonic:
+            try await subsonicService.playQueue(songs, startingAt: index)
+        }
+        
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+    }
+    
+    /// 播放MusicKit歌曲
+    private func playMusicKitSongs(_ songs: [UniversalSong], startingAt index: Int) async throws {
+        let tracks = songs.compactMap { song -> Track? in
+            guard let originalTrack = song.originalData as? Track else { return nil }
+            return originalTrack
+        }
+        
+        guard index < tracks.count else { return }
+        
+        musicKitPlayer.queue = .init(for: tracks, startingAt: tracks[index])
+        try await musicKitPlayer.play()
+    }
+    
+    /// 播放通用专辑
+    func playUniversalAlbum(_ album: UniversalAlbum, shuffled: Bool = false) async throws {
+        let detailedAlbum = try await coordinator.getAlbum(id: album.id)
+        let finalSongs = shuffled ? detailedAlbum.songs.shuffled() : detailedAlbum.songs
+        try await playUniversalSongs(finalSongs)
+    }
+    
+    /// 播放通用播放列表
+    func playUniversalPlaylist(_ playlist: UniversalPlaylist, shuffled: Bool = false) async throws {
+        let detailedPlaylist = try await coordinator.getPlaylist(id: playlist.id)
+        let finalSongs = shuffled ? detailedPlaylist.songs.shuffled() : detailedPlaylist.songs
+        try await playUniversalSongs(finalSongs)
     }
 
     /// 播放
     func play() async throws {
-        try await player.play()
+        switch currentDataSource {
+        case .musicKit:
+            try await musicKitPlayer.play()
+        case .subsonic:
+            await subsonicService.play()
+        }
         await MainActor.run {
             isPlaying = true
             // 同步播放状态到音频效果管理器
@@ -682,7 +756,12 @@ class MusicService: ObservableObject {
 
     /// 暂停
     func pause() async {
-        player.pause()
+        switch currentDataSource {
+            case .musicKit:
+                musicKitPlayer.pause()
+            case .subsonic:
+                await subsonicService.pause()
+        }
         await MainActor.run {
             isPlaying = false
             // 同步播放状态到音频效果管理器
@@ -694,7 +773,12 @@ class MusicService: ObservableObject {
 
     /// 播放下一首
     func skipToNext() async throws {
-        try await player.skipToNextEntry()
+        switch currentDataSource {
+            case .musicKit:
+                try await musicKitPlayer.skipToNextEntry()
+            case .subsonic:
+                try await subsonicService.skipToNext()
+        }
         // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
         Task {
             try await Task.sleep(nanoseconds: 300_000_000) // 0.3秒延迟
@@ -706,7 +790,12 @@ class MusicService: ObservableObject {
 
     /// 播放上一首
     func skipToPrevious() async throws {
-        try await player.skipToPreviousEntry()
+        switch currentDataSource {
+            case .musicKit:
+                try await musicKitPlayer.skipToPreviousEntry()
+            case .subsonic:
+                try await subsonicService.skipToPrevious()
+        }
         // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
         Task {
             try await Task.sleep(nanoseconds: 300_000_000) // 0.3秒延迟
@@ -726,8 +815,14 @@ class MusicService: ObservableObject {
         
         seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            let newTime = max(0, self.player.playbackTime - 6.0) // 每0.1秒后退6秒
-            self.player.playbackTime = newTime
+            
+            switch self.currentDataSource {
+            case .musicKit:
+                let newTime = max(0, self.musicKitPlayer.playbackTime - 6.0) // 每0.1秒后退6秒
+                self.musicKitPlayer.playbackTime = newTime
+            case .subsonic:
+                self.subsonicService.seekBackward(6.0)
+            }
         }
     }
 
@@ -741,8 +836,14 @@ class MusicService: ObservableObject {
         
         seekTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            let newTime = min(self.totalDuration, self.player.playbackTime + 6.0) // 每0.1秒前进6秒
-            self.player.playbackTime = newTime
+            
+            switch self.currentDataSource {
+            case .musicKit:
+                let newTime = min(self.totalDuration, self.musicKitPlayer.playbackTime + 6.0) // 每0.1秒前进6秒
+                self.musicKitPlayer.playbackTime = newTime
+            case .subsonic:
+                self.subsonicService.seekForward(6.0)
+            }
         }
     }
 
@@ -763,8 +864,8 @@ class MusicService: ObservableObject {
 
     // MARK: - 队列管理
     private func updateQueueElapsedDuration() {
-        let entries = player.queue.entries
-        let currentEntry = player.queue.currentEntry
+        let entries = musicKitPlayer.queue.entries
+        let currentEntry = musicKitPlayer.queue.currentEntry
         let trackIndex = entries.firstIndex(where: { $0.id == currentEntry?.id })
         let elapsedDuration = calculateQueueElapsedDuration(entries: entries, currentEntryIndex: trackIndex)
         
