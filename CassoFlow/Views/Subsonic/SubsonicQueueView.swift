@@ -50,19 +50,19 @@ struct SubsonicQueueView: View {
             .onChange(of: musicService.currentTrackID) { _, _ in
                 loadQueueInfo()
             }
-            .navigationTitle("Subsonic 播放队列")
+            .navigationTitle("播放队列")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if !queueSongs.isEmpty {
                         Menu {
-                            Button {
-                                Task {
-                                    await shuffleQueue()
-                                }
-                            } label: {
-                                Label("随机播放", systemImage: "shuffle")
-                            }
+//                            Button {
+//                                Task {
+//                                    await shuffleQueue()
+//                                }
+//                            } label: {
+//                                Label("随机播放", systemImage: "shuffle")
+//                            }
                             
                             Button {
                                 Task {
@@ -114,25 +114,11 @@ struct SubsonicQueueView: View {
                 .font(.title2)
                 .foregroundColor(.primary)
             
-            Text("从 Subsonic 服务器播放音乐后，队列将显示在这里")
+            Text("队列会在播放音乐时显示")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            
-            Button {
-                dismiss()
-            } label: {
-                Text("浏览音乐")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(Color.orange)
-                    )
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -169,25 +155,25 @@ struct SubsonicQueueView: View {
         }
     }
     
-    private func shuffleQueue() async {
-        guard !queueSongs.isEmpty else { return }
-        
-        let shuffledSongs = queueSongs.shuffled()
-        let subsonicService = musicService.getSubsonicService()
-        
-        do {
-            try await subsonicService.playQueue(shuffledSongs, startingAt: 0)
-            
-            await MainActor.run {
-                queueSongs = shuffledSongs
-                currentIndex = 0
-            }
-            
-            print("🎵 Subsonic队列已随机播放")
-        } catch {
-            print("🎵 随机播放失败：\(error.localizedDescription)")
-        }
-    }
+//    private func shuffleQueue() async {
+//        guard !queueSongs.isEmpty else { return }
+//        
+//        let shuffledSongs = queueSongs.shuffled()
+//        let subsonicService = musicService.getSubsonicService()
+//        
+//        do {
+//            try await subsonicService.playQueue(shuffledSongs, startingAt: 0)
+//            
+//            await MainActor.run {
+//                queueSongs = shuffledSongs
+//                currentIndex = 0
+//            }
+//            
+//            print("🎵 Subsonic队列已随机播放")
+//        } catch {
+//            print("🎵 随机播放失败：\(error.localizedDescription)")
+//        }
+//    }
     
     private func clearQueue() async {
         let subsonicService = musicService.getSubsonicService()
@@ -229,14 +215,14 @@ struct SubsonicQueueTrackRow: View {
             
             // 专辑封面
             if let artworkURL = song.artworkURL {
-                AsyncImage(url: artworkURL) { image in
+                CachedAsyncImage(url: artworkURL) {
+                    defaultArtwork
+                } content: { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 50, height: 50)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                } placeholder: {
-                    defaultArtwork
                 }
             } else {
                 defaultArtwork
@@ -269,12 +255,6 @@ struct SubsonicQueueTrackRow: View {
             }
             
             Spacer()
-            
-            // 数据源标识
-            Image(systemName: "server.rack")
-                .font(.caption2)
-                .foregroundColor(.orange)
-                .padding(.trailing, 4)
             
             // 歌曲时长
             Text(formattedDuration(song.duration))

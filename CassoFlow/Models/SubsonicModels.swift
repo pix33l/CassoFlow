@@ -22,13 +22,14 @@ struct SubsonicResponseContent<T: Codable>: Codable {
     let artists: ArtistsIndex?
     let artist: SubsonicArtist?
     let album: SubsonicAlbum?
+    let albumList2: AlbumList2Wrapper?  // 添加这行
     let playlists: PlaylistsWrapper?
     let playlist: SubsonicPlaylist?
     let searchResult3: SubsonicSearchResult?
     
     enum CodingKeys: String, CodingKey {
         case status, version, type, serverVersion, openSubsonic, error
-        case artists, artist, album, playlists, playlist
+        case artists, artist, album, albumList2, playlists, playlist
         case searchResult3 = "searchResult3"
     }
 }
@@ -180,6 +181,16 @@ struct PlaylistContent: Codable {
 
 struct SearchResultContent: Codable {
     let searchResult3: SubsonicSearchResult?
+}
+
+// MARK: - 专辑列表2相关 (用于getAlbumList2)
+
+struct AlbumList2Content: Codable {
+    let albumList2: AlbumList2Wrapper?
+}
+
+struct AlbumList2Wrapper: Codable {
+    let album: [SubsonicAlbum]
 }
 
 // MARK: - 扩展方法

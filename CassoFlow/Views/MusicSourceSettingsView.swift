@@ -14,8 +14,9 @@ struct MusicSourceSettingsView: View {
                 }) {
                     HStack {
                         Image(systemName: "apple.logo")
+                            .font(.title)
                             .foregroundColor(.white)
-                            .frame(width: 24, height: 24)
+                            .frame(width: 48, height: 48)
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Apple Music")
@@ -46,14 +47,14 @@ struct MusicSourceSettingsView: View {
                 }) {
                     HStack {
                         
-                        Image("Navidrome")
+                        Image("Subsonic")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(width: 24, height: 24)
+                            .frame(width: 48, height: 48)
 
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Navidrome")
+                            Text("Subsonic API")
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
@@ -86,10 +87,10 @@ struct MusicSourceSettingsView: View {
                         showingSubsonicSettings = true
                     }) {
                         HStack {
-                            Image(systemName: "gear")
-                                .foregroundColor(.blue)
+//                            Image(systemName: "gear")
+//                                .foregroundColor(.blue)
                             
-                            Text("配置 Subsonic 服务器")
+                            Text("配置 Subsonic API 服务器")
                                 .foregroundColor(.primary)
                             
                             Spacer()
@@ -102,8 +103,8 @@ struct MusicSourceSettingsView: View {
                     
                     // 连接状态显示
                     HStack {
-                        Image(systemName: "antenna.radiowaves.left.and.right")
-                            .foregroundColor(.secondary)
+//                        Image(systemName: "antenna.radiowaves.left.and.right")
+//                            .foregroundColor(.secondary)
                         
                         Text("连接状态")
                             .foregroundColor(.primary)
@@ -115,7 +116,7 @@ struct MusicSourceSettingsView: View {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.green)
                                 Text("已连接")
-                                    .font(.caption)
+                                    .font(.body)
                                     .foregroundColor(.green)
                             }
                         } else {
@@ -123,7 +124,7 @@ struct MusicSourceSettingsView: View {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.red)
                                 Text("未连接")
-                                    .font(.caption)
+                                    .font(.body)
                                     .foregroundColor(.red)
                             }
                         }
@@ -131,11 +132,11 @@ struct MusicSourceSettingsView: View {
                 } header: {
                     Text("Subsonic 设置")
                 } footer: {
-                    Text("配置您的 Subsonic 服务器连接信息。需要有效的服务器地址、用户名和密码。")
+                    Text("配置您的 Subsonic API 服务器,需要准备有效的服务器地址、用户名和密码。")
                 }
             }
         }
-        .navigationTitle("音乐服务商")
+        .navigationTitle("音乐提供商")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingSubsonicSettings) {
             SubsonicSettingsView()

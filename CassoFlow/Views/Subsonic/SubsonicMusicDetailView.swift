@@ -12,6 +12,9 @@ struct SubsonicMusicDetailView: View {
     @State private var shufflePlayTapped = false
     @State private var trackTapped = false
     
+    // 获取缓存管理器
+    private let cacheManager = MusicDetailCacheManager.shared
+    
     /// 判断当前是否正在播放指定歌曲
     private func isPlaying(_ song: UniversalSong) -> Bool {
         // 使用元数据匹配
@@ -36,7 +39,9 @@ struct SubsonicMusicDetailView: View {
                         
                         // 背景封面
                         if let artworkURL = album.artworkURL {
-                            AsyncImage(url: artworkURL) { image in
+                            CachedAsyncImage(url: artworkURL) {
+                                defaultBackground
+                            } content: { image in
                                 image
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
@@ -45,8 +50,6 @@ struct SubsonicMusicDetailView: View {
                                     .overlay(Color.black.opacity(0.3))
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                     .padding(.bottom, 37)
-                            } placeholder: {
-                                defaultBackground
                             }
                         } else {
                             defaultBackground
@@ -69,14 +72,14 @@ struct SubsonicMusicDetailView: View {
                         HStack {
                             // 小封面
                             if let artworkURL = album.artworkURL {
-                                AsyncImage(url: artworkURL) { image in
+                                CachedAsyncImage(url: artworkURL) {
+                                    defaultSmallCover
+                                } content: { image in
                                     image
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 60, height: 60)
                                         .clipShape(RoundedRectangle(cornerRadius: 2))
-                                } placeholder: {
-                                    defaultSmallCover
                                 }
                             } else {
                                 defaultSmallCover
@@ -175,7 +178,7 @@ struct SubsonicMusicDetailView: View {
                             
                             Button("重试") {
                                 Task {
-                                    await loadDetailedAlbum()
+                                    await loadDetailedAlbum(forceRefresh: true)
                                 }
                             }
                             .buttonStyle(.bordered)
@@ -244,7 +247,7 @@ struct SubsonicMusicDetailView: View {
         .navigationTitle(album.title)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await loadDetailedAlbum()
+            await loadDetailedAlbum(forceRefresh: false)
         }
     }
     
@@ -275,9 +278,22 @@ struct SubsonicMusicDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 2))
     }
     
-    // MARK: - 数据加载
+    // MARK: - 数据加载（优化缓存版本）
     
-    private func loadDetailedAlbum() async {
+    /// 加载详细专辑信息（支持缓存）
+    private func loadDetailedAlbum(forceRefresh: Bool) async {
+        // 如果不是强制刷新，先检查缓存
+        if !forceRefresh {
+            if let cached = cacheManager.getCachedAlbum(id: album.id) {
+                await MainActor.run {
+                    detailedAlbum = cached
+                    isLoading = false
+                    errorMessage = nil
+                }
+                return
+            }
+        }
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil
@@ -286,6 +302,9 @@ struct SubsonicMusicDetailView: View {
         do {
             let coordinator = musicService.getCoordinator()
             let detailed = try await coordinator.getAlbum(id: album.id)
+            
+            // 缓存结果
+            cacheManager.cacheAlbum(detailed, id: album.id)
             
             await MainActor.run {
                 detailedAlbum = detailed
@@ -353,7 +372,9 @@ struct SubsonicPlaylistDetailView: View {
                         
                         // 背景封面
                         if let artworkURL = playlist.artworkURL {
-                            AsyncImage(url: artworkURL) { image in
+                            CachedAsyncImage(url: artworkURL) {
+                                defaultBackground
+                            } content: { image in
                                 image
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
@@ -362,8 +383,6 @@ struct SubsonicPlaylistDetailView: View {
                                     .overlay(Color.black.opacity(0.3))
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                     .padding(.bottom, 37)
-                            } placeholder: {
-                                defaultBackground
                             }
                         } else {
                             defaultBackground
@@ -386,14 +405,14 @@ struct SubsonicPlaylistDetailView: View {
                         HStack {
                             // 小封面
                             if let artworkURL = playlist.artworkURL {
-                                AsyncImage(url: artworkURL) { image in
+                                CachedAsyncImage(url: artworkURL) {
+                                    defaultSmallCover
+                                } content: { image in
                                     image
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 60, height: 60)
                                         .clipShape(RoundedRectangle(cornerRadius: 2))
-                                } placeholder: {
-                                    defaultSmallCover
                                 }
                             } else {
                                 defaultSmallCover

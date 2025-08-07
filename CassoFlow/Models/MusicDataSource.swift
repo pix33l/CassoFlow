@@ -67,7 +67,7 @@ struct UniversalPlaylist: Identifiable {
 
 enum MusicDataSourceType: String, CaseIterable {
     case musicKit = "Apple Music"
-    case subsonic = "Navidrome"
+    case subsonic = "Subsonic"
     
     var displayName: String {
         rawValue

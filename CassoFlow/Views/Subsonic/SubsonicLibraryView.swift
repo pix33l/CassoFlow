@@ -8,7 +8,7 @@ struct SubsonicLibraryView: View {
     
     // 数据管理器
     @StateObject private var libraryData = SubsonicLibraryDataManager()
-    @StateObject private var preferences = LibraryPreferences()
+    @StateObject private var preferences = SubsonicLibraryPreferences()
     
     // UI状态
     @State private var selectedSegment = 0 // 0: 专辑, 1: 播放列表, 2: 艺术家
@@ -57,7 +57,7 @@ struct SubsonicLibraryView: View {
                 if !musicService.getSubsonicService().isConnected {
                     connectionErrorView
                 } else if libraryData.isLoading {
-                    ProgressView("正在加载Subsonic音乐库...")
+                    ProgressView("正在加载...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = libraryData.errorMessage {
                     errorView(message: error)
@@ -65,11 +65,38 @@ struct SubsonicLibraryView: View {
                     contentView
                 }
             }
-            .navigationTitle("Subsonic 音乐库")
+            .navigationTitle("媒体库")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 
+                ToolbarItem(placement: .navigationBarLeading) {
+                    // 刷新按钮
+                    Button(action: {
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
+                        }
+                        
+                        Task {
+                            // 清除所有缓存
+                            await MainActor.run {
+                                MusicDetailCacheManager.shared.clearAllCache()
+                                ImageCacheManager.shared.clearCache()
+                                SubsonicLibraryDataManager.clearSharedCache()
+                            }
+                            // 重新加载库数据
+                            await libraryData.reloadLibrary(subsonicService: musicService.getSubsonicService())
+                        }
+                    }) {
+                        Image(systemName: "arrow.trianglehead.2.counterclockwise")
+                            .foregroundColor(.primary)
+                            .font(.body)
+                    }
+                    .disabled(libraryData.isLoading)
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
+                    // 刷新按钮
                     Button {
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -107,7 +134,7 @@ struct SubsonicLibraryView: View {
         VStack(spacing: 20) {
             Image(systemName: "server.rack")
                 .font(.system(size: 48))
-                .foregroundColor(.orange)
+                .foregroundColor(.yellow)
             
             Text("Subsonic 服务器未连接")
                 .font(.title2)
@@ -129,7 +156,7 @@ struct SubsonicLibraryView: View {
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 25)
-                                .fill(Color.orange)
+                                .fill(Color.yellow)
                         )
                 }
                 
@@ -140,7 +167,7 @@ struct SubsonicLibraryView: View {
                 }) {
                     Text("重新连接")
                         .font(.subheadline)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.yellow)
                 }
             }
         }
@@ -168,6 +195,12 @@ struct SubsonicLibraryView: View {
             
             Button(action: {
                 Task {
+                    // 清除所有缓存
+                    await MainActor.run {
+                        MusicDetailCacheManager.shared.clearAllCache()
+                        ImageCacheManager.shared.clearCache()
+                        SubsonicLibraryDataManager.clearSharedCache()
+                    }
                     await libraryData.reloadLibrary(subsonicService: musicService.getSubsonicService())
                 }
             }) {
@@ -192,20 +225,37 @@ struct SubsonicLibraryView: View {
         VStack(spacing: 0) {
             // 控制栏
             HStack {
-                // 刷新按钮
-                Button(action: {
-                    Task {
-                        await libraryData.reloadLibrary(subsonicService: musicService.getSubsonicService())
+                // 排序菜单
+                Menu {
+                    ForEach(SubsonicSortType.allCases, id: \.self) { sortType in
+                        Button {
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
+                            preferences.currentSortType = sortType
+                            Task {
+                                await libraryData.applySorting(sortType)
+                            }
+                        } label: {
+                            if preferences.currentSortType == sortType {
+                                Label(sortType.localizedName, systemImage: "checkmark")
+                            } else {
+                                Text(sortType.localizedName)
+                            }
+                        }
                     }
-                }) {
-                    Image(systemName: "arrow.clockwise")
-                        .foregroundColor(.secondary)
-                        .font(.body)
-                        .padding(8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.gray.opacity(0.2))
-                        )
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.up.arrow.down")
+                            .foregroundColor(.secondary)
+                            .font(.body)
+                    }
+                    .padding(8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.gray.opacity(0.2))
+                    )
                 }
                 .disabled(libraryData.isLoading)
                 
@@ -428,7 +478,7 @@ struct SubsonicLibraryView: View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))
-                .foregroundColor(.orange)
+                .foregroundColor(.yellow)
             
             Text(message)
                 .font(.title3)
@@ -448,7 +498,7 @@ struct SubsonicLibraryView: View {
         VStack(spacing: 16) {
             Image(systemName: systemImage)
                 .font(.system(size: 48))
-                .foregroundColor(.orange)
+                .foregroundColor(.yellow)
             
             Text(message)
                 .font(.title3)
@@ -467,6 +517,49 @@ struct SubsonicLibraryView: View {
 
 // MARK: - Subsonic音乐库数据管理器
 
+// Subsonic 专用的排序类型
+enum SubsonicSortType: String, CaseIterable {
+    case newest = "newest"          // 最新添加 (对应 Subsonic API 中的 newest)
+    case alphabeticalByName = "alphabeticalByName"  // 按专辑名称
+    case alphabeticalByArtist = "alphabeticalByArtist" // 按艺术家名称
+    
+    var localizedName: String {
+        switch self {
+        case .newest:
+            return "最近添加"
+        case .alphabeticalByName:
+            return "专辑"
+        case .alphabeticalByArtist:
+            return "艺术家"
+        }
+    }
+}
+
+// Subsonic 图书馆偏好设置管理器
+class SubsonicLibraryPreferences: ObservableObject {
+    private let sortTypeKey = "SubsonicLibrarySortType"
+    private let displayModeKey = "SubsonicLibraryDisplayMode"
+    
+    @Published var currentSortType: SubsonicSortType {
+        didSet {
+            UserDefaults.standard.set(currentSortType.rawValue, forKey: sortTypeKey)
+        }
+    }
+    
+    @Published var isGridMode: Bool {
+        didSet {
+            UserDefaults.standard.set(isGridMode, forKey: displayModeKey)
+        }
+    }
+    
+    init() {
+        let savedSortType = UserDefaults.standard.string(forKey: sortTypeKey) ?? SubsonicSortType.newest.rawValue
+        self.currentSortType = SubsonicSortType(rawValue: savedSortType) ?? .newest
+        
+        self.isGridMode = UserDefaults.standard.object(forKey: displayModeKey) as? Bool ?? true
+    }
+}
+
 class SubsonicLibraryDataManager: ObservableObject {
     @Published var albums: [UniversalAlbum] = []
     @Published var playlists: [UniversalPlaylist] = []
@@ -475,8 +568,39 @@ class SubsonicLibraryDataManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var hasLoaded = false
     
+    // 添加静态缓存，在整个应用生命周期中保持
+    private static var sharedLibraryData: (albums: [UniversalAlbum], playlists: [UniversalPlaylist], artists: [UniversalArtist])?
+    
+    // 保存原始未排序的数据
+    private var originalAlbums: [UniversalAlbum] = []
+    private var originalPlaylists: [UniversalPlaylist] = []
+    private var originalArtists: [UniversalArtist] = []
+    
     func loadLibraryIfNeeded(subsonicService: SubsonicMusicService) async {
-        guard !hasLoaded else { return }
+        // 如果已经加载过或有静态缓存，直接使用缓存数据
+        if hasLoaded {
+            return
+        }
+        
+        // 检查静态缓存
+        if let cachedData = Self.sharedLibraryData {
+            await MainActor.run {
+                self.albums = cachedData.albums
+                self.playlists = cachedData.playlists
+                self.artists = cachedData.artists
+                self.originalAlbums = cachedData.albums
+                self.originalPlaylists = cachedData.playlists
+                self.originalArtists = cachedData.artists
+                self.hasLoaded = true
+                self.isLoading = false
+                self.errorMessage = nil
+                
+                // 预加载封面
+                self.preloadAlbumCovers()
+                self.preloadPlaylistCovers()
+            }
+            return
+        }
         
         await MainActor.run {
             isLoading = true
@@ -501,18 +625,37 @@ class SubsonicLibraryDataManager: ObservableObject {
             
             let (albumsResult, playlistsResult, artistsResult) = try await (albumsTask, playlistsTask, artistsTask)
             
+            // 添加调试信息
+            print("Albums loaded: \(albumsResult.count)")
+            print("Playlists loaded: \(playlistsResult.count)")
+            print("Artists loaded: \(artistsResult.count)")
+            
             await MainActor.run {
                 self.albums = albumsResult
                 self.playlists = playlistsResult
                 self.artists = artistsResult
+                self.originalAlbums = albumsResult
+                self.originalPlaylists = playlistsResult
+                self.originalArtists = artistsResult
                 self.isLoading = false
                 self.hasLoaded = true
+                
+                // 缓存到静态变量
+                Self.sharedLibraryData = (albumsResult, playlistsResult, artistsResult)
                 
                 if albumsResult.isEmpty && playlistsResult.isEmpty && artistsResult.isEmpty {
                     self.errorMessage = "Subsonic服务器上没有找到音乐内容"
                 }
+                
+                // 预加载专辑封面
+                self.preloadAlbumCovers()
+                
+                // 预加载播放列表封面
+                self.preloadPlaylistCovers()
             }
         } catch {
+            // 添加更详细的错误信息
+            print("Library loading error: \(error)")
             await MainActor.run {
                 self.errorMessage = "加载音乐库失败：\(error.localizedDescription)"
                 self.isLoading = false
@@ -520,9 +663,68 @@ class SubsonicLibraryDataManager: ObservableObject {
         }
     }
     
+    /// 应用排序
+    func applySorting(_ sortType: SubsonicSortType) async {
+        await MainActor.run {
+            // 对专辑排序
+            switch sortType {
+            case .newest:
+                albums = originalAlbums // Subsonic通常已按最新排序
+            case .alphabeticalByName:
+                albums = originalAlbums.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+            case .alphabeticalByArtist:
+                albums = originalAlbums.sorted { $0.artistName.localizedCaseInsensitiveCompare($1.artistName) == .orderedAscending }
+            }
+            
+            // 对播放列表排序
+            switch sortType {
+            case .newest:
+                playlists = originalPlaylists
+            case .alphabeticalByName:
+                playlists = originalPlaylists.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            case .alphabeticalByArtist:
+                playlists = originalPlaylists.sorted { ($0.curatorName ?? "").localizedCaseInsensitiveCompare($1.curatorName ?? "") == .orderedAscending }
+            }
+            
+            // 对艺术家排序
+            switch sortType {
+            case .newest:
+                artists = originalArtists
+            case .alphabeticalByName, .alphabeticalByArtist:
+                artists = originalArtists.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            }
+        }
+    }
+    
+    /// 预加载专辑封面
+    @MainActor private func preloadAlbumCovers() {
+        let imageCache = ImageCacheManager.shared
+        
+        // 预加载前20个专辑的封面
+        for album in albums.prefix(20) {
+            if let artworkURL = album.artworkURL {
+                imageCache.preloadImage(from: artworkURL)
+            }
+        }
+    }
+    
+    /// 预加载播放列表封面
+    @MainActor private func preloadPlaylistCovers() {
+        let imageCache = ImageCacheManager.shared
+        
+        // 预加载前20个播放列表的封面
+        for playlist in playlists.prefix(20) {
+            if let artworkURL = playlist.artworkURL {
+                imageCache.preloadImage(from: artworkURL)
+            }
+        }
+    }
+    
     func reloadLibrary(subsonicService: SubsonicMusicService) async {
         await MainActor.run {
             hasLoaded = false
+            // 清除静态缓存，强制重新加载
+            Self.sharedLibraryData = nil
         }
         await loadLibraryIfNeeded(subsonicService: subsonicService)
     }
@@ -538,12 +740,19 @@ class SubsonicLibraryDataManager: ObservableObject {
             isLoading = false
             if isConnected {
                 hasLoaded = false
+                // 连接测试成功后清除缓存
+                Self.sharedLibraryData = nil
             }
         }
         
         if isConnected {
             await loadLibraryIfNeeded(subsonicService: subsonicService)
         }
+    }
+    
+    /// 清除缓存的类方法
+    static func clearSharedCache() {
+        sharedLibraryData = nil
     }
 }
 

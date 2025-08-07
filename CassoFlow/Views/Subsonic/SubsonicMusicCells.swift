@@ -11,13 +11,16 @@ struct SubsonicGridAlbumCell: View {
             // 专辑封面
             ZStack {
                 if let artworkURL = album.artworkURL {
-                    AsyncImage(url: artworkURL) { image in
+                    CachedAsyncImage(url: artworkURL) {
+                        defaultAlbumCover
+                    } content: { image in
                         if musicService.currentCoverStyle == .rectangle {
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 110, height: 170)
                                 .clipShape(Rectangle())
+                                .contentShape(Rectangle())
                         } else {
                             image
                                 .resizable()
@@ -26,6 +29,7 @@ struct SubsonicGridAlbumCell: View {
                                 .blur(radius: 8)
                                 .overlay(Color.black.opacity(0.3))
                                 .clipShape(Rectangle())
+                                .contentShape(Rectangle())
                                 .overlay(
                                     image
                                         .resizable()
@@ -34,8 +38,6 @@ struct SubsonicGridAlbumCell: View {
                                         .clipShape(Rectangle())
                                 )
                         }
-                    } placeholder: {
-                        defaultAlbumCover
                     }
                 } else {
                     defaultAlbumCover
@@ -62,6 +64,7 @@ struct SubsonicGridAlbumCell: View {
             }
             .padding(.top, 2)
         }
+        .id(album.id) // 稳定视图身份，减少重新创建
     }
     
     private var defaultAlbumCover: some View {
@@ -88,7 +91,9 @@ struct SubsonicListAlbumCell: View {
             ZStack {
                 // 背景
                 if let artworkURL = album.artworkURL {
-                    AsyncImage(url: artworkURL) { image in
+                    CachedAsyncImage(url: artworkURL) {
+                        defaultListBackground
+                    } content: { image in
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
@@ -96,8 +101,7 @@ struct SubsonicListAlbumCell: View {
                             .blur(radius: 8)
                             .overlay(Color.black.opacity(0.3))
                             .clipShape(Rectangle())
-                    } placeholder: {
-                        defaultListBackground
+                            .contentShape(Rectangle())
                     }
                 } else {
                     defaultListBackground
@@ -107,14 +111,14 @@ struct SubsonicListAlbumCell: View {
                 HStack(spacing: 16) {
                     // 小封面
                     if let artworkURL = album.artworkURL {
-                        AsyncImage(url: artworkURL) { image in
+                        CachedAsyncImage(url: artworkURL) {
+                            defaultSmallCover
+                        } content: { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 40, height: 40)
                                 .clipShape(Rectangle())
-                        } placeholder: {
-                            defaultSmallCover
                         }
                     } else {
                         defaultSmallCover
@@ -143,6 +147,7 @@ struct SubsonicListAlbumCell: View {
                     .frame(width: 360, height: 48)
             }
         }
+        .id(album.id) // 稳定视图身份
     }
     
     private var defaultListBackground: some View {
@@ -181,13 +186,16 @@ struct SubsonicGridPlaylistCell: View {
             // 播放列表封面
             ZStack {
                 if let artworkURL = playlist.artworkURL {
-                    AsyncImage(url: artworkURL) { image in
+                    CachedAsyncImage(url: artworkURL) {
+                        defaultPlaylistCover
+                    } content: { image in
                         if musicService.currentCoverStyle == .rectangle {
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 110, height: 170)
                                 .clipShape(Rectangle())
+                                .contentShape(Rectangle())
                         } else {
                             image
                                 .resizable()
@@ -196,6 +204,7 @@ struct SubsonicGridPlaylistCell: View {
                                 .blur(radius: 8)
                                 .overlay(Color.black.opacity(0.3))
                                 .clipShape(Rectangle())
+                                .contentShape(Rectangle())
                                 .overlay(
                                     image
                                         .resizable()
@@ -204,8 +213,6 @@ struct SubsonicGridPlaylistCell: View {
                                         .clipShape(Rectangle())
                                 )
                         }
-                    } placeholder: {
-                        defaultPlaylistCover
                     }
                 } else {
                     defaultPlaylistCover
@@ -234,6 +241,7 @@ struct SubsonicGridPlaylistCell: View {
             }
             .padding(.top, 2)
         }
+        .id(playlist.id) // 稳定视图身份
     }
     
     private var defaultPlaylistCover: some View {
@@ -260,7 +268,9 @@ struct SubsonicListPlaylistCell: View {
             ZStack {
                 // 背景
                 if let artworkURL = playlist.artworkURL {
-                    AsyncImage(url: artworkURL) { image in
+                    CachedAsyncImage(url: artworkURL) {
+                        defaultListPlaylistBackground
+                    } content: { image in
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fill)
@@ -268,8 +278,7 @@ struct SubsonicListPlaylistCell: View {
                             .blur(radius: 8)
                             .overlay(Color.black.opacity(0.3))
                             .clipShape(Rectangle())
-                    } placeholder: {
-                        defaultListPlaylistBackground
+                            .contentShape(Rectangle())
                     }
                 } else {
                     defaultListPlaylistBackground
@@ -279,14 +288,14 @@ struct SubsonicListPlaylistCell: View {
                 HStack(spacing: 16) {
                     // 小封面
                     if let artworkURL = playlist.artworkURL {
-                        AsyncImage(url: artworkURL) { image in
+                        CachedAsyncImage(url: artworkURL) {
+                            defaultSmallPlaylistCover
+                        } content: { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 40, height: 40)
                                 .clipShape(Rectangle())
-                        } placeholder: {
-                            defaultSmallPlaylistCover
                         }
                     } else {
                         defaultSmallPlaylistCover
@@ -317,6 +326,7 @@ struct SubsonicListPlaylistCell: View {
                     .frame(width: 360, height: 48)
             }
         }
+        .id(playlist.id) // 稳定视图身份
     }
     
     private var defaultListPlaylistBackground: some View {

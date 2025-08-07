@@ -174,6 +174,24 @@ class SubsonicAPIClient: ObservableObject {
         return album
     }
     
+    /// 获取专辑列表 (getAlbumList2)
+    func getAlbumList2(type: String, size: Int, offset: Int = 0) async throws -> [SubsonicAlbum] {
+        let params = [
+            "type": type,
+            "size": String(size),
+            "offset": String(offset)
+        ]
+        
+        let data = try await makeRequest(endpoint: "getAlbumList2", additionalParams: params)
+        let response = try JSONDecoder().decode(SubsonicResponse<AlbumList2Content>.self, from: data)
+        
+        guard response.subsonicResponse.status == "ok" else {
+            throw SubsonicError.serverError(response.subsonicResponse.error?.message ?? "Unknown error")
+        }
+        
+        return response.subsonicResponse.albumList2?.album ?? []
+    }
+    
     /// 获取播放列表
     func getPlaylists() async throws -> [SubsonicPlaylist] {
         let data = try await makeRequest(endpoint: "getPlaylists")

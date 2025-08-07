@@ -70,8 +70,6 @@ class MusicService: ObservableObject {
     @Published var currentCassetteSkin: CassetteSkin
     @Published var currentCoverStyle: CoverStyle = .rectangle
 
-
-
     // MARK: - 磁带音效属性
     @Published var isCassetteEffectEnabled: Bool = false {
         didSet {
@@ -97,12 +95,19 @@ class MusicService: ObservableObject {
     
     // MARK: - 数据源管理
     
-    var currentDataSource: MusicDataSourceType {
-        get { coordinator.currentDataSource }
-        set { coordinator.currentDataSource = newValue }
+    @Published var currentDataSource: MusicDataSourceType = .musicKit {
+        didSet {
+            UserDefaults.standard.set(currentDataSource.rawValue, forKey: "SelectedDataSource")
+            coordinator.currentDataSource = currentDataSource
+            
+            // 🔑 切换数据源时重置播放状态
+            Task { @MainActor in
+                resetPlaybackStateForDataSourceChange()
+            }
+        }
     }
     
-    // MARK: - 皮肤存储键值
+    // MARK: - 存储键值
     private static let playerSkinKey = "SelectedPlayerSkin"
     private static let cassetteSkinKey = "SelectedCassetteSkin"
     private static let cassetteEffectKey = "CassetteEffectEnabled"
@@ -138,7 +143,7 @@ class MusicService: ObservableObject {
         set { musicKitPlayer.state.shuffleMode = newValue }
     }
     
-    /// 请求音乐授权
+    /// ？请求音乐授权
     func requestMusicAuthorization() async {
         let status = await MusicAuthorization.request()
         
@@ -152,7 +157,7 @@ class MusicService: ObservableObject {
         }
     }
     
-    // 设置MusicKit
+    // ？设置MusicKit
     private func setupMusicKit() async {
         do {
             // 检查订阅状态
@@ -162,7 +167,7 @@ class MusicService: ObservableObject {
         }
     }
     
-    /// 重置库视图关闭状态
+    /// ？重置库视图关闭状态
     func resetLibraryCloseState() {
         shouldCloseLibrary = false
     }
@@ -170,7 +175,7 @@ class MusicService: ObservableObject {
     // MARK: - 初始化
     
     init() {
-        // 设置默认的显示状态
+        // ？设置默认的显示状态
         self.currentTitle = String(localized: "未播放歌曲")
         self.currentArtist = String(localized: "点此选择音乐")
         self.currentDuration = 0
@@ -201,6 +206,31 @@ class MusicService: ObservableObject {
             currentCassetteSkin = defaultSkin
         }
         
+        // 加载其他设置
+        loadSettings()
+        
+        // 🔑 智能启动Timer - 只在需要时启动
+        startUpdateTimer()
+        
+        // 监听会员状态变化通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleMembershipStatusChanged),
+            name: NSNotification.Name("MembershipStatusChanged"),
+            object: nil
+        )
+        
+        // 监听应用状态变化
+        setupAppStateNotifications()
+    }
+    
+    deinit {
+        stopAllTimers()
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: - 设置加载
+    private func loadSettings() {
         // 加载磁带音效设置
         isCassetteEffectEnabled = UserDefaults.standard.bool(forKey: Self.cassetteEffectKey)
         
@@ -226,25 +256,6 @@ class MusicService: ObservableObject {
         } else {
             currentCoverStyle = .rectangle // 默认矩形样式
         }
-        
-        // 🔑 智能启动Timer - 只在需要时启动
-        startUpdateTimer()
-        
-        // 监听会员状态变化通知
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleMembershipStatusChanged),
-            name: NSNotification.Name("MembershipStatusChanged"),
-            object: nil
-        )
-        
-        // 监听应用状态变化
-        setupAppStateNotifications()
-    }
-    
-    deinit {
-        stopAllTimers()
-        NotificationCenter.default.removeObserver(self)
     }
     
     // 设置应用状态通知监听
@@ -472,6 +483,15 @@ class MusicService: ObservableObject {
     }
 
     private func updateCurrentSongInfo() {
+        switch currentDataSource {
+        case .musicKit:
+            updateMusicKitInfo()
+        case .subsonic:
+            updateSubsonicInfo()
+        }
+    }
+    
+    private func updateMusicKitInfo() {
         guard let entry = musicKitPlayer.queue.currentEntry else {
             DispatchQueue.main.async {
                 self.currentTitle = String(localized: "未播放歌曲")
@@ -568,8 +588,131 @@ class MusicService: ObservableObject {
         }
     }
     
+    private func updateSubsonicInfo() {
+        let queueInfo = subsonicService.getQueueInfo()
+        let playbackInfo = subsonicService.getPlaybackInfo()
+        
+        guard let currentSong = subsonicService.getCurrentSong() else {
+            resetPlaybackInfo()
+            return
+        }
+        
+        // 计算 Subsonic 队列的总时长和已播放时长
+        let queueTotalDuration = calculateSubsonicQueueTotalDuration(queue: queueInfo.queue)
+        let queueElapsedDuration = calculateSubsonicQueueElapsedDuration(
+            queue: queueInfo.queue, 
+            currentIndex: queueInfo.currentIndex,
+            currentTime: playbackInfo.current
+        )
+        
+        updatePlaybackInfo(
+            title: currentSong.title,
+            artist: currentSong.artistName,
+            duration: playbackInfo.total,
+            currentTime: playbackInfo.current,
+            trackID: MusicItemID(rawValue: currentSong.id),
+            trackIndex: queueInfo.currentIndex + 1,
+            totalTracks: queueInfo.queue.count,
+            queueTotalDuration: queueTotalDuration,
+            queueElapsedDuration: queueElapsedDuration,
+            isPlaying: playbackInfo.isPlaying
+        )
+    }
+    
+    private func updatePlaybackInfo(
+        title: String,
+        artist: String,
+        duration: TimeInterval,
+        currentTime: TimeInterval,
+        trackID: MusicItemID?,
+        trackIndex: Int?,
+        totalTracks: Int,
+        queueTotalDuration: TimeInterval = 0, // 新增参数
+        queueElapsedDuration: TimeInterval = 0, // 新增参数
+        isPlaying: Bool
+    ) {
+        let songInfoChanged = title != lastTitle ||
+                             artist != lastArtist ||
+                             trackID?.rawValue != lastTrackID?.rawValue ||
+                             trackIndex != lastTrackIndex ||
+                             totalTracks != lastTotalTracks
+        
+        if songInfoChanged {
+            lastTitle = title
+            lastArtist = artist
+            lastTrackID = trackID
+            lastTrackIndex = trackIndex
+            lastTotalTracks = totalTracks
+            
+            DispatchQueue.main.async {
+                self.currentTitle = title
+                self.currentArtist = artist
+                self.totalDuration = duration
+                self.currentTrackID = trackID
+                self.currentTrackIndex = trackIndex
+                self.totalTracksInQueue = totalTracks
+                self.queueTotalDuration = queueTotalDuration // 更新队列总时长
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self.isPlaying = isPlaying
+            self.currentDuration = currentTime
+            self.queueElapsedDuration = queueElapsedDuration // 更新队列已播放时长
+            self.audioEffectsManager.setMusicPlayingState(isPlaying)
+        }
+    }
+    
+    private func resetPlaybackInfo() {
+        DispatchQueue.main.async {
+            self.currentTitle = String(localized: "未播放歌曲")
+            self.currentArtist = String(localized: "点此选择音乐")
+            self.currentDuration = 0
+            self.totalDuration = 0
+            self.isPlaying = false
+            self.currentTrackID = nil
+            self.currentTrackIndex = nil
+            self.totalTracksInQueue = 0
+            self.audioEffectsManager.setMusicPlayingState(false)
+            
+            self.lastTitle = ""
+            self.lastArtist = ""
+            self.lastTrackID = nil
+            self.lastTrackIndex = nil
+            self.lastTotalTracks = 0
+        }
+    }
+    
     // MARK: - 播放时长计算方法
-/// 计算队列中所有歌曲的总时长
+
+    /// 计算 Subsonic 队列中所有歌曲的总时长
+    private func calculateSubsonicQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
+        let totalDuration = queue.reduce(0) { total, song in
+            total + song.duration
+        }
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
+    }
+    
+    /// 计算 Subsonic 队列中已播放的总时长
+    private func calculateSubsonicQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
+        guard currentIndex < queue.count else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for index in 0..<currentIndex {
+            elapsedDuration += queue[index].duration
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += currentTime
+        
+        return elapsedDuration
+    }
+
+    /// 计算队列中所有歌曲的总时长（MusicKit）
     private func calculateQueueTotalDuration(entries: ApplicationMusicPlayer.Queue.Entries) -> TimeInterval {
         var totalDuration: TimeInterval = 0
         
@@ -588,7 +731,8 @@ class MusicService: ObservableObject {
         // 如果总时长为0，返回默认值
         return totalDuration > 0 ? totalDuration : 180.0
     }
-/// 计算队列中已播放的总时长
+
+    /// 计算队列中已播放的总时长（MusicKit）
     private func calculateQueueElapsedDuration(entries: ApplicationMusicPlayer.Queue.Entries, currentEntryIndex: Int?) -> TimeInterval {
         guard let currentIndex = currentEntryIndex else { return 0 }
         
@@ -704,6 +848,10 @@ class MusicService: ObservableObject {
         await MainActor.run {
             shouldCloseLibrary = true
         }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
     
     /// 播放MusicKit歌曲
@@ -724,6 +872,10 @@ class MusicService: ObservableObject {
         let detailedAlbum = try await coordinator.getAlbum(id: album.id)
         let finalSongs = shuffled ? detailedAlbum.songs.shuffled() : detailedAlbum.songs
         try await playUniversalSongs(finalSongs)
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await forceSyncPlaybackStatus()
     }
     
     /// 播放通用播放列表
@@ -731,15 +883,19 @@ class MusicService: ObservableObject {
         let detailedPlaylist = try await coordinator.getPlaylist(id: playlist.id)
         let finalSongs = shuffled ? detailedPlaylist.songs.shuffled() : detailedPlaylist.songs
         try await playUniversalSongs(finalSongs)
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.1秒
+        await forceSyncPlaybackStatus()
     }
 
     /// 播放
     func play() async throws {
         switch currentDataSource {
-        case .musicKit:
-            try await musicKitPlayer.play()
-        case .subsonic:
-            await subsonicService.play()
+            case .musicKit:
+                try await musicKitPlayer.play()
+            case .subsonic:
+                await subsonicService.play()
         }
         await MainActor.run {
             isPlaying = true
@@ -750,7 +906,7 @@ class MusicService: ObservableObject {
         }
         
         // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.1秒
         await forceSyncPlaybackStatus()
     }
 
@@ -897,5 +1053,33 @@ class MusicService: ObservableObject {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    // 🔑 新增：切换数据源时重置播放状态
+    private func resetPlaybackStateForDataSourceChange() {
+        // 重置播放信息显示
+        currentTitle = String(localized: "未播放歌曲")
+        currentArtist = String(localized: "点此选择音乐")
+        currentDuration = 0
+        totalDuration = 0
+        isPlaying = false
+        currentTrackID = nil
+        currentTrackIndex = nil
+        totalTracksInQueue = 0
+        queueTotalDuration = 0
+        queueElapsedDuration = 0
+        
+        // 重置缓存值
+        lastTitle = ""
+        lastArtist = ""
+        lastTrackID = nil
+        lastTrackIndex = nil
+        lastTotalTracks = 0
+        
+        // 停止相关Timer
+        stopUpdateTimer()
+        
+        // 通知音频效果管理器停止播放
+        audioEffectsManager.setMusicPlayingState(false)
     }
 }

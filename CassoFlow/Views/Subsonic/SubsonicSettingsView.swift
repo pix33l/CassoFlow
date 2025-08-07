@@ -7,6 +7,8 @@ struct SubsonicSettingsView: View {
     @State private var isConnecting = false
     @State private var connectionStatus: ConnectionStatus = .notTested
     @State private var showPassword = false
+    @State private var showSaveSuccess = false // 添加保存成功状态
+    @State private var rotationAngle: Double = 0 // 添加旋转角度状态
     
     enum ConnectionStatus: Equatable {
         case notTested
@@ -19,7 +21,7 @@ struct SubsonicSettingsView: View {
             case .notTested:
                 return .secondary
             case .connecting:
-                return .blue
+                return .secondary
             case .success:
                 return .green
             case .failed:
@@ -32,7 +34,7 @@ struct SubsonicSettingsView: View {
             case .notTested:
                 return "circle"
             case .connecting:
-                return "arrow.clockwise"
+                return "arrow.trianglehead.2.clockwise"
             case .success:
                 return "checkmark.circle.fill"
             case .failed:
@@ -55,44 +57,94 @@ struct SubsonicSettingsView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "server.rack")
-                                .foregroundColor(.blue)
-                                .font(.title2)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Subsonic服务器")
-                                    .font(.headline)
-                                Text("连接到您的个人音乐服务器")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
+                    HStack {
+                        Image("Subsonic")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 48, height: 48)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Subsonic API 服务器")
+                                .font(.headline)
+                            // 连接状态指示器
+//                            HStack {
+//                                Image(systemName: connectionStatus.iconName)
+//                                    .font(.footnote)
+//                                    .foregroundColor(connectionStatus.color)
+//                                    .rotationEffect(.degrees(rotationAngle))
+//                                    .onChange(of: connectionStatus) { _, newStatus in
+//                                        if newStatus == .connecting {
+//                                            withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
+//                                                rotationAngle = 360
+//                                            }
+//                                        } else {
+//                                            withAnimation(.default) {
+//                                                rotationAngle = 0
+//                                            }
+//                                        }
+//                                    }
+//                                
+//                                Text(connectionStatus.message)
+//                                    .font(.footnote)
+//                                    .foregroundColor(connectionStatus.color)
+//                            }
                         }
                         
-                        // 连接状态指示器
-                        HStack {
-                            Image(systemName: connectionStatus.iconName)
-                                .foregroundColor(connectionStatus.color)
-                                .rotationEffect(.degrees(connectionStatus == .connecting ? 360 : 0))
-                                .animation(getRotationAnimation(), value: connectionStatus)
-                            
-                            Text(connectionStatus.message)
-                                .font(.caption)
-                                .foregroundColor(connectionStatus.color)
+                        Spacer()
+                        // 测试连接按钮
+                        Button(action: testConnection) {
+                            HStack {
+//                                if isConnecting {
+//                                    ProgressView()
+//                                        .scaleEffect(0.8)
+//                                        .progressViewStyle(CircularProgressViewStyle())
+//                                } else {
+//                                    Image(systemName: "antenna.radiowaves.left.and.right")
+//                                }
+                                
+                                Text(isConnecting ? "连接中..." : "测试连接")
+                                    .fontWeight(.bold)
+                                    .font(.footnote)
+                            }
+                            .frame(width: 54)
+                            .foregroundColor(canTestConnection ? .black : .secondary)
                         }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.yellow)
+                        .disabled(!canTestConnection || isConnecting)
                     }
-                    .padding(.vertical, 8)
                 } header: {
                     Text("服务器状态")
+                } footer: {
+                    HStack {
+                        Image(systemName: connectionStatus.iconName)
+                            .font(.footnote)
+                            .foregroundColor(connectionStatus.color)
+                            .rotationEffect(.degrees(rotationAngle))
+                            .onChange(of: connectionStatus) { _, newStatus in
+                                if newStatus == .connecting {
+                                    withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
+                                        rotationAngle = 360
+                                    }
+                                } else {
+                                    withAnimation(.default) {
+                                        rotationAngle = 0
+                                    }
+                                }
+                            }
+                        
+                        Text(connectionStatus.message)
+                            .font(.footnote)
+                            .foregroundColor(connectionStatus.color)
+                    }
                 }
                 
                 Section {
                     // 服务器URL
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 12) {
                         Text("服务器地址")
                             .font(.headline)
                         
@@ -102,13 +154,13 @@ struct SubsonicSettingsView: View {
                             .autocapitalization(.none)
                             .disableAutocorrection(true)
                         
-                        Text("输入您的Subsonic服务器完整URL地址")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+//                        Text("请输入您的 Subsonic API 服务器完整 URL 地址")
+//                            .font(.caption)
+//                            .foregroundColor(.secondary)
                     }
                     
                     // 用户名
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 12) {
                         Text("用户名")
                             .font(.headline)
                         
@@ -119,7 +171,7 @@ struct SubsonicSettingsView: View {
                     }
                     
                     // 密码
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("密码")
                                 .font(.headline)
@@ -130,7 +182,7 @@ struct SubsonicSettingsView: View {
                                 showPassword.toggle()
                             }) {
                                 Image(systemName: showPassword ? "eye.slash" : "eye")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.yellow)
                             }
                         }
                         
@@ -146,75 +198,73 @@ struct SubsonicSettingsView: View {
                         .disableAutocorrection(true)
                     }
                 } header: {
-                    Text("服务器配置")
+                    Text("服务器设置")
                 } footer: {
-                    Text("请输入您的Subsonic服务器登录信息。密码将安全存储在设备上。")
+                    Text("请输入服务器登录信息，密码将安全存储在设备上。")
                 }
                 
-                Section {
-                    // 测试连接按钮
-                    Button(action: testConnection) {
-                        HStack {
-                            if isConnecting {
-                                ProgressView()
-                                    .scaleEffect(0.8)
-                                    .progressViewStyle(CircularProgressViewStyle())
-                            } else {
-                                Image(systemName: "antenna.radiowaves.left.and.right")
-                            }
-                            
-                            Text(isConnecting ? "测试连接中..." : "测试连接")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .foregroundColor(canTestConnection ? .white : .secondary)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!canTestConnection || isConnecting)
+//                Section {
+//                    // 测试连接按钮
+//                    Button(action: testConnection) {
+//                        HStack {
+//                            if isConnecting {
+//                                ProgressView()
+//                                    .scaleEffect(0.8)
+//                                    .progressViewStyle(CircularProgressViewStyle())
+//                            } else {
+//                                Image(systemName: "antenna.radiowaves.left.and.right")
+//                            }
+//                            
+//                            Text(isConnecting ? "测试连接中..." : "测试连接")
+//                        }
+//                        .frame(maxWidth: .infinity)
+//                        .foregroundColor(canTestConnection ? .white : .secondary)
+//                    }
+//                    .buttonStyle(.borderedProminent)
+//                    .disabled(!canTestConnection || isConnecting)
                     
                     // 保存按钮
-                    Button(action: saveConfiguration) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.down")
-                            Text("保存配置")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(!canSave)
-                    
-                } footer: {
-                    if connectionStatus == .success {
-                        Text("✅ 配置正确，可以开始使用Subsonic服务")
-                            .foregroundColor(.green)
-                    }
-                }
-                
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("关于Subsonic")
-                            .font(.headline)
-                        
-                        Text("Subsonic是一个个人音乐流媒体服务器，允许您从任何地方访问自己的音乐收藏。")
-                            .font(.body)
-                        
-                        Text("要使用此功能，您需要：")
-                            .font(.body)
-                            .padding(.top, 8)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("• 一个运行中的Subsonic服务器")
-                            Text("• 服务器的URL地址")
-                            Text("• 有效的用户账户")
-                        }
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.leading, 8)
-                    }
-                } header: {
-                    Text("帮助信息")
-                }
+//                    Button(action: saveConfiguration) {
+//                        HStack {
+//                            Image(systemName: "checkmark.circle.fill")
+//                            Text("保存")
+//                        }
+//                        .foregroundStyle(.black)
+//                        .frame(maxWidth: .infinity)
+//                    }
+//                    .buttonStyle(.borderedProminent)
+//                    .tint(.yellow)
+//                    .disabled(!canSave)
+//                    
+//                } footer: {
+//                    if showSaveSuccess {
+//                        Text("保存成功，可以开始使用 Subsonic 服务")
+//                            .foregroundColor(.green)
+//                    }
+//                }
             }
-            .navigationTitle("Subsonic设置")
+            
+            VStack {
+                Button(action: saveConfiguration) {
+                    HStack {
+                        if showSaveSuccess {
+                            Image(systemName: "checkmark.circle.fill")
+                        }
+                        Text(showSaveSuccess ? "保存成功" : "保存")
+                    }
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(!canSave ? Color.gray : Color.yellow) // 禁用时变灰
+                    .foregroundColor(!canSave ? Color.white : Color.black) // 禁用时文字变白
+                    .cornerRadius(12)
+                }
+                .disabled(!canSave) // 移动到这里！
+                .padding()
+            }
+            
+            .navigationTitle("Subsonic API 设置")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -248,17 +298,8 @@ struct SubsonicSettingsView: View {
     }
     
     private var canSave: Bool {
-        canTestConnection
-    }
-    
-    // MARK: - 辅助方法
-    
-    private func getRotationAnimation() -> Animation? {
-        if case .connecting = connectionStatus {
-            return Animation.linear.repeatForever(autoreverses: false)
-        } else {
-            return Animation.default
-        }
+        // 只有连接测试成功后才能保存
+        connectionStatus == .success
     }
     
     // MARK: - 方法
@@ -290,7 +331,19 @@ struct SubsonicSettingsView: View {
         apiClient.saveConfiguration()
         
         // 显示保存成功提示
-        // 这里可以添加HapticFeedback或Toast提示
+        showSaveSuccess = true
+        
+        // 触觉反馈
+        if musicService.isHapticFeedbackEnabled {
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+        }
+        
+        // 3秒后隐藏成功提示
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            showSaveSuccess = false
+            dismiss()
+        }
     }
 }
 
