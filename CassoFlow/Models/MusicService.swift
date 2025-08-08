@@ -2,6 +2,7 @@ import MusicKit
 import Combine
 import Foundation
 import UIKit
+import MediaPlayer
 
 // MARK: - 磁带封面样式枚举
 enum CoverStyle: String, CaseIterable {
@@ -43,6 +44,7 @@ class MusicService: ObservableObject {
     // MARK: - 核心组件
     private let musicKitPlayer = ApplicationMusicPlayer.shared
     private let subsonicService = SubsonicMusicService.shared
+    private let audioStationService = AudioStationMusicService.shared // 新增
     private let coordinator = MusicServiceCoordinator()
     private let audioEffectsManager = AudioEffectsManager.shared
     private let storeManager = StoreManager.shared
@@ -102,7 +104,7 @@ class MusicService: ObservableObject {
             
             // 🔑 切换数据源时重置播放状态
             Task { @MainActor in
-                resetPlaybackStateForDataSourceChange()
+                await resetPlaybackStateForDataSourceChange()
             }
         }
     }
@@ -132,13 +134,13 @@ class MusicService: ObservableObject {
     private var lastTotalTracks: Int = 0
     
     // 循环播放
-    var repeatMode: MusicPlayer.RepeatMode {
+    var repeatMode: MusicKit.MusicPlayer.RepeatMode {
         get { musicKitPlayer.state.repeatMode ?? .none }
         set { musicKitPlayer.state.repeatMode = newValue }
     }
     
     // 随机播放
-    var shuffleMode: MusicPlayer.ShuffleMode {
+    var shuffleMode: MusicKit.MusicPlayer.ShuffleMode {
         get { musicKitPlayer.state.shuffleMode ?? .off }
         set { musicKitPlayer.state.shuffleMode = newValue }
     }
@@ -372,6 +374,11 @@ class MusicService: ObservableObject {
         return subsonicService
     }
     
+    /// 获取Audio Station服务（用于配置）
+    func getAudioStationService() -> AudioStationMusicService {
+        return audioStationService
+    }
+    
     /// 获取音乐服务协调器
     func getCoordinator() -> MusicServiceCoordinator {
         return coordinator
@@ -488,6 +495,8 @@ class MusicService: ObservableObject {
             updateMusicKitInfo()
         case .subsonic:
             updateSubsonicInfo()
+        case .audioStation:
+            updateAudioStationInfo()
         }
     }
     
@@ -600,6 +609,37 @@ class MusicService: ObservableObject {
         // 计算 Subsonic 队列的总时长和已播放时长
         let queueTotalDuration = calculateSubsonicQueueTotalDuration(queue: queueInfo.queue)
         let queueElapsedDuration = calculateSubsonicQueueElapsedDuration(
+            queue: queueInfo.queue, 
+            currentIndex: queueInfo.currentIndex,
+            currentTime: playbackInfo.current
+        )
+        
+        updatePlaybackInfo(
+            title: currentSong.title,
+            artist: currentSong.artistName,
+            duration: playbackInfo.total,
+            currentTime: playbackInfo.current,
+            trackID: MusicItemID(rawValue: currentSong.id),
+            trackIndex: queueInfo.currentIndex + 1,
+            totalTracks: queueInfo.queue.count,
+            queueTotalDuration: queueTotalDuration,
+            queueElapsedDuration: queueElapsedDuration,
+            isPlaying: playbackInfo.isPlaying
+        )
+    }
+    
+    private func updateAudioStationInfo() {
+        let queueInfo = audioStationService.getQueueInfo()
+        let playbackInfo = audioStationService.getPlaybackInfo()
+        
+        guard let currentSong = audioStationService.getCurrentSong() else {
+            resetPlaybackInfo()
+            return
+        }
+        
+        // 计算 Audio Station 队列的总时长和已播放时长
+        let queueTotalDuration = calculateAudioStationQueueTotalDuration(queue: queueInfo.queue)
+        let queueElapsedDuration = calculateAudioStationQueueElapsedDuration(
             queue: queueInfo.queue, 
             currentIndex: queueInfo.currentIndex,
             currentTime: playbackInfo.current
@@ -760,6 +800,33 @@ class MusicService: ObservableObject {
         return elapsedDuration
     }
     
+    /// 计算 Audio Station 队列中所有歌曲的总时长
+    private func calculateAudioStationQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
+        let totalDuration = queue.reduce(0) { total, song in
+            total + song.duration
+        }
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
+    }
+    
+    /// 计算 Audio Station 队列中已播放的总时长
+    private func calculateAudioStationQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
+        guard currentIndex < queue.count else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for index in 0..<currentIndex {
+            elapsedDuration += queue[index].duration
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += currentTime
+        
+        return elapsedDuration
+    }
+
     // MARK: - 播放控制方法
     
     /// 播放 MusicKit 专辑中的特定歌曲
@@ -843,6 +910,8 @@ class MusicService: ObservableObject {
             try await playMusicKitSongs(songs, startingAt: index)
         case .subsonic:
             try await subsonicService.playQueue(songs, startingAt: index)
+        case .audioStation:
+            try await audioStationService.playQueue(songs, startingAt: index)
         }
         
         await MainActor.run {
@@ -896,6 +965,8 @@ class MusicService: ObservableObject {
                 try await musicKitPlayer.play()
             case .subsonic:
                 await subsonicService.play()
+            case .audioStation:
+                await audioStationService.play()
         }
         await MainActor.run {
             isPlaying = true
@@ -917,6 +988,8 @@ class MusicService: ObservableObject {
                 musicKitPlayer.pause()
             case .subsonic:
                 await subsonicService.pause()
+            case .audioStation:
+                await audioStationService.pause()
         }
         await MainActor.run {
             isPlaying = false
@@ -934,6 +1007,8 @@ class MusicService: ObservableObject {
                 try await musicKitPlayer.skipToNextEntry()
             case .subsonic:
                 try await subsonicService.skipToNext()
+            case .audioStation:
+                try await audioStationService.skipToNext()
         }
         // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
         Task {
@@ -951,6 +1026,8 @@ class MusicService: ObservableObject {
                 try await musicKitPlayer.skipToPreviousEntry()
             case .subsonic:
                 try await subsonicService.skipToPrevious()
+            case .audioStation:
+                try await audioStationService.skipToPrevious()
         }
         // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
         Task {
@@ -978,6 +1055,8 @@ class MusicService: ObservableObject {
                 self.musicKitPlayer.playbackTime = newTime
             case .subsonic:
                 self.subsonicService.seekBackward(6.0)
+            case .audioStation:
+                self.audioStationService.seekBackward(6.0)
             }
         }
     }
@@ -999,6 +1078,8 @@ class MusicService: ObservableObject {
                 self.musicKitPlayer.playbackTime = newTime
             case .subsonic:
                 self.subsonicService.seekForward(6.0)
+            case .audioStation:
+                self.audioStationService.seekForward(6.0)
             }
         }
     }
@@ -1055,31 +1136,68 @@ class MusicService: ObservableObject {
         return String(format: "%02d:%02d", minutes, seconds)
     }
     
-    // 🔑 新增：切换数据源时重置播放状态
-    private func resetPlaybackStateForDataSourceChange() {
-        // 重置播放信息显示
-        currentTitle = String(localized: "未播放歌曲")
-        currentArtist = String(localized: "点此选择音乐")
-        currentDuration = 0
-        totalDuration = 0
-        isPlaying = false
-        currentTrackID = nil
-        currentTrackIndex = nil
-        totalTracksInQueue = 0
-        queueTotalDuration = 0
-        queueElapsedDuration = 0
+    // 🔑 修改：切换数据源时重置播放状态（异步版本）
+    private func resetPlaybackStateForDataSourceChange() async {
+        // 🔑 首先停止所有数据源的音乐播放
+        await stopAllDataSourcesPlayback()
         
-        // 重置缓存值
-        lastTitle = ""
-        lastArtist = ""
-        lastTrackID = nil
-        lastTrackIndex = nil
-        lastTotalTracks = 0
+        // 🔑 确保在主线程上更新 @Published 属性
+        await MainActor.run {
+            // 重置播放信息显示
+            currentTitle = String(localized: "未播放歌曲")
+            currentArtist = String(localized: "点此选择音乐")
+            currentDuration = 0
+            totalDuration = 0
+            isPlaying = false
+            currentTrackID = nil
+            currentTrackIndex = nil
+            totalTracksInQueue = 0
+            queueTotalDuration = 0
+            queueElapsedDuration = 0
+            
+            // 重置缓存值
+            lastTitle = ""
+            lastArtist = ""
+            lastTrackID = nil
+            lastTrackIndex = nil
+            lastTotalTracks = 0
+            
+            // 停止相关Timer
+            stopUpdateTimer()
+            
+            // 通知音频效果管理器停止播放
+            audioEffectsManager.setMusicPlayingState(false)
+        }
+    }
+    
+    // 🔑 修改：停止所有数据源的音乐播放（异步版本）
+    private func stopAllDataSourcesPlayback() async {
+        print("🛑 停止所有数据源的播放")
         
-        // 停止相关Timer
-        stopUpdateTimer()
+        // 停止MusicKit播放 - 确保在主线程
+        await MainActor.run {
+            musicKitPlayer.stop()
+            print("🛑 已停止 MusicKit 播放")
+        }
         
-        // 通知音频效果管理器停止播放
-        audioEffectsManager.setMusicPlayingState(false)
+        // 并行停止其他服务的播放
+        async let subsonicStop: Void = {
+            await subsonicService.pause()
+            print("🛑 已停止 Subsonic 播放")
+        }()
+        
+        async let audioStationStop: Void = {
+            await audioStationService.pause()
+            print("🛑 已停止 Audio Station 播放")
+        }()
+        
+        // 等待所有停止操作完成
+        let _ = await (subsonicStop, audioStationStop)
+        
+        // 🔑 清除锁屏播放信息
+        await MainActor.run {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+            print("🛑 已清除锁屏播放信息")
+        }
     }
 }

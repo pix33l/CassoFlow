@@ -1,9 +1,10 @@
 import Foundation
 import AVFoundation
 import Combine
+import MediaPlayer
 
 /// Subsonic音乐服务管理器
-class SubsonicMusicService: ObservableObject {
+class SubsonicMusicService: NSObject, ObservableObject {
     static let shared = SubsonicMusicService()
     
     // MARK: - 属性
@@ -52,8 +53,15 @@ class SubsonicMusicService: ObservableObject {
         case one     // 重复当前歌曲
     }
     
-    private init() {
+    private override init() {
+        super.init()
         setupNotifications()
+        
+        // 🔑 延迟设置音频会话和远程控制
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.setupAudioSession()
+            self.setupRemoteCommandCenter()
+        }
     }
     
     deinit {
@@ -92,6 +100,233 @@ class SubsonicMusicService: ObservableObject {
     /// 获取API客户端（用于配置）
     func getAPIClient() -> SubsonicAPIClient {
         return apiClient
+    }
+    
+    // MARK: - 🔑 新增：音频会话和锁屏播放器配置
+    
+    /// 设置音频会话
+    private func setupAudioSession() {
+        // 🔑 在主线程上配置音频会话
+        DispatchQueue.main.async {
+            do {
+                let audioSession = AVAudioSession.sharedInstance()
+                
+                // 🔑 iOS 18 要求：更严格的音频会话配置
+                try audioSession.setCategory(.playback, 
+                                           mode: .default, 
+                                           options: [.allowAirPlay, .allowBluetooth, .interruptSpokenAudioAndMixWithOthers])
+                print("✅ 音频会话类别设置成功")
+                
+                // 🔑 重要：先停用再激活音频会话
+                try audioSession.setActive(false)
+                try audioSession.setActive(true, options: [.notifyOthersOnDeactivation])
+                print("✅ 音频会话激活成功")
+                
+                // 🔑 立即开始接收远程控制事件
+                UIApplication.shared.beginReceivingRemoteControlEvents()
+                print("✅ 开始接收远程控制事件")
+                
+            } catch {
+                print("❌ Subsonic 音频会话配置失败: \(error)")
+            }
+        }
+    }
+    
+    /// 激活音频会话（简化版本）
+    private func activateAudioSession() {
+        // 🔑 简化，只确保会话是激活的
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("✅ 音频会话激活确认")
+        } catch {
+            print("⚠️ 音频会话激活失败: \(error)")
+        }
+    }
+    
+    /// 设置远程控制命令中心（iOS 18 优化版本）
+    private func setupRemoteCommandCenter() {
+        DispatchQueue.main.async {
+            let commandCenter = MPRemoteCommandCenter.shared()
+            
+            // 🔑 iOS 18：更完整的命令配置
+            
+            // 清除所有现有目标
+            commandCenter.playCommand.removeTarget(nil)
+            commandCenter.pauseCommand.removeTarget(nil)
+            commandCenter.nextTrackCommand.removeTarget(nil)
+            commandCenter.previousTrackCommand.removeTarget(nil)
+            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+            commandCenter.togglePlayPauseCommand.removeTarget(nil)
+            
+            // 启用命令
+            commandCenter.playCommand.isEnabled = true
+            commandCenter.pauseCommand.isEnabled = true
+            commandCenter.nextTrackCommand.isEnabled = true
+            commandCenter.previousTrackCommand.isEnabled = true
+            commandCenter.changePlaybackPositionCommand.isEnabled = true
+            commandCenter.togglePlayPauseCommand.isEnabled = true
+            
+            // 播放命令
+            commandCenter.playCommand.addTarget { [weak self] _ in
+                print("🎵 锁屏播放命令")
+                Task { await self?.play() }
+                return .success
+            }
+            
+            // 暂停命令
+            commandCenter.pauseCommand.addTarget { [weak self] _ in
+                print("⏸️ 锁屏暂停命令")
+                Task { await self?.pause() }
+                return .success
+            }
+            
+            // 🔑 新增：播放/暂停切换命令
+            commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+                print("⏯️ 锁屏播放/暂停切换命令")
+                Task {
+                    if self?.isPlaying == true {
+                        await self?.pause()
+                    } else {
+                        await self?.play()
+                    }
+                }
+                return .success
+            }
+            
+            // 下一首命令
+            commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                print("⏭️ 锁屏下一首命令")
+                Task { try? await self?.skipToNext() }
+                return .success
+            }
+            
+            // 上一首命令
+            commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                print("⏮️ 锁屏上一首命令")
+                Task { try? await self?.skipToPrevious() }
+                return .success
+            }
+            
+            // 🔑 重要：跳转命令
+            commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+                if let event = event as? MPChangePlaybackPositionCommandEvent {
+                    let time = event.positionTime
+                    print("⏩ 锁屏跳转命令: \(time)秒")
+                    Task {
+                        await self?.seek(to: time)
+                    }
+                    return .success
+                }
+                return .commandFailed
+            }
+            
+            print("✅ 远程控制命令中心配置完成")
+        }
+    }
+    
+    /// 更新锁屏播放信息（iOS 18 优化版本）
+    private func updateNowPlayingInfo() {
+        // 🔑 确保在主线程上执行
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let song = self.currentSong else {
+                // 🔑 iOS 18：使用空字典而不是 nil
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+                print("🔄 清除锁屏播放信息")
+                return
+            }
+            
+            // 🔑 重要：验证播放器状态
+            guard let player = self.avPlayer else {
+                print("❌ 播放器为空，跳过锁屏信息更新")
+                return
+            }
+            
+            var nowPlayingInfo = [String: Any]()
+            
+            // 🔑 基本信息（必需）
+            nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
+            nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
+            nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumName ?? ""
+            
+            // 🔑 时间信息（关键）- iOS 18 对这些值更敏感
+            let safeDuration = self.duration > 0 ? self.duration : song.duration
+            let validDuration = max(1.0, safeDuration) // 确保时长至少为1秒
+            let validCurrentTime = max(0.0, min(self.currentTime, validDuration)) // 确保当前时间不超过总时长
+            
+            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = validDuration
+            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = validCurrentTime
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
+            
+            // 🔑 iOS 18 重要：明确设置所有相关属性
+            nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.audio.rawValue
+            nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = false
+            nowPlayingInfo[MPNowPlayingInfoPropertyAvailableLanguageOptions] = []
+            nowPlayingInfo[MPNowPlayingInfoPropertyCurrentLanguageOptions] = []
+            
+            // 🔑 队列信息（如果有的话）
+            if !self.currentQueue.isEmpty {
+                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = self.currentIndex
+                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = self.currentQueue.count
+            }
+            
+            // 🔑 封面艺术 - 使用更标准的尺寸
+            let artworkSize = CGSize(width: 600, height: 600)
+            if let defaultImage = UIImage(systemName: "music.note") {
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
+                    return defaultImage
+                }
+            }
+            
+            // 🔑 iOS 18：一次性设置，不要清除再设置
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+            
+            print("🔄 设置锁屏播放信息:")
+            print("   标题: \(song.title)")
+            print("   艺术家: \(song.artistName)")
+            print("   时长: \(validDuration)秒")
+            print("   当前时间: \(validCurrentTime)秒")
+            print("   播放速率: \(self.isPlaying ? 1.0 : 0.0)")
+            print("   播放器控制状态: \(player.timeControlStatus.rawValue)")
+            
+            // 🔑 验证设置结果
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let info = MPNowPlayingInfoCenter.default().nowPlayingInfo {
+                    print("✅ 锁屏播放信息验证成功，包含 \(info.keys.count) 个字段")
+                    print("   字段: \(info.keys.map { $0 })")
+                } else {
+                    print("❌ 锁屏播放信息验证失败 - 信息为空")
+                }
+            }
+        }
+    }
+    
+    /// 异步加载专辑封面
+    private func loadAndSetArtwork(from url: URL) async {
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let image = UIImage(data: data) {
+                let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in
+                    return image
+                }
+                
+                await MainActor.run {
+                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+                    updatedInfo[MPMediaItemPropertyArtwork] = artwork
+                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
+                    print("🖼️ 专辑封面加载完成")
+                }
+            }
+        } catch {
+            print("❌ 加载专辑封面失败: \(error)")
+        }
+    }
+    
+    /// 更新播放进度信息（用于定期更新）
+    private func updatePlaybackProgress() {
+        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
+        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     
     // MARK: - 数据获取方法
@@ -302,6 +537,11 @@ class SubsonicMusicService: ObservableObject {
     
     /// 播放歌曲队列
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
+        print("🎵 开始播放Subsonic队列，共\(songs.count)首歌，从第\(index + 1)首开始")
+        
+        // 🔑 激活音频会话
+        activateAudioSession()
+        
         await MainActor.run {
             currentQueue = songs
             currentIndex = index
@@ -328,6 +568,9 @@ class SubsonicMusicService: ObservableObject {
             throw SubsonicMusicServiceError.noStreamURL
         }
         
+        print("🎵 播放歌曲: \(song.title) - \(song.artistName)")
+        print("   流URL: \(streamURL)")
+        
         await MainActor.run {
             currentSong = song
             setupAVPlayer(with: streamURL)
@@ -338,38 +581,125 @@ class SubsonicMusicService: ObservableObject {
     private func setupAVPlayer(with url: URL) {
         cleanupPlayer()
         
-        avPlayer = AVPlayer(url: url)
-        
-        // 🔑 简单解决方案：直接使用当前歌曲的预设时长
-        if let song = currentSong {
-            duration = song.duration
+        // 🔑 确保在主线程上执行
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.avPlayer = AVPlayer(url: url)
+            
+            // 🔑 设置时长
+            if let song = self.currentSong {
+                self.duration = song.duration
+            }
+            
+            // 🔑 监听播放器状态变化
+            self.avPlayer?.addObserver(self, forKeyPath: "timeControlStatus", options: [.new], context: nil)
+            self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
+            
+            // 🔑 修复：时间观察者
+            let timeInterval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+            if CMTimeCompare(timeInterval, CMTime.zero) > 0 {
+                self.avPlayerObserver = self.avPlayer?.addPeriodicTimeObserver(
+                    forInterval: timeInterval,
+                    queue: .main
+                ) { [weak self] time in
+                    guard let self = self else { return }
+                    let newTime = CMTimeGetSeconds(time)
+                    if newTime.isFinite && !newTime.isNaN {
+                        self.currentTime = newTime
+                        
+                        // 🔑 iOS 18：实时更新播放进度
+                        if var info = MPNowPlayingInfoCenter.default().nowPlayingInfo {
+                            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = newTime
+                            info[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
+                            MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+                        }
+                    }
+                }
+            }
+            
+            // 🔑 重要：先激活音频会话
+            self.activateAudioSession()
+            
+            // 🔑 开始播放
+            self.avPlayer?.play()
+            self.isPlaying = true
+            
+            print("✅ AVPlayer 设置完成，开始播放")
+            
+            // 🔑 延迟设置播放信息，等待播放器完全准备就绪
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.updateNowPlayingInfo()
+            }
         }
+    }
+    
+    /// KVO 观察者
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard let keyPath = keyPath else { return }
         
-        // 添加时间观察者
-        avPlayerObserver = avPlayer?.addPeriodicTimeObserver(
-            forInterval: CMTime(seconds: 1.0, preferredTimescale: 1),
-            queue: .main
-        ) { [weak self] time in
-            let currentTime = CMTimeGetSeconds(time)
-            self?.currentTime = currentTime
+        DispatchQueue.main.async { [weak self] in
+            switch keyPath {
+            case "timeControlStatus":
+                if let player = self?.avPlayer {
+                    print("🎵 播放器状态变化: \(player.timeControlStatus.rawValue)")
+                    if player.timeControlStatus == .playing {
+                        self?.updateNowPlayingInfo()
+                    }
+                }
+            case "status":
+                if let status = self?.avPlayer?.currentItem?.status {
+                    print("🎵 播放项状态变化: \(status.rawValue)")
+                    if status == .readyToPlay {
+                        self?.updateNowPlayingInfo()
+                    }
+                }
+            default:
+                break
+            }
         }
+    }
+    
+    /// 强制刷新当前播放信息
+    private func forceRefreshNowPlaying() {
+        // 🔑 强制刷新的方法：先清除再设置
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         
-        // 监听播放完成
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(playerDidFinishPlaying),
-            name: .AVPlayerItemDidPlayToEndTime,
-            object: avPlayer?.currentItem
-        )
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.updateNowPlayingInfo()
+            print("🔄 强制刷新锁屏播放信息")
+        }
+    }
+    
+    /// 刷新远程控制中心
+    private func refreshRemoteCommandCenter() {
+        let commandCenter = MPRemoteCommandCenter.shared()
         
-        // 开始播放
-        avPlayer?.play()
-        isPlaying = true
+        // 强制刷新命令状态
+        commandCenter.playCommand.isEnabled = !isPlaying
+        commandCenter.pauseCommand.isEnabled = isPlaying
+        commandCenter.nextTrackCommand.isEnabled = currentIndex < currentQueue.count - 1
+        commandCenter.previousTrackCommand.isEnabled = currentIndex > 0
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
         
-        // 🗑️ 删除原来依赖AVPlayer duration的代码
-        // if let duration = avPlayer?.currentItem?.duration.seconds, !duration.isNaN {
-        //     self.duration = duration
-        // }
+        print("🔄 刷新远程控制中心状态")
+    }
+    
+    /// 监听播放器项目状态变化
+    @objc private func playerItemStatusChanged() {
+        guard let playerItem = avPlayer?.currentItem else { return }
+        
+        switch playerItem.status {
+        case .readyToPlay:
+            print("✅ 播放器准备就绪")
+            updateNowPlayingInfo()
+        case .failed:
+            print("❌ 播放器播放失败: \(playerItem.error?.localizedDescription ?? "未知错误")")
+        case .unknown:
+            print("⏳ 播放器状态未知")
+        @unknown default:
+            break
+        }
     }
     
     /// 播放
@@ -377,6 +707,8 @@ class SubsonicMusicService: ObservableObject {
         avPlayer?.play()
         await MainActor.run {
             isPlaying = true
+            // 🔑 更新锁屏播放状态
+            updatePlaybackProgress()
         }
     }
     
@@ -385,6 +717,8 @@ class SubsonicMusicService: ObservableObject {
         avPlayer?.pause()
         await MainActor.run {
             isPlaying = false
+            // 🔑 更新锁屏播放状态
+            updatePlaybackProgress()
         }
     }
     
@@ -428,8 +762,13 @@ class SubsonicMusicService: ObservableObject {
     }
     
     /// 跳转到指定时间
-    func seek(to time: TimeInterval) {
-        avPlayer?.seek(to: CMTime(seconds: time, preferredTimescale: 1))
+    func seek(to time: TimeInterval) async {
+        await MainActor.run {
+            avPlayer?.seek(to: CMTime(seconds: time, preferredTimescale: 1))
+            currentTime = time
+            // 🔑 更新锁屏播放进度
+            updatePlaybackProgress()
+        }
     }
     
     /// 停止播放
@@ -441,6 +780,9 @@ class SubsonicMusicService: ObservableObject {
         isPlaying = false
         currentTime = 0
         duration = 0
+        
+        // 🔑 清除锁屏播放信息
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
     // MARK: - 播放统计
@@ -599,6 +941,10 @@ class SubsonicMusicService: ObservableObject {
     }
     
     private func cleanupPlayer() {
+        // 🔑 移除观察者
+        avPlayer?.removeObserver(self, forKeyPath: "timeControlStatus")
+        avPlayer?.currentItem?.removeObserver(self, forKeyPath: "status")
+        
         if let observer = avPlayerObserver {
             avPlayer?.removeTimeObserver(observer)
             avPlayerObserver = nil

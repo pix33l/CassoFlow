@@ -13,6 +13,9 @@ struct UniversalQueueView: View {
             case .subsonic:
                 // 使用Subsonic队列视图
                 SubsonicQueueView()
+            case .audioStation:
+                // 使用Audio Station队列视图
+                AudioStationQueueView()
             }
         }
         .animation(.easeInOut(duration: 0.3), value: musicService.currentDataSource)
@@ -41,6 +44,15 @@ struct UniversalQueueView_Previews: PreviewProvider {
                     return service
                 }())
                 .previewDisplayName("Subsonic 队列")
+            
+            // Audio Station数据源预览
+            UniversalQueueView()
+                .environmentObject({
+                    let service = MusicService.shared
+                    service.currentDataSource = .audioStation
+                    return service
+                }())
+                .previewDisplayName("Audio Station 队列")
         }
     }
 }

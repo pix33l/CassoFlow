@@ -687,6 +687,9 @@ struct RepeatAndShuffleView: View {
             return isShuffled != .off
         case .subsonic:
             return subsonicModes.shuffle
+        case .audioStation:
+            // Audio Station 暂时不支持随机播放状态获取，默认为false
+            return false
         }
     }
     
@@ -701,6 +704,9 @@ struct RepeatAndShuffleView: View {
             }
         case .subsonic:
             return subsonicModes.repeat
+        case .audioStation:
+            // Audio Station 暂时不支持重复播放模式获取，默认为none
+            return .none
         }
     }
     
@@ -734,6 +740,10 @@ struct RepeatAndShuffleView: View {
                     }
                     musicService.getSubsonicService().setRepeatMode(newMode)
                     updateSubsonicModes()
+                    
+                case .audioStation:
+                    // Audio Station 暂时不支持重复播放模式切换
+                    print("Audio Station 不支持重复播放模式切换")
                 }
             } label: {
                 Group {
@@ -775,6 +785,10 @@ struct RepeatAndShuffleView: View {
                     let newShuffleState = !subsonicModes.shuffle
                     musicService.getSubsonicService().setShuffleEnabled(newShuffleState)
                     updateSubsonicModes()
+                    
+                case .audioStation:
+                    // Audio Station 暂时不支持随机播放切换
+                    print("Audio Station 不支持随机播放切换")
                 }
             } label: {
                 Image(systemName: "shuffle")
@@ -1257,7 +1271,7 @@ struct CassetteHole: View {
 //                            .font(.title3)
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
-//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false));
 //                    
 //                    // 下一首按钮
 //                    Button(action: {}) {
@@ -1265,7 +1279,7 @@ struct CassetteHole: View {
 //                            .font(.title3)
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
-//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false));
 //                    
 //                    // 设置按钮
 //                    Button(action: {}) {
@@ -1273,7 +1287,7 @@ struct CassetteHole: View {
 //                            .font(.title3)
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
-//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false));
 //                }
 //                .frame(height: buttonHeight)
 //                .padding(.horizontal, 10.0)

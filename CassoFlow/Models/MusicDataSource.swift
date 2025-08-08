@@ -68,6 +68,7 @@ struct UniversalPlaylist: Identifiable {
 enum MusicDataSourceType: String, CaseIterable {
     case musicKit = "Apple Music"
     case subsonic = "Subsonic"
+    case audioStation = "Audio Station"
     
     var displayName: String {
         rawValue
@@ -564,6 +565,247 @@ class SubsonicDataSource: MusicDataSource {
     
     func reportPlayback(song: UniversalSong) async throws {
         try await apiClient.scrobble(id: song.id)
+    }
+}
+
+// MARK: - Audio Station数据源实现
+
+class AudioStationDataSource: MusicDataSource {
+    @Published var isAvailable: Bool = false
+    
+    let sourceType: MusicDataSourceType = .audioStation
+    private let apiClient: AudioStationAPIClient
+    
+    init(apiClient: AudioStationAPIClient) {
+        self.apiClient = apiClient
+    }
+    
+    func initialize() async throws {
+        let connected = try await apiClient.ping()
+        await MainActor.run {
+            isAvailable = connected
+        }
+    }
+    
+    func checkAvailability() async -> Bool {
+        do {
+            let connected = try await apiClient.ping()
+            await MainActor.run {
+                isAvailable = connected
+            }
+            return connected
+        } catch {
+            await MainActor.run {
+                isAvailable = false
+            }
+            return false
+        }
+    }
+    
+    func getRecentAlbums() async throws -> [UniversalAlbum] {
+        let albums = try await apiClient.getAlbums()
+        
+        // 取前50个专辑作为"最新专辑"
+        return Array(albums.prefix(50)).compactMap { album in
+            UniversalAlbum(
+                id: album.id,
+                title: album.displayName,
+                artistName: album.artistName,
+                year: album.year,
+                genre: nil,
+                songCount: 0, // Audio Station API 不直接提供歌曲数量
+                duration: album.durationTimeInterval,
+                artworkURL: apiClient.getCoverArtURL(id: album.id),
+                songs: [],
+                source: .audioStation,
+                originalData: album
+            )
+        }
+    }
+    
+    func getRecentPlaylists() async throws -> [UniversalPlaylist] {
+        let playlists = try await apiClient.getPlaylists()
+        
+        return playlists.compactMap { playlist in
+            UniversalPlaylist(
+                id: playlist.id,
+                name: playlist.name,
+                curatorName: nil,
+                songCount: 0, // Audio Station API 不直接提供歌曲数量
+                duration: playlist.durationTimeInterval,
+                artworkURL: apiClient.getCoverArtURL(id: playlist.id),
+                songs: [],
+                source: .audioStation,
+                originalData: playlist
+            )
+        }
+    }
+    
+    func getArtists() async throws -> [UniversalArtist] {
+        let artists = try await apiClient.getArtists()
+        
+        return artists.compactMap { artist in
+            UniversalArtist(
+                id: artist.id,
+                name: artist.name,
+                albumCount: artist.albumCount,
+                albums: [],
+                source: .audioStation,
+                originalData: artist
+            )
+        }
+    }
+    
+    func getArtist(id: String) async throws -> UniversalArtist {
+        // Audio Station API 需要通过专辑列表来获取艺术家详情
+        let albums = try await apiClient.getAlbums()
+        let artistAlbums = albums.filter { $0.artistName.contains(id) || $0.id == id }
+        
+        let universalAlbums = artistAlbums.compactMap { album in
+            UniversalAlbum(
+                id: album.id,
+                title: album.displayName,
+                artistName: album.artistName,
+                year: album.year,
+                genre: nil,
+                songCount: 0,
+                duration: album.durationTimeInterval,
+                artworkURL: apiClient.getCoverArtURL(id: album.id),
+                songs: [],
+                source: .audioStation,
+                originalData: album
+            )
+        }
+        
+        guard let firstAlbum = artistAlbums.first else {
+            throw MusicDataSourceError.notFound
+        }
+        
+        return UniversalArtist(
+            id: id,
+            name: firstAlbum.artistName,
+            albumCount: artistAlbums.count,
+            albums: universalAlbums,
+            source: .audioStation,
+            originalData: firstAlbum
+        )
+    }
+    
+    func getAlbum(id: String) async throws -> UniversalAlbum {
+        let album = try await apiClient.getAlbum(id: id)
+        
+        // 获取专辑中的歌曲
+        let allSongs = try await apiClient.getSongs()
+        let albumSongs = allSongs.filter { $0.album == album.displayName || $0.album?.contains(album.displayName) == true }
+        
+        let songs = albumSongs.compactMap { song in
+            UniversalSong(
+                id: song.id,
+                title: song.title,
+                artistName: song.artistName,
+                albumName: song.album,
+                duration: song.durationTimeInterval,
+                trackNumber: song.track,
+                artworkURL: apiClient.getCoverArtURL(id: song.id),
+                streamURL: apiClient.getStreamURL(id: song.id),
+                source: .audioStation,
+                originalData: song
+            )
+        }
+        
+        return UniversalAlbum(
+            id: album.id,
+            title: album.displayName,
+            artistName: album.artistName,
+            year: album.year,
+            genre: nil,
+            songCount: songs.count,
+            duration: songs.reduce(0) { $0 + $1.duration },
+            artworkURL: apiClient.getCoverArtURL(id: album.id),
+            songs: songs,
+            source: .audioStation,
+            originalData: album
+        )
+    }
+    
+    func getPlaylist(id: String) async throws -> UniversalPlaylist {
+        // Audio Station 播放列表详情需要特殊处理
+        let playlists = try await apiClient.getPlaylists()
+        guard let playlist = playlists.first(where: { $0.id == id }) else {
+            throw MusicDataSourceError.notFound
+        }
+        
+        // 获取播放列表中的歌曲（这里简化处理，实际可能需要专门的API）
+        let songs: [UniversalSong] = []
+        
+        return UniversalPlaylist(
+            id: playlist.id,
+            name: playlist.name,
+            curatorName: nil,
+            songCount: songs.count,
+            duration: playlist.durationTimeInterval,
+            artworkURL: apiClient.getCoverArtURL(id: playlist.id),
+            songs: songs,
+            source: .audioStation,
+            originalData: playlist
+        )
+    }
+    
+    func search(query: String) async throws -> (artists: [UniversalArtist], albums: [UniversalAlbum], songs: [UniversalSong]) {
+        let searchResult = try await apiClient.search(query: query)
+        
+        let artists = searchResult.artists.compactMap { artist in
+            UniversalArtist(
+                id: artist.id,
+                name: artist.name,
+                albumCount: artist.albumCount,
+                albums: [],
+                source: .audioStation,
+                originalData: artist
+            )
+        }
+        
+        let albums = searchResult.albums.compactMap { album in
+            UniversalAlbum(
+                id: album.id,
+                title: album.displayName,
+                artistName: album.artistName,
+                year: album.year,
+                genre: nil,
+                songCount: 0,
+                duration: album.durationTimeInterval,
+                artworkURL: apiClient.getCoverArtURL(id: album.id),
+                songs: [],
+                source: .audioStation,
+                originalData: album
+            )
+        }
+        
+        let songs = searchResult.songs.compactMap { song in
+            UniversalSong(
+                id: song.id,
+                title: song.title,
+                artistName: song.artistName,
+                albumName: song.album,
+                duration: song.durationTimeInterval,
+                trackNumber: song.track,
+                artworkURL: apiClient.getCoverArtURL(id: song.id),
+                streamURL: apiClient.getStreamURL(id: song.id),
+                source: .audioStation,
+                originalData: song
+            )
+        }
+        
+        return (artists: artists, albums: albums, songs: songs)
+    }
+    
+    func getStreamURL(for song: UniversalSong) async throws -> URL? {
+        return song.streamURL
+    }
+    
+    func reportPlayback(song: UniversalSong) async throws {
+        // Audio Station 可能没有播放统计功能，或者需要特殊API
+        // 这里暂时留空
     }
 }
 

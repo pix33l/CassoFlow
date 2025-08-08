@@ -3,6 +3,7 @@ import SwiftUI
 struct MusicSourceSettingsView: View {
     @EnvironmentObject private var musicService: MusicService
     @State private var showingSubsonicSettings = false
+    @State private var showingAudioStationSettings = false
     
     var body: some View {
         List {
@@ -31,6 +32,38 @@ struct MusicSourceSettingsView: View {
                         Spacer()
                         
                         if musicService.currentDataSource == .musicKit {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.yellow)
+                        } else {
+                            Image(systemName: "circle")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
+                Button(action: {
+                    musicService.currentDataSource = .audioStation
+                }) {
+                    HStack {
+                        Image("Audio-Station")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 48, height: 48)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Audio Station")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Text("使用您的群晖 Audio Station 媒体库")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        if musicService.currentDataSource == .audioStation {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.yellow)
                         } else {
@@ -135,11 +168,64 @@ struct MusicSourceSettingsView: View {
                     Text("配置您的 Subsonic API 服务器,需要准备有效的服务器地址、用户名和密码。")
                 }
             }
+
+            // Audio Station 配置部分
+            if musicService.currentDataSource == .audioStation {
+                Section {
+                    Button(action: {
+                        showingAudioStationSettings = true
+                    }) {
+                        HStack {
+                            Text("配置 Audio Station 服务器")
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    // 连接状态显示
+                    HStack {
+                        Text("连接状态")
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        if musicService.getAudioStationService().isConnected {
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text("已连接")
+                                    .font(.body)
+                                    .foregroundColor(.green)
+                            }
+                        } else {
+                            HStack {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                Text("未连接")
+                                    .font(.body)
+                                    .foregroundColor(.red)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Audio Station 设置")
+                } footer: {
+                    Text("配置您的群晖 Audio Station 服务器，需要准备有效的服务器地址、用户名和密码。")
+                }
+            }
         }
         .navigationTitle("音乐提供商")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingSubsonicSettings) {
             SubsonicSettingsView()
+        }
+        .sheet(isPresented: $showingAudioStationSettings) {
+            AudioStationSettingsView()
         }
     }
 }

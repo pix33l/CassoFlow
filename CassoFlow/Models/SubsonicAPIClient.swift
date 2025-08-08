@@ -3,6 +3,8 @@ import CryptoKit
 
 /// Subsonic API 客户端
 class SubsonicAPIClient: ObservableObject {
+    static let shared = SubsonicAPIClient()
+    
     // MARK: - 配置属性
     @Published var serverURL: String = ""
     @Published var username: String = ""

@@ -167,13 +167,13 @@ struct SubsonicMusicDetailView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 20)
                     } else if let error = errorMessage {
-                        VStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.triangle")
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.title2)
-                                .foregroundColor(.orange)
+                                .foregroundColor(.yellow)
                             
                             Text(error)
-                                .foregroundColor(.red)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                             
                             Button("重试") {
@@ -181,9 +181,11 @@ struct SubsonicMusicDetailView: View {
                                     await loadDetailedAlbum(forceRefresh: true)
                                 }
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                            .foregroundColor(.black)
                         }
-                        .padding()
+                        .padding(.vertical, 40)
                     } else if let detailed = detailedAlbum, !detailed.songs.isEmpty {
                         Divider()
                             .padding(.leading, 20)
@@ -499,13 +501,13 @@ struct SubsonicPlaylistDetailView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 20)
                     } else if let error = errorMessage {
-                        VStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.triangle")
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.title2)
-                                .foregroundColor(.orange)
+                                .foregroundColor(.yellow)
                             
                             Text(error)
-                                .foregroundColor(.red)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                             
                             Button("重试") {
@@ -513,9 +515,11 @@ struct SubsonicPlaylistDetailView: View {
                                     await loadDetailedPlaylist()
                                 }
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                            .foregroundColor(.black)
                         }
-                        .padding()
+                        .padding(.vertical, 40)
                     } else if let detailed = detailedPlaylist, !detailed.songs.isEmpty {
                         Divider()
                             .padding(.leading, 20)
@@ -669,12 +673,12 @@ struct SubsonicArtistDetailView: View {
                     // 艺术家头像
                     ZStack {
                         Circle()
-                            .fill(Color.orange.opacity(0.2))
+                            .fill(Color.yellow.opacity(0.2))
                             .frame(width: 120, height: 120)
                         
                         Image(systemName: "person.fill")
                             .font(.system(size: 60))
-                            .foregroundColor(.orange)
+                            .foregroundColor(.yellow)
                     }
                     
                     VStack(spacing: 8) {
@@ -695,13 +699,13 @@ struct SubsonicArtistDetailView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 20)
                     } else if let error = errorMessage {
-                        VStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.triangle")
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.title2)
-                                .foregroundColor(.orange)
+                                .foregroundColor(.yellow)
                             
                             Text(error)
-                                .foregroundColor(.red)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                             
                             Button("重试") {
@@ -709,9 +713,11 @@ struct SubsonicArtistDetailView: View {
                                     await loadDetailedArtist()
                                 }
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                            .foregroundColor(.black)
                         }
-                        .padding()
+                        .padding(.vertical, 40)
                     } else if let detailed = detailedArtist, !detailed.albums.isEmpty {
                         Text("专辑")
                             .font(.headline)

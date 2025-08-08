@@ -8,7 +8,7 @@ struct UniversalMusicDetailView: View {
     // 用于Apple Music数据源
     let containerType: MusicContainerType?
     
-    // 用于Subsonic数据源
+    // 用于Subsonic和Audio Station数据源
     let album: UniversalAlbum?
     let playlist: UniversalPlaylist?
     let artist: UniversalArtist?
@@ -23,7 +23,7 @@ struct UniversalMusicDetailView: View {
         self.artist = nil
     }
     
-    /// 用于Subsonic专辑
+    /// 用于通用专辑（Subsonic/Audio Station）
     init(album: UniversalAlbum) {
         self.containerType = nil
         self.album = album
@@ -31,7 +31,7 @@ struct UniversalMusicDetailView: View {
         self.artist = nil
     }
     
-    /// 用于Subsonic播放列表
+    /// 用于通用播放列表（Subsonic/Audio Station）
     init(playlist: UniversalPlaylist) {
         self.containerType = nil
         self.album = nil
@@ -39,7 +39,7 @@ struct UniversalMusicDetailView: View {
         self.artist = nil
     }
     
-    /// 用于Subsonic艺术家
+    /// 用于通用艺术家（Subsonic/Audio Station）
     init(artist: UniversalArtist) {
         self.containerType = nil
         self.album = nil
@@ -68,6 +68,18 @@ struct UniversalMusicDetailView: View {
                     SubsonicArtistDetailView(artist: artist)
                 } else {
                     ErrorView(message: "无效的Subsonic内容类型")
+                }
+                
+            case .audioStation:
+                // 使用Audio Station详情视图
+                if let album = album {
+                    AudioStationMusicDetailView(album: album)
+                } else if let playlist = playlist {
+                    AudioStationPlaylistDetailView(playlist: playlist)
+                } else if let artist = artist {
+                    AudioStationArtistDetailView(artist: artist)
+                } else {
+                    ErrorView(message: "无效的Audio Station内容类型")
                 }
             }
         }
@@ -129,6 +141,29 @@ struct UniversalMusicDetailView_Previews: PreviewProvider {
                 }())
             }
             .previewDisplayName("Subsonic 专辑")
+            
+            // Audio Station专辑预览
+            NavigationView {
+                UniversalMusicDetailView(album: UniversalAlbum(
+                    id: "test-album-as",
+                    title: "Audio Station专辑",
+                    artistName: "测试艺术家",
+                    year: 2024,
+                    genre: "流行",
+                    songCount: 12,
+                    duration: 2880,
+                    artworkURL: nil,
+                    songs: [],
+                    source: .audioStation,
+                    originalData: "mock"
+                ))
+                .environmentObject({
+                    let service = MusicService.shared
+                    service.currentDataSource = .audioStation
+                    return service
+                }())
+            }
+            .previewDisplayName("Audio Station 专辑")
             
             // Subsonic播放列表预览
             NavigationView {

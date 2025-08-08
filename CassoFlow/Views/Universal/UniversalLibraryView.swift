@@ -13,6 +13,9 @@ struct UniversalLibraryView: View {
             case .subsonic:
                 // 使用Subsonic音乐库视图
                 SubsonicLibraryView()
+            case .audioStation:
+                // 使用Audio Station音乐库视图
+                AudioStationLibraryView()
             }
         }
         .animation(.easeInOut(duration: 0.3), value: musicService.currentDataSource)
@@ -41,6 +44,15 @@ struct UniversalLibraryView_Previews: PreviewProvider {
                     return service
                 }())
                 .previewDisplayName("Subsonic")
+            
+            // Audio Station数据源预览
+            UniversalLibraryView()
+                .environmentObject({
+                    let service = MusicService.shared
+                    service.currentDataSource = .audioStation
+                    return service
+                }())
+                .previewDisplayName("Audio Station")
         }
     }
 }
