@@ -106,40 +106,23 @@ class SubsonicMusicService: NSObject, ObservableObject {
     
     /// 设置音频会话
     private func setupAudioSession() {
-        // 🔑 在主线程上配置音频会话
-        DispatchQueue.main.async {
-            do {
-                let audioSession = AVAudioSession.sharedInstance()
-                
-                // 🔑 iOS 18 要求：更严格的音频会话配置
-                try audioSession.setCategory(.playback, 
-                                           mode: .default, 
-                                           options: [.allowAirPlay, .allowBluetooth, .interruptSpokenAudioAndMixWithOthers])
-                print("✅ 音频会话类别设置成功")
-                
-                // 🔑 重要：先停用再激活音频会话
-                try audioSession.setActive(false)
-                try audioSession.setActive(true, options: [.notifyOthersOnDeactivation])
-                print("✅ 音频会话激活成功")
-                
-                // 🔑 立即开始接收远程控制事件
-                UIApplication.shared.beginReceivingRemoteControlEvents()
-                print("✅ 开始接收远程控制事件")
-                
-            } catch {
-                print("❌ Subsonic 音频会话配置失败: \(error)")
-            }
+        // 🔑 使用统一音频会话管理器
+        let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
+        if success {
+            print("✅ Subsonic音频会话设置成功")
+        } else {
+            print("❌ Subsonic音频会话设置失败")
         }
     }
     
     /// 激活音频会话（简化版本）
     private func activateAudioSession() {
-        // 🔑 简化，只确保会话是激活的
-        do {
-            try AVAudioSession.sharedInstance().setActive(true)
-            print("✅ 音频会话激活确认")
-        } catch {
-            print("⚠️ 音频会话激活失败: \(error)")
+        // 🔑 通过统一管理器激活
+        let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
+        if success {
+            print("✅ Subsonic音频会话激活成功")
+        } else {
+            print("⚠️ Subsonic音频会话激活失败")
         }
     }
     
@@ -592,6 +575,14 @@ class SubsonicMusicService: NSObject, ObservableObject {
                 self.duration = song.duration
             }
             
+            // 🔑 重要：先注册播放完成通知
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(self.playerDidFinishPlaying),
+                name: .AVPlayerItemDidPlayToEndTime,
+                object: self.avPlayer?.currentItem
+            )
+            
             // 🔑 监听播放器状态变化
             self.avPlayer?.addObserver(self, forKeyPath: "timeControlStatus", options: [.new], context: nil)
             self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
@@ -627,10 +618,8 @@ class SubsonicMusicService: NSObject, ObservableObject {
             
             print("✅ AVPlayer 设置完成，开始播放")
             
-            // 🔑 延迟设置播放信息，等待播放器完全准备就绪
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.updateNowPlayingInfo()
-            }
+            // 🔑 关键修复：立即设置播放信息
+            self.updateNowPlayingInfo()
         }
     }
     
@@ -780,6 +769,9 @@ class SubsonicMusicService: NSObject, ObservableObject {
         isPlaying = false
         currentTime = 0
         duration = 0
+        
+        // 🔑 释放音频会话控制权
+        AudioSessionManager.shared.releaseAudioSession(for: .subsonic)
         
         // 🔑 清除锁屏播放信息
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
