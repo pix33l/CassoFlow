@@ -57,11 +57,8 @@ class SubsonicMusicService: NSObject, ObservableObject {
         super.init()
         setupNotifications()
         
-        // 🔑 延迟设置音频会话和远程控制
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.setupAudioSession()
-            self.setupRemoteCommandCenter()
-        }
+        // 🔑 移除初始化时的音频会话设置，只在需要时设置
+        // setupAudioSession() 和 setupRemoteCommandCenter() 将在首次播放时调用
     }
     
     deinit {
@@ -79,8 +76,18 @@ class SubsonicMusicService: NSObject, ObservableObject {
         }
     }
     
-    /// 检查服务可用性
+    /// 检查服务可用性（不自动连接）
     func checkAvailability() async -> Bool {
+        // 🔑 只有在已有配置的情况下才检查连接
+        if apiClient.serverURL.isEmpty || apiClient.username.isEmpty || apiClient.password.isEmpty {
+            await MainActor.run {
+                isConnected = false
+                isAvailable = false
+            }
+            return false
+        }
+        
+        // 🔑 只在有配置信息时才尝试ping
         do {
             let connected = try await apiClient.ping()
             await MainActor.run {
@@ -522,8 +529,19 @@ class SubsonicMusicService: NSObject, ObservableObject {
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
         print("🎵 开始播放Subsonic队列，共\(songs.count)首歌，从第\(index + 1)首开始")
         
-        // 🔑 激活音频会话
-        activateAudioSession()
+        // 🔑 在首次播放时才初始化连接和音频会话
+        if !isConnected {
+            let connected = try await apiClient.ping()
+            if !connected {
+                throw SubsonicMusicServiceError.notConnected
+            }
+            // 🔑 只在连接成功后设置音频会话
+            setupAudioSession()
+            setupRemoteCommandCenter()
+        } else {
+            // 🔑 激活音频会话
+            activateAudioSession()
+        }
         
         await MainActor.run {
             currentQueue = songs

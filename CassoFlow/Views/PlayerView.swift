@@ -690,6 +690,9 @@ struct RepeatAndShuffleView: View {
         case .audioStation:
             // Audio Station 暂时不支持随机播放状态获取，默认为false
             return false
+        case .local:
+            // 本地音乐支持随机播放状态获取
+            return musicService.getLocalService().isShuffleEnabled
         }
     }
     
@@ -707,6 +710,13 @@ struct RepeatAndShuffleView: View {
         case .audioStation:
             // Audio Station 暂时不支持重复播放模式获取，默认为none
             return .none
+        case .local:
+            // 本地音乐支持重复播放模式获取
+            switch musicService.getLocalService().repeatMode {
+            case .none: return .none
+            case .all: return .all
+            case .one: return .one
+            }
         }
     }
     
@@ -744,6 +754,19 @@ struct RepeatAndShuffleView: View {
                 case .audioStation:
                     // Audio Station 暂时不支持重复播放模式切换
                     print("Audio Station 不支持重复播放模式切换")
+                    
+                case .local:
+                    // 本地音乐支持重复播放模式切换
+                    let localService = musicService.getLocalService()
+                    let currentMode = localService.repeatMode
+                    let newMode: LocalMusicService.LocalRepeatMode
+                    switch currentMode {
+                    case .none: newMode = .all
+                    case .all: newMode = .one
+                    case .one: newMode = .none
+                    }
+                    localService.setRepeatMode(newMode)
+
                 }
             } label: {
                 Group {
@@ -789,6 +812,12 @@ struct RepeatAndShuffleView: View {
                 case .audioStation:
                     // Audio Station 暂时不支持随机播放切换
                     print("Audio Station 不支持随机播放切换")
+                    
+                case .local:
+                    // 本地音乐支持随机播放切换
+                    let localService = musicService.getLocalService()
+                    localService.setShuffleEnabled(!localService.isShuffleEnabled)
+
                 }
             } label: {
                 Image(systemName: "shuffle")

@@ -69,6 +69,7 @@ enum MusicDataSourceType: String, CaseIterable {
     case musicKit = "Apple Music"
     case subsonic = "Subsonic"
     case audioStation = "Audio Station"
+    case local = "Local"
     
     var displayName: String {
         rawValue
@@ -809,6 +810,95 @@ class AudioStationDataSource: MusicDataSource {
     }
 }
 
+/// 本地音乐数据源
+class LocalDataSource: MusicDataSource {
+    // MARK: - 属性
+    @Published var isAvailable: Bool = true
+    let sourceType: MusicDataSourceType = .local
+    private let localMusicService = LocalMusicService.shared
+    
+    // MARK: - 生命周期
+    
+    func initialize() async throws {
+        try await localMusicService.initialize()
+        await MainActor.run {
+            isAvailable = localMusicService.isAvailable
+        }
+    }
+    
+    func checkAvailability() async -> Bool {
+        // 本地音乐服务始终可用
+        _ = await localMusicService.checkAvailability()
+        await MainActor.run {
+            isAvailable = true // 始终设为true以确保本地音乐数据源可用
+        }
+        return true // 始终返回true以确保本地音乐数据源可用
+    }
+    
+    // MARK: - 数据获取
+    
+    func getRecentAlbums() async throws -> [UniversalAlbum] {
+        return try await localMusicService.getRecentAlbums()
+    }
+    
+    func getRecentPlaylists() async throws -> [UniversalPlaylist] {
+        // 本地音乐不支持播放列表
+        return []
+    }
+    
+    func getArtists() async throws -> [UniversalArtist] {
+        return try await localMusicService.getArtists()
+    }
+    
+    func getArtist(id: String) async throws -> UniversalArtist {
+        return try await localMusicService.getArtist(id: id)
+    }
+    
+    func getAlbum(id: String) async throws -> UniversalAlbum {
+        return try await localMusicService.getAlbum(id: id)
+    }
+    
+    func getPlaylist(id: String) async throws -> UniversalPlaylist {
+        // 本地音乐不支持播放列表
+        throw MusicDataSourceError.notSupported
+    }
+    
+    func search(query: String) async throws -> (artists: [UniversalArtist], albums: [UniversalAlbum], songs: [UniversalSong]) {
+        // 本地音乐搜索实现
+        let allArtists = try await getArtists()
+        let allAlbums = try await getRecentAlbums()
+        
+        let matchedArtists = allArtists.filter { artist in
+            artist.name.localizedCaseInsensitiveContains(query)
+        }
+        
+        let matchedAlbums = allAlbums.filter { album in
+            album.title.localizedCaseInsensitiveContains(query) ||
+            album.artistName.localizedCaseInsensitiveContains(query)
+        }
+        
+        // 收集匹配专辑中的歌曲
+        var matchedSongs: [UniversalSong] = []
+        for album in matchedAlbums {
+            let detailedAlbum = try await getAlbum(id: album.id)
+            matchedSongs.append(contentsOf: detailedAlbum.songs.filter { song in
+                song.title.localizedCaseInsensitiveContains(query) ||
+                song.artistName.localizedCaseInsensitiveContains(query)
+            })
+        }
+        
+        return (artists: matchedArtists, albums: matchedAlbums, songs: matchedSongs)
+    }
+    
+    func getStreamURL(for song: UniversalSong) async throws -> URL? {
+        return song.streamURL
+    }
+    
+    func reportPlayback(song: UniversalSong) async throws {
+        // 本地音乐不需要报告播放记录
+    }
+}
+
 // MARK: - 数据源错误
 
 enum MusicDataSourceError: LocalizedError {
@@ -816,6 +906,7 @@ enum MusicDataSourceError: LocalizedError {
     case invalidID
     case notFound
     case unauthorized
+    case notSupported
     
     var errorDescription: String? {
         switch self {
@@ -827,6 +918,8 @@ enum MusicDataSourceError: LocalizedError {
             return "未找到请求的资源"
         case .unauthorized:
             return "未授权访问"
+        case .notSupported:
+            return "不支持的功能"
         }
     }
 }

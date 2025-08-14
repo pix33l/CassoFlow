@@ -14,6 +14,7 @@ class AudioSessionManager {
         case subsonic
         case audioStation
         case musicKit
+        case local
     }
     
     private init() {}

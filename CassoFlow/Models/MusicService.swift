@@ -45,6 +45,7 @@ class MusicService: ObservableObject {
     private let musicKitPlayer = ApplicationMusicPlayer.shared
     private let subsonicService = SubsonicMusicService.shared
     private let audioStationService = AudioStationMusicService.shared // 新增
+    private let localService = LocalMusicService.shared
     private let coordinator = MusicServiceCoordinator()
     private let audioEffectsManager = AudioEffectsManager.shared
     private let storeManager = StoreManager.shared
@@ -384,6 +385,11 @@ class MusicService: ObservableObject {
         return coordinator
     }
     
+    /// 获取本地音乐服务
+    func getLocalService() -> LocalMusicService {
+        return localService
+    }
+    
     // MARK: - 会员状态变化处理
     @objc private func handleMembershipStatusChanged() {
         Task { @MainActor in
@@ -497,6 +503,8 @@ class MusicService: ObservableObject {
             updateSubsonicInfo()
         case .audioStation:
             updateAudioStationInfo()
+        case .local:
+            updateLocalInfo()
         }
     }
     
@@ -641,6 +649,37 @@ class MusicService: ObservableObject {
         let queueTotalDuration = calculateAudioStationQueueTotalDuration(queue: queueInfo.queue)
         let queueElapsedDuration = calculateAudioStationQueueElapsedDuration(
             queue: queueInfo.queue, 
+            currentIndex: queueInfo.currentIndex,
+            currentTime: playbackInfo.current
+        )
+        
+        updatePlaybackInfo(
+            title: currentSong.title,
+            artist: currentSong.artistName,
+            duration: playbackInfo.total,
+            currentTime: playbackInfo.current,
+            trackID: MusicItemID(rawValue: currentSong.id),
+            trackIndex: queueInfo.currentIndex + 1,
+            totalTracks: queueInfo.queue.count,
+            queueTotalDuration: queueTotalDuration,
+            queueElapsedDuration: queueElapsedDuration,
+            isPlaying: playbackInfo.isPlaying
+        )
+    }
+    
+    private func updateLocalInfo() {
+        let queueInfo = localService.getQueueInfo()
+        let playbackInfo = localService.getPlaybackInfo()
+        
+        guard let currentSong = localService.getCurrentSong() else {
+            resetPlaybackInfo()
+            return
+        }
+        
+        // 计算 Local 队列的总时长和已播放时长
+        let queueTotalDuration = calculateLocalQueueTotalDuration(queue: queueInfo.queue)
+        let queueElapsedDuration = calculateLocalQueueElapsedDuration(
+            queue: queueInfo.queue,
             currentIndex: queueInfo.currentIndex,
             currentTime: playbackInfo.current
         )
@@ -827,6 +866,33 @@ class MusicService: ObservableObject {
         return elapsedDuration
     }
 
+    /// 计算 Local 队列中所有歌曲的总时长
+    private func calculateLocalQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
+        let totalDuration = queue.reduce(0) { total, song in
+            total + song.duration
+        }
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
+    }
+    
+    /// 计算 Local 队列中已播放的总时长
+    private func calculateLocalQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
+        guard currentIndex < queue.count else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for index in 0..<currentIndex {
+            elapsedDuration += queue[index].duration
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += currentTime
+        
+        return elapsedDuration
+    }
+    
     // MARK: - 播放控制方法
     
     /// 播放 MusicKit 专辑中的特定歌曲
@@ -912,6 +978,8 @@ class MusicService: ObservableObject {
             try await subsonicService.playQueue(songs, startingAt: index)
         case .audioStation:
             try await audioStationService.playQueue(songs, startingAt: index)
+        case .local:
+            try await localService.playQueue(songs, startingAt: index)
         }
         
         await MainActor.run {
@@ -967,6 +1035,8 @@ class MusicService: ObservableObject {
                 await subsonicService.play()
             case .audioStation:
                 await audioStationService.play()
+            case .local:
+                await localService.play()
         }
         await MainActor.run {
             isPlaying = true
@@ -990,6 +1060,8 @@ class MusicService: ObservableObject {
                 await subsonicService.pause()
             case .audioStation:
                 await audioStationService.pause()
+            case .local:
+                await localService.pause()
         }
         await MainActor.run {
             isPlaying = false
@@ -1009,6 +1081,8 @@ class MusicService: ObservableObject {
                 try await subsonicService.skipToNext()
             case .audioStation:
                 try await audioStationService.skipToNext()
+            case .local:
+                try await localService.skipToNext()
         }
         // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
         Task {
@@ -1028,6 +1102,8 @@ class MusicService: ObservableObject {
                 try await subsonicService.skipToPrevious()
             case .audioStation:
                 try await audioStationService.skipToPrevious()
+            case .local:
+                try await localService.skipToPrevious()
         }
         // 🔑 切歌后立即同步状态，确保UI更新（特别是暂停状态下）
         Task {
@@ -1057,6 +1133,8 @@ class MusicService: ObservableObject {
                 self.subsonicService.seekBackward(6.0)
             case .audioStation:
                 self.audioStationService.seekBackward(6.0)
+            case .local:
+                self.localService.seekBackward(6.0)
             }
         }
     }
@@ -1080,6 +1158,8 @@ class MusicService: ObservableObject {
                 self.subsonicService.seekForward(6.0)
             case .audioStation:
                 self.audioStationService.seekForward(6.0)
+            case .local:
+                self.localService.seekForward(6.0)
             }
         }
     }

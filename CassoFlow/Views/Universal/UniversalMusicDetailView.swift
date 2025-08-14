@@ -81,6 +81,18 @@ struct UniversalMusicDetailView: View {
                 } else {
                     ErrorView(message: "无效的Audio Station内容类型")
                 }
+                
+            case .local:
+                // 使用Subsonic详情视图
+                if let album = album {
+                    LocalMusicDetailView(album: album)
+                } else if let playlist = playlist {
+                    LocalPlaylistDetailView(playlist: playlist)
+                } else if let artist = artist {
+                    LocalArtistDetailView(artist: artist)
+                } else {
+                    ErrorView(message: "无效的Subsonic内容类型")
+                }
             }
         }
         .animation(.easeInOut(duration: 0.3), value: musicService.currentDataSource)

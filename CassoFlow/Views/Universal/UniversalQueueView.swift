@@ -16,6 +16,10 @@ struct UniversalQueueView: View {
             case .audioStation:
                 // 使用Audio Station队列视图
                 AudioStationQueueView()
+            case .local:
+                // 使用Local队列视图
+                LocalQueueView()
+                
             }
         }
         .animation(.easeInOut(duration: 0.3), value: musicService.currentDataSource)

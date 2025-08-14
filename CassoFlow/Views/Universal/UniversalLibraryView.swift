@@ -16,6 +16,8 @@ struct UniversalLibraryView: View {
             case .audioStation:
                 // 使用Audio Station音乐库视图
                 AudioStationLibraryView()
+            case .local:
+                LocalMusicLibraryView()
             }
         }
         .animation(.easeInOut(duration: 0.3), value: musicService.currentDataSource)

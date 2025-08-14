@@ -28,14 +28,6 @@ class AudioStationMusicService: ObservableObject {
             .assign(to: &$isConnected)
         
         setupPlayer()
-        setupAudioSession()
-        setupRemoteCommandCenter()
-        
-        // 🔑 重要：开始接收远程控制事件
-        DispatchQueue.main.async {
-            UIApplication.shared.beginReceivingRemoteControlEvents()
-            print("✅ Audio Station 开始接收远程控制事件")
-        }
     }
     
     deinit {
@@ -260,6 +252,22 @@ class AudioStationMusicService: ObservableObject {
     // MARK: - 播放队列管理
     
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
+        // 🔑 在首次播放时才初始化连接和音频会话
+        if !isConnected {
+            let connected = try await connect()
+            if !connected {
+                throw AudioStationError.authenticationFailed("连接失败")
+            }
+            // 🔑 只在连接成功后设置音频会话和远程控制
+            setupAudioSession()
+            setupRemoteCommandCenter()
+            // 🔑 开始接收远程控制事件
+            DispatchQueue.main.async {
+                UIApplication.shared.beginReceivingRemoteControlEvents()
+                print("✅ Audio Station 开始接收远程控制事件")
+            }
+        }
+        
         currentQueue = songs
         currentIndex = max(0, min(index, songs.count - 1))
         

@@ -21,6 +21,7 @@ class MusicServiceCoordinator: ObservableObject {
     private let musicKitDataSource = MusicKitDataSource()
     private let subsonicDataSource: SubsonicDataSource
     private let audioStationDataSource: AudioStationDataSource
+    private let localDataSource: LocalDataSource
     
     // MARK: - 向后兼容的服务引用（用于配置和播放控制）
     
@@ -37,6 +38,7 @@ class MusicServiceCoordinator: ObservableObject {
         // 初始化数据源
         subsonicDataSource = SubsonicDataSource(apiClient: SubsonicAPIClient.shared)
         audioStationDataSource = AudioStationDataSource(apiClient: AudioStationAPIClient.shared)
+        localDataSource = LocalDataSource()
         
         loadDataSourcePreference()
         
@@ -62,9 +64,10 @@ class MusicServiceCoordinator: ObservableObject {
         async let musicKitInit: Void = initializeMusicKit()
         async let subsonicInit: Void = initializeSubsonic()
         async let audioStationInit: Void = initializeAudioStation()
+        async let localInit: Void = initializeLocal()
         
         // 并行初始化所有数据源
-        let _ = await (musicKitInit, subsonicInit, audioStationInit)
+        let _ = await (musicKitInit, subsonicInit, audioStationInit, localInit)
     }
     
     private func initializeMusicKit() async {
@@ -76,35 +79,38 @@ class MusicServiceCoordinator: ObservableObject {
     }
     
     private func initializeSubsonic() async {
-        // 初始化新的数据源
+        // 🔑 不再在初始化时连接Subsonic，只初始化数据源
         do {
             try await subsonicDataSource.initialize()
         } catch {
             print("Subsonic数据源初始化失败: \(error)")
         }
         
-        // 为了向后兼容，也初始化旧服务（仅用于播放控制）
-        do {
-            try await subsonicService.initialize()
-        } catch {
-            print("Subsonic播放服务初始化失败: \(error)")
-        }
+        // 🔑 移除旧服务的自动初始化，只在需要时初始化
+        // 为了向后兼容，保留服务实例但不自动初始化
+        print("Subsonic服务已准备，等待用户选择")
     }
     
     private func initializeAudioStation() async {
-        // 初始化新的数据源
+        // 🔑 不再在初始化时连接Audio Station，只初始化数据源
         do {
             try await audioStationDataSource.initialize()
         } catch {
             print("Audio Station数据源初始化失败: \(error)")
         }
         
-//        // 为了向后兼容，也初始化旧服务（仅用于播放控制）
-//        do {
-//            try await audioStationService.initialize()
-//        } catch {
-//            print("Audio Station播放服务初始化失败: \(error)")
-//        }
+        // 🔑 移除旧服务的自动初始化，只在需要时初始化
+        print("Audio Station服务已准备，等待用户选择")
+    }
+    
+    private func initializeLocal() async {
+        // 初始化本地音乐数据源
+        do {
+            try await localDataSource.initialize()
+        } catch {
+            print("本地音乐数据源初始化失败: \(error)")
+        }
+        print("本地音乐数据源已准备")
     }
     
     private func switchDataSource() async {
@@ -133,6 +139,8 @@ class MusicServiceCoordinator: ObservableObject {
             return subsonicDataSource
         case .audioStation:
             return audioStationDataSource
+        case .local:
+            return localDataSource
         }
     }
     
@@ -212,6 +220,11 @@ class MusicServiceCoordinator: ObservableObject {
         return audioStationDataSource
     }
     
+    /// 获取本地音乐数据源
+    func getLocalDataSource() -> LocalDataSource {
+        return localDataSource
+    }
+    
     /// 获取当前活动的数据源实例
     func getCurrentDataSource() -> any MusicDataSource {
         return activeDataSource
@@ -225,12 +238,13 @@ class MusicServiceCoordinator: ObservableObject {
     }
     
     /// 获取所有数据源的可用性状态
-    func getDataSourceStatus() async -> (musicKit: Bool, subsonic: Bool, audioStation: Bool) {
+    func getDataSourceStatus() async -> (musicKit: Bool, subsonic: Bool, audioStation: Bool, local: Bool) {
         async let musicKitStatus = musicKitDataSource.checkAvailability()
         async let subsonicStatus = subsonicDataSource.checkAvailability()
         async let audioStationStatus = audioStationDataSource.checkAvailability()
+        async let localStatus = localDataSource.checkAvailability()
         
-        return await (musicKitStatus, subsonicStatus, audioStationStatus)
+        return await (musicKitStatus, subsonicStatus, audioStationStatus, localStatus)
     }
     
     /// 获取当前数据源信息
