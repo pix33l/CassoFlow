@@ -277,7 +277,6 @@ struct PlayerSkin: Identifiable {
 struct CassetteSkin: Identifiable {
     let id = UUID()
     let name: String
-    let year: String
     let description: String
     let coverImage: String
     let cassetteImage: String
@@ -288,8 +287,7 @@ struct CassetteSkin: Identifiable {
     static let cassetteSkins: [CassetteSkin] = [
         
         CassetteSkin(
-            name: "CFT-DEMO",  // 名称作为唯一标识
-            year: "2025",
+            name: "CFT-DEMO",
             description: String(localized: "透明演示磁带"),
             coverImage: "cover-CFT-DEMO",
             cassetteImage: "CFT-DEMO",
@@ -297,8 +295,7 @@ struct CassetteSkin: Identifiable {
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
-            name: "CFT-W60",  // 名称作为唯一标识
-            year: "2022",
+            name: "CFT-W60",
             description: String(localized: "彩虹条纹录音磁带"),
             coverImage: "cover-CFT-W60",
             cassetteImage: "CFT-W60",
@@ -306,8 +303,7 @@ struct CassetteSkin: Identifiable {
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
-            name: "CFT-C60",  // 名称作为唯一标识
-            year: "1985",
+            name: "CFT-C60",
             description: String(localized: "标签可写的彩色磁带"),
             coverImage: "cover-CFT-C60",
             cassetteImage: "CFT-C60",
@@ -315,8 +311,31 @@ struct CassetteSkin: Identifiable {
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
-            name: "CFT-60CR",  // 名称作为唯一标识
-            year: "2025",
+            name: "CFT-LNC60",
+            description: String(localized: "蓝色外观的低噪音磁带"),
+            coverImage: "cover-CFT-LNC60",
+            cassetteImage: "CFT-LNC60",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
+            name: "CFT-HFC60",
+            description: String(localized: "复古设计的高保值磁带"),
+            coverImage: "cover-CFT-HFC60",
+            cassetteImage: "CFT-HFC60",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
+            name: "CFT-FC60",
+            description: String(localized: "黄色外观的含铁磁带"),
+            coverImage: "cover-CFT-FC60",
+            cassetteImage: "CFT-FC60",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
+            name: "CFT-60CR",
             description: String(localized: "二氧化铬作为材料的高端磁带"),
             coverImage: "cover-CFT-60CR",
             cassetteImage: "CFT-60CR",
@@ -324,11 +343,18 @@ struct CassetteSkin: Identifiable {
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
-            name: "CFT-MM60",  // 名称作为唯一标识
-            year: "1988",
+            name: "CFT-MM60",
             description: String(localized: "白色陶瓷外壳的顶级磁带"),
             coverImage: "cover-CFT-MM60",
             cassetteImage: "CFT-MM60",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
+            name: "CFT-MV60",
+            description: String(localized: "黑色外观的尖端磁带"),
+            coverImage: "cover-CFT-MV60",
+            cassetteImage: "CFT-MV60",
             cassetteHole: "holeDark",
             cassetteColor: Color("cassetteColor")
         )
