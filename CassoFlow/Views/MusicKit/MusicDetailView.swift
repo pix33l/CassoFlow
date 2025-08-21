@@ -24,6 +24,7 @@ import MusicKit
 /// 通用的音乐详情视图，支持专辑和播放列表
 struct MusicDetailView: View {
     @EnvironmentObject private var musicService: MusicService
+    @StateObject private var musicKitService = MusicKitService.shared
     let containerType: MusicContainerType
     @State private var tracks: [Track] = []
     @State private var isLoading = false
@@ -317,21 +318,31 @@ struct MusicDetailView: View {
     
     /// 播放音乐（专辑或播放列表）
     private func playMusic(shuffled: Bool) async throws {
+        // 设置数据源为MusicKit
+        await MainActor.run {
+            musicService.currentDataSource = .musicKit
+        }
+        
         switch containerType {
         case .album(let album):
-            try await musicService.playAlbum(album, shuffled: shuffled)
+            try await musicKitService.playAlbum(album, shuffled: shuffled)
         case .playlist(let playlist):
-            try await musicService.playPlaylist(playlist, shuffled: shuffled)
+            try await musicKitService.playPlaylist(playlist, shuffled: shuffled)
         }
     }
     
     /// 播放指定歌曲
     private func playTrack(_ track: Track) async throws {
+        // 设置数据源为MusicKit
+        await MainActor.run {
+            musicService.currentDataSource = .musicKit
+        }
+        
         switch containerType {
         case .album(let album):
-            try await musicService.playTrack(track, in: album)
+            try await musicKitService.playTrack(track, in: album)
         case .playlist(let playlist):
-            try await musicService.playTrack(track, in: playlist)
+            try await musicKitService.playTrack(track, in: playlist)
         }
     }
     

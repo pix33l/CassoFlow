@@ -132,7 +132,7 @@ struct SubsonicLibraryView: View {
     
     private var connectionErrorView: some View {
         VStack(spacing: 20) {
-            Image(systemName: "server.rack")
+            Image(systemName: "Subsonic")
                 .font(.system(size: 48))
                 .foregroundColor(.yellow)
             
@@ -151,7 +151,7 @@ struct SubsonicLibraryView: View {
                 }) {
                     Text("配置服务器")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(.black)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                         .background(

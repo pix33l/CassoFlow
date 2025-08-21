@@ -25,8 +25,8 @@ class MusicServiceCoordinator: ObservableObject {
     
     // MARK: - 向后兼容的服务引用（用于配置和播放控制）
     
-    private let subsonicService = SubsonicMusicService.shared
-    private let audioStationService = AudioStationMusicService.shared
+//    private let subsonicService = SubsonicMusicService.shared
+//    private let audioStationService = AudioStationMusicService.shared
     
     // MARK: - 存储键
     
@@ -194,14 +194,14 @@ class MusicServiceCoordinator: ObservableObject {
     // MARK: - 向后兼容的播放服务访问方法
     
     /// 获取Subsonic播放服务（用于播放控制和配置）
-    func getSubsonicPlaybackService() -> SubsonicMusicService {
-        return subsonicService
-    }
+//    func getSubsonicPlaybackService() -> SubsonicMusicService {
+//        return subsonicService
+//    }
     
     /// 获取Audio Station播放服务（用于播放控制和配置）
-    func getAudioStationPlaybackService() -> AudioStationMusicService {
-        return audioStationService
-    }
+//    func getAudioStationPlaybackService() -> AudioStationMusicService {
+//        return audioStationService
+//    }
     
     // MARK: - 数据源实例访问方法
     

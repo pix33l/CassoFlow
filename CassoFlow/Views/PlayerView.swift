@@ -671,6 +671,7 @@ struct TrackInfoHeader: View {
 
 struct RepeatAndShuffleView: View {
     @EnvironmentObject private var musicService: MusicService
+    @StateObject private var musicKitService = MusicKitService.shared
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     @Binding var showLibraryView: Bool
@@ -738,7 +739,7 @@ struct RepeatAndShuffleView: View {
                     case .one: repeatMode = .none
                     @unknown default: repeatMode = .none
                     }
-                    musicService.repeatMode = repeatMode
+                    musicKitService.repeatMode = repeatMode
                     
                 case .subsonic:
                     let currentMode = subsonicModes.repeat
@@ -801,8 +802,8 @@ struct RepeatAndShuffleView: View {
                 // 🔑 根据数据源处理随机播放
                 switch musicService.currentDataSource {
                 case .musicKit:
-                    musicService.shuffleMode = isShuffleEnabled ? .off : .songs
-                    isShuffled = musicService.shuffleMode
+                    musicKitService.shuffleMode = isShuffleEnabled ? .off : .songs
+                    isShuffled = musicKitService.shuffleMode
                     
                 case .subsonic:
                     let newShuffleState = !subsonicModes.shuffle
