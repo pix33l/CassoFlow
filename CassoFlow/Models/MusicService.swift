@@ -118,7 +118,7 @@ class MusicService: ObservableObject {
     private static let screenAlwaysOnKey = "ScreenAlwaysOnEnabled"
     private static let coverStyleKey = "SelectedCoverStyle"
     
-    // 新增：后台状态监听Timer
+    // 后台状态监听Timer
     private var backgroundStatusTimer: Timer?
     
     // 应用状态管理
@@ -198,6 +198,13 @@ class MusicService: ObservableObject {
         self.totalTracksInQueue = 0
         self.queueTotalDuration = 0
         self.queueElapsedDuration = 0
+        
+        // 🔑 从 UserDefaults 加载保存的数据源设置
+        let savedDataSource = UserDefaults.standard.string(forKey: "SelectedDataSource")
+        if let sourceString = savedDataSource,
+           let source = MusicDataSourceType(rawValue: sourceString) {
+            _currentDataSource = Published(initialValue: source)
+        }
         
         // 从 UserDefaults 加载保存的皮肤，如果没有则使用默认值
         let savedPlayerSkinName = UserDefaults.standard.string(forKey: Self.playerSkinKey)
@@ -376,7 +383,7 @@ class MusicService: ObservableObject {
     }
     
     // 🔑 新增：强制同步播放状态（解决首次播放显示问题）
-    private func forceSyncPlaybackStatus() async {
+    func forceSyncPlaybackStatus() async {
         await MainActor.run {
             updateCurrentSongInfo()
             
@@ -399,14 +406,14 @@ class MusicService: ObservableObject {
         return audioStationService
     }
     
+    /// 获取本地音乐服务（用于配置）
+    func getLocalService() -> LocalMusicService {
+        return localService
+    }
+    
     /// 获取音乐服务协调器
     func getCoordinator() -> MusicServiceCoordinator {
         return coordinator
-    }
-    
-    /// 获取本地音乐服务
-    func getLocalService() -> LocalMusicService {
-        return localService
     }
     
     // MARK: - 会员状态变化处理
@@ -634,9 +641,11 @@ class MusicService: ObservableObject {
         }
         
         // 计算 Subsonic 队列的总时长和已播放时长
-        let queueTotalDuration = calculateSubsonicQueueTotalDuration(queue: queueInfo.queue)
-        let queueElapsedDuration = calculateSubsonicQueueElapsedDuration(
-            queue: queueInfo.queue, 
+        let queueTotalDuration = subsonicService
+            .calculateSubsonicQueueTotalDuration(queue: queueInfo.queue)
+        let queueElapsedDuration = subsonicService
+            .calculateSubsonicQueueElapsedDuration(
+            queue: queueInfo.queue,
             currentIndex: queueInfo.currentIndex,
             currentTime: playbackInfo.current
         )
@@ -665,9 +674,9 @@ class MusicService: ObservableObject {
         }
         
         // 计算 Audio Station 队列的总时长和已播放时长
-        let queueTotalDuration = calculateAudioStationQueueTotalDuration(queue: queueInfo.queue)
-        let queueElapsedDuration = calculateAudioStationQueueElapsedDuration(
-            queue: queueInfo.queue, 
+        let queueTotalDuration = audioStationService.calculateAudioStationQueueTotalDuration(queue: queueInfo.queue)
+        let queueElapsedDuration = audioStationService.calculateAudioStationQueueElapsedDuration(
+            queue: queueInfo.queue,
             currentIndex: queueInfo.currentIndex,
             currentTime: playbackInfo.current
         )
@@ -696,8 +705,8 @@ class MusicService: ObservableObject {
         }
         
         // 计算 Local 队列的总时长和已播放时长
-        let queueTotalDuration = calculateLocalQueueTotalDuration(queue: queueInfo.queue)
-        let queueElapsedDuration = calculateLocalQueueElapsedDuration(
+        let queueTotalDuration = localService.calculateLocalQueueTotalDuration(queue: queueInfo.queue)
+        let queueElapsedDuration = localService.calculateLocalQueueElapsedDuration(
             queue: queueInfo.queue,
             currentIndex: queueInfo.currentIndex,
             currentTime: playbackInfo.current
@@ -781,96 +790,13 @@ class MusicService: ObservableObject {
         }
     }
     
-    // MARK: - 播放时长计算方法
-
-    /// 计算 Subsonic 队列中所有歌曲的总时长
-    private func calculateSubsonicQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
-        let totalDuration = queue.reduce(0) { total, song in
-            total + song.duration
-        }
-        
-        // 如果总时长为0，返回默认值
-        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
-    }
-    
-    /// 计算 Subsonic 队列中已播放的总时长
-    private func calculateSubsonicQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
-        guard currentIndex < queue.count else { return 0 }
-        
-        var elapsedDuration: TimeInterval = 0
-        
-        // 计算当前歌曲之前所有歌曲的总时长
-        for index in 0..<currentIndex {
-            elapsedDuration += queue[index].duration
-        }
-        
-        // 加上当前歌曲的播放时长
-        elapsedDuration += currentTime
-        
-        return elapsedDuration
-    }
-
-    /// 计算 Audio Station 队列中所有歌曲的总时长
-    private func calculateAudioStationQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
-        let totalDuration = queue.reduce(0) { total, song in
-            total + song.duration
-        }
-        
-        // 如果总时长为0，返回默认值
-        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
-    }
-    
-    /// 计算 Audio Station 队列中已播放的总时长
-    private func calculateAudioStationQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
-        guard currentIndex < queue.count else { return 0 }
-        
-        var elapsedDuration: TimeInterval = 0
-        
-        // 计算当前歌曲之前所有歌曲的总时长
-        for index in 0..<currentIndex {
-            elapsedDuration += queue[index].duration
-        }
-        
-        // 加上当前歌曲的播放时长
-        elapsedDuration += currentTime
-        
-        return elapsedDuration
-    }
-
-    /// 计算 Local 队列中所有歌曲的总时长
-    private func calculateLocalQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
-        let totalDuration = queue.reduce(0) { total, song in
-            total + song.duration
-        }
-        
-        // 如果总时长为0，返回默认值
-        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
-    }
-    
-    /// 计算 Local 队列中已播放的总时长
-    private func calculateLocalQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
-        guard currentIndex < queue.count else { return 0 }
-        
-        var elapsedDuration: TimeInterval = 0
-        
-        // 计算当前歌曲之前所有歌曲的总时长
-        for index in 0..<currentIndex {
-            elapsedDuration += queue[index].duration
-        }
-        
-        // 加上当前歌曲的播放时长
-        elapsedDuration += currentTime
-        
-        return elapsedDuration
-    }
-    
     // MARK: - 播放控制方法
     
     /// 播放通用歌曲队列
     func playUniversalSongs(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
         switch currentDataSource {
         case .musicKit:
-            try await musicKitService.playMusicKitSongs(songs, startingAt: index)
+            fallthrough
         case .subsonic:
             try await subsonicService.playQueue(songs, startingAt: index)
         case .audioStation:
@@ -1072,7 +998,7 @@ class MusicService: ObservableObject {
         case .subsonic:
             let queueInfo = subsonicService.getQueueInfo()
             let playbackInfo = subsonicService.getPlaybackInfo()
-            let elapsedDuration = calculateSubsonicQueueElapsedDuration(
+            let elapsedDuration = subsonicService.calculateSubsonicQueueElapsedDuration(
                 queue: queueInfo.queue,
                 currentIndex: queueInfo.currentIndex,
                 currentTime: playbackInfo.current
@@ -1081,7 +1007,7 @@ class MusicService: ObservableObject {
         case .audioStation:
             let queueInfo = audioStationService.getQueueInfo()
             let playbackInfo = audioStationService.getPlaybackInfo()
-            let elapsedDuration = calculateAudioStationQueueElapsedDuration(
+            let elapsedDuration = audioStationService.calculateAudioStationQueueElapsedDuration(
                 queue: queueInfo.queue,
                 currentIndex: queueInfo.currentIndex,
                 currentTime: playbackInfo.current
@@ -1090,7 +1016,7 @@ class MusicService: ObservableObject {
         case .local:
             let queueInfo = localService.getQueueInfo()
             let playbackInfo = localService.getPlaybackInfo()
-            let elapsedDuration = calculateLocalQueueElapsedDuration(
+            let elapsedDuration = localService.calculateLocalQueueElapsedDuration(
                 queue: queueInfo.queue,
                 currentIndex: queueInfo.currentIndex,
                 currentTime: playbackInfo.current

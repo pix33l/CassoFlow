@@ -1,12 +1,13 @@
 import MusicKit
 import Foundation
-import MediaPlayer
+//import MediaPlayer
 
 /// MusicKit 服务类 - 专门处理 Apple Music 相关功能
 class MusicKitService: ObservableObject {
     static let shared = MusicKitService()
     
     private let musicKitPlayer = ApplicationMusicPlayer.shared
+    private lazy var musicService = MusicService.shared
     
     // MARK: - 播放控制方法
     
@@ -17,6 +18,14 @@ class MusicKitService: ObservableObject {
         
         musicKitPlayer.queue = .init(for: songs, startingAt: songs[index])
         try await musicKitPlayer.play()
+        
+        await MainActor.run {
+            musicService.shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await musicService.forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表中的特定歌曲
@@ -26,6 +35,14 @@ class MusicKitService: ObservableObject {
         
         musicKitPlayer.queue = .init(for: songs, startingAt: songs[index])
         try await musicKitPlayer.play()
+        
+        await MainActor.run {
+            musicService.shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await musicService.forceSyncPlaybackStatus()
     }
     
     /// 播放专辑（可选择随机播放）
@@ -36,6 +53,14 @@ class MusicKitService: ObservableObject {
         }
         musicKitPlayer.queue = .init(for: songs, startingAt: nil)
         try await musicKitPlayer.play()
+        
+        await MainActor.run {
+            musicService.shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await musicService.forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表（可选择随机播放）
@@ -46,20 +71,28 @@ class MusicKitService: ObservableObject {
         }
         musicKitPlayer.queue = .init(for: songs, startingAt: nil)
         try await musicKitPlayer.play()
+        
+        await MainActor.run {
+            musicService.shouldCloseLibrary = true
+        }
+        
+        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
+        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        await musicService.forceSyncPlaybackStatus()
     }
     
     /// 播放MusicKit歌曲
-    func playMusicKitSongs(_ songs: [UniversalSong], startingAt index: Int) async throws {
-        let tracks = songs.compactMap { song -> Track? in
-            guard let originalTrack = song.originalData as? Track else { return nil }
-            return originalTrack
-        }
-        
-        guard index < tracks.count else { return }
-        
-        musicKitPlayer.queue = .init(for: tracks, startingAt: tracks[index])
-        try await musicKitPlayer.play()
-    }
+//    func playMusicKitSongs(_ songs: [UniversalSong], startingAt index: Int) async throws {
+//        let tracks = songs.compactMap { song -> Track? in
+//            guard let originalTrack = song.originalData as? Track else { return nil }
+//            return originalTrack
+//        }
+//        
+//        guard index < tracks.count else { return }
+//        
+//        musicKitPlayer.queue = .init(for: tracks, startingAt: tracks[index])
+//        try await musicKitPlayer.play()
+//    }
     
     /// 播放
     func play() async throws {
@@ -189,7 +222,7 @@ class MusicKitService: ObservableObject {
     func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
         var request = MusicLibraryRequest<Album>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 50 // 设置合理的限制
+        request.limit = 200 // 设置合理的限制
         
         let response = try await request.response()
         return response.items
@@ -199,7 +232,7 @@ class MusicKitService: ObservableObject {
     func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
         var request = MusicLibraryRequest<Playlist>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 50
+        request.limit = 200
         
         let response = try await request.response()
         return response.items

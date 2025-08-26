@@ -13,6 +13,8 @@ struct LocalMusicItem: Identifiable, Hashable {
     let duration: TimeInterval
     let artwork: Data? // 封面图片数据
     let trackNumber: Int? // 音轨号
+    let year: Int? // 年份信息
+    let genre: String? // 流派信息
     
     init(url: URL) async {
         self.url = url
@@ -25,6 +27,8 @@ struct LocalMusicItem: Identifiable, Hashable {
         var duration: TimeInterval = 0
         var artwork: Data?
         var trackNumber: Int?
+        var year: Int?
+        var genre: String?
         
         // 获取音频时长 (使用新API)
         do {
@@ -76,6 +80,22 @@ struct LocalMusicItem: Identifiable, Hashable {
                     } else if let stringValue = value as? String, let number = Int(stringValue) {
                         trackNumber = number
                     }
+                case "creationDate":
+                    if let dateString = value as? String {
+                        // 尝试解析日期字符串获取年份
+                        let formatter = ISO8601DateFormatter()
+                        if let date = formatter.date(from: dateString) {
+                            let calendar = Calendar.current
+                            year = calendar.component(.year, from: date)
+                        }
+                    } else if let date = value as? Date {
+                        let calendar = Calendar.current
+                        year = calendar.component(.year, from: date)
+                    }
+                case "genre":
+                    if let stringValue = value as? String, !stringValue.isEmpty {
+                        genre = stringValue
+                    }
                 default:
                     break
                 }
@@ -91,6 +111,8 @@ struct LocalMusicItem: Identifiable, Hashable {
         self.duration = duration
         self.artwork = artwork
         self.trackNumber = trackNumber
+        self.year = year
+        self.genre = genre
     }
 }
 
@@ -529,12 +551,16 @@ class LocalMusicService: NSObject, ObservableObject {
             
             let universalSongs = songs.map { $0.toUniversalSong() }
             
+            // 从歌曲中提取年份和流派信息（使用第一首歌曲的信息）
+            let year = firstSong.year
+            let genre = firstSong.genre
+            
             return UniversalAlbum(
-                id: UUID().uuidString,
+                id: albumName, // 🔑 使用专辑名称作为ID，确保与getAlbum方法匹配
                 title: albumName,
                 artistName: firstSong.artist,
-                year: nil, // 本地文件通常没有年份信息
-                genre: nil, // 本地文件可能没有流派信息
+                year: year, // 使用从元数据中提取的年份信息
+                genre: genre, // 使用从元数据中提取的流派信息
                 songCount: songs.count,
                 duration: songs.reduce(0) { $0 + max(0, $1.duration) }, // 确保时长不为负数
                 artworkURL: nil, // 本地文件没有远程URL
@@ -568,12 +594,16 @@ class LocalMusicService: NSObject, ObservableObject {
                     return nil
                 }
                 
+                // 从歌曲中提取年份和流派信息
+                let year = albumSongs.first?.year
+                let genre = albumSongs.first?.genre
+                
                 return UniversalAlbum(
-                    id: UUID().uuidString,
+                    id: albumName, //UUID().uuidString,
                     title: albumName,
                     artistName: artistName,
-                    year: nil,
-                    genre: nil,
+                    year: year, // 使用从元数据中提取的年份信息
+                    genre: genre, // 使用从元数据中提取的流派信息
                     songCount: albumSongs.count,
                     duration: albumSongs.reduce(0) { $0 + max(0, $1.duration) },
                     artworkURL: nil,
@@ -588,7 +618,7 @@ class LocalMusicService: NSObject, ObservableObject {
             }
             
             return UniversalArtist(
-                id: UUID().uuidString,
+                id: artistName, //UUID().uuidString,
                 name: artistName,
                 albumCount: albums.count,
                 albums: albums,
@@ -612,7 +642,7 @@ class LocalMusicService: NSObject, ObservableObject {
             // 检查专辑是否有歌曲
             guard !albumSongs.isEmpty else {
                 return UniversalAlbum(
-                    id: UUID().uuidString,
+                    id: albumName, //UUID().uuidString,
                     title: albumName,
                     artistName: id,
                     year: nil,
@@ -626,12 +656,16 @@ class LocalMusicService: NSObject, ObservableObject {
                 )
             }
             
+            // 从歌曲中提取年份和流派信息
+            let year = albumSongs.first?.year
+            let genre = albumSongs.first?.genre
+            
             return UniversalAlbum(
-                id: UUID().uuidString,
+                id: albumName, //UUID().uuidString,
                 title: albumName,
                 artistName: id,
-                year: nil,
-                genre: nil,
+                year: year, // 使用从元数据中提取的年份信息
+                genre: genre, // 使用从元数据中提取的流派信息
                 songCount: albumSongs.count,
                 duration: albumSongs.reduce(0) { $0 + $1.duration },
                 artworkURL: nil,
@@ -655,7 +689,7 @@ class LocalMusicService: NSObject, ObservableObject {
     func getAlbum(id: String) async throws -> UniversalAlbum {
         await scanLocalMusic()
         
-        // 这里我们假设id实际上是专辑名称
+        // 🔑 使用专辑名称作为ID进行匹配
         let albumSongs = localSongs.filter { $0.album == id }
         
         // 检查是否有歌曲
@@ -683,12 +717,16 @@ class LocalMusicService: NSObject, ObservableObject {
         
         let universalSongs = albumSongs.map { $0.toUniversalSong() }
         
+        // 从歌曲中提取年份和流派信息
+        let year = firstSong.year
+        let genre = firstSong.genre
+        
         return UniversalAlbum(
             id: id,
             title: id,
             artistName: firstSong.artist,
-            year: nil,
-            genre: nil,
+            year: year, // 使用从元数据中提取的年份信息
+            genre: genre, // 使用从元数据中提取的流派信息
             songCount: albumSongs.count,
             duration: albumSongs.reduce(0) { $0 + $1.duration },
             artworkURL: nil,
@@ -1017,6 +1055,35 @@ class LocalMusicService: NSObject, ObservableObject {
     /// 获取播放模式状态
     func getPlaybackModes() -> (shuffle: Bool, repeat: LocalRepeatMode) {
         return (isShuffleEnabled, repeatMode)
+    }
+    
+    // MARK: - 播放时长计算方法
+
+    /// 计算 Local 队列中所有歌曲的总时长
+    func calculateLocalQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
+        let totalDuration = queue.reduce(0) { total, song in
+            total + song.duration
+        }
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
+    }
+    
+    /// 计算 Local 队列中已播放的总时长
+    func calculateLocalQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
+        guard currentIndex < queue.count else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for index in 0..<currentIndex {
+            elapsedDuration += queue[index].duration
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += currentTime
+        
+        return elapsedDuration
     }
     
     // MARK: - 私有方法

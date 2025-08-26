@@ -30,7 +30,6 @@ struct MusicDetailView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     
-    @State private var playTapped = false
     @State private var shufflePlayTapped = false
     @State private var trackTapped = false
     
@@ -191,7 +190,6 @@ struct MusicDetailView: View {
                     // 播放控制按钮
                     HStack(spacing: 20) {
                         Button {
-                            playTapped.toggle()
                             if musicService.isHapticFeedbackEnabled {
                                 let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                                 impactFeedback.impactOccurred()

@@ -10,7 +10,37 @@ struct LocalGridAlbumCell: View {
         VStack(alignment: .leading) {
             // 专辑封面
             ZStack {
-                defaultAlbumCover
+                // 🔑 正确显示本地专辑封面，并根据封面样式调整显示
+                if let localAlbum = album.originalData as? LocalAlbumItem,
+                   let artworkData = localAlbum.artworkData,
+                   let image = UIImage(data: artworkData) {
+                    if musicService.currentCoverStyle == .rectangle {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 110, height: 170)
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                    } else {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 110, height: 170)
+                            .blur(radius: 8)
+                            .overlay(Color.black.opacity(0.3))
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                            .overlay(
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 110, height: 110)
+                                    .clipShape(Rectangle())
+                            )
+                    }
+                } else {
+                    defaultAlbumCover
+                }
                 
                 // 磁带装饰
                 Image(CassetteImageHelper.getRandomCassetteImage(for: album.id))
@@ -59,12 +89,46 @@ struct LocalListAlbumCell: View {
         VStack(alignment: .leading) {
             ZStack {
                 // 背景
-                defaultListBackground
+                // 🔑 正确显示本地专辑封面，并根据封面样式调整显示
+                if let localAlbum = album.originalData as? LocalAlbumItem,
+                   let artworkData = localAlbum.artworkData,
+                   let image = UIImage(data: artworkData) {
+                    if musicService.currentCoverStyle == .rectangle {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360, height: 48)
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                    } else {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 360, height: 48)
+                            .blur(radius: 8)
+                            .overlay(Color.black.opacity(0.3))
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                    }
+                } else {
+                    defaultListBackground
+                }
                 
                 // 前景内容
                 HStack(spacing: 16) {
                     // 小封面
-                    defaultSmallCover
+                    // 🔑 正确显示本地小专辑封面
+                    if let localAlbum = album.originalData as? LocalAlbumItem,
+                       let artworkData = localAlbum.artworkData,
+                       let image = UIImage(data: artworkData) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 40, height: 40)
+                            .clipShape(Rectangle())
+                    } else {
+                        defaultSmallCover
+                    }
                     
                     VStack(alignment: .leading) {
                         Text(album.title)
@@ -248,12 +312,12 @@ struct LocalArtistCell: View {
             // 艺术家头像（使用默认图标）
             ZStack {
                 Circle()
-                    .fill(Color.orange.opacity(0.2))
+                    .fill(Color.yellow.opacity(0.2))
                     .frame(width: 50, height: 50)
                 
                 Image(systemName: "person.fill")
                     .font(.title2)
-                    .foregroundColor(.orange)
+                    .foregroundColor(.yellow)
             }
             
             VStack(alignment: .leading, spacing: 4) {
@@ -348,13 +412,23 @@ struct LocalQueueTrackRow: View {
                 } else {
                     Text("\(index + 1)")
                         .font(.caption)
-                        .foregroundColor(isCurrent ? .orange : .secondary)
+                        .foregroundColor(isCurrent ? .yellow : .secondary)
                         .frame(width: 24, alignment: .center)
                 }
             }
             
-            // 专辑封面
-            defaultArtwork
+            if let localSong = song.originalData as? LocalMusicItem,
+               let artworkData = localSong.artwork,
+               let image = UIImage(data: artworkData) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 50, height: 50)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+            } else {
+                // 专辑封面
+                defaultArtwork
+            }
             
             // 歌曲信息
             VStack(alignment: .leading, spacing: 4) {
@@ -392,19 +466,19 @@ struct LocalQueueTrackRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(
-            isCurrent ? Color.orange.opacity(0.1) : Color.clear
+            isCurrent ? Color.yellow.opacity(0.1) : Color.clear
         )
         .contentShape(Rectangle())
     }
     
     private var defaultArtwork: some View {
         RoundedRectangle(cornerRadius: 4)
-            .fill(Color.orange.opacity(0.2))
+            .fill(Color.yellow.opacity(0.2))
             .frame(width: 50, height: 50)
             .overlay(
                 Image(systemName: "music.note")
                     .font(.title2)
-                    .foregroundColor(.orange)
+                    .foregroundColor(.yellow)
             )
     }
     

@@ -873,28 +873,3 @@ struct SubsonicInfoFooter: View {
         }
     }
 }
-
-// MARK: - 预览
-
-struct SubsonicMusicDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockAlbum = UniversalAlbum(
-            id: "mock-1",
-            title: "Subsonic专辑示例",
-            artistName: "Subsonic艺术家",
-            year: 2024,
-            genre: "摇滚",
-            songCount: 10,
-            duration: 2400,
-            artworkURL: nil,
-            songs: [],
-            source: .subsonic,
-            originalData: "mock"
-        )
-        
-        NavigationView {
-            SubsonicMusicDetailView(album: mockAlbum)
-                .environmentObject(MusicService.shared)
-        }
-    }
-}

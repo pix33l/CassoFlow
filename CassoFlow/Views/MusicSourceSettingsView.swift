@@ -127,9 +127,9 @@ struct MusicSourceSettingsView: View {
                 }) {
                     HStack {
                         
-                        Image("Subsonic")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
+                        Image(systemName: "folder.fill")
+                            .font(.title)
+                            .foregroundColor(.white)
                             .frame(width: 48, height: 48)
 
                         

@@ -1,8 +1,8 @@
 import SwiftUI
 
-// MARK: - Subsonic专辑网格单元格
+// MARK: - Audio Station专辑网格单元格
 
-struct SubsonicGridAlbumCell: View {
+struct AudioStationGridAlbumCell: View {
     let album: UniversalAlbum
     @EnvironmentObject private var musicService: MusicService
     
@@ -80,9 +80,9 @@ struct SubsonicGridAlbumCell: View {
     }
 }
 
-// MARK: - Subsonic专辑列表单元格
+// MARK: - Audio Station专辑列表单元格
 
-struct SubsonicListAlbumCell: View {
+struct AudioStationListAlbumCell: View {
     let album: UniversalAlbum
     @EnvironmentObject private var musicService: MusicService
     
@@ -175,9 +175,9 @@ struct SubsonicListAlbumCell: View {
     }
 }
 
-// MARK: - Subsonic播放列表网格单元格
+// MARK: - Audio Station播放列表网格单元格
 
-struct SubsonicGridPlaylistCell: View {
+struct AudioStationGridPlaylistCell: View {
     let playlist: UniversalPlaylist
     @EnvironmentObject private var musicService: MusicService
     
@@ -257,9 +257,9 @@ struct SubsonicGridPlaylistCell: View {
     }
 }
 
-// MARK: - Subsonic播放列表列表单元格
+// MARK: - Audio Station播放列表列表单元格
 
-struct SubsonicListPlaylistCell: View {
+struct AudioStationListPlaylistCell: View {
     let playlist: UniversalPlaylist
     @EnvironmentObject private var musicService: MusicService
     
@@ -354,9 +354,9 @@ struct SubsonicListPlaylistCell: View {
     }
 }
 
-// MARK: - Subsonic艺术家单元格
+// MARK: - Audio Station艺术家单元格
 
-struct SubsonicArtistCell: View {
+struct AudioStationArtistCell: View {
     let artist: UniversalArtist
     
     var body: some View {
@@ -364,12 +364,12 @@ struct SubsonicArtistCell: View {
             // 艺术家头像（使用默认图标）
             ZStack {
                 Circle()
-                    .fill(Color.yellow.opacity(0.2))
+                    .fill(Color.orange.opacity(0.2))
                     .frame(width: 50, height: 50)
                 
                 Image(systemName: "person.fill")
                     .font(.title2)
-                    .foregroundColor(.yellow)
+                    .foregroundColor(.orange)
             }
             
             VStack(alignment: .leading, spacing: 4) {

@@ -819,6 +819,35 @@ class SubsonicMusicService: NSObject, ObservableObject {
         return (currentQueue, currentIndex)
     }
     
+    // MARK: - 播放时长计算方法
+
+    /// 计算 Subsonic 队列中所有歌曲的总时长
+    func calculateSubsonicQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
+        let totalDuration = queue.reduce(0) { total, song in
+            total + song.duration
+        }
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
+    }
+    
+    /// 计算 Subsonic 队列中已播放的总时长
+    func calculateSubsonicQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
+        guard currentIndex < queue.count else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for index in 0..<currentIndex {
+            elapsedDuration += queue[index].duration
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += currentTime
+        
+        return elapsedDuration
+    }
+    
     // MARK: - 私有方法
     
     private func setupNotifications() {

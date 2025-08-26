@@ -1,388 +1,875 @@
 import SwiftUI
 
+/// Audio Station专用音乐详情视图 - 专辑
 struct AudioStationMusicDetailView: View {
     @EnvironmentObject private var musicService: MusicService
-    @StateObject private var coordinator = MusicServiceCoordinator()
-    
     let album: UniversalAlbum
-    
     @State private var detailedAlbum: UniversalAlbum?
-    @State private var isLoading = true
+    @State private var isLoading = false
     @State private var errorMessage: String?
+    
+    @State private var playTapped = false
+    @State private var shufflePlayTapped = false
+    @State private var trackTapped = false
+    
+    // 获取缓存管理器
+    private let cacheManager = MusicDetailCacheManager.shared
+    
+    /// 判断当前是否正在播放指定歌曲
+    private func isPlaying(_ song: UniversalSong) -> Bool {
+        // 使用元数据匹配
+        let titleMatch = musicService.currentTitle.trimmingCharacters(in: .whitespaces).lowercased() ==
+                        song.title.trimmingCharacters(in: .whitespaces).lowercased()
+        let artistMatch = musicService.currentArtist.trimmingCharacters(in: .whitespaces).lowercased() ==
+                         song.artistName.trimmingCharacters(in: .whitespaces).lowercased()
+        
+        return titleMatch && artistMatch && musicService.currentDataSource == .audioStation
+    }
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                if isLoading {
-                    LoadingView()
-                } else if let error = errorMessage {
-                    ErrorSection(message: error) {
-                        Task {
-                            await loadAlbumDetails()
+            LazyVStack(spacing: 20) {
+                // 顶部专辑信息
+                VStack(spacing: 16) {
+                    ZStack {
+                        Image("artwork-cassette")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 360)
+                        
+                        // 背景封面
+                        if let artworkURL = album.artworkURL {
+                            CachedAsyncImage(url: artworkURL) {
+                                defaultBackground
+                            } content: { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 270, height: 120)
+                                    .blur(radius: 8)
+                                    .overlay(Color.black.opacity(0.3))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .padding(.bottom, 37)
+                            }
+                        } else {
+                            defaultBackground
                         }
+                        
+                        // CassoFlow Logo
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 100)
+                            .padding(.bottom, 110)
+                        
+                        // 磁带孔洞
+                        Image("artwork-cassette-hole")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 360)
+                        
+                        // 专辑信息
+                        HStack {
+                            // 小封面
+                            if let artworkURL = album.artworkURL {
+                                CachedAsyncImage(url: artworkURL) {
+                                    defaultSmallCover
+                                } content: { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 60, height: 60)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                }
+                            } else {
+                                defaultSmallCover
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(album.title)
+                                    .font(.headline.bold())
+                                    .lineLimit(1)
+                                
+                                Text(album.artistName)
+                                    .font(.footnote)
+                                    .lineLimit(1)
+                                    .padding(.top, 4)
+                                
+                                if let year = album.year {
+                                    let genreText = album.genre ?? "未知风格"
+                                    Text("\(genreText) • \(year)")
+                                        .font(.footnote)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.top, 120)
+                        .frame(width: 300)
                     }
-                } else if let detailedAlbum = detailedAlbum {
-                    // 专辑头部信息
-                    AlbumHeaderView(album: detailedAlbum)
                     
                     // 播放控制按钮
-                    PlayControlsView(album: detailedAlbum)
-                    
-                    // 歌曲列表
-                    if !detailedAlbum.songs.isEmpty {
-                        SongListView(songs: detailedAlbum.songs)
+                    HStack(spacing: 20) {
+                        Button {
+                            playTapped.toggle()
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
+                            Task {
+                                try await playAlbum(shuffled: false)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "play.fill")
+                                Text("播放")
+                                    .lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.2))
+                            .foregroundColor(.primary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(isLoading)
+                        
+                        Button {
+                            shufflePlayTapped.toggle()
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
+                            Task {
+                                try await playAlbum(shuffled: true)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "shuffle")
+                                Text("随机播放")
+                                    .lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.2))
+                            .foregroundColor(.primary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(isLoading)
                     }
-                    
-                    // 专辑信息
-                    AlbumInfoView(album: detailedAlbum)
+                }
+                .padding(.horizontal)
+                
+                // 歌曲列表
+                VStack(alignment: .leading, spacing: 0) {
+                    if isLoading {
+                        ProgressView("正在加载歌曲...")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
+                    } else if let error = errorMessage {
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.title2)
+                                .foregroundColor(.yellow)
+                            
+                            Text(error)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button("重试") {
+                                Task {
+                                    await loadDetailedAlbum(forceRefresh: true)
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                            .foregroundColor(.black)
+                        }
+                        .padding(.vertical, 40)
+                    } else if let detailed = detailedAlbum, !detailed.songs.isEmpty {
+                        Divider()
+                            .padding(.leading, 20)
+                            .padding(.trailing, 16)
+                        
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(detailed.songs.enumerated()), id: \.element.id) { index, song in
+                                AudioStationTrackRow(
+                                    index: index,
+                                    song: song,
+                                    isPlaying: isPlaying(song)
+                                )
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    trackTapped.toggle()
+                                    if musicService.isHapticFeedbackEnabled {
+                                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                        impactFeedback.impactOccurred()
+                                    }
+                                    Task {
+                                        try await playSong(song, from: detailed.songs, startingAt: index)
+                                    }
+                                }
+                                
+                                if index < detailed.songs.count - 1 {
+                                    Divider()
+                                        .padding(.leading, 40)
+                                        .padding(.trailing, 16)
+                                }
+                            }
+                        }
+                        
+                        Divider()
+                            .padding(.leading, 20)
+                            .padding(.trailing, 16)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "music.note")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            
+                            Text("此专辑暂无歌曲")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 20)
+                    }
+                }
+                
+                // 底部信息
+                if let detailed = detailedAlbum, !detailed.songs.isEmpty {
+                    AudioStationInfoFooter(
+                        year: album.year,
+                        trackCount: detailed.songs.count,
+                        totalDuration: detailed.songs.reduce(0) { $0 + $1.duration },
+                        isPlaylist: false
+                    )
                 }
             }
-            .padding()
+            .padding(.vertical)
         }
         .navigationTitle(album.title)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await loadAlbumDetails()
+            await loadDetailedAlbum(forceRefresh: false)
         }
     }
     
-    @MainActor
-    private func loadAlbumDetails() async {
-        isLoading = true
-        errorMessage = nil
+    // MARK: - 默认视图
+    
+    private var defaultBackground: some View {
+        ZStack {
+            Color.black
+            Image("CASSOFLOW")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 75)
+        }
+        .frame(width: 270, height: 120)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .padding(.bottom, 37)
+    }
+    
+    private var defaultSmallCover: some View {
+        ZStack {
+            Color.black
+            Image("CASSOFLOW")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 30)
+        }
+        .frame(width: 60, height: 60)
+        .clipShape(RoundedRectangle(cornerRadius: 2))
+    }
+    
+    // MARK: - 数据加载（优化缓存版本）
+    
+    /// 加载详细专辑信息（支持缓存）
+    private func loadDetailedAlbum(forceRefresh: Bool) async {
+        // 如果不是强制刷新，先检查缓存
+        if !forceRefresh {
+            if let cached = cacheManager.getCachedAlbum(id: album.id) {
+                await MainActor.run {
+                    detailedAlbum = cached
+                    isLoading = false
+                    errorMessage = nil
+                }
+                return
+            }
+        }
+        
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
         
         do {
-            let loadedAlbum = try await coordinator.getAlbum(id: album.id)
-            detailedAlbum = loadedAlbum
+            let coordinator = musicService.getCoordinator()
+            let detailed = try await coordinator.getAlbum(id: album.id)
+            
+            // 缓存结果
+            cacheManager.cacheAlbum(detailed, id: album.id)
+            
+            await MainActor.run {
+                detailedAlbum = detailed
+                isLoading = false
+                
+                if detailed.songs.isEmpty {
+                    errorMessage = "此专辑没有歌曲"
+                }
+            }
         } catch {
-            errorMessage = "加载专辑详情失败：\(error.localizedDescription)"
-            print("Audio Station专辑加载失败: \(error)")
-        }
-        
-        isLoading = false
-    }
-}
-
-// MARK: - 子视图组件
-
-private struct LoadingView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .scaleEffect(1.2)
-            
-            Text("正在加载专辑详情...")
-                .font(.headline)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity, minHeight: 200)
-    }
-}
-
-private struct ErrorSection: View {
-    let message: String
-    let retry: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 48))
-                .foregroundColor(.orange)
-            
-            Text("加载失败")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            Text(message)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            Button("重试", action: retry)
-                .buttonStyle(.borderedProminent)
-        }
-        .frame(maxWidth: .infinity, minHeight: 200)
-    }
-}
-
-private struct AlbumHeaderView: View {
-    let album: UniversalAlbum
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            // 专辑封面
-            AsyncImage(url: album.artworkURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(.tertiary)
-                    .overlay {
-                        Image(systemName: "music.note")
-                            .font(.system(size: 48))
-                            .foregroundColor(.secondary)
-                    }
+            await MainActor.run {
+                errorMessage = "加载专辑详情失败：\(error.localizedDescription)"
+                isLoading = false
             }
-            .frame(width: 200, height: 200)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(radius: 8)
-            
-            // 专辑信息
-            VStack(spacing: 8) {
-                Text(album.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                
-                Text(album.artistName)
-                    .font(.headline)
-                    .foregroundColor(.orange)
-                
-                HStack {
-                    if let year = album.year {
-                        Text(String(year))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    if album.year != nil && !album.songs.isEmpty {
-                        Text("•")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    if !album.songs.isEmpty {
-                        Text("\(album.songs.count) 首歌曲")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    if !album.songs.isEmpty && album.duration > 0 {
-                        Text("•")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+        }
+    }
+    
+    // MARK: - 播放控制
+    
+    private func playAlbum(shuffled: Bool) async throws {
+        guard let detailed = detailedAlbum, !detailed.songs.isEmpty else { return }
+        
+        let songs = shuffled ? detailed.songs.shuffled() : detailed.songs
+        try await musicService.playUniversalSongs(songs)
+    }
+    
+    private func playSong(_ song: UniversalSong, from songs: [UniversalSong], startingAt index: Int) async throws {
+        try await musicService.playUniversalSongs(songs, startingAt: index)
+    }
+}
+
+// MARK: - Audio Station播放列表详情视图
+
+struct AudioStationPlaylistDetailView: View {
+    @EnvironmentObject private var musicService: MusicService
+    let playlist: UniversalPlaylist
+    @State private var detailedPlaylist: UniversalPlaylist?
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    
+    @State private var playTapped = false
+    @State private var shufflePlayTapped = false
+    @State private var trackTapped = false
+    
+    /// 判断当前是否正在播放指定歌曲
+    private func isPlaying(_ song: UniversalSong) -> Bool {
+        let titleMatch = musicService.currentTitle.trimmingCharacters(in: .whitespaces).lowercased() ==
+                        song.title.trimmingCharacters(in: .whitespaces).lowercased()
+        let artistMatch = musicService.currentArtist.trimmingCharacters(in: .whitespaces).lowercased() ==
+                         song.artistName.trimmingCharacters(in: .whitespaces).lowercased()
+        
+        return titleMatch && artistMatch && musicService.currentDataSource == .audioStation
+    }
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: 20) {
+                // 顶部播放列表信息
+                VStack(spacing: 16) {
+                    ZStack {
+                        Image("artwork-cassette")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 360)
                         
-                        Text(formatDuration(album.duration))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        // 背景封面
+                        if let artworkURL = playlist.artworkURL {
+                            CachedAsyncImage(url: artworkURL) {
+                                defaultBackground
+                            } content: { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 270, height: 120)
+                                    .blur(radius: 8)
+                                    .overlay(Color.black.opacity(0.3))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .padding(.bottom, 37)
+                            }
+                        } else {
+                            defaultBackground
+                        }
+                        
+                        // CassoFlow Logo
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 100)
+                            .padding(.bottom, 110)
+                        
+                        // 磁带孔洞
+                        Image("artwork-cassette-hole")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 360)
+                        
+                        // 播放列表信息
+                        HStack {
+                            // 小封面
+                            if let artworkURL = playlist.artworkURL {
+                                CachedAsyncImage(url: artworkURL) {
+                                    defaultSmallCover
+                                } content: { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 60, height: 60)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                }
+                            } else {
+                                defaultSmallCover
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(playlist.name)
+                                    .font(.headline.bold())
+                                    .lineLimit(1)
+                                
+                                if let curatorName = playlist.curatorName {
+                                    Text(curatorName)
+                                        .font(.footnote)
+                                        .lineLimit(1)
+                                        .padding(.top, 4)
+                                }
+                                
+                                Text("播放列表")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.top, 120)
+                        .frame(width: 300)
+                    }
+                    
+                    // 播放控制按钮
+                    HStack(spacing: 20) {
+                        Button {
+                            playTapped.toggle()
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
+                            Task {
+                                try await playPlaylist(shuffled: false)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "play.fill")
+                                Text("播放")
+                                    .lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.2))
+                            .foregroundColor(.primary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(isLoading)
+                        
+                        Button {
+                            shufflePlayTapped.toggle()
+                            if musicService.isHapticFeedbackEnabled {
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
+                            }
+                            Task {
+                                try await playPlaylist(shuffled: true)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "shuffle")
+                                Text("随机播放")
+                                    .lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.secondary.opacity(0.2))
+                            .foregroundColor(.primary)
+                            .cornerRadius(8)
+                        }
+                        .disabled(isLoading)
                     }
                 }
-            }
-        }
-    }
-    
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let hours = Int(duration) / 3600
-        let minutes = (Int(duration) % 3600) / 60
-        
-        if hours > 0 {
-            return "\(hours)小时\(minutes)分钟"
-        } else {
-            return "\(minutes)分钟"
-        }
-    }
-}
-
-private struct PlayControlsView: View {
-    let album: UniversalAlbum
-    @EnvironmentObject private var musicService: MusicService
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            // 播放按钮
-            Button {
-                Task {
-                    do {
-                        try await musicService.playUniversalAlbum(album)
-                    } catch {
-                        print("播放专辑失败: \(error)")
-                    }
-                }
-            } label: {
-                HStack {
-                    Image(systemName: "play.fill")
-                    Text("播放")
-                }
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(.orange)
-                .clipShape(Capsule())
-            }
-            
-            // 随机播放按钮
-            Button {
-                Task {
-                    do {
-                        try await musicService.playUniversalAlbum(album, shuffled: true)
-                    } catch {
-                        print("随机播放专辑失败: \(error)")
-                    }
-                }
-            } label: {
-                HStack {
-                    Image(systemName: "shuffle")
-                    Text("随机播放")
-                }
-                .font(.headline)
-                .foregroundColor(.orange)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(.orange.opacity(0.1))
-                .clipShape(Capsule())
-            }
-        }
-    }
-}
-
-private struct SongListView: View {
-    let songs: [UniversalSong]
-    @EnvironmentObject private var musicService: MusicService
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("歌曲")
-                .font(.title3)
-                .fontWeight(.semibold)
                 .padding(.horizontal)
-            
-            LazyVStack(spacing: 0) {
-                ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                    SongRowView(song: song, index: index + 1) {
-                        Task {
-                            do {
-                                try await musicService.playUniversalSongs(songs, startingAt: index)
-                            } catch {
-                                print("播放歌曲失败: \(error)")
+                
+                // 歌曲列表
+                VStack(alignment: .leading, spacing: 0) {
+                    if isLoading {
+                        ProgressView("正在加载歌曲...")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
+                    } else if let error = errorMessage {
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.title2)
+                                .foregroundColor(.yellow)
+                            
+                            Text(error)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button("重试") {
+                                Task {
+                                    await loadDetailedPlaylist()
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                            .foregroundColor(.black)
+                        }
+                        .padding(.vertical, 40)
+                    } else if let detailed = detailedPlaylist, !detailed.songs.isEmpty {
+                        Divider()
+                            .padding(.leading, 20)
+                            .padding(.trailing, 16)
+                        
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(detailed.songs.enumerated()), id: \.element.id) { index, song in
+                                AudioStationTrackRow(
+                                    index: index,
+                                    song: song,
+                                    isPlaying: isPlaying(song)
+                                )
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    trackTapped.toggle()
+                                    if musicService.isHapticFeedbackEnabled {
+                                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                        impactFeedback.impactOccurred()
+                                    }
+                                    Task {
+                                        try await playSong(song, from: detailed.songs, startingAt: index)
+                                    }
+                                }
+                                
+                                if index < detailed.songs.count - 1 {
+                                    Divider()
+                                        .padding(.leading, 40)
+                                        .padding(.trailing, 16)
+                                }
                             }
                         }
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    
-                    if index < songs.count - 1 {
+                        
                         Divider()
-                            .padding(.leading, 60)
+                            .padding(.leading, 20)
+                            .padding(.trailing, 16)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "music.note.list")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            
+                            Text("此播放列表暂无歌曲")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 20)
+                    }
+                }
+                
+                // 底部信息
+                if let detailed = detailedPlaylist, !detailed.songs.isEmpty {
+                    AudioStationInfoFooter(
+                        year: nil,
+                        trackCount: detailed.songs.count,
+                        totalDuration: detailed.songs.reduce(0) { $0 + $1.duration },
+                        isPlaylist: true
+                    )
+                }
+            }
+            .padding(.vertical)
+        }
+        .navigationTitle(playlist.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await loadDetailedPlaylist()
+        }
+    }
+    
+    // MARK: - 默认视图
+    
+    private var defaultBackground: some View {
+        ZStack {
+            Color.black
+            Image("CASSOFLOW")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 75)
+        }
+        .frame(width: 270, height: 120)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .padding(.bottom, 37)
+    }
+    
+    private var defaultSmallCover: some View {
+        ZStack {
+            Color.black
+            Image("CASSOFLOW")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 30)
+        }
+        .frame(width: 60, height: 60)
+        .clipShape(RoundedRectangle(cornerRadius: 2))
+    }
+    
+    // MARK: - 数据加载
+    
+    private func loadDetailedPlaylist() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
+        
+        do {
+            let coordinator = musicService.getCoordinator()
+            let detailed = try await coordinator.getPlaylist(id: playlist.id)
+            
+            await MainActor.run {
+                detailedPlaylist = detailed
+                isLoading = false
+                
+                if detailed.songs.isEmpty {
+                    errorMessage = "此播放列表没有歌曲"
+                }
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = "加载播放列表详情失败：\(error.localizedDescription)"
+                isLoading = false
+            }
+        }
+    }
+    
+    // MARK: - 播放控制
+    
+    private func playPlaylist(shuffled: Bool) async throws {
+        guard let detailed = detailedPlaylist, !detailed.songs.isEmpty else { return }
+        
+        let songs = shuffled ? detailed.songs.shuffled() : detailed.songs
+        try await musicService.playUniversalSongs(songs)
+    }
+    
+    private func playSong(_ song: UniversalSong, from songs: [UniversalSong], startingAt index: Int) async throws {
+        try await musicService.playUniversalSongs(songs, startingAt: index)
+    }
+}
+
+// MARK: - Audio Station艺术家详情视图
+
+struct AudioStationArtistDetailView: View {
+    @EnvironmentObject private var musicService: MusicService
+    let artist: UniversalArtist
+    @State private var detailedArtist: UniversalArtist?
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: 20) {
+                // 顶部艺术家信息
+                VStack(spacing: 16) {
+                    // 艺术家头像
+                    ZStack {
+                        Circle()
+                            .fill(Color.yellow.opacity(0.2))
+                            .frame(width: 120, height: 120)
+                        
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(.yellow)
+                    }
+                    
+                    VStack(spacing: 8) {
+                        Text(artist.name)
+                            .font(.largeTitle.bold())
+                        
+                        Text("\(artist.albumCount) 张专辑")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 专辑列表
+                VStack(alignment: .leading, spacing: 0) {
+                    if isLoading {
+                        ProgressView("正在加载专辑...")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
+                    } else if let error = errorMessage {
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.title2)
+                                .foregroundColor(.yellow)
+                            
+                            Text(error)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button("重试") {
+                                Task {
+                                    await loadDetailedArtist()
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                            .foregroundColor(.black)
+                        }
+                        .padding(.vertical, 40)
+                    } else if let detailed = detailedArtist, !detailed.albums.isEmpty {
+                        Text("专辑")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.bottom, 8)
+                        
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 10)], spacing: 20) {
+                            ForEach(detailed.albums, id: \.id) { album in
+                                NavigationLink(destination: UniversalMusicDetailView(album: album).environmentObject(musicService)) {
+                                    AudioStationGridAlbumCell(album: album)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                        .padding(.horizontal)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "opticaldisc")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            
+                            Text("此艺术家暂无专辑")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 20)
                     }
                 }
             }
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.vertical)
         }
-    }
-}
-
-private struct SongRowView: View {
-    let song: UniversalSong
-    let index: Int
-    let onTap: () -> Void
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            // 序号
-            Text("\(index)")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(width: 20)
-            
-            // 歌曲信息
-            VStack(alignment: .leading, spacing: 2) {
-                Text(song.title)
-                    .font(.body)
-                    .lineLimit(1)
-                
-                Text(song.artistName)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-            }
-            
-            Spacer()
-            
-            // 时长
-            Text(formatTime(song.duration))
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTap()
+        .navigationTitle(artist.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await loadDetailedArtist()
         }
     }
     
-    private func formatTime(_ time: TimeInterval) -> String {
-        let minutes = Int(time) / 60
-        let seconds = Int(time) % 60
-        return String(format: "%d:%02d", minutes, seconds)
-    }
-}
-
-private struct AlbumInfoView: View {
-    let album: UniversalAlbum
+    // MARK: - 数据加载
     
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("专辑信息")
-                .font(.title3)
-                .fontWeight(.semibold)
-            
-            VStack(spacing: 8) {
-                InfoRow(title: "专辑", value: album.title)
-                InfoRow(title: "艺术家", value: album.artistName)
-                
-                if let year = album.year {
-                    InfoRow(title: "发行年份", value: String(year))
-                }
-                
-                if let genre = album.genre {
-                    InfoRow(title: "流派", value: genre)
-                }
-                
-                InfoRow(title: "歌曲数量", value: "\(album.songCount) 首")
-                
-                if album.duration > 0 {
-                    InfoRow(title: "总时长", value: formatDuration(album.duration))
-                }
-                
-                InfoRow(title: "来源", value: "Audio Station")
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+    private func loadDetailedArtist() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
         }
-    }
-    
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let hours = Int(duration) / 3600
-        let minutes = (Int(duration) % 3600) / 60
-        let seconds = Int(duration) % 60
         
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
+        do {
+            let coordinator = musicService.getCoordinator()
+            let detailed = try await coordinator.getArtist(id: artist.id)
+            
+            await MainActor.run {
+                detailedArtist = detailed
+                isLoading = false
+                
+                if detailed.albums.isEmpty {
+                    errorMessage = "此艺术家没有专辑"
+                }
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = "加载艺术家详情失败：\(error.localizedDescription)"
+                isLoading = false
+            }
         }
     }
 }
 
-private struct InfoRow: View {
-    let title: String
-    let value: String
+// MARK: - Audio Station歌曲行视图
+
+struct AudioStationTrackRow: View {
+    let index: Int
+    let song: UniversalSong
+    let isPlaying: Bool
+    @EnvironmentObject private var musicService: MusicService
     
     var body: some View {
         HStack {
-            Text(title)
-                .font(.body)
-                .foregroundColor(.secondary)
+            if isPlaying {
+                AudioWaveView()
+                    .frame(width: 24, height: 24)
+                    .opacity(musicService.isPlaying ? 1.0 : 0.6)
+            } else {
+                Text("\(index + 1)")
+                    .frame(width: 24, alignment: .center)
+                    .foregroundColor(.secondary)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(song.title)
+                    .foregroundColor(.primary)
+                Text(song.artistName)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
             
             Spacer()
             
-            Text(value)
-                .font(.body)
-                .multilineTextAlignment(.trailing)
+            Text(formattedDuration(song.duration))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 16)
+        .background(
+            isPlaying ? Color.white.opacity(0.1) : Color.clear
+        )
+        .contentShape(Rectangle())
+    }
+    
+    private func formattedDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+}
+
+// MARK: - Audio Station底部信息栏
+
+struct AudioStationInfoFooter: View {
+    let year: Int?
+    let trackCount: Int
+    let totalDuration: TimeInterval
+    let isPlaylist: Bool
+    
+    var body: some View {
+        VStack(alignment: .center, spacing: 4) {
+            if let year = year, !isPlaylist {
+                Text("发布于 \(year) 年")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            } else if isPlaylist {
+                Text("Audio Station 播放列表")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
+            
+            Text("\(trackCount)首歌曲 • \(formatMinutes(totalDuration))")
+                .font(.footnote)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal)
+        .padding(.top, 16)
+    }
+    
+    private func formatMinutes(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        
+        if minutes < 60 {
+            return String(localized: "\(minutes)分钟")
+        } else {
+            let hours = minutes / 60
+            let remainingMinutes = minutes % 60
+            return String(localized: "\(hours)小时\(remainingMinutes)分钟")
         }
     }
 }
@@ -391,21 +878,23 @@ private struct InfoRow: View {
 
 struct AudioStationMusicDetailView_Previews: PreviewProvider {
     static var previews: some View {
+        let mockAlbum = UniversalAlbum(
+            id: "mock-1",
+            title: "Audio Station专辑示例",
+            artistName: "Audio Station艺术家",
+            year: 2024,
+            genre: "摇滚",
+            songCount: 10,
+            duration: 2400,
+            artworkURL: nil,
+            songs: [],
+            source: .audioStation,
+            originalData: "mock"
+        )
+        
         NavigationView {
-            AudioStationMusicDetailView(album: UniversalAlbum(
-                id: "test-album",
-                title: "测试专辑",
-                artistName: "测试艺术家",
-                year: 2024,
-                genre: "摇滚",
-                songCount: 12,
-                duration: 2800,
-                artworkURL: nil,
-                songs: [],
-                source: .audioStation,
-                originalData: "mock"
-            ))
-            .environmentObject(MusicService.shared)
+            AudioStationMusicDetailView(album: mockAlbum)
+                .environmentObject(MusicService.shared)
         }
     }
 }

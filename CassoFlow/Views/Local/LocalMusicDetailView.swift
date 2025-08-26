@@ -37,8 +37,21 @@ struct LocalMusicDetailView: View {
                           .aspectRatio(contentMode: .fit)
                           .frame(width: 360)
                       
-                      // 背景封面
-                      defaultBackground
+                      if let localAlbum = album.originalData as? LocalAlbumItem,
+                         let artworkData = localAlbum.artworkData,
+                         let image = UIImage(data: artworkData) {
+                          Image(uiImage: image)
+                              .resizable()
+                              .aspectRatio(contentMode: .fill)
+                              .frame(width: 270, height: 120)
+                              .blur(radius: 8)
+                              .overlay(Color.black.opacity(0.3))
+                              .clipShape(RoundedRectangle(cornerRadius: 4))
+                              .padding(.bottom, 37)
+                      } else {
+                          // 背景封面
+                          defaultBackground
+                      }
                       
                       // CassoFlow Logo
                       Image("CASSOFLOW")
@@ -55,8 +68,19 @@ struct LocalMusicDetailView: View {
                       
                       // 专辑信息
                       HStack {
-                          // 小封面
-                          defaultSmallCover
+                          
+                          if let localAlbum = album.originalData as? LocalAlbumItem,
+                             let artworkData = localAlbum.artworkData,
+                             let image = UIImage(data: artworkData) {
+                              Image(uiImage: image)
+                                  .resizable()
+                                  .aspectRatio(contentMode: .fill)
+                                  .frame(width: 60, height: 60)
+                                  .clipShape(RoundedRectangle(cornerRadius: 2))
+                          } else {
+                              // 小封面
+                              defaultSmallCover
+                          }
                           
                           VStack(alignment: .leading, spacing: 0) {
                               Text(album.title)

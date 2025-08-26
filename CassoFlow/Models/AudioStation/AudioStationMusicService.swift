@@ -9,7 +9,8 @@ class AudioStationMusicService: ObservableObject {
     
     @Published var isConnected: Bool = false
     
-    private let apiClient = AudioStationAPIClient.shared
+    private let apiClient = AudioStationAPIClient
+.shared
     private var currentQueue: [UniversalSong] = []
     private var currentIndex: Int = 0
     private var player: AVPlayer?
@@ -249,6 +250,220 @@ class AudioStationMusicService: ObservableObject {
         stopPlayback()
     }
     
+    // 🔑 新增：检查可用性方法（用于库视图）
+    func checkAvailability() async -> Bool {
+        do {
+            let connected = try await connect()
+            return connected
+        } catch {
+            print("Audio Station 连接检查失败: \(error)")
+            return false
+        }
+    }
+    
+    // MARK: - 数据获取方法
+    // 🔑 新增：获取最近专辑方法
+    func getRecentAlbums() async throws -> [UniversalAlbum] {
+        do {
+            // 获取所有专辑
+            let audioStationAlbums = try await apiClient.getAlbums()
+            
+            // 转换为 UniversalAlbum 格式
+            let universalAlbums = audioStationAlbums.map { album -> UniversalAlbum in
+                UniversalAlbum(
+                    id: album.id,
+                    title: album.displayName,
+                    artistName: album.artistName,
+                    year: album.year,
+                    genre: album.additional?.song_tag?.genre,
+                    songCount: 0, // 需要后续获取歌曲数量
+                    duration: album.durationTimeInterval,
+                    artworkURL: apiClient.getCoverArtURL(id: album.id),
+                    songs: [], // 专辑详情中填充
+                    source: .audioStation,
+                    originalData: album as Any
+                )
+            }
+            
+            return universalAlbums
+        } catch {
+            print("获取 Audio Station 专辑失败: \(error)")
+            throw error
+        }
+    }
+    
+    // 🔑 新增：获取播放列表方法
+    func getPlaylists() async throws -> [UniversalPlaylist] {
+        do {
+            // 获取播放列表
+            let audioStationPlaylists = try await apiClient.getPlaylists()
+            
+            // 转换为 UniversalPlaylist 格式
+            let universalPlaylists = audioStationPlaylists.map { playlist -> UniversalPlaylist in
+                UniversalPlaylist(
+                    id: playlist.id,
+                    name: playlist.name,
+                    curatorName: nil, // Audio Station 播放列表可能没有创建者信息
+                    songCount: playlist.additional?.song_tag?.track ?? 0,
+                    duration: playlist.durationTimeInterval,
+                    artworkURL: apiClient.getCoverArtURL(id: playlist.id),
+                    songs: [], // 播放列表详情中填充
+                    source: .audioStation,
+                    originalData: playlist as Any
+                )
+            }
+            
+            return universalPlaylists
+        } catch {
+            print("获取 Audio Station 播放列表失败: \(error)")
+            throw error
+        }
+    }
+    
+    // 🔑 新增：获取艺术家方法
+    func getArtists() async throws -> [UniversalArtist] {
+        do {
+            // 获取艺术家
+            let audioStationArtists = try await apiClient.getArtists()
+            
+            // 转换为 UniversalArtist 格式
+            let universalArtists = audioStationArtists.map { artist -> UniversalArtist in
+                UniversalArtist(
+                    id: artist.id,
+                    name: artist.name,
+                    albumCount: artist.albumCount,
+                    albums: [], // 艺术家详情中填充
+                    source: .audioStation,
+                    originalData: artist as Any
+                )
+            }
+            
+            return universalArtists
+        } catch {
+            print("获取 Audio Station 艺术家失败: \(error)")
+            throw error
+        }
+    }
+    
+    // 🔑 新增：获取专辑详情方法（用于专辑详情视图）
+    func getAlbum(id: String) async throws -> UniversalAlbum {
+        do {
+            // 获取专辑详情
+            let audioStationAlbum = try await apiClient.getAlbum(id: id)
+            
+            // 获取专辑歌曲
+            let audioStationSongs = try await apiClient.getAlbumSongs(albumId: id)
+            
+            // 转换歌曲为 UniversalSong 格式
+            let universalSongs = audioStationSongs.map { song -> UniversalSong in
+                UniversalSong(
+                    id: song.id,
+                    title: song.title,
+                    artistName: song.artistName,
+                    albumName: song.album,
+                    duration: song.durationTimeInterval,
+                    trackNumber: song.track,
+                    artworkURL: apiClient.getCoverArtURL(id: song.id),
+                    streamURL: apiClient.getStreamURL(id: song.id),
+                    source: .audioStation,
+                    originalData: song as Any
+                )
+            }
+            
+            // 创建完整的 UniversalAlbum
+            let universalAlbum = UniversalAlbum(
+                id: audioStationAlbum.id,
+                title: audioStationAlbum.displayName,
+                artistName: audioStationAlbum.artistName,
+                year: audioStationAlbum.year,
+                genre: audioStationAlbum.additional?.song_tag?.genre,
+                songCount: universalSongs.count,
+                duration: universalSongs.reduce(0) { $0 + $1.duration },
+                artworkURL: apiClient.getCoverArtURL(id: audioStationAlbum.id),
+                songs: universalSongs,
+                source: .audioStation,
+                originalData: audioStationAlbum as Any
+            )
+            
+            return universalAlbum
+        } catch {
+            print("获取 Audio Station 专辑详情失败: \(error)")
+            throw error
+        }
+    }
+    
+    // 🔑 新增：获取播放列表详情方法（用于播放列表详情视图）
+    func getPlaylist(id: String) async throws -> UniversalPlaylist {
+        // 这里需要根据你的实际 API 实现来获取播放列表详情
+        // 暂时抛出未实现错误
+        throw AudioStationError.apiError("播放列表详情功能暂未实现")
+    }
+    
+    // 🔑 新增：获取艺术家详情方法（用于艺术家详情视图）
+    func getArtist(id: String) async throws -> UniversalArtist {
+        do {
+            // 获取艺术家歌曲
+            let audioStationSongs = try await apiClient.getArtistSongs(artistId: id)
+            
+            // 转换歌曲为 UniversalSong 格式
+            let universalSongs = audioStationSongs.map { song -> UniversalSong in
+                UniversalSong(
+                    id: song.id,
+                    title: song.title,
+                    artistName: song.artistName,
+                    albumName: song.album,
+                    duration: song.durationTimeInterval,
+                    trackNumber: song.track,
+                    artworkURL: apiClient.getCoverArtURL(id: song.id),
+                    streamURL: apiClient.getStreamURL(id: song.id),
+                    source: .audioStation,
+                    originalData: song as Any
+                )
+            }
+            
+            // 按专辑分组歌曲
+            let albumsByTitle = Dictionary(grouping: universalSongs) { song in
+                song.albumName ?? "未知专辑"
+            }
+            
+            // 创建专辑列表
+            let universalAlbums = albumsByTitle.map { (albumName, songs) -> UniversalAlbum in
+                UniversalAlbum(
+                    id: "artist_\(id)_album_\(albumName)",
+                    title: albumName,
+                    artistName: songs.first?.artistName ?? "未知艺术家",
+                    year: nil, // UniversalSong没有year属性，使用nil
+                    genre: nil, // UniversalSong没有genre属性，使用nil
+                    songCount: songs.count,
+                    duration: songs.reduce(0) { $0 + $1.duration },
+                    artworkURL: songs.first?.artworkURL,
+                    songs: songs,
+                    source: .audioStation,
+                    originalData: Optional<Any>.none as Any // 将nil转换为Any类型
+                )
+            }
+            
+            // 获取艺术家信息
+            // 注意：这里可能需要通过其他方式获取艺术家信息，因为我们没有直接的 getArtist API
+            let artistName = universalSongs.first?.artistName ?? "未知艺术家"
+            
+            // 创建完整的 UniversalArtist
+            let universalArtist = UniversalArtist(
+                id: id,
+                name: artistName,
+                albumCount: universalAlbums.count,
+                albums: universalAlbums,
+                source: .audioStation,
+                originalData: Optional<Any>.none as Any // 将nil转换为Any类型
+            )
+            
+            return universalArtist
+        } catch {
+            print("获取 Audio Station 艺术家详情失败: \(error)")
+            throw error
+        }
+    }
+    
     // MARK: - 播放队列管理
     
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
@@ -378,6 +593,35 @@ class AudioStationMusicService: ObservableObject {
         Task {
             await seek(to: newTime)
         }
+    }
+    
+    // MARK: - 播放时长计算方法
+
+    /// 计算 Audio Station 队列中所有歌曲的总时长
+    func calculateAudioStationQueueTotalDuration(queue: [UniversalSong]) -> TimeInterval {
+        let totalDuration = queue.reduce(0) { total, song in
+            total + song.duration
+        }
+        
+        // 如果总时长为0，返回默认值
+        return totalDuration > 0 ? totalDuration : TimeInterval(queue.count * 180) // 每首歌默认3分钟
+    }
+    
+    /// 计算 Audio Station 队列中已播放的总时长
+    func calculateAudioStationQueueElapsedDuration(queue: [UniversalSong], currentIndex: Int, currentTime: TimeInterval) -> TimeInterval {
+        guard currentIndex < queue.count else { return 0 }
+        
+        var elapsedDuration: TimeInterval = 0
+        
+        // 计算当前歌曲之前所有歌曲的总时长
+        for index in 0..<currentIndex {
+            elapsedDuration += queue[index].duration
+        }
+        
+        // 加上当前歌曲的播放时长
+        elapsedDuration += currentTime
+        
+        return elapsedDuration
     }
     
     // MARK: - 状态获取
