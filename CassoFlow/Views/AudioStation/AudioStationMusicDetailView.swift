@@ -7,6 +7,7 @@ struct AudioStationMusicDetailView: View {
     @State private var detailedAlbum: UniversalAlbum?
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var coverURL: URL? // 🔧 添加动态封面URL状态
     
     @State private var playTapped = false
     @State private var shufflePlayTapped = false
@@ -37,22 +38,18 @@ struct AudioStationMusicDetailView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 360)
                         
-                        // 背景封面
-                        if let artworkURL = album.artworkURL {
-                            CachedAsyncImage(url: artworkURL) {
-                                defaultBackground
-                            } content: { image in
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 270, height: 120)
-                                    .blur(radius: 8)
-                                    .overlay(Color.black.opacity(0.3))
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    .padding(.bottom, 37)
-                            }
-                        } else {
+                        // 🔧 背景封面 - 使用动态封面URL
+                        CachedAsyncImage(url: coverURL ?? album.artworkURL) {
                             defaultBackground
+                        } content: { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 270, height: 120)
+                                .blur(radius: 8)
+                                .overlay(Color.black.opacity(0.3))
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .padding(.bottom, 37)
                         }
                         
                         // CassoFlow Logo
@@ -70,19 +67,15 @@ struct AudioStationMusicDetailView: View {
                         
                         // 专辑信息
                         HStack {
-                            // 小封面
-                            if let artworkURL = album.artworkURL {
-                                CachedAsyncImage(url: artworkURL) {
-                                    defaultSmallCover
-                                } content: { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 60, height: 60)
-                                        .clipShape(RoundedRectangle(cornerRadius: 2))
-                                }
-                            } else {
+                            // 🔧 小封面 - 使用动态封面URL
+                            CachedAsyncImage(url: coverURL ?? album.artworkURL) {
                                 defaultSmallCover
+                            } content: { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
                             }
                             
                             VStack(alignment: .leading, spacing: 0) {
@@ -250,7 +243,55 @@ struct AudioStationMusicDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadDetailedAlbum(forceRefresh: false)
+            await loadAlbumCover() // 🔧 加载专辑封面
         }
+    }
+    
+    // 🔧 新增：加载专辑封面方法
+    private func loadAlbumCover() async {
+        print("🎨 开始为专辑详情加载封面: \(album.title) - \(album.artistName)")
+        
+        let apiClient = AudioStationAPIClient.shared
+        
+        // 优先使用专辑名称和艺术家名称获取封面
+        let albumCoverURL = apiClient.getCoverArtURL(albumName: album.title, artistName: album.artistName)
+        
+        if let coverURL = albumCoverURL {
+            await MainActor.run {
+                self.coverURL = coverURL
+                print("🎨 专辑详情封面URL已设置: \(coverURL.absoluteString)")
+            }
+            
+            // 🔧 验证封面URL是否有效
+            let isValid = await apiClient.testCoverURL(albumName: album.title, artistName: album.artistName)
+            if isValid {
+                print("✅ 专辑详情封面URL验证成功")
+                return
+            } else {
+                print("❌ 专辑详情封面URL验证失败，尝试其他方法")
+            }
+        }
+//        
+//        // 回退方法：从详细专辑信息中获取封面
+//        if let detailed = detailedAlbum, let firstSong = detailed.songs.first {
+//            var songCoverURL: URL?
+//            
+//            if let audioStationSong = firstSong.originalData as? AudioStationSong {
+//                songCoverURL = apiClient.getCoverArtURL(for: audioStationSong)
+//            } else {
+//                // 使用歌曲的专辑信息获取封面
+//                if let albumName = firstSong.albumName, !albumName.isEmpty {
+//                    songCoverURL = apiClient.getCoverArtURL(albumName: albumName, artistName: firstSong.artistName)
+//                }
+//            }
+//            
+//            if let coverURL = songCoverURL {
+//                await MainActor.run {
+//                    self.coverURL = coverURL
+//                    print("🎨 专辑详情封面URL已设置（歌曲方法）: \(coverURL.absoluteString)")
+//                }
+//            }
+//        }
     }
     
     // MARK: - 默认视图
@@ -292,6 +333,8 @@ struct AudioStationMusicDetailView: View {
                     isLoading = false
                     errorMessage = nil
                 }
+                // 🔧 加载详情后也尝试加载封面
+                await loadAlbumCover()
                 return
             }
         }
@@ -316,6 +359,9 @@ struct AudioStationMusicDetailView: View {
                     errorMessage = "此专辑没有歌曲"
                 }
             }
+            
+            // 🔧 加载详情后尝试加载封面
+            await loadAlbumCover()
         } catch {
             await MainActor.run {
                 errorMessage = "加载专辑详情失败：\(error.localizedDescription)"
@@ -371,25 +417,10 @@ struct AudioStationPlaylistDetailView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 360)
-                        
-                        // 背景封面
-                        if let artworkURL = playlist.artworkURL {
-                            CachedAsyncImage(url: artworkURL) {
-                                defaultBackground
-                            } content: { image in
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 270, height: 120)
-                                    .blur(radius: 8)
-                                    .overlay(Color.black.opacity(0.3))
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    .padding(.bottom, 37)
-                            }
-                        } else {
-                            defaultBackground
-                        }
-                        
+
+                        // 统一只用默认背景封面
+                        defaultPlaylistBackground
+
                         // CassoFlow Logo
                         Image("CASSOFLOW")
                             .resizable()
@@ -405,20 +436,8 @@ struct AudioStationPlaylistDetailView: View {
                         
                         // 播放列表信息
                         HStack {
-                            // 小封面
-                            if let artworkURL = playlist.artworkURL {
-                                CachedAsyncImage(url: artworkURL) {
-                                    defaultSmallCover
-                                } content: { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 60, height: 60)
-                                        .clipShape(RoundedRectangle(cornerRadius: 2))
-                                }
-                            } else {
-                                defaultSmallCover
-                            }
+                            // 只用默认小封面
+                            defaultSmallPlaylistCover
                             
                             VStack(alignment: .leading, spacing: 0) {
                                 Text(playlist.name)
@@ -586,10 +605,9 @@ struct AudioStationPlaylistDetailView: View {
             await loadDetailedPlaylist()
         }
     }
-    
-    // MARK: - 默认视图
-    
-    private var defaultBackground: some View {
+
+    // 默认大封面
+    private var defaultPlaylistBackground: some View {
         ZStack {
             Color.black
             Image("CASSOFLOW")
@@ -601,8 +619,9 @@ struct AudioStationPlaylistDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding(.bottom, 37)
     }
-    
-    private var defaultSmallCover: some View {
+
+    // 默认小封面
+    private var defaultSmallPlaylistCover: some View {
         ZStack {
             Color.black
             Image("CASSOFLOW")
@@ -613,7 +632,7 @@ struct AudioStationPlaylistDetailView: View {
         .frame(width: 60, height: 60)
         .clipShape(RoundedRectangle(cornerRadius: 2))
     }
-    
+
     // MARK: - 数据加载
     
     private func loadDetailedPlaylist() async {
@@ -634,6 +653,7 @@ struct AudioStationPlaylistDetailView: View {
                     errorMessage = "此播放列表没有歌曲"
                 }
             }
+            
         } catch {
             await MainActor.run {
                 errorMessage = "加载播放列表详情失败：\(error.localizedDescription)"

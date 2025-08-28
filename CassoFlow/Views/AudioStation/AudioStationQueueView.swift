@@ -1,322 +1,237 @@
 import SwiftUI
 
+/// AudioStation播放队列视图
 struct AudioStationQueueView: View {
     @EnvironmentObject private var musicService: MusicService
-    @StateObject private var audioStationService = AudioStationMusicService.shared
-    
-    @State private var currentQueue: [UniversalSong] = []
+    @Environment(\.dismiss) private var dismiss
+    @State private var queueSongs: [UniversalSong] = []
     @State private var currentIndex: Int = 0
-    @State private var isLoading = true
+    @State private var isLoading = false
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
-                // 当前播放歌曲信息
-                CurrentTrackSection()
-                
-                Divider()
-                
-                // 播放队列
-                if isLoading {
-                    LoadingView()
-                } else if currentQueue.isEmpty {
-                    EmptyQueueView()
+                // 队列列表
+                if queueSongs.isEmpty {
+                    emptyQueueView
                 } else {
-                    QueueList(
-                        queue: currentQueue,
-                        currentIndex: currentIndex,
-                        onReorder: reorderQueue
-                    )
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(queueSongs.enumerated()), id: \.element.id) { index, song in
+                                AudioStationQueueTrackRow(
+                                    index: index,
+                                    song: song,
+                                    isPlaying: index == currentIndex,
+                                    isCurrent: index == currentIndex
+                                )
+                                .onTapGesture {
+                                    if musicService.isHapticFeedbackEnabled {
+                                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                        impactFeedback.impactOccurred()
+                                    }
+                                    Task {
+                                        await jumpToSong(at: index)
+                                    }
+                                }
+                                
+                                if index < queueSongs.count - 1 {
+                                    Divider()
+                                        .padding(.horizontal, 16)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    }
                 }
+            }
+            .onAppear {
+                loadQueueInfo()
+            }
+            .onChange(of: musicService.currentTrackID) { _, _ in
+                loadQueueInfo()
             }
             .navigationTitle("播放队列")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button {
-                            clearQueue()
-                        } label: {
-                            Label("清空队列", systemImage: "trash")
-                        }
-                        .disabled(currentQueue.isEmpty)
-                        
-                        Button {
-                            shuffleQueue()
-                        } label: {
-                            Label("随机播放", systemImage: "shuffle")
-                        }
-                        .disabled(currentQueue.isEmpty)
-                        
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
-            }
-        }
-        .onAppear {
-            loadQueueData()
-        }
-        .onReceive(Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()) { _ in
-            updateQueueInfo()
-        }
-    }
-    
-    // MARK: - 数据管理
-    
-    private func loadQueueData() {
-        let queueInfo = audioStationService.getQueueInfo()
-        
-        DispatchQueue.main.async {
-            currentQueue = queueInfo.queue
-            currentIndex = queueInfo.currentIndex
-            isLoading = false
-        }
-    }
-    
-    private func updateQueueInfo() {
-        let queueInfo = audioStationService.getQueueInfo()
-        
-        // 只在队列发生变化时更新UI
-        if currentQueue.count != queueInfo.queue.count || currentIndex != queueInfo.currentIndex {
-            DispatchQueue.main.async {
-                currentQueue = queueInfo.queue
-                currentIndex = queueInfo.currentIndex
-            }
-        }
-    }
-    
-    private func reorderQueue(from source: IndexSet, to destination: Int) {
-        // Audio Station 队列重排序功能
-        // 注意：这需要Audio Station API支持，可能需要额外实现
-        print("队列重排序: \(source) -> \(destination)")
-    }
-    
-    private func clearQueue() {
-        Task {
-            await audioStationService.stop()
-            loadQueueData()
-        }
-    }
-    
-    private func shuffleQueue() {
-        // 实现队列随机化
-        print("随机播放队列")
-    }
-}
-
-// MARK: - 子视图组件
-
-private struct CurrentTrackSection: View {
-    @EnvironmentObject private var musicService: MusicService
-    @StateObject private var audioStationService = AudioStationMusicService.shared
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            if let currentSong = audioStationService.getCurrentSong() {
-                HStack(spacing: 12) {
-                    // 专辑封面
-                    AsyncImage(url: currentSong.artworkURL) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Rectangle()
-                            .fill(.tertiary)
-                            .overlay {
-                                Image(systemName: "music.note")
-                                    .foregroundColor(.secondary)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if !queueSongs.isEmpty {
+                        Menu {
+//                            Button {
+//                                Task {
+//                                    await shuffleQueue()
+//                                }
+//                            } label: {
+//                                Label("随机播放", systemImage: "shuffle")
+//                            }
+                            
+                            Button {
+                                Task {
+                                    await clearQueue()
+                                }
+                            } label: {
+                                Label("清空队列", systemImage: "trash")
                             }
-                    }
-                    .frame(width: 50, height: 50)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    
-                    // 歌曲信息
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(currentSong.title)
-                            .font(.headline)
-                            .lineLimit(1)
-                        
-                        Text(currentSong.artistName)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                        
-                        if let albumName = currentSong.albumName {
-                            Text(albumName)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.body)
+                                .foregroundColor(.primary)
                         }
                     }
-                    
-                    Spacer()
-                    
-                    // 播放状态指示器
-                    VStack {
-                        Image(systemName: musicService.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
-                            .foregroundColor(.orange)
-                            .font(.title3)
-                        
-                        Text("正在播放")
-                            .font(.caption2)
-                            .foregroundColor(.orange)
-                    }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
-                .background(.ultraThinMaterial)
-            } else {
-                // 没有当前播放歌曲
-                HStack {
-                    Rectangle()
-                        .fill(.tertiary)
-                        .frame(width: 50, height: 50)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            Image(systemName: "music.note")
-                                .foregroundColor(.secondary)
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        if musicService.isHapticFeedbackEnabled {
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                            impactFeedback.impactOccurred()
                         }
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("没有正在播放的歌曲")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-                        
-                        Text("从媒体库选择音乐开始播放")
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.primary)
+                            .padding(8)
+                            .background(
+                                Circle()
+                                    .fill(Color.gray.opacity(0.15))
+                            )
                     }
-                    
-                    Spacer()
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
             }
         }
     }
-}
-
-private struct LoadingView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .scaleEffect(1.2)
-            
-            Text("正在加载播放队列...")
-                .font(.headline)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-private struct EmptyQueueView: View {
-    var body: some View {
+    
+    // MARK: - 空队列视图
+    
+    private var emptyQueueView: some View {
         VStack(spacing: 20) {
             Image(systemName: "music.note.list")
-                .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .font(.system(size: 48))
+                .foregroundColor(.orange)
+                .padding(.bottom, 10)
             
-            VStack(spacing: 8) {
-                Text("播放队列为空")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Text("从媒体库添加歌曲到播放队列")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
+            Text("播放队列为空")
+                .font(.title2)
+                .foregroundColor(.primary)
+            
+            Text("队列会在播放音乐时显示")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
     }
-}
-
-private struct QueueList: View {
-    let queue: [UniversalSong]
-    let currentIndex: Int
-    let onReorder: (IndexSet, Int) -> Void
     
-    @EnvironmentObject private var musicService: MusicService
-    @StateObject private var audioStationService = AudioStationMusicService.shared
+    // MARK: - 数据加载
     
-    var body: some View {
-        List {
-            ForEach(Array(queue.enumerated()), id: \.element.id) { index, song in
-                QueueRowView(
-                    song: song,
-                    index: index,
-                    isCurrentSong: index == currentIndex,
-                    onTap: {
-                        jumpToSong(at: index)
-                    }
-                )
-                .listRowSeparator(.hidden)
+    private func loadQueueInfo() {
+        let audioStationService = musicService.getAudioStationService()
+        let queueInfo = audioStationService.getQueueInfo()
+        
+        queueSongs = queueInfo.queue
+        currentIndex = queueInfo.currentIndex
+    }
+    
+    // MARK: - 队列操作
+    
+    private func jumpToSong(at index: Int) async {
+        guard index < queueSongs.count else { return }
+        
+        let audioStationService = musicService.getAudioStationService()
+        
+        do {
+            // 播放指定索引的歌曲
+            try await audioStationService.playQueue(queueSongs, startingAt: index)
+            
+            // 更新当前索引
+            await MainActor.run {
+                currentIndex = index
             }
-            .onMove(perform: onReorder)
+            
+            print("🎵 AudioStation队列跳转到歌曲：\(queueSongs[index].title)")
+        } catch {
+            print("🎵 AudioStation队列跳转失败：\(error.localizedDescription)")
         }
-        .listStyle(.plain)
     }
     
-    private func jumpToSong(at index: Int) {
-        Task {
-            // 跳转到指定歌曲播放
-            // 注意：这需要Audio Station服务支持跳转到指定索引
-            try await audioStationService.playQueue(queue, startingAt: index)
+//    private func shuffleQueue() async {
+//        guard !queueSongs.isEmpty else { return }
+//        
+//        let shuffledSongs = queueSongs.shuffled()
+//        let audioStationService = musicService.getAudioStationService()
+//        
+//        do {
+//            try await audioStationService.playQueue(shuffledSongs, startingAt: 0)
+//            
+//            await MainActor.run {
+//                queueSongs = shuffledSongs
+//                currentIndex = 0
+//            }
+//            
+//            print("🎵 AudioStation队列已随机播放")
+//        } catch {
+//            print("🎵 随机播放失败：\(error.localizedDescription)")
+//        }
+//    }
+    
+    private func clearQueue() async {
+        let audioStationService = musicService.getAudioStationService()
+        await audioStationService.stop()
+        
+        await MainActor.run {
+            queueSongs.removeAll()
+            currentIndex = 0
         }
+        
+        print("🎵 AudioStation队列已清空")
     }
 }
 
-private struct QueueRowView: View {
-    let song: UniversalSong
+// MARK: - AudioStation队列歌曲行视图
+
+struct AudioStationQueueTrackRow: View {
     let index: Int
-    let isCurrentSong: Bool
-    let onTap: () -> Void
+    let song: UniversalSong
+    let isPlaying: Bool
+    let isCurrent: Bool
+    @EnvironmentObject private var musicService: MusicService
     
     var body: some View {
         HStack(spacing: 12) {
-            // 序号或播放指示器
-            ZStack {
-                if isCurrentSong {
-                    Image(systemName: "speaker.wave.2.fill")
-                        .foregroundColor(.orange)
-                        .font(.caption)
+            // 歌曲序号或播放状态
+            VStack {
+                if isPlaying {
+                    AudioWaveView()
+                        .frame(width: 24, height: 24)
+                        .opacity(musicService.isPlaying ? 1.0 : 0.6)
                 } else {
                     Text("\(index + 1)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(isCurrent ? .orange : .secondary)
+                        .frame(width: 24, alignment: .center)
                 }
             }
-            .frame(width: 24)
             
             // 专辑封面
-            AsyncImage(url: song.artworkURL) { image in
+            CachedAsyncImage(url: getCoverURL()) {
+                defaultArtwork
+            } content: { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle()
-                    .fill(.tertiary)
-                    .overlay {
-                        Image(systemName: "music.note")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
+                    .frame(width: 50, height: 50)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
-            .frame(width: 40, height: 40)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
             
             // 歌曲信息
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(song.title)
                     .font(.body)
-                    .fontWeight(isCurrentSong ? .semibold : .regular)
-                    .foregroundColor(isCurrentSong ? .orange : .primary)
+                    .foregroundColor(.primary)
                     .lineLimit(1)
                 
-                HStack {
+                HStack(spacing: 4) {
                     Text(song.artistName)
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -337,22 +252,51 @@ private struct QueueRowView: View {
             
             Spacer()
             
-            // 时长
-            Text(formatTime(song.duration))
+            // 歌曲时长
+            Text(formattedDuration(song.duration))
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(
+            isCurrent ? Color.orange.opacity(0.1) : Color.clear
+        )
         .contentShape(Rectangle())
-        .onTapGesture {
-            onTap()
-        }
     }
     
-    private func formatTime(_ time: TimeInterval) -> String {
-        let minutes = Int(time) / 60
-        let seconds = Int(time) % 60
-        return String(format: "%d:%02d", minutes, seconds)
+    /// 获取歌曲封面URL
+    private func getCoverURL() -> URL? {
+        // 优先使用歌曲自带的封面URL
+        if let artworkURL = song.artworkURL {
+            return artworkURL
+        }
+        
+        // 使用AudioStation的封面获取方法（基于专辑名称和艺术家）
+        if let audioStationSong = song.originalData as? AudioStationSong {
+            let apiClient = AudioStationAPIClient.shared
+            return apiClient.getCoverArtURL(for: audioStationSong)
+        }
+        
+        return nil
+    }
+    
+    private var defaultArtwork: some View {
+        RoundedRectangle(cornerRadius: 4)
+            .fill(Color.orange.opacity(0.2))
+            .frame(width: 50, height: 50)
+            .overlay(
+                Image(systemName: "music.note")
+                    .font(.title2)
+                    .foregroundColor(.orange)
+            )
+    }
+    
+    /// 格式化时长
+    private func formattedDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }
 

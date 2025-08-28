@@ -158,25 +158,38 @@ class AudioStationMusicService: ObservableObject {
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = currentIndex
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = currentQueue.count
         
-        // 专辑封面（异步加载）
-        if let artworkURL = song.artworkURL {
-            Task {
-                await loadAndSetArtwork(from: artworkURL, info: &nowPlayingInfo)
-            }
-        } else {
-            // 没有封面时使用默认封面
-            if let defaultImage = UIImage(systemName: "music.note") {
-                nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
-                    return defaultImage
-                }
-            }
+        // 🔧 专辑封面（使用智能封面获取）
+        Task {
+            await loadAndSetArtwork(for: song, info: &nowPlayingInfo)
         }
         
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
-    // 🔑 新增：异步加载专辑封面
-    private func loadAndSetArtwork(from url: URL, info: inout [String: Any]) async {
+    // 🔧 改进：异步加载专辑封面
+    private func loadAndSetArtwork(for song: UniversalSong, info: inout [String: Any]) async {
+        // 优先使用歌曲的artworkURL
+        var coverURL: URL? = song.artworkURL
+        
+        // 如果没有，尝试获取智能封面
+        if coverURL == nil, let originalSong = song.originalData as? AudioStationSong {
+            coverURL = apiClient.getCoverArtURL(for: originalSong)
+        }
+        
+        guard let url = coverURL else {
+            // 使用默认封面
+            if let defaultImage = UIImage(systemName: "music.note") {
+                await MainActor.run {
+                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+                    updatedInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
+                        return defaultImage
+                    }
+                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
+                }
+            }
+            return
+        }
+        
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             if let image = UIImage(data: data) {
@@ -189,9 +202,22 @@ class AudioStationMusicService: ObservableObject {
                     updatedInfo[MPMediaItemPropertyArtwork] = artwork
                     MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
                 }
+                
+                print("✅ 锁屏封面加载成功")
             }
         } catch {
-            print("加载专辑封面失败: \(error)")
+            print("❌ 锁屏封面加载失败: \(error)")
+            
+            // 使用默认封面
+            if let defaultImage = UIImage(systemName: "music.note") {
+                await MainActor.run {
+                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+                    updatedInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
+                        return defaultImage
+                    }
+                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
+                }
+            }
         }
     }
     
@@ -278,7 +304,7 @@ class AudioStationMusicService: ObservableObject {
                     genre: album.additional?.song_tag?.genre,
                     songCount: 0, // 需要后续获取歌曲数量
                     duration: album.durationTimeInterval,
-                    artworkURL: apiClient.getCoverArtURL(id: album.id),
+                    artworkURL: nil, // 🔧 专辑列表暂时不设置封面，将在详情页获取
                     songs: [], // 专辑详情中填充
                     source: .audioStation,
                     originalData: album as Any
@@ -300,13 +326,16 @@ class AudioStationMusicService: ObservableObject {
             
             // 转换为 UniversalPlaylist 格式
             let universalPlaylists = audioStationPlaylists.map { playlist -> UniversalPlaylist in
-                UniversalPlaylist(
+                // 🔧 播放列表通常没有直接的封面，我们先设为nil
+                // 封面将在播放列表单元格中动态加载（通过第一首歌曲）
+                
+                return UniversalPlaylist(
                     id: playlist.id,
                     name: playlist.name,
                     curatorName: nil, // Audio Station 播放列表可能没有创建者信息
                     songCount: playlist.additional?.song_tag?.track ?? 0,
                     duration: playlist.durationTimeInterval,
-                    artworkURL: apiClient.getCoverArtURL(id: playlist.id),
+                    artworkURL: nil, // 🔧 播放列表封面将通过其他方式获取
                     songs: [], // 播放列表详情中填充
                     source: .audioStation,
                     originalData: playlist as Any
@@ -319,7 +348,7 @@ class AudioStationMusicService: ObservableObject {
             throw error
         }
     }
-    
+
     // 🔑 新增：获取艺术家方法
     func getArtists() async throws -> [UniversalArtist] {
         do {
@@ -363,12 +392,15 @@ class AudioStationMusicService: ObservableObject {
                     albumName: song.album,
                     duration: song.durationTimeInterval,
                     trackNumber: song.track,
-                    artworkURL: apiClient.getCoverArtURL(id: song.id),
+                    artworkURL: apiClient.getCoverArtURL(for: song), // 🔧 使用新的封面方法
                     streamURL: apiClient.getStreamURL(id: song.id),
                     source: .audioStation,
                     originalData: song as Any
                 )
             }
+            
+            // 🔧 使用专辑封面API
+            let albumCoverURL = apiClient.getCoverArtURL(for: audioStationAlbum)
             
             // 创建完整的 UniversalAlbum
             let universalAlbum = UniversalAlbum(
@@ -379,7 +411,7 @@ class AudioStationMusicService: ObservableObject {
                 genre: audioStationAlbum.additional?.song_tag?.genre,
                 songCount: universalSongs.count,
                 duration: universalSongs.reduce(0) { $0 + $1.duration },
-                artworkURL: apiClient.getCoverArtURL(id: audioStationAlbum.id),
+                artworkURL: albumCoverURL, // 🔧 使用专辑封面方法
                 songs: universalSongs,
                 source: .audioStation,
                 originalData: audioStationAlbum as Any
@@ -394,9 +426,70 @@ class AudioStationMusicService: ObservableObject {
     
     // 🔑 新增：获取播放列表详情方法（用于播放列表详情视图）
     func getPlaylist(id: String) async throws -> UniversalPlaylist {
-        // 这里需要根据你的实际 API 实现来获取播放列表详情
-        // 暂时抛出未实现错误
-        throw AudioStationError.apiError("播放列表详情功能暂未实现")
+        do {
+            // 🔧 首先从播放列表列表中找到对应的播放列表
+            let playlists = try await getPlaylists()
+            guard let playlist = playlists.first(where: { $0.id == id }) else {
+                throw AudioStationError.apiError("未找到指定播放列表")
+            }
+            
+            // 🔧 尝试获取播放列表中的歌曲
+            // 对于AudioStation，我们尝试通过播放列表名称搜索相关歌曲
+            print("🎵 尝试获取播放列表歌曲: \(playlist.name)")
+            
+            var playlistSongs: [UniversalSong] = []
+            
+            // 方法1: 尝试使用搜索功能查找相关歌曲
+            do {
+                let searchResult = try await apiClient.search(query: playlist.name)
+                
+                // 将搜索到的歌曲转换为UniversalSong
+                playlistSongs = searchResult.songs.map { song -> UniversalSong in
+                    UniversalSong(
+                        id: song.id,
+                        title: song.title,
+                        artistName: song.artistName,
+                        albumName: song.album,
+                        duration: song.durationTimeInterval,
+                        trackNumber: song.track,
+                        artworkURL: apiClient.getCoverArtURL(for: song),
+                        streamURL: apiClient.getStreamURL(id: song.id),
+                        source: .audioStation,
+                        originalData: song as Any
+                    )
+                }
+                
+                print("✅ 通过搜索获取到播放列表歌曲: \(playlistSongs.count) 首")
+            } catch {
+                print("❌ 搜索播放列表歌曲失败: \(error)")
+                // 如果搜索失败，返回空的播放列表
+                playlistSongs = []
+            }
+            
+            // 🔧 获取播放列表封面（使用第一首歌曲的封面）
+            var playlistCoverURL: URL?
+            if let firstSong = playlistSongs.first,
+               let originalSong = firstSong.originalData as? AudioStationSong {
+                playlistCoverURL = apiClient.getCoverArtURL(for: originalSong)
+            }
+            
+            let detailedPlaylist = UniversalPlaylist(
+                id: playlist.id,
+                name: playlist.name,
+                curatorName: playlist.curatorName,
+                songCount: playlistSongs.count,
+                duration: playlistSongs.reduce(0) { $0 + $1.duration },
+                artworkURL: playlistCoverURL, // 🔧 使用第一首歌曲的封面
+                songs: playlistSongs,
+                source: .audioStation,
+                originalData: playlist.originalData
+            )
+            
+            return detailedPlaylist
+        } catch {
+            print("获取 Audio Station 播放列表详情失败: \(error)")
+            throw error
+        }
     }
     
     // 🔑 新增：获取艺术家详情方法（用于艺术家详情视图）
@@ -414,7 +507,7 @@ class AudioStationMusicService: ObservableObject {
                     albumName: song.album,
                     duration: song.durationTimeInterval,
                     trackNumber: song.track,
-                    artworkURL: apiClient.getCoverArtURL(id: song.id),
+                    artworkURL: apiClient.getCoverArtURL(for: song), // 🔧 使用新的封面方法
                     streamURL: apiClient.getStreamURL(id: song.id),
                     source: .audioStation,
                     originalData: song as Any
@@ -436,7 +529,7 @@ class AudioStationMusicService: ObservableObject {
                     genre: nil, // UniversalSong没有genre属性，使用nil
                     songCount: songs.count,
                     duration: songs.reduce(0) { $0 + $1.duration },
-                    artworkURL: songs.first?.artworkURL,
+                    artworkURL: songs.first?.artworkURL, // 🔧 使用第一首歌曲的封面
                     songs: songs,
                     source: .audioStation,
                     originalData: Optional<Any>.none as Any // 将nil转换为Any类型
@@ -499,6 +592,8 @@ class AudioStationMusicService: ObservableObject {
             throw AudioStationError.apiError("无法获取歌曲流URL")
         }
         
+        print("🎵 准备播放: \(song.title) - URL: \(streamURL)")
+        
         // 🔑 激活音频会话
         activateAudioSession()
         
@@ -510,18 +605,68 @@ class AudioStationMusicService: ObservableObject {
             statusObserver?.cancel()
             statusObserver = playerItem?.publisher(for: \.status)
                 .sink { [weak self] status in
-                    if status == .readyToPlay {
+                    switch status {
+                    case .readyToPlay:
+                        print("✅ 歌曲准备就绪，开始播放")
                         self?.player?.play()
                         self?.isPlaying = true
                         // 🔑 更新锁屏播放信息
                         self?.updateNowPlayingInfo()
-                    } else if status == .failed {
-                        print("播放失败: \(self?.playerItem?.error?.localizedDescription ?? "未知错误")")
+                    case .failed:
+                        let error = self?.playerItem?.error?.localizedDescription ?? "未知错误"
+                        print("❌ 播放失败: \(error)")
+                        if let playerError = self?.playerItem?.error {
+                            print("❌ 详细错误: \(playerError)")
+                        }
                         self?.isPlaying = false
                         // 🔑 清除锁屏播放信息
                         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+                        
+                        // 🔧 尝试使用转码后的格式重新播放
+                        Task {
+                            await self?.retryWithTranscodedFormat()
+                        }
+                    case .unknown:
+                        print("🔄 播放状态未知")
+                    @unknown default:
+                        print("🔄 播放状态: \(status)")
                     }
                 }
+        }
+    }
+    
+    // 🔧 新增：使用转码格式重试播放
+    private func retryWithTranscodedFormat() async {
+        guard currentIndex < currentQueue.count else { return }
+        
+        let song = currentQueue[currentIndex]
+        
+        // 🔧 尝试使用转码的MP3格式
+        if let transcodedURL = apiClient.getTranscodedStreamURL(id: song.id) {
+            print("🔄 尝试使用转码格式播放: \(transcodedURL)")
+            
+            await MainActor.run {
+                let newPlayerItem = AVPlayerItem(url: transcodedURL)
+                player?.replaceCurrentItem(with: newPlayerItem)
+                playerItem = newPlayerItem
+                
+                // 重新监听状态
+                statusObserver?.cancel()
+                statusObserver = newPlayerItem.publisher(for: \.status)
+                    .sink { [weak self] status in
+                        if status == .readyToPlay {
+                            print("✅ 转码格式播放成功")
+                            self?.player?.play()
+                            self?.isPlaying = true
+                            self?.updateNowPlayingInfo()
+                        } else if status == .failed {
+                            let error = newPlayerItem.error?.localizedDescription ?? "未知错误"
+                            print("❌ 转码格式也播放失败: \(error)")
+                            self?.isPlaying = false
+                            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+                        }
+                    }
+            }
         }
     }
     

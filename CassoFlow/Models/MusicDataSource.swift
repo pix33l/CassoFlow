@@ -616,7 +616,7 @@ class AudioStationDataSource: MusicDataSource {
                 genre: nil,
                 songCount: 0, // Audio Station API 不直接提供歌曲数量
                 duration: album.durationTimeInterval,
-                artworkURL: apiClient.getCoverArtURL(id: album.id),
+                artworkURL: apiClient.getCoverArtURL(for: album),
                 songs: [],
                 source: .audioStation,
                 originalData: album
@@ -634,7 +634,7 @@ class AudioStationDataSource: MusicDataSource {
                 curatorName: nil,
                 songCount: 0, // Audio Station API 不直接提供歌曲数量
                 duration: playlist.durationTimeInterval,
-                artworkURL: apiClient.getCoverArtURL(id: playlist.id),
+                artworkURL: nil, // 播放列表没有封面信息
                 songs: [],
                 source: .audioStation,
                 originalData: playlist
@@ -671,7 +671,7 @@ class AudioStationDataSource: MusicDataSource {
                 genre: nil,
                 songCount: 0,
                 duration: album.durationTimeInterval,
-                artworkURL: apiClient.getCoverArtURL(id: album.id),
+                artworkURL: apiClient.getCoverArtURL(for: album),
                 songs: [],
                 source: .audioStation,
                 originalData: album
@@ -707,7 +707,7 @@ class AudioStationDataSource: MusicDataSource {
                 albumName: song.album,
                 duration: song.durationTimeInterval,
                 trackNumber: song.track,
-                artworkURL: apiClient.getCoverArtURL(id: song.id),
+                artworkURL: apiClient.getCoverArtURL(for: song),
                 streamURL: apiClient.getStreamURL(id: song.id),
                 source: .audioStation,
                 originalData: song
@@ -722,34 +722,17 @@ class AudioStationDataSource: MusicDataSource {
             genre: nil,
             songCount: songs.count,
             duration: songs.reduce(0) { $0 + $1.duration },
-            artworkURL: apiClient.getCoverArtURL(id: album.id),
+            artworkURL: apiClient.getCoverArtURL(for: album),
             songs: songs,
             source: .audioStation,
             originalData: album
         )
     }
-    
+
     func getPlaylist(id: String) async throws -> UniversalPlaylist {
-        // Audio Station 播放列表详情需要特殊处理
-        let playlists = try await apiClient.getPlaylists()
-        guard let playlist = playlists.first(where: { $0.id == id }) else {
-            throw MusicDataSourceError.notFound
-        }
-        
-        // 获取播放列表中的歌曲（这里简化处理，实际可能需要专门的API）
-        let songs: [UniversalSong] = []
-        
-        return UniversalPlaylist(
-            id: playlist.id,
-            name: playlist.name,
-            curatorName: nil,
-            songCount: songs.count,
-            duration: playlist.durationTimeInterval,
-            artworkURL: apiClient.getCoverArtURL(id: playlist.id),
-            songs: songs,
-            source: .audioStation,
-            originalData: playlist
-        )
+        // 🔧 修复：使用AudioStationMusicService中的完整实现
+        let audioStationService = AudioStationMusicService.shared
+        return try await audioStationService.getPlaylist(id: id)
     }
     
     func search(query: String) async throws -> (artists: [UniversalArtist], albums: [UniversalAlbum], songs: [UniversalSong]) {
@@ -775,7 +758,7 @@ class AudioStationDataSource: MusicDataSource {
                 genre: nil,
                 songCount: 0,
                 duration: album.durationTimeInterval,
-                artworkURL: apiClient.getCoverArtURL(id: album.id),
+                artworkURL: apiClient.getCoverArtURL(for: album),
                 songs: [],
                 source: .audioStation,
                 originalData: album
@@ -790,7 +773,7 @@ class AudioStationDataSource: MusicDataSource {
                 albumName: song.album,
                 duration: song.durationTimeInterval,
                 trackNumber: song.track,
-                artworkURL: apiClient.getCoverArtURL(id: song.id),
+                artworkURL: apiClient.getCoverArtURL(for: song),
                 streamURL: apiClient.getStreamURL(id: song.id),
                 source: .audioStation,
                 originalData: song

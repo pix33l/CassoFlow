@@ -595,7 +595,7 @@ class AudioStationLibraryDataManager: ObservableObject {
                 self.errorMessage = nil
                 
                 // 预加载封面
-                self.preloadAlbumCovers()
+                self.preloadAlbumCovers(audioStationService: audioStationService)
                 self.preloadPlaylistCovers()
             }
             return
@@ -647,7 +647,7 @@ class AudioStationLibraryDataManager: ObservableObject {
                 }
                 
                 // 预加载专辑封面
-                self.preloadAlbumCovers()
+                self.preloadAlbumCovers(audioStationService: audioStationService)
                 
                 // 预加载播放列表封面
                 self.preloadPlaylistCovers()
@@ -696,13 +696,20 @@ class AudioStationLibraryDataManager: ObservableObject {
     }
     
     /// 预加载专辑封面
-    @MainActor private func preloadAlbumCovers() {
+    @MainActor private func preloadAlbumCovers(audioStationService: AudioStationMusicService) {
         let imageCache = ImageCacheManager.shared
         
-        // 预加载前20个专辑的封面
-        for album in albums.prefix(20) {
-            if let artworkURL = album.artworkURL {
-                imageCache.preloadImage(from: artworkURL)
+        // 🔧 为前10个专辑异步获取并预加载封面
+        Task {
+            for album in albums.prefix(10) {
+                do {
+                    let detailedAlbum = try await audioStationService.getAlbum(id: album.id)
+                    if let artworkURL = detailedAlbum.artworkURL {
+                        imageCache.preloadImage(from: artworkURL)
+                    }
+                } catch {
+                    print("❌ 预加载专辑封面失败: \(album.title) - \(error)")
+                }
             }
         }
     }

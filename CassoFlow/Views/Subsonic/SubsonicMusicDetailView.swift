@@ -665,6 +665,9 @@ struct SubsonicArtistDetailView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     
+    // 新增：艺术家缓存管理器
+    private let artistCacheManager = SubsonicArtistCacheManager.shared
+    
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 20) {
@@ -710,7 +713,7 @@ struct SubsonicArtistDetailView: View {
                             
                             Button("重试") {
                                 Task {
-                                    await loadDetailedArtist()
+                                    await loadDetailedArtist(forceRefresh: true)
                                 }
                             }
                             .buttonStyle(.borderedProminent)
@@ -751,13 +754,27 @@ struct SubsonicArtistDetailView: View {
         .navigationTitle(artist.name)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await loadDetailedArtist()
+            await loadDetailedArtist(forceRefresh: false)
         }
     }
     
-    // MARK: - 数据加载
+    // MARK: - 数据加载（优化缓存版本）
     
-    private func loadDetailedArtist() async {
+    /// 加载详细艺术家信息（支持缓存）
+    private func loadDetailedArtist(forceRefresh: Bool) async {
+        // 如果不是强制刷新，先检查缓存
+        if !forceRefresh {
+            if let cached = artistCacheManager.getCachedArtist(id: artist.id) {
+                await MainActor.run {
+                    detailedArtist = cached
+                    isLoading = false
+                    errorMessage = nil
+                    print("使用缓存的艺术家数据: \(artist.name)")
+                }
+                return
+            }
+        }
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil
@@ -766,6 +783,10 @@ struct SubsonicArtistDetailView: View {
         do {
             let coordinator = musicService.getCoordinator()
             let detailed = try await coordinator.getArtist(id: artist.id)
+            
+            // 缓存结果
+            artistCacheManager.cacheArtist(detailed, id: artist.id)
+            print("缓存艺术家数据: \(detailed.name)，专辑数量: \(detailed.albums.count)")
             
             await MainActor.run {
                 detailedArtist = detailed
@@ -781,6 +802,43 @@ struct SubsonicArtistDetailView: View {
                 isLoading = false
             }
         }
+    }
+}
+
+// MARK: - 新增：Subsonic艺术家缓存管理器
+
+class SubsonicArtistCacheManager: ObservableObject {
+    static let shared = SubsonicArtistCacheManager()
+    
+    private var artistCache: [String: UniversalArtist] = [:]
+    private let maxCacheSize = 50 // 最大缓存数量
+    
+    private init() {}
+    
+    /// 获取缓存的艺术家
+    func getCachedArtist(id: String) -> UniversalArtist? {
+        return artistCache[id]
+    }
+    
+    /// 缓存艺术家
+    func cacheArtist(_ artist: UniversalArtist, id: String) {
+        // 如果缓存已满，移除最旧的一些项目
+        if artistCache.count >= maxCacheSize {
+            let keysToRemove = Array(artistCache.keys.prefix(maxCacheSize / 4))
+            for key in keysToRemove {
+                artistCache.removeValue(forKey: key)
+            }
+            print("清理了 \(keysToRemove.count) 个旧艺术家缓存")
+        }
+        
+        artistCache[id] = artist
+        print("艺术家已缓存: \(id)，当前缓存数量: \(artistCache.count)")
+    }
+    
+    /// 清理所有缓存
+    func clearAllCache() {
+        artistCache.removeAll()
+        print("所有艺术家缓存已清理")
     }
 }
 

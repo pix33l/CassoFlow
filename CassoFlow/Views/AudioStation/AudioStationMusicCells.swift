@@ -5,42 +5,40 @@ import SwiftUI
 struct AudioStationGridAlbumCell: View {
     let album: UniversalAlbum
     @EnvironmentObject private var musicService: MusicService
+    @State private var coverURL: URL?
     
     var body: some View {
         VStack(alignment: .leading) {
             // 专辑封面
             ZStack {
-                if let artworkURL = album.artworkURL {
-                    CachedAsyncImage(url: artworkURL) {
-                        defaultAlbumCover
-                    } content: { image in
-                        if musicService.currentCoverStyle == .rectangle {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 110, height: 170)
-                                .clipShape(Rectangle())
-                                .contentShape(Rectangle())
-                        } else {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 110, height: 170)
-                                .blur(radius: 8)
-                                .overlay(Color.black.opacity(0.3))
-                                .clipShape(Rectangle())
-                                .contentShape(Rectangle())
-                                .overlay(
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 110, height: 110)
-                                        .clipShape(Rectangle())
-                                )
-                        }
-                    }
-                } else {
+                // 🔧 使用优化后的CachedAsyncImage，支持动态URL变化
+                CachedAsyncImage(url: coverURL ?? album.artworkURL) {
                     defaultAlbumCover
+                } content: { image in
+                    if musicService.currentCoverStyle == .rectangle {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 110, height: 170)
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                    } else {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 110, height: 170)
+                            .blur(radius: 8)
+                            .overlay(Color.black.opacity(0.3))
+                            .clipShape(Rectangle())
+                            .contentShape(Rectangle())
+                            .overlay(
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 110, height: 110)
+                                    .clipShape(Rectangle())
+                            )
+                    }
                 }
                 
                 // 磁带装饰
@@ -65,6 +63,66 @@ struct AudioStationGridAlbumCell: View {
             .padding(.top, 2)
         }
         .id(album.id) // 稳定视图身份，减少重新创建
+        .task {
+            // 🔧 只在没有封面URL时才加载，避免重复请求
+            if album.artworkURL == nil && coverURL == nil {
+                await loadCoverURL()
+            }
+        }
+    }
+    
+    // 🔧 改进的封面加载方法，使用新的专辑封面API
+    private func loadCoverURL() async {
+        print("🎨 开始为专辑加载封面: \(album.title) - \(album.artistName)")
+        
+        let apiClient = AudioStationAPIClient.shared
+        
+        // 🔧 使用专辑名称和艺术家名称获取封面
+        let albumCoverURL = apiClient.getCoverArtURL(albumName: album.title, artistName: album.artistName)
+        
+        if let coverURL = albumCoverURL {
+            await MainActor.run {
+                self.coverURL = coverURL
+                print("🎨 设置专辑封面URL: \(coverURL.absoluteString)")
+            }
+            return
+        }
+        
+        // 🔧 回退方法：获取专辑详情并使用第一首歌曲的封面
+        do {
+            let audioStationService = musicService.getAudioStationService()
+            let detailedAlbum = try await audioStationService.getAlbum(id: album.id)
+            
+            print("🎨 专辑详情获取成功，歌曲数量: \(detailedAlbum.songs.count)")
+            
+            // 使用第一首歌曲获取封面
+            if let firstSong = detailedAlbum.songs.first {
+                print("🎨 使用第一首歌曲获取封面: \(firstSong.title) (ID: \(firstSong.id))")
+                
+                // 🔧 修复：从UniversalSong的originalData中获取AudioStationSong
+                var songCoverURL: URL?
+                
+                if let audioStationSong = firstSong.originalData as? AudioStationSong {
+                    songCoverURL = apiClient.getCoverArtURL(for: audioStationSong)
+                } else {
+                    // 回退到使用歌曲的专辑信息
+                    if let albumName = firstSong.albumName, !albumName.isEmpty {
+                        songCoverURL = apiClient.getCoverArtURL(albumName: albumName, artistName: firstSong.artistName)
+                    }
+                }
+                
+                await MainActor.run {
+                    // 🔧 关键：更新coverURL会触发CachedAsyncImage的onChange监听
+                    self.coverURL = songCoverURL
+                    print("🎨 设置歌曲封面URL: \(songCoverURL?.absoluteString ?? "无")")
+                }
+            } else {
+                print("🎨 专辑没有歌曲，无法获取封面")
+            }
+            
+        } catch {
+            print("❌ 获取专辑封面失败: \(album.title) - \(error)")
+        }
     }
     
     private var defaultAlbumCover: some View {
@@ -85,43 +143,36 @@ struct AudioStationGridAlbumCell: View {
 struct AudioStationListAlbumCell: View {
     let album: UniversalAlbum
     @EnvironmentObject private var musicService: MusicService
+    @State private var coverURL: URL?
     
     var body: some View {
         VStack(alignment: .leading) {
             ZStack {
                 // 背景
-                if let artworkURL = album.artworkURL {
-                    CachedAsyncImage(url: artworkURL) {
-                        defaultListBackground
-                    } content: { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 360, height: 48)
-                            .blur(radius: 8)
-                            .overlay(Color.black.opacity(0.3))
-                            .clipShape(Rectangle())
-                            .contentShape(Rectangle())
-                    }
-                } else {
+                CachedAsyncImage(url: coverURL ?? album.artworkURL) {
                     defaultListBackground
+                } content: { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 360, height: 48)
+                        .blur(radius: 8)
+                        .overlay(Color.black.opacity(0.3))
+                        .clipShape(Rectangle())
+                        .contentShape(Rectangle())
                 }
                 
                 // 前景内容
                 HStack(spacing: 16) {
                     // 小封面
-                    if let artworkURL = album.artworkURL {
-                        CachedAsyncImage(url: artworkURL) {
-                            defaultSmallCover
-                        } content: { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 40, height: 40)
-                                .clipShape(Rectangle())
-                        }
-                    } else {
+                    CachedAsyncImage(url: coverURL ?? album.artworkURL) {
                         defaultSmallCover
+                    } content: { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 40, height: 40)
+                            .clipShape(Rectangle())
                     }
                     
                     VStack(alignment: .leading) {
@@ -148,6 +199,57 @@ struct AudioStationListAlbumCell: View {
             }
         }
         .id(album.id) // 稳定视图身份
+        .task {
+            if album.artworkURL == nil && coverURL == nil {
+                await loadCoverURL()
+            }
+        }
+    }
+    
+    // 🔧 简化的封面加载方法，使用新的专辑封面API
+    private func loadCoverURL() async {
+        print("🎨 开始为列表专辑加载封面: \(album.title) - \(album.artistName)")
+        
+        let apiClient = AudioStationAPIClient.shared
+        
+        // 🔧 直接使用专辑名称和艺术家名称获取封面
+        let albumCoverURL = apiClient.getCoverArtURL(albumName: album.title, artistName: album.artistName)
+        
+        if let coverURL = albumCoverURL {
+            await MainActor.run {
+                self.coverURL = coverURL
+                print("🎨 列表封面URL已设置: \(coverURL.absoluteString)")
+            }
+            return
+        }
+        
+        // 🔧 回退方法
+        do {
+            let audioStationService = musicService.getAudioStationService()
+            let detailedAlbum = try await audioStationService.getAlbum(id: album.id)
+            
+            if let firstSong = detailedAlbum.songs.first {
+                // 🔧 修复：从UniversalSong的originalData中获取AudioStationSong
+                var songCoverURL: URL?
+                
+                if let audioStationSong = firstSong.originalData as? AudioStationSong {
+                    songCoverURL = apiClient.getCoverArtURL(for: audioStationSong)
+                } else {
+                    // 回退到使用歌曲的专辑信息
+                    if let albumName = firstSong.albumName, !albumName.isEmpty {
+                        songCoverURL = apiClient.getCoverArtURL(albumName: albumName, artistName: firstSong.artistName)
+                    }
+                }
+                
+                await MainActor.run {
+                    self.coverURL = songCoverURL
+                    print("🎨 列表封面URL已设置（回退）: \(songCoverURL?.absoluteString ?? "无")")
+                }
+            }
+            
+        } catch {
+            print("❌ 获取列表专辑封面失败: \(album.title) - \(error)")
+        }
     }
     
     private var defaultListBackground: some View {
@@ -180,51 +282,20 @@ struct AudioStationListAlbumCell: View {
 struct AudioStationGridPlaylistCell: View {
     let playlist: UniversalPlaylist
     @EnvironmentObject private var musicService: MusicService
-    
+
     var body: some View {
         VStack(alignment: .leading) {
-            // 播放列表封面
+            // 直接使用默认封面
             ZStack {
-                if let artworkURL = playlist.artworkURL {
-                    CachedAsyncImage(url: artworkURL) {
-                        defaultPlaylistCover
-                    } content: { image in
-                        if musicService.currentCoverStyle == .rectangle {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 110, height: 170)
-                                .clipShape(Rectangle())
-                                .contentShape(Rectangle())
-                        } else {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 110, height: 170)
-                                .blur(radius: 8)
-                                .overlay(Color.black.opacity(0.3))
-                                .clipShape(Rectangle())
-                                .contentShape(Rectangle())
-                                .overlay(
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 110, height: 110)
-                                        .clipShape(Rectangle())
-                                )
-                        }
-                    }
-                } else {
-                    defaultPlaylistCover
-                }
-                
+                defaultPlaylistCover
+
                 // 磁带装饰
                 Image(CassetteImageHelper.getRandomCassetteImage(for: playlist.id))
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 110, height: 170)
             }
-            
+
             // 播放列表信息
             VStack(alignment: .leading, spacing: 4) {
                 Text(playlist.name)
@@ -262,44 +333,14 @@ struct AudioStationGridPlaylistCell: View {
 struct AudioStationListPlaylistCell: View {
     let playlist: UniversalPlaylist
     @EnvironmentObject private var musicService: MusicService
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             ZStack {
-                // 背景
-                if let artworkURL = playlist.artworkURL {
-                    CachedAsyncImage(url: artworkURL) {
-                        defaultListPlaylistBackground
-                    } content: { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 360, height: 48)
-                            .blur(radius: 8)
-                            .overlay(Color.black.opacity(0.3))
-                            .clipShape(Rectangle())
-                            .contentShape(Rectangle())
-                    }
-                } else {
-                    defaultListPlaylistBackground
-                }
-                
-                // 前景内容
+                defaultListPlaylistBackground
+
                 HStack(spacing: 16) {
-                    // 小封面
-                    if let artworkURL = playlist.artworkURL {
-                        CachedAsyncImage(url: artworkURL) {
-                            defaultSmallPlaylistCover
-                        } content: { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 40, height: 40)
-                                .clipShape(Rectangle())
-                        }
-                    } else {
-                        defaultSmallPlaylistCover
-                    }
+                    defaultSmallPlaylistCover
                     
                     VStack(alignment: .leading) {
                         Text(playlist.name)
@@ -319,7 +360,6 @@ struct AudioStationListPlaylistCell: View {
                 }
                 .padding(.horizontal, 5)
                 
-                // 磁带装饰
                 Image(ListCassetteImageHelper.getRandomCassetteImage(for: playlist.id))
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -364,12 +404,12 @@ struct AudioStationArtistCell: View {
             // 艺术家头像（使用默认图标）
             ZStack {
                 Circle()
-                    .fill(Color.orange.opacity(0.2))
+                    .fill(Color.yellow.opacity(0.2))
                     .frame(width: 50, height: 50)
                 
                 Image(systemName: "person.fill")
                     .font(.title2)
-                    .foregroundColor(.orange)
+                    .foregroundColor(.yellow)
             }
             
             VStack(alignment: .leading, spacing: 4) {
