@@ -1,6 +1,70 @@
 {
   "sourceLanguage" : "zh-Hans",
   "strings" : {
+    "「七夕」情人节磁带" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valentinstags-Kassette (chinesisch)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinese Valentine's Day Cassette "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casete del Día de San Valentín Chino"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cassette de la Saint-Valentin chinoise"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Musicassetta del San Valentino Cinese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「七夕」のカセット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중국 발렌타인데이 카세트"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fita cassete do Dia dos Namorados Chinês"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассета Китайского Дня Святого Валентина"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "七夕節卡式錄音帶"
+          }
+        }
+      }
+    },
     "%@ • %@" : {
       "localizations" : {
         "zh-Hans" : {
@@ -7537,6 +7601,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "錄音帶播放器之王"
+          }
+        }
+      }
+    },
+    "磁带盒一般大小的磁带播放器" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Kassettenspieler in etwa der Größe eines Standard-Kassettengehäuses"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cassette player about the size of a standard cassette case"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un reproductor de casetes de aproximadamente el tamaño de una caja de casete estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lecteur de cassettes d'environ la taille d'un boîtier de cassette standard"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un lettore di cassette delle dimensioni di una custodia standard per cassette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準的なカセットケースほどの大きさのカセットプレーヤー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표준 카세트 케이스 크기 정도의 카세트 플레이어"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um leitor de cassetes com aproximadamente o tamanho de uma caixa de fita cassete padrão"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кассетный плеер размером со стандартную кассетную коробку"
+          }
+        },
+        "zh-Hant-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準卡式錄音帶盒大小的卡帶播放機"
           }
         }
       }

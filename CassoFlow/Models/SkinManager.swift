@@ -132,6 +132,24 @@ struct PlayerSkin: Identifiable {
             buttonHeight: 50
         ),
         PlayerSkin(
+            name: "CF-20",  // 名称作为唯一标识
+            year: "1983",
+            description: String(localized: "磁带盒一般大小的磁带播放器"),
+            coverImage: "cover-CF-20",
+            panelColor: .clear,
+            panelOutlineColor: .clear,
+            buttonColor: Color("button-dark"),
+            buttonTextColor: .white,
+            buttonShadowColor: Color("shadow-button-dark"),
+            screenColor: Color("bg-screen-blue"),
+            screenTextColor: Color("text-screen-blue"),
+            screenOutlineColor: .black,
+            playerImage: "player-CF-20",
+            cassetteBgImage: "bg-cassette",
+            buttonCornerRadius: 25,
+            buttonHeight: 50
+        ),
+        PlayerSkin(
             name: "CF-22",  // 名称作为唯一标识
             year: "1984",
             description: String(localized: "物美价廉的磁带播放器"),
@@ -143,7 +161,7 @@ struct PlayerSkin: Identifiable {
             buttonShadowColor:  Color("shadow-button-dark"),
             screenColor: Color("bg-screen-green"),
             screenTextColor: Color("text-screen-green"),
-            screenOutlineColor: Color("outline-screen-CF-11"),
+            screenOutlineColor: .black,
             playerImage: "player-CF-22",
             cassetteBgImage: "bg-cassette",
             buttonCornerRadius: 8,
@@ -270,7 +288,7 @@ struct PlayerSkin: Identifiable {
     }
     
     func isMemberExclusiveSkin() -> Bool {
-        return ["CF-PC13", "CF-M10", "CF-MU01", "CF-L2", "CF-2", "CF-22", "CF-504", "CF-D6C", "CF-DD9", "CF-DT1", "CF-CW5", "CF-NT"].contains(self.name)
+        return ["CF-PC13", "CF-M10", "CF-MU01", "CF-L2", "CF-2", "CF-20", "CF-22", "CF-504", "CF-D6C", "CF-DD9", "CF-DT1", "CF-CW5", "CF-NT"].contains(self.name)
     }
 }
 
@@ -335,6 +353,14 @@ struct CassetteSkin: Identifiable {
             cassetteColor: Color("cassetteColor")
         ),
         CassetteSkin(
+            name: "CFT-77",
+            description: String(localized: "「七夕」情人节磁带"),
+            coverImage: "cover-CFT-77",
+            cassetteImage: "CFT-77",
+            cassetteHole: "holeDark",
+            cassetteColor: Color("cassetteColor")
+        ),
+        CassetteSkin(
             name: "CFT-60CR",
             description: String(localized: "二氧化铬作为材料的高端磁带"),
             coverImage: "cover-CFT-60CR",
@@ -371,7 +397,7 @@ struct CassetteSkin: Identifiable {
     }
     
     func isMemberExclusiveSkin() -> Bool {
-        return ["CFT-W60", "CFT-C60", "CFT-60CR", "CFT-MM60"].contains(self.name)
+        return ["CFT-W60", "CFT-C60", "CFT-LNC60", "CFT-HFC60", "CFT-FC60", "CFT-77", "CFT-60CR", "CFT-MM60", "CFT-MV60"].contains(self.name)
     }
 }
 
