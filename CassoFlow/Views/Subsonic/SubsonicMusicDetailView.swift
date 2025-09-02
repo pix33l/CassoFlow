@@ -97,7 +97,7 @@ struct SubsonicMusicDetailView: View {
                                 
                                 if let year = album.year {
                                     let genreText = album.genre ?? "未知风格"
-                                    Text("\(genreText) • \(year)")
+                                    Text("\(genreText) • \(String(year))")
                                         .font(.footnote)
                                         .foregroundColor(.secondary)
                                 }
@@ -902,7 +902,7 @@ struct SubsonicInfoFooter: View {
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
             if let year = year, !isPlaylist {
-                Text("发布于 \(year) 年")
+                Text("发布于 \(String(year)) 年")
                     .font(.footnote)
                     .foregroundColor(.secondary)
             } else if isPlaylist {

@@ -148,7 +148,7 @@ struct SubsonicSettingsView: View {
                         Text("服务器地址")
                             .font(.headline)
                         
-                        TextField("https://your-server.com", text: $apiClient.serverURL)
+                        TextField("https://", text: $apiClient.serverURL)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .keyboardType(.URL)
                             .autocapitalization(.none)

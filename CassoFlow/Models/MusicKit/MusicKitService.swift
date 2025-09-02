@@ -23,8 +23,8 @@ class MusicKitService: ObservableObject {
             musicService.shouldCloseLibrary = true
         }
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await musicService.forceSyncPlaybackStatus()
     }
     
@@ -40,8 +40,8 @@ class MusicKitService: ObservableObject {
             musicService.shouldCloseLibrary = true
         }
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await musicService.forceSyncPlaybackStatus()
     }
     
@@ -58,8 +58,8 @@ class MusicKitService: ObservableObject {
             musicService.shouldCloseLibrary = true
         }
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await musicService.forceSyncPlaybackStatus()
     }
     
@@ -76,23 +76,10 @@ class MusicKitService: ObservableObject {
             musicService.shouldCloseLibrary = true
         }
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await musicService.forceSyncPlaybackStatus()
     }
-    
-    /// 播放MusicKit歌曲
-//    func playMusicKitSongs(_ songs: [UniversalSong], startingAt index: Int) async throws {
-//        let tracks = songs.compactMap { song -> Track? in
-//            guard let originalTrack = song.originalData as? Track else { return nil }
-//            return originalTrack
-//        }
-//        
-//        guard index < tracks.count else { return }
-//        
-//        musicKitPlayer.queue = .init(for: tracks, startingAt: tracks[index])
-//        try await musicKitPlayer.play()
-//    }
     
     /// 播放
     func play() async throws {

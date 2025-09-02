@@ -53,9 +53,9 @@ struct AudioStationQueueView: View {
             .navigationTitle("播放队列")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if !queueSongs.isEmpty {
-                        Menu {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    if !queueSongs.isEmpty {
+//                        Menu {
 //                            Button {
 //                                Task {
 //                                    await shuffleQueue()
@@ -63,21 +63,21 @@ struct AudioStationQueueView: View {
 //                            } label: {
 //                                Label("随机播放", systemImage: "shuffle")
 //                            }
-                            
-                            Button {
-                                Task {
-                                    await clearQueue()
-                                }
-                            } label: {
-                                Label("清空队列", systemImage: "trash")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .font(.body)
-                                .foregroundColor(.primary)
-                        }
-                    }
-                }
+//                            
+//                            Button {
+//                                Task {
+//                                    await clearQueue()
+//                                }
+//                            } label: {
+//                                Label("清空队列", systemImage: "trash")
+//                            }
+//                        } label: {
+//                            Image(systemName: "ellipsis")
+//                                .font(.body)
+//                                .foregroundColor(.primary)
+//                        }
+//                    }
+//                }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -107,7 +107,7 @@ struct AudioStationQueueView: View {
         VStack(spacing: 20) {
             Image(systemName: "music.note.list")
                 .font(.system(size: 48))
-                .foregroundColor(.orange)
+                .foregroundColor(.yellow)
                 .padding(.bottom, 10)
             
             Text("播放队列为空")
@@ -175,17 +175,17 @@ struct AudioStationQueueView: View {
 //        }
 //    }
     
-    private func clearQueue() async {
-        let audioStationService = musicService.getAudioStationService()
-        await audioStationService.stop()
-        
-        await MainActor.run {
-            queueSongs.removeAll()
-            currentIndex = 0
-        }
-        
-        print("🎵 AudioStation队列已清空")
-    }
+//    private func clearQueue() async {
+//        let audioStationService = musicService.getAudioStationService()
+//        await audioStationService.stop()
+//        
+//        await MainActor.run {
+//            queueSongs.removeAll()
+//            currentIndex = 0
+//        }
+//        
+//        print("🎵 AudioStation队列已清空")
+//    }
 }
 
 // MARK: - AudioStation队列歌曲行视图
@@ -208,7 +208,7 @@ struct AudioStationQueueTrackRow: View {
                 } else {
                     Text("\(index + 1)")
                         .font(.caption)
-                        .foregroundColor(isCurrent ? .orange : .secondary)
+                        .foregroundColor(isCurrent ? .yellow : .secondary)
                         .frame(width: 24, alignment: .center)
                 }
             }
@@ -260,7 +260,7 @@ struct AudioStationQueueTrackRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(
-            isCurrent ? Color.orange.opacity(0.1) : Color.clear
+            isCurrent ? Color.yellow.opacity(0.1) : Color.clear
         )
         .contentShape(Rectangle())
     }
@@ -283,12 +283,12 @@ struct AudioStationQueueTrackRow: View {
     
     private var defaultArtwork: some View {
         RoundedRectangle(cornerRadius: 4)
-            .fill(Color.orange.opacity(0.2))
+            .fill(Color.yellow.opacity(0.2))
             .frame(width: 50, height: 50)
             .overlay(
                 Image(systemName: "music.note")
                     .font(.title2)
-                    .foregroundColor(.orange)
+                    .foregroundColor(.yellow)
             )
     }
     

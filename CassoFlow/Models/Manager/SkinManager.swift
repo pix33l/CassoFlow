@@ -371,7 +371,7 @@ struct CassetteSkin: Identifiable {
     }
     
     func isMemberExclusiveSkin() -> Bool {
-        return ["CFT-W60", "CFT-C60", "CFT-60CR", "CFT-LNC60", "CFT-HFC60", "CFT-FC60", "CFT-MM60"].contains(self.name)
+        return ["CFT-W60", "CFT-C60", "CFT-60CR", "CFT-LNC60", "CFT-HFC60", "CFT-FC60", "CFT-MM60", "CFT-MV60"].contains(self.name)
     }
 }
 

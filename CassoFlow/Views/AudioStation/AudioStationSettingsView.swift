@@ -127,7 +127,7 @@ struct AudioStationSettingsView: View {
                         Text("服务器地址")
                             .font(.headline)
                         
-                        TextField("http://192.168.1.100:5000", text: $baseURL)
+                        TextField("https://", text: $baseURL)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .keyboardType(.URL)
                             .autocorrectionDisabled()

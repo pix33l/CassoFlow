@@ -53,9 +53,9 @@ struct SubsonicQueueView: View {
             .navigationTitle("播放队列")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if !queueSongs.isEmpty {
-                        Menu {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    if !queueSongs.isEmpty {
+//                        Menu {
 //                            Button {
 //                                Task {
 //                                    await shuffleQueue()
@@ -63,21 +63,21 @@ struct SubsonicQueueView: View {
 //                            } label: {
 //                                Label("随机播放", systemImage: "shuffle")
 //                            }
-                            
-                            Button {
-                                Task {
-                                    await clearQueue()
-                                }
-                            } label: {
-                                Label("清空队列", systemImage: "trash")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .font(.body)
-                                .foregroundColor(.primary)
-                        }
-                    }
-                }
+//                            
+//                            Button {
+//                                Task {
+//                                    await clearQueue()
+//                                }
+//                            } label: {
+//                                Label("清空队列", systemImage: "trash")
+//                            }
+//                        } label: {
+//                            Image(systemName: "ellipsis")
+//                                .font(.body)
+//                                .foregroundColor(.primary)
+//                        }
+//                    }
+//                }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -175,17 +175,17 @@ struct SubsonicQueueView: View {
 //        }
 //    }
     
-    private func clearQueue() async {
-        let subsonicService = musicService.getSubsonicService()
-        subsonicService.stop()
-        
-        await MainActor.run {
-            queueSongs.removeAll()
-            currentIndex = 0
-        }
-        
-        print("🎵 Subsonic队列已清空")
-    }
+//    private func clearQueue() async {
+//        let subsonicService = musicService.getSubsonicService()
+//        subsonicService.stop()
+//        
+//        await MainActor.run {
+//            queueSongs.removeAll()
+//            currentIndex = 0
+//        }
+//        
+//        print("🎵 Subsonic队列已清空")
+//    }
 }
 
 // MARK: - Subsonic队列歌曲行视图

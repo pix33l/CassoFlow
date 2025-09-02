@@ -382,18 +382,6 @@ class MusicService: ObservableObject {
         stopBackgroundStatusTimer()
     }
     
-    // 🔑 新增：强制同步播放状态（解决首次播放显示问题）
-    func forceSyncPlaybackStatus() async {
-        await MainActor.run {
-            updateCurrentSongInfo()
-            
-            // 如果状态同步成功且正在播放，确保Timer运行
-            if isPlaying {
-                startUpdateTimer()
-            }
-        }
-    }
-    
     // MARK: - 数据获取方法（委托给协调器）
     
     /// 获取Subsonic服务（用于配置）
@@ -442,35 +430,38 @@ class MusicService: ObservableObject {
     // MARK: - 定时器管理（优化后台耗电）
     
     private func startUpdateTimer() {
-        // 🔑 总是先执行一次更新，确保歌曲信息和磁带显示正确
-        updateCurrentSongInfo()
-        
-        // 只有在需要动态更新时才启动Timer
+        // 🔑 优化Timer启动逻辑，确保在播放状态下才启动
         guard shouldRunDynamicUpdates() else {
             stopUpdateTimer()
             return
         }
         
         stopUpdateTimer() // 确保没有重复的定时器
+        
+        // 🔑 立即执行一次更新，但不依赖这次更新来判断是否继续
+        updateCurrentSongInfo()
+        
         updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.updateCurrentSongInfo()
+            guard let self = self else { return }
+            
+            self.updateCurrentSongInfo()
             
             // 动态检查是否还需要继续运行Timer
-            if !(self?.shouldRunDynamicUpdates() ?? false) {
-                self?.stopUpdateTimer()
+            if !self.shouldRunDynamicUpdates() {
+                self.stopUpdateTimer()
             }
         }
     }
     
-    /// 判断是否需要运行动态更新Timer
+    /// 判断是否需要运行动态更新Timer - 添加更严格的条件检查
     private func shouldRunDynamicUpdates() -> Bool {
         // 快进/快退时必须运行Timer
         if isFastForwarding || isFastRewinding {
             return true
         }
         
-        // 正在播放时需要更新进度
-        if isPlaying {
+        // 正在播放且有有效的歌曲时需要更新进度
+        if isPlaying && currentTrackID != nil {
             return true
         }
         
@@ -809,8 +800,8 @@ class MusicService: ObservableObject {
             shouldCloseLibrary = true
         }
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        // 🔑 增加延迟时间，确保播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await forceSyncPlaybackStatus()
     }
     
@@ -820,8 +811,8 @@ class MusicService: ObservableObject {
         let finalSongs = shuffled ? detailedAlbum.songs.shuffled() : detailedAlbum.songs
         try await playUniversalSongs(finalSongs)
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.3秒
+        // 🔑 增加延迟时间，确保播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await forceSyncPlaybackStatus()
     }
     
@@ -831,8 +822,8 @@ class MusicService: ObservableObject {
         let finalSongs = shuffled ? detailedPlaylist.songs.shuffled() : detailedPlaylist.songs
         try await playUniversalSongs(finalSongs)
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.1秒
+        // 🔑 增加延迟时间，确保播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
         await forceSyncPlaybackStatus()
     }
 
@@ -852,12 +843,11 @@ class MusicService: ObservableObject {
             isPlaying = true
             // 同步播放状态到音频效果管理器
             audioEffectsManager.setMusicPlayingState(true)
-            // 🔑 开始播放时启动Timer
-            startUpdateTimer()
+            // 🔑 暂时不启动Timer，让播放器有时间初始化
         }
         
-        // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
-        try await Task.sleep(nanoseconds: 300_000_000) // 延迟0.1秒
+        // 🔑 增加延迟时间并在延迟后启动Timer
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒，给播放器更多初始化时间
         await forceSyncPlaybackStatus()
     }
 
@@ -1024,16 +1014,6 @@ class MusicService: ObservableObject {
             self.queueElapsedDuration = elapsedDuration
         }
     }
-
-    /// 获取用户媒体库专辑
-//    func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
-//        return try await musicKitService.fetchUserLibraryAlbums()
-//    }
-
-    /// 获取用户媒体库播放列表
-//    func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
-//        return try await musicKitService.fetchUserLibraryPlaylists()
-//    }
     
     // 格式化时间显示
     func formatTime(_ time: TimeInterval) -> String {
@@ -1104,6 +1084,29 @@ class MusicService: ObservableObject {
         await MainActor.run {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             print("🛑 已清除锁屏播放信息")
+        }
+    }
+    
+    // 🔑 新增：强制同步播放状态（解决首次播放显示问题）
+    func forceSyncPlaybackStatus() async {
+        await MainActor.run {
+            // 强制更新一次播放信息
+            updateCurrentSongInfo()
+            
+            // 确保Timer在有播放状态时运行
+            if isPlaying {
+                startUpdateTimer()
+            }
+        }
+        
+        // 🔑 添加额外的验证机制，如果播放时间仍然是0，再次尝试同步
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 额外延迟1秒
+        await MainActor.run {
+            if isPlaying && currentDuration == 0 {
+                // 播放时间仍然是0，再次更新并启动Timer
+                updateCurrentSongInfo()
+                startUpdateTimer()
+            }
         }
     }
 }

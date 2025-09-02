@@ -113,21 +113,22 @@ class SubsonicMusicService: NSObject, ObservableObject {
     
     /// 设置音频会话
     private func setupAudioSession() {
-        // 🔑 使用统一音频会话管理器
+        // 🔑 使用统一音频会话管理器，确保中断其他音乐应用
         let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
         if success {
-            print("✅ Subsonic音频会话设置成功")
+            print("✅ Subsonic音频会话设置成功 - 其他音乐应用将被中断")
         } else {
             print("❌ Subsonic音频会话设置失败")
         }
     }
     
-    /// 激活音频会话（简化版本）
+    /// 激活音频会话（在播放前调用）
     private func activateAudioSession() {
-        // 🔑 通过统一管理器激活
+        // 🔑 每次播放前都重新请求音频会话，确保中断其他应用
+        print("🎵 激活Subsonic音频会话，将中断其他音乐应用")
         let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
         if success {
-            print("✅ Subsonic音频会话激活成功")
+            print("✅ Subsonic音频会话激活成功 - 其他音乐应用已被中断")
         } else {
             print("⚠️ Subsonic音频会话激活失败")
         }
@@ -529,25 +530,26 @@ class SubsonicMusicService: NSObject, ObservableObject {
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
         print("🎵 开始播放Subsonic队列，共\(songs.count)首歌，从第\(index + 1)首开始")
         
-        // 🔑 在首次播放时才初始化连接和音频会话
+        // 🔑 2024最佳实践：立即获取独占音频会话控制权
+        print("🎯 获取独占音频会话控制权，将中断其他音乐应用")
+        let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
+        if !success {
+            throw SubsonicMusicServiceError.audioSessionFailed
+        }
+        
+        // 检查连接状态
         if !isConnected {
             let connected = try await apiClient.ping()
             if !connected {
                 throw SubsonicMusicServiceError.notConnected
             }
-            // 🔑 只在连接成功后设置音频会话
-            setupAudioSession()
-            setupRemoteCommandCenter()
-        } else {
-            // 🔑 激活音频会话
-            activateAudioSession()
         }
         
         await MainActor.run {
             currentQueue = songs
             currentIndex = index
             
-            // 🔑 重置播放模式相关状态
+            // 重置播放模式相关状态
             originalQueue = songs
             originalIndex = index
             
@@ -586,14 +588,15 @@ class SubsonicMusicService: NSObject, ObservableObject {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            // 🔑 创建播放器
             self.avPlayer = AVPlayer(url: url)
             
-            // 🔑 设置时长
+            // 设置时长
             if let song = self.currentSong {
                 self.duration = song.duration
             }
             
-            // 🔑 重要：先注册播放完成通知
+            // 注册播放完成通知
             NotificationCenter.default.addObserver(
                 self,
                 selector: #selector(self.playerDidFinishPlaying),
@@ -601,11 +604,11 @@ class SubsonicMusicService: NSObject, ObservableObject {
                 object: self.avPlayer?.currentItem
             )
             
-            // 🔑 监听播放器状态变化
+            // 监听播放器状态变化
             self.avPlayer?.addObserver(self, forKeyPath: "timeControlStatus", options: [.new], context: nil)
             self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
             
-            // 🔑 修复：时间观察者
+            // 时间观察者
             let timeInterval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
             if CMTimeCompare(timeInterval, CMTime.zero) > 0 {
                 self.avPlayerObserver = self.avPlayer?.addPeriodicTimeObserver(
@@ -617,7 +620,7 @@ class SubsonicMusicService: NSObject, ObservableObject {
                     if newTime.isFinite && !newTime.isNaN {
                         self.currentTime = newTime
                         
-                        // 🔑 iOS 18：实时更新播放进度
+                        // 实时更新播放进度
                         if var info = MPNowPlayingInfoCenter.default().nowPlayingInfo {
                             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = newTime
                             info[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
@@ -627,16 +630,21 @@ class SubsonicMusicService: NSObject, ObservableObject {
                 }
             }
             
-            // 🔑 重要：先激活音频会话
-            self.activateAudioSession()
-            
             // 🔑 开始播放
             self.avPlayer?.play()
             self.isPlaying = true
             
-            print("✅ AVPlayer 设置完成，开始播放")
+            print("✅ AVPlayer开始播放")
             
-            // 🔑 关键修复：立即设置播放信息
+            // 🔑 验证独占状态
+            let session = AVAudioSession.sharedInstance()
+            if session.isOtherAudioPlaying {
+                print("⚠️ 警告：仍检测到其他音频播放")
+            } else {
+                print("✅ 确认获得独占音频控制权")
+            }
+            
+            // 设置锁屏播放信息
             self.updateNowPlayingInfo()
         }
     }
@@ -711,12 +719,16 @@ class SubsonicMusicService: NSObject, ObservableObject {
     
     /// 播放
     func play() async {
+        // 🔑 播放前确保音频会话控制权
+        AudioSessionManager.shared.requestAudioSession(for: .subsonic)
+        
         avPlayer?.play()
         await MainActor.run {
             isPlaying = true
-            // 🔑 更新锁屏播放状态
             updatePlaybackProgress()
         }
+        
+        print("▶️ Subsonic继续播放")
     }
     
     /// 暂停
@@ -724,7 +736,6 @@ class SubsonicMusicService: NSObject, ObservableObject {
         avPlayer?.pause()
         await MainActor.run {
             isPlaying = false
-            // 🔑 更新锁屏播放状态
             updatePlaybackProgress()
         }
     }
@@ -773,7 +784,6 @@ class SubsonicMusicService: NSObject, ObservableObject {
         await MainActor.run {
             avPlayer?.seek(to: CMTime(seconds: time, preferredTimescale: 1))
             currentTime = time
-            // 🔑 更新锁屏播放进度
             updatePlaybackProgress()
         }
     }
@@ -788,11 +798,13 @@ class SubsonicMusicService: NSObject, ObservableObject {
         currentTime = 0
         duration = 0
         
-        // 🔑 释放音频会话控制权
+        // 🔑 释放音频会话控制权，让其他应用可以恢复播放
         AudioSessionManager.shared.releaseAudioSession(for: .subsonic)
         
-        // 🔑 清除锁屏播放信息
+        // 清除锁屏播放信息
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        
+        print("⏹️ Subsonic停止播放，释放音频会话控制权")
     }
     
     // MARK: - 播放统计
@@ -1011,6 +1023,7 @@ enum SubsonicMusicServiceError: LocalizedError {
     case noStreamURL
     case playbackFailed
     case queueEmpty
+    case audioSessionFailed
     
     var errorDescription: String? {
         switch self {
@@ -1022,6 +1035,8 @@ enum SubsonicMusicServiceError: LocalizedError {
             return "播放失败"
         case .queueEmpty:
             return "播放队列为空"
+        case .audioSessionFailed:
+            return "音频会话配置失败"
         }
     }
 }
