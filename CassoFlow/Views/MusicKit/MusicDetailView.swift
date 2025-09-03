@@ -159,6 +159,7 @@ struct MusicDetailView: View {
                                         .font(.footnote)
                                 }
                             }
+                            .foregroundColor(.black)
                             
                             Spacer()
                         }

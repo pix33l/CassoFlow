@@ -104,7 +104,7 @@ struct LocalQueueView: View {
         VStack(spacing: 20) {
             Image(systemName: "music.note.list")
                 .font(.system(size: 48))
-                .foregroundColor(.orange)
+                .foregroundColor(.yellow)
                 .padding(.bottom, 10)
             
             Text("播放队列为空")

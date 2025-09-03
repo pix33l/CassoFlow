@@ -116,10 +116,34 @@ struct LocalMusicItem: Identifiable, Hashable {
     }
 }
 
+// MARK: - 🔑 新增：本地歌曲项目（用于删除功能）
+struct LocalSongItem: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let artistName: String
+    let albumName: String?
+    let filePath: String
+    let duration: TimeInterval
+    let artworkData: Data?
+    
+    init(from localMusicItem: LocalMusicItem) {
+        self.id = localMusicItem.id.uuidString
+        self.title = localMusicItem.title
+        self.artistName = localMusicItem.artist
+        self.albumName = localMusicItem.album
+        self.filePath = localMusicItem.url.path // 🔑 修复：使用path而不是absoluteString
+        self.duration = localMusicItem.duration
+        self.artworkData = localMusicItem.artwork
+    }
+}
+
 // MARK: - 扩展以符合UniversalSong协议
 extension LocalMusicItem {
     /// 转换为UniversalSong以兼容通用播放接口
     func toUniversalSong() -> UniversalSong {
+        // 🔑 创建LocalSongItem作为originalData
+        let localSongItem = LocalSongItem(from: self)
+        
         return UniversalSong(
             id: self.id.uuidString,
             title: self.title,
@@ -130,7 +154,7 @@ extension LocalMusicItem {
             artworkURL: nil, // 本地文件没有远程URL
             streamURL: self.url, // 本地文件URL作为streamURL
             source: .local,
-            originalData: self
+            originalData: localSongItem // 🔑 使用LocalSongItem作为originalData
         )
     }
 }
@@ -146,6 +170,15 @@ struct LocalAlbumItem: Identifiable, Hashable {
     var artwork: UIImage? {
         guard let data = artworkData else { return nil }
         return UIImage(data: data)
+    }
+    
+    // 🔑 新增：专辑名称属性（用于删除功能）
+    var albumName: String {
+        return title
+    }
+    
+    var artistName: String {
+        return artist
     }
 }
 
@@ -193,6 +226,14 @@ class LocalMusicService: NSObject, ObservableObject {
     @Published var localAlbums: [LocalAlbumItem] = []
     @Published var isLoadingLocalMusic = false
     
+    // 🔑 新增：用于删除功能的属性
+    private var songs: [UniversalSong] {
+        return localSongs.map { $0.toUniversalSong() }
+    }
+    
+    private var albums: [UniversalAlbum] = [] 
+    private var artists: [UniversalArtist] = []
+
     // 重复播放模式枚举
     enum LocalRepeatMode {
         case none    // 不重复
@@ -642,7 +683,7 @@ class LocalMusicService: NSObject, ObservableObject {
             // 检查专辑是否有歌曲
             guard !albumSongs.isEmpty else {
                 return UniversalAlbum(
-                    id: albumName, //UUID().uuidString,
+                    id: albumName,
                     title: albumName,
                     artistName: id,
                     year: nil,
@@ -652,7 +693,12 @@ class LocalMusicService: NSObject, ObservableObject {
                     artworkURL: nil,
                     songs: [],
                     source: .local,
-                    originalData: []
+                    originalData: LocalAlbumItem(
+                        title: albumName,
+                        artist: id,
+                        artworkData: nil,
+                        songs: []
+                    )
                 )
             }
             
@@ -661,7 +707,7 @@ class LocalMusicService: NSObject, ObservableObject {
             let genre = albumSongs.first?.genre
             
             return UniversalAlbum(
-                id: albumName, //UUID().uuidString,
+                id: albumName,
                 title: albumName,
                 artistName: id,
                 year: year, // 使用从元数据中提取的年份信息
@@ -671,9 +717,15 @@ class LocalMusicService: NSObject, ObservableObject {
                 artworkURL: nil,
                 songs: albumSongs.map { $0.toUniversalSong() },
                 source: .local,
-                originalData: albumSongs
+                // 🔑 修复：确保每个专辑都有正确的LocalAlbumItem数据，包含封面
+                originalData: LocalAlbumItem(
+                    title: albumName,
+                    artist: id,
+                    artworkData: albumSongs.first?.artwork, // 使用第一首歌的封面作为专辑封面
+                    songs: albumSongs
+                )
             )
-        }
+        }.sorted { $0.title < $1.title }
         
         return UniversalArtist(
             id: id,
@@ -1162,26 +1214,272 @@ class LocalMusicService: NSObject, ObservableObject {
         cleanupPlayer()
         NotificationCenter.default.removeObserver(self)
     }
+    
+    /// 删除本地音乐文件
+    func deleteSong(_ song: UniversalSong) async throws {
+        print("🗑️ 开始删除歌曲: \(song.title)")
+        print("🗑️ originalData类型: \(type(of: song.originalData))")
+
+        guard let localSong = song.originalData as? LocalSongItem else {
+            print("❌ 无效的song.originalData类型，期望LocalSongItem，实际: \(type(of: song.originalData))")
+            throw LocalMusicServiceError.invalidFileURL
+        }
+        
+        print("🗑️ LocalSongItem filePath: \(localSong.filePath)")
+
+        // 🔑 修复：正确处理URL编码的文件路径
+        let fileURL: URL
+        if localSong.filePath.hasPrefix("file://") {
+            // 如果是完整的file URL字符串
+            guard let url = URL(string: localSong.filePath) else {
+                throw LocalMusicServiceError.invalidFileURL
+            }
+            fileURL = url
+        } else {
+            // 如果是普通路径字符串
+            fileURL = URL(fileURLWithPath: localSong.filePath)
+        }
+        
+        print("🗑️ 尝试删除文件: \(fileURL.path)")
+        print("🗑️ 文件URL: \(fileURL)")
+        
+        // 检查文件是否存在
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            print("❌ 文件不存在: \(fileURL.path)")
+            throw LocalMusicServiceError.fileNotFound
+        }
+        
+        do {
+            // 删除文件
+            try FileManager.default.removeItem(at: fileURL)
+            print("✅ 成功删除文件: \(fileURL.lastPathComponent)")
+            
+            // 从内存中移除
+            await MainActor.run {
+                // 从localSongs列表中移除
+                if let localIndex = self.localSongs.firstIndex(where: { $0.id.uuidString == song.id }) {
+                    self.localSongs.remove(at: localIndex)
+                    print("✅ 从localSongs中移除: \(song.title)")
+                }
+                
+                // 更新专辑信息
+                self.updateAlbumsAfterSongDeletion(deletedSong: song)
+                
+                // 更新艺术家信息
+                self.updateArtistsAfterSongDeletion(deletedSong: song)
+            }
+            
+            print("🗑️ 已删除本地歌曲: \(song.title)")
+            
+        } catch {
+            print("❌ 删除文件时发生错误: \(error)")
+            throw LocalMusicServiceError.deletionFailed(error.localizedDescription)
+        }
+    }
+    
+    /// 删除整张专辑
+    func deleteAlbum(_ album: UniversalAlbum) async throws {
+        // 🔑 修复：检查专辑的originalData类型
+        print("🗑️ 开始删除专辑: \(album.title)")
+        print("🗑️ 专辑数据类型: \(type(of: album.originalData))")
+        
+        // 🔑 根据专辑中的歌曲来删除，而不是依赖originalData
+        let albumSongs = album.songs.filter { song in
+            song.source == .local
+        }
+        
+        guard !albumSongs.isEmpty else {
+            print("❌ 专辑中没有本地歌曲")
+            throw LocalMusicServiceError.invalidAlbumData
+        }
+        
+        print("🗑️ 专辑包含 \(albumSongs.count) 首歌曲")
+        
+        var deletionErrors: [String] = []
+        
+        // 删除专辑中的所有歌曲
+        for song in albumSongs {
+            do {
+                try await deleteSong(song)
+                print("✅ 成功删除歌曲: \(song.title)")
+            } catch {
+                let errorMsg = "\(song.title): \(error.localizedDescription)"
+                deletionErrors.append(errorMsg)
+                print("❌ 删除歌曲失败: \(errorMsg)")
+            }
+        }
+        
+        // 如果有删除失败的歌曲，抛出错误
+        if !deletionErrors.isEmpty {
+            let errorMessage = deletionErrors.joined(separator: ", ")
+            throw LocalMusicServiceError.partialDeletionFailed(errorMessage)
+        }
+        
+        print("🗑️ 已删除本地专辑: \(album.title)")
+    }
+    
+    /// 删除艺术家的所有音乐
+    func deleteArtist(_ artist: UniversalArtist) async throws {
+        let artistSongs = songs.filter { song in
+            song.artistName.localizedCaseInsensitiveCompare(artist.name) == .orderedSame
+        }
+        
+        var deletionErrors: [String] = []
+        
+        // 删除艺术家的所有歌曲
+        for song in artistSongs {
+            do {
+                try await deleteSong(song)
+            } catch {
+                deletionErrors.append("\(song.title): \(error.localizedDescription)")
+            }
+        }
+        
+        // 如果有删除失败的歌曲，抛出错误
+        if !deletionErrors.isEmpty {
+            let errorMessage = deletionErrors.joined(separator: ", ")
+            throw LocalMusicServiceError.partialDeletionFailed(errorMessage)
+        }
+        
+        print("🗑️ 已删除艺术家所有音乐: \(artist.name)")
+    }
+    
+    /// 获取本地音乐库存储大小
+    func getLibraryStorageSize() -> Int64 {
+        var totalSize: Int64 = 0
+        
+        for song in songs {
+            if let localSong = song.originalData as? LocalSongItem,
+               let fileURL = URL(string: localSong.filePath),
+               FileManager.default.fileExists(atPath: fileURL.path) {
+                do {
+                    let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
+                    if let fileSize = attributes[FileAttributeKey.size] as? Int64 {
+                        totalSize += fileSize
+                    }
+                } catch {
+                    // 忽略获取文件大小失败的情况
+                }
+            }
+        }
+        
+        return totalSize
+    }
+    
+    /// 获取本地音乐文件数量统计
+    func getLibraryStatistics() -> (songCount: Int, albumCount: Int, artistCount: Int, storageSize: Int64) {
+        let songCount = songs.count
+        let albumCount = Set(songs.compactMap { song in
+            if let localSong = song.originalData as? LocalSongItem {
+                return "\(localSong.artistName)_\(localSong.albumName ?? "Unknown")"
+            }
+            return nil
+        }).count
+        let artistCount = Set(songs.map { $0.artistName }).count
+        let storageSize = getLibraryStorageSize()
+        
+        return (songCount, albumCount, artistCount, storageSize)
+    }
+    
+    // MARK: - 私有辅助方法
+    
+    /// 创建UniversalAlbum的辅助方法
+    private func createUniversalAlbum(from localSong: LocalSongItem, songs: [UniversalSong]) -> UniversalAlbum {
+        return UniversalAlbum(
+            id: localSong.albumName ?? "Unknown Album",
+            title: localSong.albumName ?? "Unknown Album",
+            artistName: localSong.artistName,
+            year: nil,
+            genre: nil,
+            songCount: songs.count,
+            duration: songs.reduce(0) { $0 + $1.duration },
+            artworkURL: nil,
+            songs: songs,
+            source: .local,
+            originalData: LocalAlbumItem(
+                title: localSong.albumName ?? "Unknown Album",
+                artist: localSong.artistName,
+                artworkData: localSong.artworkData,
+                songs: []
+            )
+        )
+    }
+    
+    /// 更新专辑信息（删除歌曲后）
+    private func updateAlbumsAfterSongDeletion(deletedSong: UniversalSong) {
+        // 重新生成专辑列表
+        let groupedSongs = Dictionary(grouping: songs) { song -> String in
+            guard let localSong = song.originalData as? LocalSongItem else { return "Unknown Album" }
+            return "\(localSong.artistName)_\(localSong.albumName ?? "Unknown Album")"
+        }
+        
+        albums = groupedSongs.compactMap { (key, songs) in
+            guard let firstSong = songs.first,
+                  let localSong = firstSong.originalData as? LocalSongItem else { return nil }
+            
+            return createUniversalAlbum(from: localSong, songs: songs)
+        }.sorted { $0.title < $1.title }
+    }
+    
+    /// 更新艺术家信息（删除歌曲后）
+    private func updateArtistsAfterSongDeletion(deletedSong: UniversalSong) {
+        // 重新生成艺术家列表
+        let groupedSongs = Dictionary(grouping: songs) { $0.artistName }
+        
+        artists = groupedSongs.compactMap { (artistName, songs) in
+            let artistAlbums = Set(songs.compactMap { song -> String? in
+                guard let localSong = song.originalData as? LocalSongItem else { return nil }
+                return localSong.albumName
+            })
+            
+            return UniversalArtist(
+                id: artistName.replacingOccurrences(of: " ", with: "_"),
+                name: artistName,
+                albumCount: artistAlbums.count,
+                albums: [],
+                source: .local,
+                originalData: artistName
+            )
+        }.sorted { $0.name < $1.name }
+    }
 }
 
 // MARK: - 本地音乐服务错误
 
 enum LocalMusicServiceError: LocalizedError {
-    case notConnected
+    case noMusicFiles
+    case scanFailed(String)
+    case importFailed(String)
+    case metadataError(String)
     case noStreamURL
-    case playbackFailed
-    case queueEmpty
+    case invalidFileURL
+    case fileNotFound
+    case deletionFailed(String)
+    case invalidAlbumData
+    case partialDeletionFailed(String)
     
     var errorDescription: String? {
         switch self {
-        case .notConnected:
-            return "本地音乐服务未连接"
+        case .noMusicFiles:
+            return "没有找到音乐文件"
+        case .scanFailed(let reason):
+            return "扫描音乐文件失败: \(reason)"
+        case .importFailed(let reason):
+            return "导入音乐文件失败: \(reason)"
+        case .metadataError(let reason):
+            return "读取音乐元数据失败: \(reason)"
         case .noStreamURL:
-            return "无法获取本地音乐文件路径"
-        case .playbackFailed:
-            return "本地音乐播放失败"
-        case .queueEmpty:
-            return "播放队列为空"
+            return "无法获取播放链接"
+        case .invalidFileURL:
+            return "无效的文件路径"
+        case .fileNotFound:
+            return "文件不存在"
+        case .deletionFailed(let reason):
+            return "删除文件失败: \(reason)"
+        case .invalidAlbumData:
+            return "无效的专辑数据"
+        case .partialDeletionFailed(let reason):
+            return "部分文件删除失败: \(reason)"
         }
     }
 }

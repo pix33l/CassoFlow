@@ -1,5 +1,10 @@
 import SwiftUI
 
+// 🔑 新增：本地音乐库变化通知
+extension Notification.Name {
+    static let localMusicLibraryDidChange = Notification.Name("localMusicLibraryDidChange")
+}
+
 /// 本地音乐库视图
 struct LocalMusicLibraryView: View {
     @EnvironmentObject private var musicService: MusicService
@@ -65,6 +70,8 @@ struct LocalMusicLibraryView: View {
                         showDocumentPicker = true
                     }) {
                         Image(systemName: "plus")
+                            .font(.body)
+                            .foregroundColor(.primary)
                     }
                 }
                 
@@ -97,6 +104,12 @@ struct LocalMusicLibraryView: View {
             }
             .task {
                 await libraryData.loadLibraryIfNeeded(localService: musicService.getLocalService())
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .localMusicLibraryDidChange)) { _ in
+                // 🔑 接收到本地音乐库变化通知时，重新加载数据
+                Task {
+                    await libraryData.reloadLibrary(localService: musicService.getLocalService())
+                }
             }
         }
     }
@@ -251,7 +264,7 @@ struct LocalMusicLibraryView: View {
             if filteredAlbums.isEmpty && !albumSearchText.isEmpty {
                 emptySearchView(message: "未找到匹配的专辑")
             } else if filteredAlbums.isEmpty {
-                emptyLibraryView(message: "暂无本地专辑", systemImage: "opticaldisc")
+                emptyLibraryView(message: "暂无本地音乐", systemImage: "folder.fill.badge.plus")
             } else {
                 if preferences.isGridMode {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 5)], spacing: 20) {
@@ -395,15 +408,15 @@ struct LocalMusicLibraryView: View {
             }) {
                 HStack {
                     Image(systemName: "plus")
-                    Text("导入音乐")
+                    Text("导入")
                 }
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(.black)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(Color.blue)
+                        .fill(Color.yellow)
                 )
             }
             .padding(.top, 20)
@@ -602,17 +615,26 @@ class LocalLibraryDataManager: ObservableObject {
                 // 缓存到静态变量
                 Self.sharedLibraryData = (albumsResult, artistsResult)
                 
-                if albumsResult.isEmpty && artistsResult.isEmpty {
-                    self.errorMessage = "未找到本地音乐文件"
-                }
+                // 🔑 修复：不要设置错误消息，让UI根据数据是否为空来决定显示内容
+                // 移除这行：if albumsResult.isEmpty && artistsResult.isEmpty { self.errorMessage = "未找到本地音乐文件" }
                 
                 // 预加载专辑封面
                 self.preloadAlbumCovers()
             }
         } catch {
             await MainActor.run {
+                // 🔑 修复：只有在真正发生错误时才设置错误消息
                 self.errorMessage = "加载本地音乐库失败：\(error.localizedDescription)"
                 self.isLoading = false
+                
+                // 🔑 即使发生错误，也要标记为已加载，避免后续重复尝试
+                self.hasLoaded = true
+                
+                // 🔑 确保数组为空状态，这样UI会显示空状态而不是错误状态
+                self.albums = []
+                self.artists = []
+                self.originalAlbums = []
+                self.originalArtists = []
             }
         }
     }

@@ -92,9 +92,9 @@ struct AudioStationMusicDetailView: View {
                                     let genreText = album.genre ?? "未知风格"
                                     Text("\(genreText) • \(String(year))")
                                         .font(.footnote)
-                                        .foregroundColor(.secondary)
                                 }
                             }
+                            .foregroundColor(.black)
                             
                             Spacer()
                         }

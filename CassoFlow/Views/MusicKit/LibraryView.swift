@@ -340,7 +340,6 @@ struct LibraryView: View {
                         Image(systemName: "barcode.viewfinder")
                             .font(.body)
                             .foregroundColor(.primary)
-                            .padding(8)
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {

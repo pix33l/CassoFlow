@@ -345,14 +345,21 @@ struct LocalArtistCell: View {
 
 // MARK: - 本地歌曲行视图
 
+/// 带删除功能的本地歌曲行视图
 struct LocalTrackRow: View {
     let index: Int
     let song: UniversalSong
     let isPlaying: Bool
+    let onDelete: () async -> Void
+    let onTap: () -> Void // 🔑 新增：点击播放回调
+    
     @EnvironmentObject private var musicService: MusicService
+    @State private var showingDeleteAlert = false
+    @State private var isDeleting = false
     
     var body: some View {
         HStack {
+            // 播放状态或序号
             if isPlaying {
                 AudioWaveView()
                     .frame(width: 24, height: 24)
@@ -363,26 +370,118 @@ struct LocalTrackRow: View {
                     .foregroundColor(.secondary)
             }
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(song.title)
-                    .foregroundColor(.primary)
-                Text(song.artistName)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            // 歌曲信息 - 可点击区域
+            Button(action: onTap) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(song.title)
+                            .foregroundColor(.primary)
+                            .opacity(isDeleting ? 0.5 : 1.0)
+                        
+                        Text(song.artistName)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .opacity(isDeleting ? 0.5 : 1.0)
+                    }
+                    
+                    Spacer()
+                    
+                    // 时长
+                    Text(formattedDuration(song.duration))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .opacity(isDeleting ? 0.5 : 1.0)
+                }
             }
+            .buttonStyle(PlainButtonStyle())
+            .disabled(isDeleting)
             
-            Spacer()
-            
-            Text(formattedDuration(song.duration))
-                .font(.caption)
-                .foregroundColor(.secondary)
+            // 🔑 更多操作菜单按钮
+            Menu {
+                Button(role: .destructive) {
+                    if musicService.isHapticFeedbackEnabled {
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                    }
+                    showingDeleteAlert = true
+                } label: {
+                    Label("删除歌曲", systemImage: "trash")
+                }
+                .disabled(isDeleting)
+            } label: {
+                if isDeleting {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                        .frame(width: 20, height: 20)
+                } else {
+                    Image(systemName: "ellipsis")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .menuStyle(.button)
+            .menuIndicator(.hidden)
+            .disabled(isDeleting)
+            .frame(width: 32, height: 32)
         }
         .padding(.horizontal)
         .padding(.vertical, 16)
         .background(
             isPlaying ? Color.white.opacity(0.1) : Color.clear
         )
-        .contentShape(Rectangle())
+        .alert("删除歌曲", isPresented: $showingDeleteAlert) {
+            Button("取消", role: .cancel) { }
+            Button("删除", role: .destructive) {
+                Task {
+                    await deleteSong()
+                }
+            }
+        } message: {
+            Text("确定要删除歌曲《\(song.title)》吗？此操作不可撤销。")
+        }
+    }
+    
+    // 🔑 删除歌曲
+    private func deleteSong() async {
+        await MainActor.run {
+            isDeleting = true
+        }
+        
+        do {
+            let localService = musicService.getLocalService()
+            try await localService.deleteSong(song)
+            
+            await MainActor.run {
+                // 🔑 清除本地音乐库缓存并发送通知
+                LocalLibraryDataManager.clearSharedCache()
+                NotificationCenter.default.post(name: .localMusicLibraryDidChange, object: nil)
+                
+                if musicService.isHapticFeedbackEnabled {
+                    let notificationFeedback = UINotificationFeedbackGenerator()
+                    notificationFeedback.notificationOccurred(.success)
+                }
+            }
+            
+            // 调用父视图的删除回调
+            await onDelete()
+            
+        } catch {
+            await MainActor.run {
+                isDeleting = false
+                
+                if musicService.isHapticFeedbackEnabled {
+                    let notificationFeedback = UINotificationFeedbackGenerator()
+                    notificationFeedback.notificationOccurred(.error)
+                }
+            }
+            
+            print("❌ 删除歌曲失败: \(error)")
+            
+            // 显示错误提示
+            await MainActor.run {
+                // 可以在这里添加错误提示的逻辑
+            }
+        }
     }
     
     private func formattedDuration(_ duration: TimeInterval) -> String {
@@ -417,8 +516,9 @@ struct LocalQueueTrackRow: View {
                 }
             }
             
-            if let localSong = song.originalData as? LocalMusicItem,
-               let artworkData = localSong.artwork,
+            // 🔑 修复：正确使用LocalSongItem类型
+            if let localSong = song.originalData as? LocalSongItem,
+               let artworkData = localSong.artworkData,
                let image = UIImage(data: artworkData) {
                 Image(uiImage: image)
                     .resizable()

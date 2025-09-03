@@ -12,9 +12,11 @@ struct LocalMusicDetailView: View {
   @State private var shufflePlayTapped = false
   @State private var trackTapped = false
   
-  // 获取缓存管理器
-  private let cacheManager = MusicDetailCacheManager.shared
-  
+  // 🔑 删除相关状态（只保留整个专辑删除）
+  @State private var showingDeleteAlbumAlert = false
+  @State private var isDeletingAlbum = false
+  @Environment(\.dismiss) var dismiss
+
   /// 判断当前是否正在播放指定歌曲
   private func isPlaying(_ song: UniversalSong) -> Bool {
       // 使用元数据匹配
@@ -92,13 +94,28 @@ struct LocalMusicDetailView: View {
                                   .lineLimit(1)
                                   .padding(.top, 4)
                               
-                              if let year = album.year {
-                                  let genreText = album.genre ?? "未知风格"
-                                  Text("\(genreText) • \(year)")
-                                      .font(.footnote)
-                                      .foregroundColor(.secondary)
+                              // 修复：改进风格和年份信息的显示逻辑
+                              HStack(spacing: 0) {
+                                  if let genre = album.genre, !genre.isEmpty {
+                                      Text(genre)
+                                      
+                                      if album.year != nil {
+                                          Text(" • ")
+                                      }
+                                  }
+                                  
+                                  if let year = album.year {
+                                      Text("\(year)")
+                                  }
+                                  
+                                  // 如果风格和年份都没有，显示默认文本
+                                  if album.genre?.isEmpty != false && album.year == nil {
+                                      Text("本地专辑")
+                                  }
                               }
+                              .font(.footnote)
                           }
+                          .foregroundColor(.black)
                           
                           Spacer()
                       }
@@ -129,7 +146,7 @@ struct LocalMusicDetailView: View {
                           .foregroundColor(.primary)
                           .cornerRadius(8)
                       }
-                      .disabled(isLoading)
+                      .disabled(isLoading || isDeletingAlbum)
                       
                       Button {
                           shufflePlayTapped.toggle()
@@ -152,7 +169,7 @@ struct LocalMusicDetailView: View {
                           .foregroundColor(.primary)
                           .cornerRadius(8)
                       }
-                      .disabled(isLoading)
+                      .disabled(isLoading || isDeletingAlbum)
                   }
               }
               .padding(.horizontal)
@@ -184,6 +201,7 @@ struct LocalMusicDetailView: View {
                       }
                       .padding(.vertical, 40)
                   } else if let detailed = detailedAlbum, !detailed.songs.isEmpty {
+
                       Divider()
                           .padding(.leading, 20)
                           .padding(.trailing, 16)
@@ -193,19 +211,21 @@ struct LocalMusicDetailView: View {
                               LocalTrackRow(
                                   index: index,
                                   song: song,
-                                  isPlaying: isPlaying(song)
+                                  isPlaying: isPlaying(song),
+                                  onDelete: {
+                                      await refreshAlbumAfterSongDeletion()
+                                  },
+                                  onTap: {
+                                      trackTapped.toggle()
+                                      if musicService.isHapticFeedbackEnabled {
+                                          let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                          impactFeedback.impactOccurred()
+                                      }
+                                      Task {
+                                          try await playSong(song, from: detailed.songs, startingAt: index)
+                                      }
+                                  }
                               )
-                              .contentShape(Rectangle())
-                              .onTapGesture {
-                                  trackTapped.toggle()
-                                  if musicService.isHapticFeedbackEnabled {
-                                      let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                                      impactFeedback.impactOccurred()
-                                  }
-                                  Task {
-                                      try await playSong(song, from: detailed.songs, startingAt: index)
-                                  }
-                              }
                               
                               if index < detailed.songs.count - 1 {
                                   Divider()
@@ -245,6 +265,48 @@ struct LocalMusicDetailView: View {
       }
       .navigationTitle(album.title)
       .navigationBarTitleDisplayMode(.inline)
+      // 🔑 修改：导航栏更多操作菜单按钮
+      .toolbar {
+          ToolbarItem(placement: .navigationBarTrailing) {
+              Menu {
+                  Button(role: .destructive) {
+                      if musicService.isHapticFeedbackEnabled {
+                          let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                          impactFeedback.impactOccurred()
+                      }
+                      showingDeleteAlbumAlert = true
+                  } label: {
+                      Label("删除专辑", systemImage: "trash")
+                  }
+                  .disabled(isDeletingAlbum)
+              } label: {
+                  if isDeletingAlbum {
+                      ProgressView()
+                          .scaleEffect(0.8)
+                          .frame(width: 20, height: 20)
+                  } else {
+                      Image(systemName: "ellipsis")
+                          .font(.headline)
+                          .foregroundColor(.primary)
+                  }
+              }
+              .menuStyle(.button)
+              .menuIndicator(.hidden)
+              .disabled(isDeletingAlbum)
+          }
+      }
+      .alert("删除专辑", isPresented: $showingDeleteAlbumAlert) {
+          Button("取消", role: .cancel) { }
+          Button("删除", role: .destructive) {
+              Task {
+                  await deleteAlbum()
+              }
+          }
+      } message: {
+          if let detailed = detailedAlbum {
+              Text("确定要删除专辑《\(detailed.title)》及其所有 \(detailed.songs.count) 首歌曲吗？此操作不可撤销。")
+          }
+      }
       .task {
           await loadDetailedAlbum(forceRefresh: false)
       }
@@ -277,33 +339,19 @@ struct LocalMusicDetailView: View {
       .clipShape(RoundedRectangle(cornerRadius: 2))
   }
   
-  // MARK: - 数据加载（优化缓存版本）
+  // MARK: - 数据加载（本地音乐直接加载，不使用缓存）
   
-  /// 加载详细专辑信息（支持缓存）
+  /// 加载详细专辑信息（本地音乐直接从LocalMusicService获取）
   private func loadDetailedAlbum(forceRefresh: Bool) async {
-      // 如果不是强制刷新，先检查缓存
-      if !forceRefresh {
-          if let cached = cacheManager.getCachedAlbum(id: album.id) {
-              await MainActor.run {
-                  detailedAlbum = cached
-                  isLoading = false
-                  errorMessage = nil
-              }
-              return
-          }
-      }
-      
       await MainActor.run {
           isLoading = true
           errorMessage = nil
       }
       
       do {
-          let coordinator = musicService.getCoordinator()
-          let detailed = try await coordinator.getAlbum(id: album.id)
-          
-          // 缓存结果
-          cacheManager.cacheAlbum(detailed, id: album.id)
+          // 🔑 本地音乐直接从LocalMusicService获取，不使用缓存
+          let localService = musicService.getLocalService()
+          let detailed = try await localService.getAlbum(id: album.id)
           
           await MainActor.run {
               detailedAlbum = detailed
@@ -332,6 +380,58 @@ struct LocalMusicDetailView: View {
   
   private func playSong(_ song: UniversalSong, from songs: [UniversalSong], startingAt index: Int) async throws {
       try await musicService.playUniversalSongs(songs, startingAt: index)
+  }
+  
+  // 🔑 新增：删除整张专辑
+  private func deleteAlbum() async {
+      guard let detailed = detailedAlbum else { return }
+      
+      await MainActor.run {
+          isDeletingAlbum = true
+      }
+      
+      do {
+          let localService = musicService.getLocalService()
+          try await localService.deleteAlbum(detailed)
+          
+          await MainActor.run {
+              // 🔑 清除本地音乐库缓存，确保列表页面能够刷新
+              LocalLibraryDataManager.clearSharedCache()
+              
+              // 🔑 发送通知，通知本地音乐库视图刷新数据
+              NotificationCenter.default.post(name: .localMusicLibraryDidChange, object: nil, userInfo: nil)
+              
+              if musicService.isHapticFeedbackEnabled {
+                  let notificationFeedback = UINotificationFeedbackGenerator()
+                  notificationFeedback.notificationOccurred(.success)
+              }
+              
+              // 删除成功后返回上级页面
+              dismiss()
+          }
+          
+      } catch {
+          await MainActor.run {
+              isDeletingAlbum = false
+              
+              if musicService.isHapticFeedbackEnabled {
+                  let notificationFeedback = UINotificationFeedbackGenerator()
+                  notificationFeedback.notificationOccurred(.error)
+              }
+          }
+          
+          print("❌ 删除专辑失败: \(error)")
+      }
+  }
+  
+  // 🔑 修改：歌曲删除后刷新专辑
+  private func refreshAlbumAfterSongDeletion() async {
+      // 🔑 重新扫描本地音乐，确保数据是最新的
+      let localService = musicService.getLocalService()
+      await localService.scanLocalMusic()
+      
+      // 重新加载专辑详情   
+      await loadDetailedAlbum(forceRefresh: true)
   }
 }
 
@@ -399,7 +499,7 @@ struct LocalPlaylistDetailView: View {
                                   Text(curatorName)
                                       .font(.footnote)
                                       .lineLimit(1)
-                                      .padding(.top, 4)
+                                      .padding(.top, 4);
                               }
                               
                               Text("播放列表")
@@ -500,19 +600,21 @@ struct LocalPlaylistDetailView: View {
                               LocalTrackRow(
                                   index: index,
                                   song: song,
-                                  isPlaying: isPlaying(song)
+                                  isPlaying: isPlaying(song),
+                                  onDelete: {
+                                      await refreshPlaylistAfterSongDeletion()
+                                  },
+                                  onTap: {
+                                      trackTapped.toggle()
+                                      if musicService.isHapticFeedbackEnabled {
+                                          let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                          impactFeedback.impactOccurred()
+                                      }
+                                      Task {
+                                          try await playSong(song, from: detailed.songs, startingAt: index)
+                                      }
+                                  }
                               )
-                              .contentShape(Rectangle())
-                              .onTapGesture {
-                                  trackTapped.toggle()
-                                  if musicService.isHapticFeedbackEnabled {
-                                      let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                                      impactFeedback.impactOccurred()
-                                  }
-                                  Task {
-                                      try await playSong(song, from: detailed.songs, startingAt: index)
-                                  }
-                              }
                               
                               if index < detailed.songs.count - 1 {
                                   Divider()
@@ -623,6 +725,16 @@ struct LocalPlaylistDetailView: View {
   
   private func playSong(_ song: UniversalSong, from songs: [UniversalSong], startingAt index: Int) async throws {
       try await musicService.playUniversalSongs(songs, startingAt: index)
+  }
+  
+  // 🔑 新增：歌曲删除后刷新播放列表
+  private func refreshPlaylistAfterSongDeletion() async {
+      // 🔑 重新扫描本地音乐，确保数据是最新的
+      let localService = musicService.getLocalService()
+      await localService.scanLocalMusic()
+      
+      // 重新加载播放列表详情   
+      await loadDetailedPlaylist()
   }
 }
 
