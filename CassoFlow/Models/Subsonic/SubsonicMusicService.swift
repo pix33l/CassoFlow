@@ -222,6 +222,31 @@ class SubsonicMusicService: NSObject, ObservableObject {
         }
     }
     
+    // MARK: - 🔑 新增：强制更新锁屏播放信息的公共方法
+    
+    /// 强制更新锁屏播放信息（用于前台/后台切换时）
+    func forceUpdateNowPlayingInfo() {
+        // 🔑 确保在主线程上执行
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self,
+                  let _ = self.currentSong,
+                  self.avPlayer != nil else {
+                print("⚠️ 强制更新锁屏信息时对象状态无效")
+                return
+            }
+            
+            print("🔧 强制更新锁屏播放信息")
+            
+            // 先清除现有信息
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+            
+            // 短暂延迟后重新设置
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.updateNowPlayingInfo()
+            }
+        }
+    }
+
     /// 更新锁屏播放信息（iOS 18 优化版本）
     private func updateNowPlayingInfo() {
         // 🔑 确保在主线程上执行，并添加弱引用检查
@@ -281,7 +306,7 @@ class SubsonicMusicService: NSObject, ObservableObject {
                 }
             }
             
-            // 🔑 先设置基本信息（包含缓存的封面或默认封面）
+            // 🔑 立即设置锁屏信息
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
             
             print("🔄 设置锁屏播放信息:")
@@ -290,6 +315,9 @@ class SubsonicMusicService: NSObject, ObservableObject {
             print("   时长: \(validDuration)秒")
             print("   当前时间: \(validCurrentTime)秒")
             print("   播放速率: \(self.isPlaying ? 1.0 : 0.0)")
+            
+            // 🔑 强制启用远程控制命令
+            self.ensureRemoteCommandsEnabled()
             
             // 🔑 只有在没有缓存封面时才异步加载
             if let artworkURL = song.artworkURL {
@@ -306,19 +334,22 @@ class SubsonicMusicService: NSObject, ObservableObject {
             } else {
                 print("📷 歌曲没有专辑封面URL，使用默认图标")
             }
-            
-            // 🔑 简化验证逻辑
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                guard let _ = self else { return }
-                
-                if let info = MPNowPlayingInfoCenter.default().nowPlayingInfo, 
-                   !info.isEmpty {
-                    print("✅ 锁屏播放信息验证成功，包含 \(info.keys.count) 个字段")
-                } else {
-                    print("❌ 锁屏播放信息验证失败 - 信息为空")
-                }
-            }
         }
+    }
+    
+    /// 🔑 新增：确保远程控制命令启用
+    private func ensureRemoteCommandsEnabled() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        // 强制启用所有需要的命令
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        
+        print("🔧 强制启用所有远程控制命令")
     }
     
     /// 异步加载专辑封面

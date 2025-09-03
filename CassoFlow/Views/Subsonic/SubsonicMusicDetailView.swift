@@ -291,6 +291,12 @@ struct SubsonicMusicDetailView: View {
                     detailedAlbum = cached
                     isLoading = false
                     errorMessage = nil
+                    print("📦 使用缓存的专辑详情: \(album.title)")
+                }
+                
+                // 后台检查是否需要更新
+                Task {
+                    await performBackgroundRefresh()
                 }
                 return
             }
@@ -307,6 +313,7 @@ struct SubsonicMusicDetailView: View {
             
             // 缓存结果
             cacheManager.cacheAlbum(detailed, id: album.id)
+            print("💾 专辑详情已缓存: \(detailed.title)，歌曲数: \(detailed.songs.count)")
             
             await MainActor.run {
                 detailedAlbum = detailed
@@ -321,6 +328,41 @@ struct SubsonicMusicDetailView: View {
                 errorMessage = "加载专辑详情失败：\(error.localizedDescription)"
                 isLoading = false
             }
+        }
+    }
+    
+    /// 后台刷新专辑详情
+    private func performBackgroundRefresh() async {
+        print("🔄 后台刷新专辑详情: \(album.title)")
+        
+        do {
+            let coordinator = musicService.getCoordinator()
+            let newDetailed = try await coordinator.getAlbum(id: album.id)
+            
+            // 检查数据是否有变化
+            let hasChanges = await MainActor.run {
+                guard let current = detailedAlbum else { return true }
+                return current.songs.count != newDetailed.songs.count ||
+                       Set(current.songs.map { $0.id }) != Set(newDetailed.songs.map { $0.id })
+            }
+            
+            if hasChanges {
+                print("✅ 检测到专辑更新，应用新数据")
+                // 更新缓存
+                cacheManager.cacheAlbum(newDetailed, id: album.id)
+                
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        detailedAlbum = newDetailed
+                    }
+                }
+            } else {
+                print("📦 专辑数据无变化")
+                // 更新缓存时间戳
+                cacheManager.updateAlbumCacheTimestamp(id: album.id)
+            }
+        } catch {
+            print("⚠️ 后台刷新专辑失败: \(error)")
         }
     }
     
@@ -350,6 +392,9 @@ struct SubsonicPlaylistDetailView: View {
     @State private var playTapped = false
     @State private var shufflePlayTapped = false
     @State private var trackTapped = false
+    
+    // 添加缓存管理器
+    private let cacheManager = MusicDetailCacheManager.shared
     
     /// 判断当前是否正在播放指定歌曲
     private func isPlaying(_ song: UniversalSong) -> Bool {
@@ -512,7 +557,7 @@ struct SubsonicPlaylistDetailView: View {
                             
                             Button("重试") {
                                 Task {
-                                    await loadDetailedPlaylist()
+                                    await loadDetailedPlaylist(forceRefresh: true)
                                 }
                             }
                             .buttonStyle(.borderedProminent)
@@ -583,7 +628,7 @@ struct SubsonicPlaylistDetailView: View {
         .navigationTitle(playlist.name)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await loadDetailedPlaylist()
+            await loadDetailedPlaylist(forceRefresh: false)
         }
     }
     
@@ -614,9 +659,28 @@ struct SubsonicPlaylistDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 2))
     }
     
-    // MARK: - 数据加载
+    // MARK: - 数据加载（优化缓存版本）
     
-    private func loadDetailedPlaylist() async {
+    /// 加载详细播放列表信息（支持缓存）
+    private func loadDetailedPlaylist(forceRefresh: Bool) async {
+        // 如果不是强制刷新，先检查缓存
+        if !forceRefresh {
+            if let cached = cacheManager.getCachedPlaylist(id: playlist.id) {
+                await MainActor.run {
+                    detailedPlaylist = cached
+                    isLoading = false
+                    errorMessage = nil
+                    print("📦 使用缓存的播放列表详情: \(playlist.name)")
+                }
+                
+                // 后台检查是否需要更新
+                Task {
+                    await performPlaylistBackgroundRefresh()
+                }
+                return
+            }
+        }
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil
@@ -625,6 +689,10 @@ struct SubsonicPlaylistDetailView: View {
         do {
             let coordinator = musicService.getCoordinator()
             let detailed = try await coordinator.getPlaylist(id: playlist.id)
+            
+            // 缓存结果
+            cacheManager.cachePlaylist(detailed, id: playlist.id)
+            print("💾 播放列表详情已缓存: \(detailed.name)，歌曲数: \(detailed.songs.count)")
             
             await MainActor.run {
                 detailedPlaylist = detailed
@@ -639,6 +707,41 @@ struct SubsonicPlaylistDetailView: View {
                 errorMessage = "加载播放列表详情失败：\(error.localizedDescription)"
                 isLoading = false
             }
+        }
+    }
+    
+    /// 后台刷新播放列表详情
+    private func performPlaylistBackgroundRefresh() async {
+        print("🔄 后台刷新播放列表详情: \(playlist.name)")
+        
+        do {
+            let coordinator = musicService.getCoordinator()
+            let newDetailed = try await coordinator.getPlaylist(id: playlist.id)
+            
+            // 检查数据是否有变化
+            let hasChanges = await MainActor.run {
+                guard let current = detailedPlaylist else { return true }
+                return current.songs.count != newDetailed.songs.count ||
+                       Set(current.songs.map { $0.id }) != Set(newDetailed.songs.map { $0.id })
+            }
+            
+            if hasChanges {
+                print("✅ 检测到播放列表更新，应用新数据")
+                // 更新缓存
+                cacheManager.cachePlaylist(newDetailed, id: playlist.id)
+                
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        detailedPlaylist = newDetailed
+                    }
+                }
+            } else {
+                print("📦 播放列表数据无变化")
+                // 更新缓存时间戳
+                cacheManager.updatePlaylistCacheTimestamp(id: playlist.id)
+            }
+        } catch {
+            print("⚠️ 后台刷新播放列表失败: \(error)")
         }
     }
     
@@ -665,8 +768,8 @@ struct SubsonicArtistDetailView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     
-    // 新增：艺术家缓存管理器
-    private let artistCacheManager = SubsonicArtistCacheManager.shared
+    // 使用统一的缓存管理器
+    private let cacheManager = MusicDetailCacheManager.shared
     
     var body: some View {
         ScrollView {
@@ -764,12 +867,17 @@ struct SubsonicArtistDetailView: View {
     private func loadDetailedArtist(forceRefresh: Bool) async {
         // 如果不是强制刷新，先检查缓存
         if !forceRefresh {
-            if let cached = artistCacheManager.getCachedArtist(id: artist.id) {
+            if let cached = cacheManager.getCachedArtist(id: artist.id) {
                 await MainActor.run {
                     detailedArtist = cached
                     isLoading = false
                     errorMessage = nil
-                    print("使用缓存的艺术家数据: \(artist.name)")
+                    print("📦 使用缓存的艺术家详情: \(artist.name)")
+                }
+                
+                // 后台检查是否需要更新
+                Task {
+                    await performArtistBackgroundRefresh()
                 }
                 return
             }
@@ -785,8 +893,8 @@ struct SubsonicArtistDetailView: View {
             let detailed = try await coordinator.getArtist(id: artist.id)
             
             // 缓存结果
-            artistCacheManager.cacheArtist(detailed, id: artist.id)
-            print("缓存艺术家数据: \(detailed.name)，专辑数量: \(detailed.albums.count)")
+            cacheManager.cacheArtist(detailed, id: artist.id)
+            print("💾 艺术家详情已缓存: \(detailed.name)，专辑数: \(detailed.albums.count)")
             
             await MainActor.run {
                 detailedArtist = detailed
@@ -803,42 +911,40 @@ struct SubsonicArtistDetailView: View {
             }
         }
     }
-}
-
-// MARK: - 新增：Subsonic艺术家缓存管理器
-
-class SubsonicArtistCacheManager: ObservableObject {
-    static let shared = SubsonicArtistCacheManager()
     
-    private var artistCache: [String: UniversalArtist] = [:]
-    private let maxCacheSize = 50 // 最大缓存数量
-    
-    private init() {}
-    
-    /// 获取缓存的艺术家
-    func getCachedArtist(id: String) -> UniversalArtist? {
-        return artistCache[id]
-    }
-    
-    /// 缓存艺术家
-    func cacheArtist(_ artist: UniversalArtist, id: String) {
-        // 如果缓存已满，移除最旧的一些项目
-        if artistCache.count >= maxCacheSize {
-            let keysToRemove = Array(artistCache.keys.prefix(maxCacheSize / 4))
-            for key in keysToRemove {
-                artistCache.removeValue(forKey: key)
-            }
-            print("清理了 \(keysToRemove.count) 个旧艺术家缓存")
-        }
+    /// 后台刷新艺术家详情
+    private func performArtistBackgroundRefresh() async {
+        print("🔄 后台刷新艺术家详情: \(artist.name)")
         
-        artistCache[id] = artist
-        print("艺术家已缓存: \(id)，当前缓存数量: \(artistCache.count)")
-    }
-    
-    /// 清理所有缓存
-    func clearAllCache() {
-        artistCache.removeAll()
-        print("所有艺术家缓存已清理")
+        do {
+            let coordinator = musicService.getCoordinator()
+            let newDetailed = try await coordinator.getArtist(id: artist.id)
+            
+            // 检查数据是否有变化
+            let hasChanges = await MainActor.run {
+                guard let current = detailedArtist else { return true }
+                return current.albums.count != newDetailed.albums.count ||
+                       Set(current.albums.map { $0.id }) != Set(newDetailed.albums.map { $0.id })
+            }
+            
+            if hasChanges {
+                print("✅ 检测到艺术家更新，应用新数据")
+                // 更新缓存
+                cacheManager.cacheArtist(newDetailed, id: artist.id)
+                
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        detailedArtist = newDetailed
+                    }
+                }
+            } else {
+                print("📦 艺术家数据无变化")
+                // 更新缓存时间戳
+                cacheManager.updateArtistCacheTimestamp(id: artist.id)
+            }
+        } catch {
+            print("⚠️ 后台刷新艺术家失败: \(error)")
+        }
     }
 }
 

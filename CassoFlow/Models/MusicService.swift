@@ -306,6 +306,12 @@ class MusicService: ObservableObject {
             UIApplication.shared.isIdleTimerDisabled = false
         }
         
+        // 🔑 修复：确保锁屏播放信息在后台保持
+        if isPlaying && currentTrackID != nil {
+            // 强制保持锁屏播放信息
+            forceUpdateNowPlayingInfo()
+        }
+        
         // 智能管理后台Timer：只在播放音乐时启动
         if isPlaying {
             startBackgroundStatusTimer()
@@ -325,8 +331,15 @@ class MusicService: ObservableObject {
         stopBackgroundStatusTimer()
         startUpdateTimer()
         
-        // 回到前台时立即同步一次播放进度
+        // 🔑 修复：回到前台时立即同步并强制更新锁屏信息
         updateCurrentSongInfo()
+        
+        // 延迟再次确保锁屏信息正确
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if self.isPlaying && self.currentTrackID != nil {
+                self.forceUpdateNowPlayingInfo()
+            }
+        }
     }
     
     // 新增：启动后台状态监听Timer
@@ -1107,6 +1120,23 @@ class MusicService: ObservableObject {
                 updateCurrentSongInfo()
                 startUpdateTimer()
             }
+        }
+    }
+    
+    // 🔑 新增：强制更新锁屏播放信息的方法
+    private func forceUpdateNowPlayingInfo() {
+        switch currentDataSource {
+        case .subsonic:
+            subsonicService.forceUpdateNowPlayingInfo()
+        case .audioStation:
+            // audioStationService.forceUpdateNowPlayingInfo() // 如需要可添加
+            break
+        case .local:
+            // localService.forceUpdateNowPlayingInfo() // 如需要可添加
+            break
+        case .musicKit:
+            // MusicKit自动处理锁屏信息
+            break
         }
     }
 }

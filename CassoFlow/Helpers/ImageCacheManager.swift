@@ -8,16 +8,66 @@ class ImageCacheManager: ObservableObject {
     
     // 内存缓存
     private var imageCache: [String: UIImage] = [:]
-    private let maxCacheSize = 100 // 最大缓存数量
+    private let maxMemoryCacheSize = 50 // 内存缓存数量限制
+    
+    // 持久化缓存目录
+    private let diskCacheDirectory: URL
+    private let maxDiskCacheSize: Int = 200 * 1024 * 1024 // 200MB磁盘缓存限制
     
     // 正在下载的URL集合，避免重复下载
     private var downloadingURLs: Set<String> = []
     
-    private init() {}
+    private init() {
+        // 创建磁盘缓存目录
+        let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        diskCacheDirectory = cacheDir.appendingPathComponent("ImageCache", isDirectory: true)
+        
+        // 确保缓存目录存在
+        try? FileManager.default.createDirectory(at: diskCacheDirectory, withIntermediateDirectories: true)
+        
+        // 启动时清理过期的磁盘缓存
+        Task {
+            await cleanExpiredDiskCache()
+        }
+        
+        print("📁 图片缓存目录: \(diskCacheDirectory.path)")
+    }
+    
+    /// 生成缓存文件名
+    private func cacheFileName(for urlString: String) -> String {
+        return urlString.data(using: .utf8)?.base64EncodedString()
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "+", with: "-") ?? ""
+    }
+    
+    /// 获取磁盘缓存文件URL
+    private func diskCacheURL(for urlString: String) -> URL {
+        let fileName = cacheFileName(for: urlString) + ".jpg"
+        return diskCacheDirectory.appendingPathComponent(fileName)
+    }
     
     /// 获取缓存的图片
     func getCachedImage(for url: URL) -> UIImage? {
-        return imageCache[url.absoluteString]
+        let urlString = url.absoluteString
+        
+        // 先检查内存缓存
+        if let memoryImage = imageCache[urlString] {
+            return memoryImage
+        }
+        
+        // 检查磁盘缓存
+        let diskURL = diskCacheURL(for: urlString)
+        if FileManager.default.fileExists(atPath: diskURL.path),
+           let imageData = try? Data(contentsOf: diskURL),
+           let diskImage = UIImage(data: imageData) {
+            
+            // 将磁盘缓存加载到内存缓存
+            cacheImageInMemory(diskImage, for: urlString)
+            print("💿 从磁盘加载图片: \(url)")
+            return diskImage
+        }
+        
+        return nil
     }
     
     /// 预加载图片
@@ -25,7 +75,7 @@ class ImageCacheManager: ObservableObject {
         let urlString = url.absoluteString
         
         // 如果已经缓存或正在下载，直接返回
-        if imageCache[urlString] != nil || downloadingURLs.contains(urlString) {
+        if getCachedImage(for: url) != nil || downloadingURLs.contains(urlString) {
             return
         }
         
@@ -38,25 +88,23 @@ class ImageCacheManager: ObservableObject {
                 
                 let (data, response) = try await URLSession.shared.data(from: url)
                 
-                // 🔧 检查HTTP响应状态
+                // 检查HTTP响应状态
                 if let httpResponse = response as? HTTPURLResponse {
                     print("🎨 ImageCacheManager: HTTP状态码: \(httpResponse.statusCode)")
                     print("🎨 ImageCacheManager: Content-Type: \(httpResponse.value(forHTTPHeaderField: "Content-Type") ?? "未知")")
                     print("🎨 ImageCacheManager: 响应数据大小: \(data.count) bytes")
                     
                     guard httpResponse.statusCode == 200 else {
-                        // 打印错误响应内容（前500字符）
                         let errorContent = String(data: data.prefix(500), encoding: .utf8) ?? "无法解析响应内容"
                         print("❌ ImageCacheManager: HTTP错误 \(httpResponse.statusCode): \(errorContent)")
                         throw URLError(.badServerResponse)
                     }
                     
-                    // 🔧 检查Content-Type，AudioStation可能返回其他格式
+                    // 检查Content-Type
                     let contentType = httpResponse.value(forHTTPHeaderField: "Content-Type") ?? ""
                     
-                    // 🔧 AudioStation封面API可能返回JSON错误而不是图片
+                    // AudioStation封面API可能返回JSON错误而不是图片
                     if contentType.contains("application/json") {
-                        // 尝试解析JSON错误响应
                         if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                             print("❌ ImageCacheManager: 收到JSON响应而不是图片: \(json)")
                             
@@ -81,7 +129,7 @@ class ImageCacheManager: ObservableObject {
                     }
                 }
                 
-                // 🔧 检查数据是否为空或太小
+                // 检查数据是否为空或太小
                 guard data.count > 100 else {
                     print("❌ ImageCacheManager: 数据太小，可能不是有效的图片数据，大小: \(data.count)")
                     throw URLError(.cannotDecodeContentData)
@@ -90,11 +138,9 @@ class ImageCacheManager: ObservableObject {
                 // 尝试创建UIImage
                 guard let image = UIImage(data: data) else {
                     print("❌ ImageCacheManager: 无法从数据创建UIImage，数据大小: \(data.count)")
-                    // 尝试打印数据的前几个字节，看是否是图片格式
                     let dataHeader = data.prefix(20).map { String(format: "%02x", $0) }.joined(separator: " ")
                     print("❌ ImageCacheManager: 数据头部: \(dataHeader)")
                     
-                    // 检查是否是常见的图片格式头部
                     let jpegHeader = data.starts(with: [0xFF, 0xD8])
                     let pngHeader = data.starts(with: [0x89, 0x50, 0x4E, 0x47])
                     let gifHeader = data.starts(with: [0x47, 0x49, 0x46])
@@ -106,11 +152,11 @@ class ImageCacheManager: ObservableObject {
                 
                 print("✅ ImageCacheManager: 图片解析成功，尺寸: \(image.size)")
                 
-                // 优化图片处理，避免色彩配置文件问题
+                // 优化图片处理
                 let processedImage = self.processImage(image)
                 
-                // 缓存图片
-                await self.cacheImage(processedImage, for: urlString)
+                // 同时缓存到内存和磁盘
+                await self.cacheImage(processedImage, for: urlString, originalData: data)
                 
             } catch {
                 print("❌ ImageCacheManager: 图片加载失败: \(url) - \(error)")
@@ -118,7 +164,7 @@ class ImageCacheManager: ObservableObject {
                     print("❌ ImageCacheManager: URLError详情: \(urlError.localizedDescription)")
                 }
                 
-                // 🔧 AudioStation特殊处理：如果是Authentication错误，记录会话可能过期
+                // AudioStation特殊处理：如果是Authentication错误，记录会话可能过期
                 if urlString.contains("AudioStation") && urlString.contains("_sid=") {
                     print("⚠️ ImageCacheManager: AudioStation图片加载失败，可能是会话过期")
                 }
@@ -149,20 +195,124 @@ class ImageCacheManager: ObservableObject {
         return processedImage
     }
     
-    /// 缓存图片
-    private func cacheImage(_ image: UIImage, for urlString: String) async {
+    /// 缓存图片到内存
+    private func cacheImageInMemory(_ image: UIImage, for urlString: String) {
+        // 如果内存缓存已满，移除最旧的一些项目
+        if imageCache.count >= maxMemoryCacheSize {
+            let keysToRemove = Array(imageCache.keys.prefix(maxMemoryCacheSize / 4))
+            for key in keysToRemove {
+                imageCache.removeValue(forKey: key)
+            }
+            print("🧹 ImageCacheManager: 清理了 \(keysToRemove.count) 个内存缓存")
+        }
+        
+        imageCache[urlString] = image
+    }
+    
+    /// 缓存图片到内存和磁盘
+    private func cacheImage(_ image: UIImage, for urlString: String, originalData: Data) async {
         await MainActor.run {
-            // 如果缓存已满，移除最旧的一些项目
-            if self.imageCache.count >= self.maxCacheSize {
-                let keysToRemove = Array(self.imageCache.keys.prefix(self.maxCacheSize / 4))
-                for key in keysToRemove {
-                    self.imageCache.removeValue(forKey: key)
+            // 缓存到内存
+            self.cacheImageInMemory(image, for: urlString)
+            print("✅ ImageCacheManager: 图片已缓存到内存，当前缓存数量: \(self.imageCache.count)")
+        }
+        
+        // 异步缓存到磁盘
+        Task.detached {
+            do {
+                let diskURL = await self.diskCacheURL(for: urlString)
+                
+                // 将图片转换为JPEG格式以节省空间
+                let quality: CGFloat = 0.8
+                if let jpegData = image.jpegData(compressionQuality: quality) {
+                    try jpegData.write(to: diskURL)
+                    print("💿 图片已缓存到磁盘: \(diskURL.lastPathComponent)")
+                    
+                    // 检查磁盘缓存大小
+                    await self.manageDiskCacheSize()
+                } else {
+                    print("❌ 无法将图片转换为JPEG格式")
                 }
-                print("🧹 ImageCacheManager: 清理了 \(keysToRemove.count) 个旧缓存")
+            } catch {
+                print("❌ 磁盘缓存失败: \(error)")
+            }
+        }
+    }
+    
+    /// 管理磁盘缓存大小
+    private func manageDiskCacheSize() async {
+        do {
+            let fileManager = FileManager.default
+            let cacheFiles = try fileManager.contentsOfDirectory(at: diskCacheDirectory, includingPropertiesForKeys: [.fileSizeKey, .creationDateKey])
+            
+            // 计算总缓存大小
+            var totalSize = 0
+            var fileInfos: [(url: URL, size: Int, date: Date)] = []
+            
+            for fileURL in cacheFiles {
+                let attributes = try fileURL.resourceValues(forKeys: [.fileSizeKey, .creationDateKey])
+                let size = attributes.fileSize ?? 0
+                let date = attributes.creationDate ?? Date.distantPast
+                
+                totalSize += size
+                fileInfos.append((url: fileURL, size: size, date: date))
             }
             
-            self.imageCache[urlString] = image
-            print("✅ ImageCacheManager: 图片已缓存，当前缓存数量: \(self.imageCache.count)")
+            print("💿 磁盘缓存统计 - 文件数: \(fileInfos.count), 总大小: \(totalSize / 1024 / 1024)MB")
+            
+            // 如果超过限制，删除最旧的文件
+            if totalSize > maxDiskCacheSize {
+                // 按创建时间排序
+                fileInfos.sort { $0.date < $1.date }
+                
+                var deletedSize = 0
+                let targetSize = maxDiskCacheSize * 3 / 4 // 删除到75%
+                
+                for fileInfo in fileInfos {
+                    if totalSize - deletedSize <= targetSize {
+                        break
+                    }
+                    
+                    try fileManager.removeItem(at: fileInfo.url)
+                    deletedSize += fileInfo.size
+                    print("🗑️ 删除过期缓存: \(fileInfo.url.lastPathComponent)")
+                }
+                
+                print("🧹 磁盘缓存清理完成 - 删除: \(deletedSize / 1024 / 1024)MB")
+            }
+            
+        } catch {
+            print("❌ 磁盘缓存管理失败: \(error)")
+        }
+    }
+    
+    /// 清理过期的磁盘缓存
+    private func cleanExpiredDiskCache() async {
+        do {
+            let fileManager = FileManager.default
+            let cacheFiles = try fileManager.contentsOfDirectory(at: diskCacheDirectory, includingPropertiesForKeys: [.creationDateKey])
+            
+            let expirationInterval: TimeInterval = 7 * 24 * 60 * 60 // 7天过期
+            let expirationDate = Date().addingTimeInterval(-expirationInterval)
+            
+            var deletedCount = 0
+            
+            for fileURL in cacheFiles {
+                let attributes = try fileURL.resourceValues(forKeys: [.creationDateKey])
+                let creationDate = attributes.creationDate ?? Date.distantPast
+                
+                if creationDate < expirationDate {
+                    try fileManager.removeItem(at: fileURL)
+                    deletedCount += 1
+                }
+            }
+            
+            if deletedCount > 0 {
+                print("🧹 清理了 \(deletedCount) 个过期的磁盘缓存文件")
+            }
+            
+        } catch {
+            print("❌ 清理过期磁盘缓存失败: \(error)")
         }
     }
     
@@ -173,9 +323,45 @@ class ImageCacheManager: ObservableObject {
     
     /// 清理缓存
     func clearCache() {
+        // 清理内存缓存
         imageCache.removeAll()
         downloadingURLs.removeAll()
-        print("🧹 ImageCacheManager: 所有缓存已清理")
+        
+        // 清理磁盘缓存
+        let diskDirectory = diskCacheDirectory
+        Task.detached {
+            do {
+                let fileManager = FileManager.default
+                try fileManager.removeItem(at: diskDirectory)
+                try fileManager.createDirectory(at: diskDirectory, withIntermediateDirectories: true)
+                print("🗑️ 所有图片缓存已清理")
+            } catch {
+                print("❌ 清理磁盘缓存失败: \(error)")
+            }
+        }
+    }
+    
+    /// 获取缓存统计信息
+    func getCacheStats() -> (memoryCount: Int, diskSizeMB: Double) {
+        let memoryCount = imageCache.count
+        
+        var diskSizeMB: Double = 0
+        do {
+            let fileManager = FileManager.default
+            let cacheFiles = try fileManager.contentsOfDirectory(at: diskCacheDirectory, includingPropertiesForKeys: [.fileSizeKey])
+            
+            var totalSize = 0
+            for fileURL in cacheFiles {
+                let attributes = try fileURL.resourceValues(forKeys: [.fileSizeKey])
+                totalSize += attributes.fileSize ?? 0
+            }
+            
+            diskSizeMB = Double(totalSize) / 1024 / 1024
+        } catch {
+            print("❌ 获取磁盘缓存统计失败: \(error)")
+        }
+        
+        return (memoryCount, diskSizeMB)
     }
 }
 
@@ -214,7 +400,7 @@ struct CachedAsyncImage: View {
             }
         }
         .onChange(of: url) { _, newURL in
-            // 🔧 关键改进：URL变化时重新加载
+            // URL变化时重新加载
             loadImage(from: newURL)
         }
         .onAppear {
@@ -234,7 +420,7 @@ struct CachedAsyncImage: View {
         
         print("🎨 CachedAsyncImage: 开始加载图片: \(imageURL)")
         
-        // 先检查缓存
+        // 先检查缓存（包括内存和磁盘）
         if let cached = cacheManager.getCachedImage(for: imageURL) {
             print("🎨 CachedAsyncImage: 使用缓存图片: \(imageURL)")
             cachedImage = cached
@@ -245,7 +431,6 @@ struct CachedAsyncImage: View {
         if cacheManager.isDownloading(imageURL) {
             print("🎨 CachedAsyncImage: 图片正在下载中: \(imageURL)")
             isLoading = true
-            // 等待下载完成
             waitForDownload(url: imageURL)
             return
         }
@@ -261,8 +446,8 @@ struct CachedAsyncImage: View {
     
     private func waitForDownload(url: URL) {
         Task {
-            // 等待下载完成，最多等待20秒
-            let maxWaitTime = 20.0
+            // 等待下载完成，最多等待30秒
+            let maxWaitTime = 30.0
             let startTime = Date()
             let checkInterval: UInt64 = 200_000_000 // 0.2秒
             

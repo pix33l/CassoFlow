@@ -53,15 +53,27 @@ struct SubsonicLibraryView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // 连接状态检查
-                if !musicService.getSubsonicService().isConnected {
-                    connectionErrorView
-                } else if libraryData.isLoading {
+                // 优先显示缓存内容，连接状态检查放到后台
+                if libraryData.isLoading && libraryData.albums.isEmpty && libraryData.playlists.isEmpty && libraryData.artists.isEmpty {
                     ProgressView("正在加载...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let error = libraryData.errorMessage {
-                    errorView(message: error)
+                } else if let error = libraryData.errorMessage, libraryData.albums.isEmpty && libraryData.playlists.isEmpty && libraryData.artists.isEmpty {
+                    // 只有在没有缓存数据且有错误时才显示错误
+                    if !musicService.getSubsonicService().isConnected {
+                        connectionErrorView
+                    } else {
+                        errorView(message: error)
+                    }
+                } else if libraryData.albums.isEmpty && libraryData.playlists.isEmpty && libraryData.artists.isEmpty && !libraryData.hasLoaded {
+                    // 没有数据且未加载过，显示连接检查
+                    if !musicService.getSubsonicService().isConnected {
+                        connectionErrorView
+                    } else {
+                        ProgressView("正在加载...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 } else {
+                    // 有数据或已加载过，显示内容
                     contentView
                 }
             }
@@ -84,8 +96,8 @@ struct SubsonicLibraryView: View {
                                 ImageCacheManager.shared.clearCache()
                                 SubsonicLibraryDataManager.clearSharedCache()
                             }
-                            // 重新加载库数据
-                            await libraryData.reloadLibrary(subsonicService: musicService.getSubsonicService())
+                            // 强制刷新库数据
+                            await libraryData.forceRefresh(subsonicService: musicService.getSubsonicService())
                         }
                     }) {
                         Image(systemName: "arrow.trianglehead.2.counterclockwise")
@@ -96,7 +108,7 @@ struct SubsonicLibraryView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    // 刷新按钮
+                    // 关闭按钮
                     Button {
                         if musicService.isHapticFeedbackEnabled {
                             let impactFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -116,6 +128,7 @@ struct SubsonicLibraryView: View {
                 }
             }
             .task {
+                // 启动时立即尝试加载缓存，不等待连接检查
                 await libraryData.loadLibraryIfNeeded(subsonicService: musicService.getSubsonicService())
             }
             .sheet(isPresented: $showSubsonicSettings) {
@@ -135,7 +148,7 @@ struct SubsonicLibraryView: View {
             Image("Subsonic")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 48, height: 48)
+                .frame(width: 96, height: 48)
             
             Text("Subsonic 服务器未连接")
                 .font(.title2)
@@ -561,13 +574,133 @@ class SubsonicLibraryPreferences: ObservableObject {
     }
 }
 
+// 缓存数据结构
+struct SubsonicLibraryCacheData: Codable {
+    let albums: [CachedAlbum]
+    let playlists: [CachedPlaylist]
+    let artists: [CachedArtist]
+    let timestamp: Date
+    
+    var isExpired: Bool {
+        let cacheValidityDuration: TimeInterval = 30 * 60 // 30分钟缓存有效期
+        return Date().timeIntervalSince(timestamp) > cacheValidityDuration
+    }
+    
+    var isStale: Bool {
+        let staleThreshold: TimeInterval = 10 * 60 // 10分钟后开始后台更新
+        return Date().timeIntervalSince(timestamp) > staleThreshold
+    }
+}
+
+// 简化的缓存模型 - 只保存必要信息
+struct CachedAlbum: Codable, Identifiable {
+    let id: String
+    let title: String
+    let artistName: String
+    let year: Int?
+    let genre: String?
+    let songCount: Int
+    let duration: TimeInterval
+    let artworkURL: URL?
+    let source: String
+    
+    init(from album: UniversalAlbum) {
+        self.id = album.id
+        self.title = album.title
+        self.artistName = album.artistName
+        self.year = album.year
+        self.genre = album.genre
+        self.songCount = album.songCount
+        self.duration = album.duration
+        self.artworkURL = album.artworkURL
+        self.source = album.source.rawValue
+    }
+    
+    func toUniversalAlbum() -> UniversalAlbum {
+        UniversalAlbum(
+            id: id,
+            title: title,
+            artistName: artistName,
+            year: year,
+            genre: genre,
+            songCount: songCount,
+            duration: duration,
+            artworkURL: artworkURL,
+            songs: [], // 缓存中不保存歌曲详情
+            source: MusicDataSourceType(rawValue: source) ?? .subsonic,
+            originalData: () // 使用空元组作为占位符
+        )
+    }
+}
+
+struct CachedPlaylist: Codable, Identifiable {
+    let id: String
+    let name: String
+    let curatorName: String?
+    let songCount: Int
+    let duration: TimeInterval
+    let artworkURL: URL?
+    let source: String
+    
+    init(from playlist: UniversalPlaylist) {
+        self.id = playlist.id
+        self.name = playlist.name
+        self.curatorName = playlist.curatorName
+        self.songCount = playlist.songCount
+        self.duration = playlist.duration
+        self.artworkURL = playlist.artworkURL
+        self.source = playlist.source.rawValue
+    }
+    
+    func toUniversalPlaylist() -> UniversalPlaylist {
+        UniversalPlaylist(
+            id: id,
+            name: name,
+            curatorName: curatorName,
+            songCount: songCount,
+            duration: duration,
+            artworkURL: artworkURL,
+            songs: [], // 缓存中不保存歌曲详情
+            source: MusicDataSourceType(rawValue: source) ?? .subsonic,
+            originalData: () // 使用空元组作为占位符
+        )
+    }
+}
+
+struct CachedArtist: Codable, Identifiable {
+    let id: String
+    let name: String
+    let albumCount: Int
+    let source: String
+    
+    init(from artist: UniversalArtist) {
+        self.id = artist.id
+        self.name = artist.name
+        self.albumCount = artist.albumCount
+        self.source = artist.source.rawValue
+    }
+    
+    func toUniversalArtist() -> UniversalArtist {
+        UniversalArtist(
+            id: id,
+            name: name,
+            albumCount: albumCount,
+            albums: [], // 缓存中不保存专辑详情
+            source: MusicDataSourceType(rawValue: source) ?? .subsonic,
+            originalData: () // 使用空元组作为占位符
+        )
+    }
+}
+
 class SubsonicLibraryDataManager: ObservableObject {
     @Published var albums: [UniversalAlbum] = []
     @Published var playlists: [UniversalPlaylist] = []
     @Published var artists: [UniversalArtist] = []
     @Published var isLoading = false
+    @Published var isBackgroundRefreshing = false // 后台刷新状态
     @Published var errorMessage: String?
     @Published var hasLoaded = false
+    @Published var lastUpdateTime: Date?
     
     // 添加静态缓存，在整个应用生命周期中保持
     private static var sharedLibraryData: (albums: [UniversalAlbum], playlists: [UniversalPlaylist], artists: [UniversalArtist])?
@@ -577,9 +710,17 @@ class SubsonicLibraryDataManager: ObservableObject {
     private var originalPlaylists: [UniversalPlaylist] = []
     private var originalArtists: [UniversalArtist] = []
     
+    // 缓存管理
+    private let cacheManager = SubsonicLibraryCacheManager()
+    
     func loadLibraryIfNeeded(subsonicService: SubsonicMusicService) async {
-        // 如果已经加载过或有静态缓存，直接使用缓存数据
-        if hasLoaded {
+        // 如果已经加载过内存数据，直接返回
+        if hasLoaded && !albums.isEmpty {
+            // 检查是否需要后台刷新
+            if let cachedData = cacheManager.getCachedData(),
+               cachedData.isStale && !isBackgroundRefreshing {
+                await performBackgroundRefresh(subsonicService: subsonicService)
+            }
             return
         }
         
@@ -600,9 +741,60 @@ class SubsonicLibraryDataManager: ObservableObject {
                 self.preloadAlbumCovers()
                 self.preloadPlaylistCovers()
             }
+            
+            // 检查是否需要后台刷新
+            if let persistedData = cacheManager.getCachedData(),
+               persistedData.isStale && !isBackgroundRefreshing {
+                await performBackgroundRefresh(subsonicService: subsonicService)
+            }
             return
         }
         
+        // 尝试从持久化缓存加载（不管是否过期，优先显示）
+        if let cachedData = cacheManager.getCachedData() {
+            let albums = cachedData.albums.map { $0.toUniversalAlbum() }
+            let playlists = cachedData.playlists.map { $0.toUniversalPlaylist() }
+            let artists = cachedData.artists.map { $0.toUniversalArtist() }
+            
+            await MainActor.run {
+                self.albums = albums
+                self.playlists = playlists
+                self.artists = artists
+                self.originalAlbums = albums
+                self.originalPlaylists = playlists
+                self.originalArtists = artists
+                self.hasLoaded = true
+                self.isLoading = false
+                self.errorMessage = nil
+                self.lastUpdateTime = cachedData.timestamp
+                
+                // 缓存到静态变量
+                Self.sharedLibraryData = (albums, playlists, artists)
+                
+                let cacheAge = Date().timeIntervalSince(cachedData.timestamp)
+                let ageString = cacheAge < 60 ? "刚刚" : cacheAge < 3600 ? "\(Int(cacheAge/60))分钟前" : "\(Int(cacheAge/3600))小时前"
+                print("📦 从缓存加载音乐库数据 (\(ageString)) - Albums: \(albums.count), Playlists: \(playlists.count), Artists: \(artists.count)")
+
+                
+                // 预加载封面
+                self.preloadAlbumCovers()
+                self.preloadPlaylistCovers()
+            }
+            
+            // 无论缓存是否过期，都在后台尝试刷新
+            if !isBackgroundRefreshing {
+                await performBackgroundRefresh(subsonicService: subsonicService)
+            }
+            
+            return
+        }
+        
+        // 没有可用缓存，执行完整加载
+        await performFullLoad(subsonicService: subsonicService)
+    }
+    
+    /// 执行完整加载
+    private func performFullLoad(subsonicService: SubsonicMusicService) async {
         await MainActor.run {
             isLoading = true
             errorMessage = nil
@@ -627,9 +819,7 @@ class SubsonicLibraryDataManager: ObservableObject {
             let (albumsResult, playlistsResult, artistsResult) = try await (albumsTask, playlistsTask, artistsTask)
             
             // 添加调试信息
-            print("Albums loaded: \(albumsResult.count)")
-            print("Playlists loaded: \(playlistsResult.count)")
-            print("Artists loaded: \(artistsResult.count)")
+            print("🔄 完整加载音乐库 - Albums: \(albumsResult.count), Playlists: \(playlistsResult.count), Artists: \(artistsResult.count)")
             
             await MainActor.run {
                 self.albums = albumsResult
@@ -640,9 +830,15 @@ class SubsonicLibraryDataManager: ObservableObject {
                 self.originalArtists = artistsResult
                 self.isLoading = false
                 self.hasLoaded = true
+                self.lastUpdateTime = Date()
                 
-                // 缓存到静态变量
+                // 缓存到静态变量和持久化存储
                 Self.sharedLibraryData = (albumsResult, playlistsResult, artistsResult)
+                self.cacheManager.saveCachedData(
+                    albums: albumsResult,
+                    playlists: playlistsResult,
+                    artists: artistsResult
+                )
                 
                 if albumsResult.isEmpty && playlistsResult.isEmpty && artistsResult.isEmpty {
                     self.errorMessage = "Subsonic服务器上没有找到音乐内容"
@@ -656,12 +852,113 @@ class SubsonicLibraryDataManager: ObservableObject {
             }
         } catch {
             // 添加更详细的错误信息
-            print("Library loading error: \(error)")
+            print("❌ 音乐库加载失败: \(error)")
             await MainActor.run {
                 self.errorMessage = "加载音乐库失败：\(error.localizedDescription)"
                 self.isLoading = false
             }
         }
+    }
+    
+    /// 执行后台刷新
+    private func performBackgroundRefresh(subsonicService: SubsonicMusicService) async {
+        await MainActor.run {
+            isBackgroundRefreshing = true
+        }
+        
+        print("🔄 开始后台刷新音乐库数据...")
+        
+        // 检查连接状态（静默检查，不影响用户界面）
+        let isConnected = await subsonicService.checkAvailability()
+        guard isConnected else {
+            print("⚠️ 后台刷新跳过：服务器不可用")
+            await MainActor.run {
+                isBackgroundRefreshing = false
+            }
+            return
+        }
+        
+        do {
+            // 并行加载新数据
+            async let albumsTask = subsonicService.getRecentAlbums()
+            async let playlistsTask = subsonicService.getPlaylists()
+            async let artistsTask = subsonicService.getArtists()
+            
+            let (newAlbums, newPlaylists, newArtists) = try await (albumsTask, playlistsTask, artistsTask)
+            
+            // 检查数据是否有变化
+            let hasChanges = await MainActor.run {
+                return !self.isDataEqual(
+                    newAlbums: newAlbums,
+                    newPlaylists: newPlaylists,
+                    newArtists: newArtists
+                )
+            }
+            
+            if hasChanges {
+                print("✅ 检测到数据更新，应用新数据")
+                await MainActor.run {
+                    // 平滑更新数据
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        self.albums = newAlbums
+                        self.playlists = newPlaylists
+                        self.artists = newArtists
+                        self.originalAlbums = newAlbums
+                        self.originalPlaylists = newPlaylists
+                        self.originalArtists = newArtists
+                        self.lastUpdateTime = Date()
+                    }
+                    
+                    // 更新缓存
+                    Self.sharedLibraryData = (newAlbums, newPlaylists, newArtists)
+                    self.cacheManager.saveCachedData(
+                        albums: newAlbums,
+                        playlists: newPlaylists,
+                        artists: newArtists
+                    )
+                    
+                    // 清除错误信息
+                    self.errorMessage = nil
+                    
+                    // 预加载新封面
+                    self.preloadAlbumCovers()
+                    self.preloadPlaylistCovers()
+                }
+            } else {
+                print("📦 数据无变化，更新缓存时间戳")
+                // 数据无变化，仅更新缓存时间戳
+                await MainActor.run {
+                    self.lastUpdateTime = Date()
+                    // 清除错误信息，因为连接是正常的
+                    self.errorMessage = nil
+                    self.cacheManager.updateCacheTimestamp()
+                }
+            }
+            
+        } catch {
+            print("⚠️ 后台刷新失败: \(error)")
+            // 后台刷新失败不应该影响当前显示的缓存内容
+            // 只在没有任何数据时才设置错误消息
+            await MainActor.run {
+                if self.albums.isEmpty && self.playlists.isEmpty && self.artists.isEmpty {
+                    self.errorMessage = "无法连接到Subsonic服务器"
+                }
+            }
+        }
+        
+        await MainActor.run {
+            isBackgroundRefreshing = false
+        }
+    }
+    
+    /// 检查数据是否相同
+    private func isDataEqual(newAlbums: [UniversalAlbum], newPlaylists: [UniversalPlaylist], newArtists: [UniversalArtist]) -> Bool {
+        return albums.count == newAlbums.count &&
+               playlists.count == newPlaylists.count &&
+               artists.count == newArtists.count &&
+               Set(albums.map { $0.id }) == Set(newAlbums.map { $0.id }) &&
+               Set(playlists.map { $0.id }) == Set(newPlaylists.map { $0.id }) &&
+               Set(artists.map { $0.id }) == Set(newArtists.map { $0.id })
     }
     
     /// 应用排序
@@ -701,8 +998,8 @@ class SubsonicLibraryDataManager: ObservableObject {
     @MainActor private func preloadAlbumCovers() {
         let imageCache = ImageCacheManager.shared
         
-        // 预加载前20个专辑的封面
-        for album in albums.prefix(20) {
+        // 预加载前30个专辑的封面（增加预加载数量）
+        for album in albums.prefix(30) {
             if let artworkURL = album.artworkURL {
                 imageCache.preloadImage(from: artworkURL)
             }
@@ -713,8 +1010,8 @@ class SubsonicLibraryDataManager: ObservableObject {
     @MainActor private func preloadPlaylistCovers() {
         let imageCache = ImageCacheManager.shared
         
-        // 预加载前20个播放列表的封面
-        for playlist in playlists.prefix(20) {
+        // 预加载前30个播放列表的封面（增加预加载数量）
+        for playlist in playlists.prefix(30) {
             if let artworkURL = playlist.artworkURL {
                 imageCache.preloadImage(from: artworkURL)
             }
@@ -727,7 +1024,9 @@ class SubsonicLibraryDataManager: ObservableObject {
             // 清除静态缓存，强制重新加载
             Self.sharedLibraryData = nil
         }
-        await loadLibraryIfNeeded(subsonicService: subsonicService)
+        // 清除持久化缓存
+        cacheManager.clearCache()
+        await performFullLoad(subsonicService: subsonicService)
     }
     
     func testConnection(subsonicService: SubsonicMusicService) async {
@@ -751,9 +1050,88 @@ class SubsonicLibraryDataManager: ObservableObject {
         }
     }
     
+    /// 强制刷新数据
+    func forceRefresh(subsonicService: SubsonicMusicService) async {
+        // 清除所有缓存
+        await MainActor.run {
+            Self.sharedLibraryData = nil
+        }
+        cacheManager.clearCache()
+        
+        // 执行完整加载
+        await performFullLoad(subsonicService: subsonicService)
+    }
+    
     /// 清除缓存的类方法
     static func clearSharedCache() {
         sharedLibraryData = nil
+    }
+}
+
+// MARK: - 缓存管理器
+
+class SubsonicLibraryCacheManager {
+    private let userDefaults = UserDefaults.standard
+    private let cacheKey = "SubsonicLibraryCache"
+    
+    /// 保存缓存数据
+    func saveCachedData(albums: [UniversalAlbum], playlists: [UniversalPlaylist], artists: [UniversalArtist]) {
+        let cacheData = SubsonicLibraryCacheData(
+            albums: albums.map { CachedAlbum(from: $0) },
+            playlists: playlists.map { CachedPlaylist(from: $0) },
+            artists: artists.map { CachedArtist(from: $0) },
+            timestamp: Date()
+        )
+        
+        do {
+            let encoded = try JSONEncoder().encode(cacheData)
+            userDefaults.set(encoded, forKey: cacheKey)
+            print("💾 缓存数据已保存 - \(albums.count) 专辑, \(playlists.count) 播放列表, \(artists.count) 艺术家")
+        } catch {
+            print("❌ 缓存保存失败: \(error)")
+        }
+    }
+    
+    /// 获取缓存数据
+    func getCachedData() -> SubsonicLibraryCacheData? {
+        guard let data = userDefaults.data(forKey: cacheKey) else {
+            return nil
+        }
+        
+        do {
+            let cachedData = try JSONDecoder().decode(SubsonicLibraryCacheData.self, from: data)
+            return cachedData
+        } catch {
+            print("❌ 缓存读取失败: \(error)")
+            clearCache()
+            return nil
+        }
+    }
+    
+    /// 更新缓存时间戳
+    func updateCacheTimestamp() {
+        guard let cachedData = getCachedData() else { return }
+        
+        // 创建更新后的缓存数据
+        let updatedData = SubsonicLibraryCacheData(
+            albums: cachedData.albums,
+            playlists: cachedData.playlists,
+            artists: cachedData.artists,
+            timestamp: Date()
+        )
+        
+        do {
+            let encoded = try JSONEncoder().encode(updatedData)
+            userDefaults.set(encoded, forKey: cacheKey)
+        } catch {
+            print("❌ 缓存时间戳更新失败: \(error)")
+        }
+    }
+    
+    /// 清除缓存
+    func clearCache() {
+        userDefaults.removeObject(forKey: cacheKey)
+        print("🗑️ 已清除缓存数据")
     }
 }
 
