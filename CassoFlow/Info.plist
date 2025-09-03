@@ -13,5 +13,17 @@
 		<key>UIImageName</key>
 		<string>LaunchScreenLogo</string>
 	</dict>
+    <!-- 🔑 启用iTunes文件共享 -->
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    
+    <!-- 🔑 允许在原位置打开文档 -->
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    
+    <!-- 🔑 支持文件应用显示 -->
+    <key>UISupportsDocumentBrowser</key>
+    <true/>
+    
 </dict>
 </plist>

@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers // 🔑 新增：导入UTType支持
 
 // 🔑 新增：本地音乐库变化通知
 extension Notification.Name {
@@ -22,6 +23,9 @@ struct LocalMusicLibraryView: View {
     
     // 添加导入状态变量
     @State private var showDocumentPicker = false
+    @State private var isImporting = false // 🔑 新增：导入状态
+    @State private var importMessage: String? // 🔑 新增：导入消息
+    @State private var showImportAlert = false // 🔑 新增：显示导入结果
     
     // 过滤后的数据
     private var filteredAlbums: [UniversalAlbum] {
@@ -101,6 +105,16 @@ struct LocalMusicLibraryView: View {
                     }
                 }
                 .ignoresSafeArea()
+            }
+            // 🔑 新增：导入结果弹窗
+            .alert("导入结果", isPresented: $showImportAlert) {
+                Button("确定") {
+                    importMessage = nil
+                }
+            } message: {
+                if let message = importMessage {
+                    Text(message)
+                }
             }
             .task {
                 await libraryData.loadLibraryIfNeeded(localService: musicService.getLocalService())
@@ -407,8 +421,14 @@ struct LocalMusicLibraryView: View {
                 showDocumentPicker = true
             }) {
                 HStack {
-                    Image(systemName: "plus")
-                    Text("导入")
+                    if isImporting {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                            .foregroundColor(.black)
+                    } else {
+                        Image(systemName: "plus")
+                    }
+                    Text(isImporting ? "导入中..." : "导入")
                 }
                 .font(.headline)
                 .foregroundColor(.black)
@@ -416,9 +436,10 @@ struct LocalMusicLibraryView: View {
                 .padding(.vertical, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(Color.yellow)
+                        .fill(Color.yellow.opacity(isImporting ? 0.6 : 1.0))
                 )
             }
+            .disabled(isImporting)
             .padding(.top, 20)
             
             Text("支持格式: MP3, AAC, WAV, FLAC 等")
@@ -430,21 +451,19 @@ struct LocalMusicLibraryView: View {
         .frame(maxWidth: .infinity)
         .padding(.top, 60)
         .padding(.horizontal)
-        .sheet(isPresented: $showDocumentPicker) {
-            DocumentPicker { urls in
-                Task {
-                    await handleImportedFiles(urls: urls)
-                }
-            }
-            .ignoresSafeArea()
-        }
     }
     
     // MARK: - 处理导入的文件
     private func handleImportedFiles(urls: [URL]) async {
+        print("🎵 开始处理导入文件，共 \(urls.count) 个")
+        for url in urls {
+            print("   - \(url.lastPathComponent)")
+        }
+        
         let localService = musicService.getLocalService()
         
         await MainActor.run {
+            isImporting = true
             libraryData.isLoading = true
             libraryData.errorMessage = nil
         }
@@ -457,12 +476,38 @@ struct LocalMusicLibraryView: View {
             await libraryData.reloadLibrary(localService: localService)
             
             await MainActor.run {
+                isImporting = false
                 libraryData.isLoading = false
+                
+                // 🔑 新增：显示成功消息
+                importMessage = "成功导入 \(urls.count) 个音乐文件"
+                showImportAlert = true
+                
+                // 🔑 触觉反馈
+                if musicService.isHapticFeedbackEnabled {
+                    let notificationFeedback = UINotificationFeedbackGenerator()
+                    notificationFeedback.notificationOccurred(.success)
+                }
             }
+            
+            print("✅ 文件导入完成")
+            
         } catch {
+            print("❌ 文件导入失败: \(error)")
+            
             await MainActor.run {
-                libraryData.errorMessage = "导入文件失败: \(error.localizedDescription)"
+                isImporting = false
                 libraryData.isLoading = false
+                
+                // 🔑 新增：显示错误消息
+                importMessage = "导入失败: \(error.localizedDescription)"
+                showImportAlert = true
+                
+                // 🔑 触觉反馈
+                if musicService.isHapticFeedbackEnabled {
+                    let notificationFeedback = UINotificationFeedbackGenerator()
+                    notificationFeedback.notificationOccurred(.error)
+                }
             }
         }
     }
@@ -473,9 +518,35 @@ struct DocumentPicker: UIViewControllerRepresentable {
     var onFilesPicked: ([URL]) -> Void
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.audio], asCopy: true)
+        // 🔑 修复：添加更多音频格式支持，包括FLAC
+        var contentTypes: [UTType] = [
+            .audio,           // 通用音频类型
+            .mp3,             // MP3文件
+            .mpeg4Audio,      // M4A/AAC文件
+            .wav,             // WAV文件
+            .aiff,            // AIFF文件
+        ]
+        
+        // 🔑 新增：添加FLAC支持（通过文件扩展名）
+        if let flacType = UTType(filenameExtension: "flac") {
+            contentTypes.append(flacType)
+        }
+        
+        // 🔑 新增：添加其他可能的音频格式
+        if let cafType = UTType(filenameExtension: "caf") {
+            contentTypes.append(cafType)
+        }
+        
+        if let oggType = UTType(filenameExtension: "ogg") {
+            contentTypes.append(oggType)
+        }
+        
+        print("🎵 DocumentPicker 支持的文件类型: \(contentTypes.map { $0.identifier })")
+        
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes, asCopy: true)
         picker.allowsMultipleSelection = true
         picker.delegate = context.coordinator
+        
         return picker
     }
     
@@ -493,11 +564,15 @@ struct DocumentPicker: UIViewControllerRepresentable {
         }
         
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            print("🎵 DocumentPicker 选择了 \(urls.count) 个文件:")
+            for url in urls {
+                print("   - \(url.lastPathComponent) (扩展名: \(url.pathExtension))")
+            }
             onFilesPicked(urls)
         }
         
         func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-            // 用户取消选择
+            print("🎵 DocumentPicker 被取消")
         }
     }
 }

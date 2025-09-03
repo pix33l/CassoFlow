@@ -30,28 +30,40 @@ struct LocalMusicItem: Identifiable, Hashable {
         var year: Int?
         var genre: String?
         
-        // 获取音频时长 (使用新API)
+        // 🔑 修复：改进时长获取方法，特别针对FLAC文件
         do {
             let durationValue = try await asset.load(.duration)
-            duration = CMTimeGetSeconds(durationValue)
+            if CMTIME_IS_VALID(durationValue) && !CMTIME_IS_INDEFINITE(durationValue) {
+                let durationSeconds = CMTimeGetSeconds(durationValue)
+                if durationSeconds.isFinite && !durationSeconds.isNaN && durationSeconds > 0 {
+                    duration = durationSeconds
+                } else {
+                    print("⚠️ 无效的时长值: \(durationSeconds)，文件: \(url.lastPathComponent)")
+                    // 🔑 尝试通过文件大小估算时长（仅用于FLAC等特殊格式）
+                    duration = await LocalMusicItem.estimateDurationFromFileSize(url: url)
+                }
+            } else {
+                print("⚠️ 时长不可用，文件: \(url.lastPathComponent)")
+                duration = await LocalMusicItem.estimateDurationFromFileSize(url: url)
+            }
         } catch {
-            print("获取音频时长失败: \(error) - 文件: \(url.lastPathComponent)")
-            // 即使获取时长失败，也继续处理其他元数据
+            print("❌ 获取音频时长失败: \(error) - 文件: \(url.lastPathComponent)")
+            duration = await LocalMusicItem.estimateDurationFromFileSize(url: url)
         }
         
-        // 获取元数据 (使用新API)
+        // 🔑 修复：改进元数据获取，支持FLAC的Vorbis Comments
         do {
             let metadata = try await asset.load(.commonMetadata)
+            
+            // 首先尝试commonKey（适用于大部分格式）
             for item in metadata {
-                // 先尝试获取键
                 guard let key = item.commonKey?.rawValue else { continue }
                 
-                // 尝试加载值
                 let value: Any?
                 do {
                     value = try await item.load(.value)
                 } catch {
-                    print("加载元数据项值失败: \(error) - 键: \(key)")
+                    print("⚠️ 加载元数据项值失败: \(error) - 键: \(key)")
                     continue
                 }
                 
@@ -59,16 +71,16 @@ struct LocalMusicItem: Identifiable, Hashable {
                 
                 switch key {
                 case "title":
-                    if let stringValue = value as? String, !stringValue.isEmpty {
-                        title = stringValue
+                    if let stringValue = value as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        title = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
                 case "artist":
-                    if let stringValue = value as? String, !stringValue.isEmpty {
-                        artist = stringValue
+                    if let stringValue = value as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        artist = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
                 case "albumName":
-                    if let stringValue = value as? String, !stringValue.isEmpty {
-                        album = stringValue
+                    if let stringValue = value as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        album = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
                 case "artwork":
                     if let imageData = value as? Data, !imageData.isEmpty {
@@ -81,27 +93,23 @@ struct LocalMusicItem: Identifiable, Hashable {
                         trackNumber = number
                     }
                 case "creationDate":
-                    if let dateString = value as? String {
-                        // 尝试解析日期字符串获取年份
-                        let formatter = ISO8601DateFormatter()
-                        if let date = formatter.date(from: dateString) {
-                            let calendar = Calendar.current
-                            year = calendar.component(.year, from: date)
-                        }
-                    } else if let date = value as? Date {
-                        let calendar = Calendar.current
-                        year = calendar.component(.year, from: date)
-                    }
+                    year = LocalMusicItem.parseYearFromDate(value)
                 case "genre":
-                    if let stringValue = value as? String, !stringValue.isEmpty {
-                        genre = stringValue
+                    if let stringValue = value as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        genre = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
                 default:
                     break
                 }
             }
+            
+            // 🔑 新增：如果commonKey没有获取到信息，尝试使用format-specific keys（特别适用于FLAC）
+            if artist == "未知艺术家" || album == "未知专辑" || title == url.deletingPathExtension().lastPathComponent || trackNumber == nil {
+                await LocalMusicItem.tryFormatSpecificMetadata(asset: asset, url: url, title: &title, artist: &artist, album: &album, trackNumber: &trackNumber, year: &year, genre: &genre, artwork: &artwork)
+            }
+            
         } catch {
-            print("获取元数据失败: \(error) - 文件: \(url.lastPathComponent)")
+            print("❌ 获取元数据失败: \(error) - 文件: \(url.lastPathComponent)")
             // 即使获取元数据失败，也使用默认值
         }
         
@@ -113,6 +121,192 @@ struct LocalMusicItem: Identifiable, Hashable {
         self.trackNumber = trackNumber
         self.year = year
         self.genre = genre
+        
+        // 🔑 添加调试信息
+        print("🎵 解析音乐文件: \(url.lastPathComponent)")
+        print("   标题: \(title)")
+        print("   艺术家: \(artist)")
+        print("   专辑: \(album)")
+        print("   时长: \(duration)秒")
+        print("   音轨号: \(trackNumber ?? 0)")
+        print("   年份: \(year ?? 0)")
+        print("   风格: \(genre ?? "无")")
+        print("   封面: \(artwork != nil ? "有" : "无")")
+    }
+    
+    // 🔑 新增：通过文件大小估算时长的方法
+    private static func estimateDurationFromFileSize(url: URL) async -> TimeInterval {
+        do {
+            let fileAttributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            if let fileSize = fileAttributes[FileAttributeKey.size] as? Int64 {
+                // 根据文件格式和大小粗略估算时长
+                let fileExtension = url.pathExtension.lowercased()
+                let estimatedBitrate: Double
+                
+                switch fileExtension {
+                case "flac":
+                    estimatedBitrate = 1000 * 1024 // FLAC约1000 kbps
+                case "wav", "aiff":
+                    estimatedBitrate = 1411 * 1024 // 无损CD质量
+                case "mp3":
+                    estimatedBitrate = 320 * 1024  // 高质量MP3
+                case "m4a", "aac":
+                    estimatedBitrate = 256 * 1024  // 高质量AAC
+                default:
+                    estimatedBitrate = 320 * 1024  // 默认值
+                }
+                
+                let estimatedDuration = Double(fileSize * 8) / estimatedBitrate // 转换为秒
+                print("⚠️ 通过文件大小估算时长: \(estimatedDuration)秒，文件: \(url.lastPathComponent)")
+                return max(1.0, estimatedDuration) // 至少1秒
+            }
+        } catch {
+            print("❌ 获取文件大小失败: \(error)")
+        }
+        
+        // 如果无法估算，返回默认值3分钟
+        return 180.0
+    }
+    
+    // 🔑 新增：尝试使用format-specific metadata keys
+    private static func tryFormatSpecificMetadata(asset: AVAsset, url: URL, title: inout String, artist: inout String, album: inout String, trackNumber: inout Int?, year: inout Int?, genre: inout String?, artwork: inout Data?) async {
+        do {
+            // 获取所有可用的metadata
+            let allMetadata = try await asset.load(.metadata)
+            
+            for item in allMetadata {
+                // 尝试获取key标识符
+                let key: String?
+                if let commonKey = item.commonKey?.rawValue {
+                    key = commonKey
+                } else if let identifierKey = item.identifier?.rawValue {
+                    key = identifierKey
+                } else if let keySpace = item.keySpace?.rawValue,
+                          let keyString = item.key as? String {
+                    key = "\(keySpace)/\(keyString)"
+                } else {
+                    continue
+                }
+                
+                guard let metadataKey = key else { continue }
+                
+                // 加载值
+                let value: Any?
+                do {
+                    value = try await item.load(.value)
+                } catch {
+                    continue
+                }
+                
+                guard let metadataValue = value else { continue }
+                
+                // 🔑 扩展的key匹配（支持FLAC/Vorbis Comments的常见字段）
+                let lowercaseKey = metadataKey.lowercased()
+                
+                if (lowercaseKey.contains("title") || lowercaseKey.contains("tit2")) && title == url.deletingPathExtension().lastPathComponent {
+                    if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        title = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                }
+                
+                if (lowercaseKey.contains("artist") || lowercaseKey.contains("tpe1") || lowercaseKey.contains("albumartist") || lowercaseKey.contains("tpe2")) && artist == "未知艺术家" {
+                    if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        artist = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                }
+                
+                if (lowercaseKey.contains("album") || lowercaseKey.contains("talb")) && album == "未知专辑" {
+                    if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        album = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                }
+                
+                // 🔑 增强音轨号识别 - 支持更多格式
+                if (lowercaseKey.contains("track") || lowercaseKey.contains("trck") || lowercaseKey.contains("tracknumber") || lowercaseKey == "trkn") && trackNumber == nil {
+                    
+                    if let numberValue = metadataValue as? NSNumber {
+                        trackNumber = numberValue.intValue
+                        print("🎵 找到音轨号 (NSNumber): \(trackNumber!) - key: \(metadataKey)")
+                    } else if let stringValue = metadataValue as? String {
+                        // 处理"3/12"这样的格式
+                        let components = stringValue.components(separatedBy: "/")
+                        if let number = Int(components.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "") {
+                            trackNumber = number
+                            print("🎵 找到音轨号 (String): \(trackNumber!) - key: \(metadataKey)")
+                        }
+                    } else if let dataValue = metadataValue as? Data {
+                        // 有些格式可能将音轨号存储为二进制数据
+                        if dataValue.count == 4 {
+                            let trackNum = dataValue.withUnsafeBytes { bytes in
+                                return bytes.load(as: UInt32.self).bigEndian
+                            }
+                            if trackNum > 0 && trackNum < 1000 { // 合理范围内的音轨号
+                                trackNumber = Int(trackNum)
+                                print("🎵 找到音轨号 (Data): \(trackNumber!) - key: \(metadataKey)")
+                            }
+                        }
+                    }
+                }
+                
+                if (lowercaseKey.contains("date") || lowercaseKey.contains("year") || lowercaseKey.contains("tyer")) && year == nil {
+                    year = parseYearFromDate(metadataValue)
+                }
+                
+                if (lowercaseKey.contains("genre") || lowercaseKey.contains("tcon")) && genre == nil {
+                    if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        genre = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                }
+                
+                if (lowercaseKey.contains("artwork") || lowercaseKey.contains("apic") || lowercaseKey.contains("covr")) && artwork == nil {
+                    if let imageData = metadataValue as? Data, !imageData.isEmpty {
+                        artwork = imageData
+                    }
+                }
+                
+                // 打印调试信息
+                print("📋 发现元数据: \(metadataKey) = \(String(describing: metadataValue).prefix(100))")
+            }
+            
+        } catch {
+            print("❌ 尝试格式特定元数据失败: \(error)")
+        }
+    }
+    
+    // 🔑 改进：年份解析方法
+    private static func parseYearFromDate(_ value: Any) -> Int? {
+        if let dateString = value as? String {
+            // 尝试解析各种日期格式
+            let yearPatterns = [
+                "yyyy-MM-dd",
+                "yyyy-MM",
+                "yyyy"
+            ]
+            
+            let dateFormatter = DateFormatter()
+            for pattern in yearPatterns {
+                dateFormatter.dateFormat = pattern
+                if let date = dateFormatter.date(from: dateString) {
+                    return Calendar.current.component(.year, from: date)
+                }
+            }
+            
+            // 如果格式不匹配，尝试提取4位数字年份
+            if let range = dateString.range(of: "\\b(19|20)\\d{2}\\b", options: .regularExpression),
+               let yearInt = Int(String(dateString[range])) {
+                return yearInt
+            }
+            
+        } else if let date = value as? Date {
+            return Calendar.current.component(.year, from: date)
+        } else if let number = value as? NSNumber {
+            let yearInt = number.intValue
+            if yearInt > 1900 && yearInt < 3000 {
+                return yearInt
+            }
+        }
+        
+        return nil
     }
 }
 
@@ -284,21 +478,62 @@ class LocalMusicService: NSObject, ObservableObject {
             throw NSError(domain: "LocalMusicService", code: 1001, userInfo: [NSLocalizedDescriptionKey: "无法访问文档目录"])
         }
         
+        // 🔑 创建Music根目录
+        let musicDir = docDir.appendingPathComponent("Music")
+        if !FileManager.default.fileExists(atPath: musicDir.path) {
+            try FileManager.default.createDirectory(at: musicDir, withIntermediateDirectories: true)
+            print("📁 创建Music根目录: \(musicDir.path)")
+        }
+        
         for sourceURL in urls {
             do {
-                let destinationURL = docDir.appendingPathComponent(sourceURL.lastPathComponent)
+                // 🔑 首先读取文件元数据来确定存放位置
+                let tempMusicItem = await LocalMusicItem(url: sourceURL)
                 
-                // 如果目标文件已存在，先删除
-                if FileManager.default.fileExists(atPath: destinationURL.path) {
-                    try FileManager.default.removeItem(at: destinationURL)
+                // 🔑 创建艺术家文件夹
+                let artistName = sanitizeFileName(tempMusicItem.artist)
+                let artistDir = musicDir.appendingPathComponent(artistName)
+                if !FileManager.default.fileExists(atPath: artistDir.path) {
+                    try FileManager.default.createDirectory(at: artistDir, withIntermediateDirectories: true)
+                    print("📁 创建艺术家目录: \(artistDir.path)")
                 }
                 
-                // 复制文件到文档目录
-                try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+                // 🔑 创建专辑文件夹
+                let albumName = sanitizeFileName(tempMusicItem.album)
+                let albumDir = artistDir.appendingPathComponent(albumName)
+                if !FileManager.default.fileExists(atPath: albumDir.path) {
+                    try FileManager.default.createDirectory(at: albumDir, withIntermediateDirectories: true)
+                    print("📁 创建专辑目录: \(albumDir.path)")
+                }
+                
+                // 🔑 生成目标文件名（包含音轨号）
+                let fileName = generateFileName(for: tempMusicItem, originalURL: sourceURL)
+                let destinationURL = albumDir.appendingPathComponent(fileName)
+                
+                // 如果目标文件已存在，处理重复文件
+                let finalDestinationURL = handleDuplicateFile(destinationURL)
+                
+                // 复制文件到分层目录结构
+                try FileManager.default.copyItem(at: sourceURL, to: finalDestinationURL)
+                
+                print("📁 文件已导入到: \(finalDestinationURL.path)")
+                
             } catch {
                 // 记录单个文件的错误但继续处理其他文件
-                print("导入文件失败 \(sourceURL.lastPathComponent): \(error.localizedDescription)")
-                continue
+                print("❌ 导入文件失败 \(sourceURL.lastPathComponent): \(error.localizedDescription)")
+                
+                // 🔑 如果元数据读取失败，使用默认位置
+                let fallbackDir = musicDir.appendingPathComponent("未知艺术家").appendingPathComponent("未知专辑")
+                try? FileManager.default.createDirectory(at: fallbackDir, withIntermediateDirectories: true)
+                let fallbackDestination = fallbackDir.appendingPathComponent(sourceURL.lastPathComponent)
+                
+                do {
+                    try FileManager.default.copyItem(at: sourceURL, to: handleDuplicateFile(fallbackDestination))
+                    print("📁 文件导入到默认位置: \(fallbackDestination.path)")
+                } catch {
+                    print("❌ 无法导入到默认位置: \(error.localizedDescription)")
+                    continue
+                }
             }
         }
         
@@ -338,25 +573,43 @@ class LocalMusicService: NSObject, ObservableObject {
         let musicFormats = ["mp3", "m4a", "wav", "aac", "flac", "aiff", "caf"]
         
         do {
-            let contents = try FileManager.default.contentsOfDirectory(at: documentsPath, includingPropertiesForKeys: nil)
+            // 🔑 修改：优先扫描Music目录，如果不存在则扫描整个Documents目录
+            let musicDir = documentsPath.appendingPathComponent("Music")
+            let scanDirectories: [URL] = FileManager.default.fileExists(atPath: musicDir.path) 
+                ? [musicDir] 
+                : [documentsPath]
             
-            // 收集所有音乐文件URL
-            let musicURLs = contents.filter { url in
-                let fileExtension = url.pathExtension.lowercased()
-                return musicFormats.contains(fileExtension)
+            print("🎵 扫描目录: \(scanDirectories.map { $0.path })")
+            
+            var allMusicURLs: [URL] = []
+            
+            // 🔑 递归扫描所有目录
+            for directory in scanDirectories {
+                let musicURLs = try await scanDirectoryRecursively(directory: directory, supportedFormats: musicFormats)
+                allMusicURLs.append(contentsOf: musicURLs)
             }
             
-            print("🎵 发现 \(musicURLs.count) 个音乐文件")
+            print("🎵 发现 \(allMusicURLs.count) 个音乐文件")
             
-            // 并行创建LocalMusicItem对象
-            let foundSongs = await musicURLs.concurrentMap { url -> LocalMusicItem in
+            // 🔑 修复：并行创建LocalMusicItem对象，但添加播放能力检查
+            let foundSongs = await allMusicURLs.concurrentMap { url -> LocalMusicItem? in
+                // 检查文件是否可播放
+                let isPlayable = await self.checkFilePlayability(url: url)
+                if !isPlayable {
+                    print("⚠️ 文件不可播放，跳过: \(url.lastPathComponent)")
+                    return nil
+                }
+                
                 let musicItem = await LocalMusicItem(url: url)
-                print("🎵 发现本地音乐: \(musicItem.title)")
+                print("🎵 成功解析本地音乐: \(musicItem.title) - \(musicItem.artist)")
                 return musicItem
             }
             
+            // 过滤掉nil值
+            let validSongs = foundSongs.compactMap { $0 }
+            
             // 按专辑分组
-            let groupedByAlbum = Dictionary(grouping: foundSongs) { $0.album }
+            let groupedByAlbum = Dictionary(grouping: validSongs) { $0.album }
             let albums = groupedByAlbum.compactMap { (albumName, songs) -> LocalAlbumItem? in
                 guard !songs.isEmpty, let firstSong = songs.first else {
                     return nil
@@ -377,7 +630,7 @@ class LocalMusicService: NSObject, ObservableObject {
             }.sorted { $0.title < $1.title }
             
             await MainActor.run {
-                self.localSongs = foundSongs.sorted { 
+                self.localSongs = validSongs.sorted { 
                     // 首先按专辑排序，然后按音轨号排序，最后按标题排序
                     if $0.album != $1.album {
                         return $0.album < $1.album
@@ -389,7 +642,7 @@ class LocalMusicService: NSObject, ObservableObject {
                 }
                 self.localAlbums = albums
                 self.isLoadingLocalMusic = false
-                print("🎵 扫描完成: 找到 \(foundSongs.count) 首歌曲, \(albums.count) 个专辑")
+                print("🎵 扫描完成: 找到 \(validSongs.count) 首可播放歌曲, \(albums.count) 个专辑")
             }
             
         } catch {
@@ -400,9 +653,41 @@ class LocalMusicService: NSObject, ObservableObject {
         }
     }
     
-    // MARK: - 音频会话和锁屏播放器配置
+    // 🔑 新增：递归扫描目录
+    private func scanDirectoryRecursively(directory: URL, supportedFormats: [String]) async throws -> [URL] {
+        var musicURLs: [URL] = []
+        
+        let contents = try FileManager.default.contentsOfDirectory(
+            at: directory, 
+            includingPropertiesForKeys: [.isDirectoryKey], 
+            options: [.skipsHiddenFiles]
+        )
+        
+        for url in contents {
+            do {
+                let resourceValues = try url.resourceValues(forKeys: [.isDirectoryKey])
+                
+                if resourceValues.isDirectory == true {
+                    // 递归扫描子目录
+                    let subDirectoryURLs = try await scanDirectoryRecursively(directory: url, supportedFormats: supportedFormats)
+                    musicURLs.append(contentsOf: subDirectoryURLs)
+                } else {
+                    // 检查文件扩展名
+                    let fileExtension = url.pathExtension.lowercased()
+                    if supportedFormats.contains(fileExtension) {
+                        musicURLs.append(url)
+                    }
+                }
+            } catch {
+                print("⚠️ 扫描文件/目录失败: \(url.lastPathComponent) - \(error)")
+                continue
+            }
+        }
+        
+        return musicURLs
+    }
     
-    /// 设置音频会话
+    /// 打开音频会话
     private func setupAudioSession() {
         // 使用统一音频会话管理器
         let success = AudioSessionManager.shared.requestAudioSession(for: .local)
@@ -542,17 +827,37 @@ class LocalMusicService: NSObject, ObservableObject {
                 nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = self.currentQueue.count
             }
             
-            // 封面艺术
+            // 🔑 修复封面艺术 - 使用LocalSongItem而不是LocalMusicItem
             let artworkSize = CGSize(width: 600, height: 600)
-            if let artworkData = (song.originalData as? LocalMusicItem)?.artwork,
+            if let localSongItem = song.originalData as? LocalSongItem,
+               let artworkData = localSongItem.artworkData,
                let image = UIImage(data: artworkData) {
                 let artwork = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
                     return image
                 }
                 nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-            } else if let defaultImage = UIImage(systemName: "music.note") {
-                nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
-                    return defaultImage
+                print("🎨 设置本地音乐封面成功，数据大小: \(artworkData.count) bytes")
+            } else {
+                // 🔑 改进默认封面处理
+                if let defaultImage = UIImage(systemName: "music.note") {
+                    let artwork = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
+                        return defaultImage
+                    }
+                    nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+                    print("🎨 使用默认音乐图标作为封面")
+                } else {
+                    print("❌ 无法创建默认封面图标")
+                }
+                
+                // 🔑 调试信息
+                if let localSongItem = song.originalData as? LocalSongItem {
+                    if localSongItem.artworkData == nil {
+                        print("⚠️ LocalSongItem 没有封面数据")
+                    } else {
+                        print("❌ LocalSongItem 有封面数据但无法创建UIImage，数据大小: \(localSongItem.artworkData?.count ?? 0) bytes")
+                    }
+                } else {
+                    print("❌ song.originalData 不是 LocalSongItem 类型，实际类型: \(type(of: song.originalData))")
                 }
             }
             
@@ -1441,6 +1746,133 @@ class LocalMusicService: NSObject, ObservableObject {
                 originalData: artistName
             )
         }.sorted { $0.name < $1.name }
+    }
+    
+    // 🔑 新增：文件名清理函数
+    private func sanitizeFileName(_ name: String) -> String {
+        let invalidChars = CharacterSet(charactersIn: ":/\\?%*|\"<>")
+        let sanitized = name.components(separatedBy: invalidChars).joined(separator: "_")
+        
+        // 限制长度并去除首尾空格
+        let trimmed = sanitized.trimmingCharacters(in: .whitespacesAndNewlines)
+        let maxLength = 100
+        
+        if trimmed.isEmpty {
+            return "Unknown"
+        } else if trimmed.count > maxLength {
+            return String(trimmed.prefix(maxLength))
+        } else {
+            return trimmed
+        }
+    }
+    
+    // 🔑 新增：生成优化的文件名
+    private func generateFileName(for musicItem: LocalMusicItem, originalURL: URL) -> String {
+        let fileExtension = originalURL.pathExtension
+        var components: [String] = []
+        
+        // 添加音轨号（如果存在）
+        if let trackNumber = musicItem.trackNumber {
+            components.append(String(format: "%02d", trackNumber))
+        }
+        
+        // 添加歌曲标题
+        let title = sanitizeFileName(musicItem.title)
+        if !title.isEmpty && title != "Unknown" {
+            components.append(title)
+        } else {
+            // 如果没有有效标题，使用原始文件名（去除扩展名）
+            components.append(originalURL.deletingPathExtension().lastPathComponent)
+        }
+        
+        let finalName = components.joined(separator: " - ")
+        return "\(finalName).\(fileExtension)"
+    }
+    
+    // 🔑 新增：处理重复文件
+    private func handleDuplicateFile(_ url: URL) -> URL {
+        var finalURL = url
+        var counter = 1
+        
+        while FileManager.default.fileExists(atPath: finalURL.path) {
+            let nameWithoutExtension = url.deletingPathExtension().lastPathComponent
+            let pathExtension = url.pathExtension
+            let directory = url.deletingLastPathComponent()
+            
+            let newName = "\(nameWithoutExtension) (\(counter)).\(pathExtension)"
+            finalURL = directory.appendingPathComponent(newName)
+            counter += 1
+        }
+        
+        return finalURL
+    }
+    
+    // 🔑 新增：检查文件是否可播放
+    private func checkFilePlayability(url: URL) async -> Bool {
+        // 检查文件是否存在
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            print("❌ 文件不存在: \(url.lastPathComponent)")
+            return false
+        }
+        
+        // 检查文件大小
+        do {
+            let fileAttributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            if let fileSize = fileAttributes[FileAttributeKey.size] as? Int64 {
+                if fileSize < 1024 { // 小于1KB可能是损坏文件
+                    print("⚠️ 文件过小，可能损坏: \(url.lastPathComponent) (\(fileSize) bytes)")
+                    return false
+                }
+            }
+        } catch {
+            print("❌ 无法获取文件属性: \(url.lastPathComponent)")
+            return false
+        }
+        
+        // 使用AVAsset检查文件是否可读
+        let asset = AVAsset(url: url)
+        do {
+            let isReadable = try await asset.load(.isReadable)
+            if !isReadable {
+                print("⚠️ 文件不可读: \(url.lastPathComponent)")
+                return false
+            }
+            
+            // 检查是否有音频轨道
+            let tracks = try await asset.load(.tracks)
+            let audioTracks = tracks.filter { track in
+                track.mediaType == .audio
+            }
+            
+            if audioTracks.isEmpty {
+                print("⚠️ 文件没有音频轨道: \(url.lastPathComponent)")
+                return false
+            }
+            
+            // 对于FLAC文件，做额外检查
+            let fileExtension = url.pathExtension.lowercased()
+            if fileExtension == "flac" {
+                // 检查AVPlayer是否支持播放这个FLAC文件
+                let playerItem = AVPlayerItem(url: url)
+                
+                // 等待一小段时间让播放项准备
+                try await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
+                
+                if playerItem.status == .failed {
+                    print("⚠️ FLAC文件不被AVPlayer支持: \(url.lastPathComponent)")
+                    if let error = playerItem.error {
+                        print("   错误: \(error.localizedDescription)")
+                    }
+                    return false
+                }
+            }
+            
+            return true
+            
+        } catch {
+            print("❌ 检查文件播放能力失败: \(url.lastPathComponent) - \(error)")
+            return false
+        }
     }
 }
 
