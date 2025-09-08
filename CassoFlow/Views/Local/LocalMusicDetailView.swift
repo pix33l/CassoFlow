@@ -105,7 +105,7 @@ struct LocalMusicDetailView: View {
                                   }
                                   
                                   if let year = album.year {
-                                      Text("\(year)")
+                                      Text("\(String(year))")
                                   }
                                   
                                   // 如果风格和年份都没有，显示默认文本
@@ -877,7 +877,7 @@ struct LocalInfoFooter: View {
   var body: some View {
       VStack(alignment: .center, spacing: 4) {
           if let year = year, !isPlaylist {
-              Text("发布于 \(year) 年")
+              Text("发布于 \(String(year)) 年")
                   .font(.footnote)
                   .foregroundColor(.secondary)
           } else if isPlaylist {

@@ -1129,10 +1129,10 @@ class MusicService: ObservableObject {
         case .subsonic:
             subsonicService.forceUpdateNowPlayingInfo()
         case .audioStation:
-            // audioStationService.forceUpdateNowPlayingInfo() // 如需要可添加
+            audioStationService.forceUpdateNowPlayingInfo() // 如需要可添加
             break
         case .local:
-            // localService.forceUpdateNowPlayingInfo() // 如需要可添加
+            localService.forceUpdateNowPlayingInfo() // 如需要可添加
             break
         case .musicKit:
             // MusicKit自动处理锁屏信息

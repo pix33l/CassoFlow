@@ -377,7 +377,7 @@ struct LocalAlbumItem: Identifiable, Hashable {
 }
 
 /// 本地音乐服务管理器
-class LocalMusicService: NSObject, ObservableObject {
+class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     static let shared = LocalMusicService()
     
     // MARK: - 属性
@@ -411,7 +411,7 @@ class LocalMusicService: NSObject, ObservableObject {
     // 私有属性
     private var avPlayer: AVPlayer?
     private var avPlayerObserver: Any?
-    private var currentSong: UniversalSong?
+    internal var currentSong: UniversalSong?
     private var originalQueue: [UniversalSong] = []  // 保存原始队列顺序
     private var originalIndex: Int = 0              // 保存原始播放位置
     
@@ -439,10 +439,9 @@ class LocalMusicService: NSObject, ObservableObject {
         super.init()
         setupNotifications()
         
-        // 延迟设置音频会话和远程控制
+        // 延迟设置音频会话，移除锁屏控制器设置（交给统一管理器）
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.setupAudioSession()
-            self.setupRemoteCommandCenter()
         }
     }
     
@@ -555,6 +554,8 @@ class LocalMusicService: NSObject, ObservableObject {
 //            // 获取本地艺术家
 //            return []
 //        }
+        // 🔑 新增：导入完成后立即扫描本地音乐
+        await scanLocalMusic()
     }
     
     /// 扫描本地音乐文件
@@ -709,178 +710,178 @@ class LocalMusicService: NSObject, ObservableObject {
         }
     }
     
-    /// 设置远程控制命令中心
-    private func setupRemoteCommandCenter() {
-        DispatchQueue.main.async {
-            let commandCenter = MPRemoteCommandCenter.shared()
-            
-            // 清除所有现有目标
-            commandCenter.playCommand.removeTarget(nil)
-            commandCenter.pauseCommand.removeTarget(nil)
-            commandCenter.nextTrackCommand.removeTarget(nil)
-            commandCenter.previousTrackCommand.removeTarget(nil)
-            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
-            commandCenter.togglePlayPauseCommand.removeTarget(nil)
-            
-            // 启用命令
-            commandCenter.playCommand.isEnabled = true
-            commandCenter.pauseCommand.isEnabled = true
-            commandCenter.nextTrackCommand.isEnabled = true
-            commandCenter.previousTrackCommand.isEnabled = true
-            commandCenter.changePlaybackPositionCommand.isEnabled = true
-            commandCenter.togglePlayPauseCommand.isEnabled = true
-            
-            // 播放命令
-            commandCenter.playCommand.addTarget { [weak self] _ in
-                print("🎵 本地音乐锁屏播放命令")
-                Task { await self?.play() }
-                return .success
-            }
-            
-            // 暂停命令
-            commandCenter.pauseCommand.addTarget { [weak self] _ in
-                print("⏸️ 本地音乐锁屏暂停命令")
-                Task { await self?.pause() }
-                return .success
-            }
-            
-            // 播放/暂停切换命令
-            commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-                print("⏯️ 本地音乐锁屏播放/暂停切换命令")
-                Task {
-                    if self?.isPlaying == true {
-                        await self?.pause()
-                    } else {
-                        await self?.play()
-                    }
-                }
-                return .success
-            }
-            
-            // 下一首命令
-            commandCenter.nextTrackCommand.addTarget { [weak self] _ in
-                print("⏭️ 本地音乐锁屏下一首命令")
-                Task { try? await self?.skipToNext() }
-                return .success
-            }
-            
-            // 上一首命令
-            commandCenter.previousTrackCommand.addTarget { [weak self] _ in
-                print("⏮️ 本地音乐锁屏上一首命令")
-                Task { try? await self?.skipToPrevious() }
-                return .success
-            }
-            
-            // 跳转命令
-            commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
-                if let event = event as? MPChangePlaybackPositionCommandEvent {
-                    let time = event.positionTime
-                    print("⏩ 本地音乐锁屏跳转命令: \(time)秒")
-                    Task {
-                        await self?.seek(to: time)
-                    }
-                    return .success
-                }
-                return .commandFailed
-            }
-            
-            print("✅ 本地音乐远程控制命令中心配置完成")
-        }
-    }
-    
-    /// 更新锁屏播放信息
-    private func updateNowPlayingInfo() {
-        // 确保在主线程上执行
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self, let song = self.currentSong else {
-                // 使用空字典而不是 nil
-                MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-                print("🔄 清除本地音乐锁屏播放信息")
-                return
-            }
-            
-            // 重要：验证播放器状态
-            guard let player = self.avPlayer else {
-                print("❌ 本地音乐播放器为空，跳过锁屏信息更新")
-                return
-            }
-            
-            var nowPlayingInfo = [String: Any]()
-            
-            // 基本信息
-            nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
-            nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
-            nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumName ?? ""
-            
-            // 时间信息
-            let safeDuration = self.duration > 0 ? self.duration : song.duration
-            let validDuration = max(1.0, safeDuration) // 确保时长至少为1秒
-            let validCurrentTime = max(0.0, min(self.currentTime, validDuration)) // 确保当前时间不超过总时长
-            
-            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = validDuration
-            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = validCurrentTime
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
-            
-            // 队列信息
-            if !self.currentQueue.isEmpty {
-                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = self.currentIndex
-                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = self.currentQueue.count
-            }
-            
-            // 🔑 修复封面艺术 - 使用LocalSongItem而不是LocalMusicItem
-            let artworkSize = CGSize(width: 600, height: 600)
-            if let localSongItem = song.originalData as? LocalSongItem,
-               let artworkData = localSongItem.artworkData,
-               let image = UIImage(data: artworkData) {
-                let artwork = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
-                    return image
-                }
-                nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-                print("🎨 设置本地音乐封面成功，数据大小: \(artworkData.count) bytes")
-            } else {
-                // 🔑 改进默认封面处理
-                if let defaultImage = UIImage(systemName: "music.note") {
-                    let artwork = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
-                        return defaultImage
-                    }
-                    nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
-                    print("🎨 使用默认音乐图标作为封面")
-                } else {
-                    print("❌ 无法创建默认封面图标")
-                }
-                
-                // 🔑 调试信息
-                if let localSongItem = song.originalData as? LocalSongItem {
-                    if localSongItem.artworkData == nil {
-                        print("⚠️ LocalSongItem 没有封面数据")
-                    } else {
-                        print("❌ LocalSongItem 有封面数据但无法创建UIImage，数据大小: \(localSongItem.artworkData?.count ?? 0) bytes")
-                    }
-                } else {
-                    print("❌ song.originalData 不是 LocalSongItem 类型，实际类型: \(type(of: song.originalData))")
-                }
-            }
-            
-            // 设置播放信息
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-            
-            print("🔄 设置本地音乐锁屏播放信息:")
-            print("   标题: \(song.title)")
-            print("   艺术家: \(song.artistName)")
-            print("   时长: \(validDuration)秒")
-            print("   当前时间: \(validCurrentTime)秒")
-            print("   播放速率: \(self.isPlaying ? 1.0 : 0.0)")
-            print("   播放器控制状态: \(player.timeControlStatus.rawValue)")
-        }
-    }
-    
-    /// 更新播放进度信息
-    private func updatePlaybackProgress() {
-        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
-    }
+//    /// 设置远程控制命令中心
+//    private func setupRemoteCommandCenter() {
+//        DispatchQueue.main.async {
+//            let commandCenter = MPRemoteCommandCenter.shared()
+//            
+//            // 清除所有现有目标
+//            commandCenter.playCommand.removeTarget(nil)
+//            commandCenter.pauseCommand.removeTarget(nil)
+//            commandCenter.nextTrackCommand.removeTarget(nil)
+//            commandCenter.previousTrackCommand.removeTarget(nil)
+//            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+//            commandCenter.togglePlayPauseCommand.removeTarget(nil)
+//            
+//            // 启用命令
+//            commandCenter.playCommand.isEnabled = true
+//            commandCenter.pauseCommand.isEnabled = true
+//            commandCenter.nextTrackCommand.isEnabled = true
+//            commandCenter.previousTrackCommand.isEnabled = true
+//            commandCenter.changePlaybackPositionCommand.isEnabled = true
+//            commandCenter.togglePlayPauseCommand.isEnabled = true
+//            
+//            // 播放命令
+//            commandCenter.playCommand.addTarget { [weak self] _ in
+//                print("🎵 本地音乐锁屏播放命令")
+//                Task { await self?.play() }
+//                return .success
+//            }
+//            
+//            // 暂停命令
+//            commandCenter.pauseCommand.addTarget { [weak self] _ in
+//                print("⏸️ 本地音乐锁屏暂停命令")
+//                Task { await self?.pause() }
+//                return .success
+//            }
+//            
+//            // 播放/暂停切换命令
+//            commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+//                print("⏯️ 本地音乐锁屏播放/暂停切换命令")
+//                Task {
+//                    if self?.isPlaying == true {
+//                        await self?.pause()
+//                    } else {
+//                        await self?.play()
+//                    }
+//                }
+//                return .success
+//            }
+//            
+//            // 下一首命令
+//            commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+//                print("⏭️ 本地音乐锁屏下一首命令")
+//                Task { try? await self?.skipToNext() }
+//                return .success
+//            }
+//            
+//            // 上一首命令
+//            commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+//                print("⏮️ 本地音乐锁屏上一首命令")
+//                Task { try? await self?.skipToPrevious() }
+//                return .success
+//            }
+//            
+//            // 跳转命令
+//            commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+//                if let event = event as? MPChangePlaybackPositionCommandEvent {
+//                    let time = event.positionTime
+//                    print("⏩ 本地音乐锁屏跳转命令: \(time)秒")
+//                    Task {
+//                        await self?.seek(to: time)
+//                    }
+//                    return .success
+//                }
+//                return .commandFailed
+//            }
+//            
+//            print("✅ 本地音乐远程控制命令中心配置完成")
+//        }
+//    }
+//    
+//    /// 更新锁屏播放信息
+//    private func updateNowPlayingInfo() {
+//        // 确保在主线程上执行
+//        DispatchQueue.main.async { [weak self] in
+//            guard let self = self, let song = self.currentSong else {
+//                // 使用空字典而不是 nil
+//                MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+//                print("🔄 清除本地音乐锁屏播放信息")
+//                return
+//            }
+//            
+//            // 重要：验证播放器状态
+//            guard let player = self.avPlayer else {
+//                print("❌ 本地音乐播放器为空，跳过锁屏信息更新")
+//                return
+//            }
+//            
+//            var nowPlayingInfo = [String: Any]()
+//            
+//            // 基本信息
+//            nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
+//            nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
+//            nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumName ?? ""
+//            
+//            // 时间信息
+//            let safeDuration = self.duration > 0 ? self.duration : song.duration
+//            let validDuration = max(1.0, safeDuration) // 确保时长至少为1秒
+//            let validCurrentTime = max(0.0, min(self.currentTime, validDuration)) // 确保当前时间不超过总时长
+//            
+//            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = validDuration
+//            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = validCurrentTime
+//            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
+//            
+//            // 队列信息
+//            if !self.currentQueue.isEmpty {
+//                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = self.currentIndex
+//                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = self.currentQueue.count
+//            }
+//            
+//            // 🔑 修复封面艺术 - 使用LocalSongItem而不是LocalMusicItem
+//            let artworkSize = CGSize(width: 600, height: 600)
+//            if let localSongItem = song.originalData as? LocalSongItem,
+//               let artworkData = localSongItem.artworkData,
+//               let image = UIImage(data: artworkData) {
+//                let artwork = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
+//                    return image
+//                }
+//                nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+//                print("🎨 设置本地音乐封面成功，数据大小: \(artworkData.count) bytes")
+//            } else {
+//                // 🔑 改进默认封面处理
+//                if let defaultImage = UIImage(systemName: "music.note") {
+//                    let artwork = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
+//                        return defaultImage
+//                    }
+//                    nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+//                    print("🎨 使用默认音乐图标作为封面")
+//                } else {
+//                    print("❌ 无法创建默认封面图标")
+//                }
+//                
+//                // 🔑 调试信息
+//                if let localSongItem = song.originalData as? LocalSongItem {
+//                    if localSongItem.artworkData == nil {
+//                        print("⚠️ LocalSongItem 没有封面数据")
+//                    } else {
+//                        print("❌ LocalSongItem 有封面数据但无法创建UIImage，数据大小: \(localSongItem.artworkData?.count ?? 0) bytes")
+//                    }
+//                } else {
+//                    print("❌ song.originalData 不是 LocalSongItem 类型，实际类型: \(type(of: song.originalData))")
+//                }
+//            }
+//            
+//            // 设置播放信息
+//            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+//            
+//            print("🔄 设置本地音乐锁屏播放信息:")
+//            print("   标题: \(song.title)")
+//            print("   艺术家: \(song.artistName)")
+//            print("   时长: \(validDuration)秒")
+//            print("   当前时间: \(validCurrentTime)秒")
+//            print("   播放速率: \(self.isPlaying ? 1.0 : 0.0)")
+//            print("   播放器控制状态: \(player.timeControlStatus.rawValue)")
+//        }
+//    }
+//    
+//    /// 更新播放进度信息
+//    private func updatePlaybackProgress() {
+//        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
+//        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+//        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
+//        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+//    }
     
     // MARK: - 数据获取方法
     
@@ -1121,6 +1122,9 @@ class LocalMusicService: NSObject, ObservableObject {
             }
         }
         
+        // 🔑 注册为锁屏控制器代理
+        NowPlayingManager.shared.setDelegate(self)
+        
         try await playCurrentSong()
     }
     
@@ -1181,12 +1185,8 @@ class LocalMusicService: NSObject, ObservableObject {
                     if newTime.isFinite && !newTime.isNaN {
                         self.currentTime = newTime
                         
-                        // 实时更新播放进度
-                        if var info = MPNowPlayingInfoCenter.default().nowPlayingInfo {
-                            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = newTime
-                            info[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
-                            MPNowPlayingInfoCenter.default().nowPlayingInfo = info
-                        }
+                        // 🔑 使用统一管理器更新播放进度
+                        NowPlayingManager.shared.updatePlaybackProgress()
                     }
                 }
             }
@@ -1200,8 +1200,8 @@ class LocalMusicService: NSObject, ObservableObject {
             
             print("✅ 本地音乐AVPlayer 设置完成，开始播放")
             
-            // 关键修复：立即设置播放信息
-            self.updateNowPlayingInfo()
+            // 🔑 使用统一管理器更新锁屏信息
+            NowPlayingManager.shared.updateNowPlayingInfo()
         }
     }
     
@@ -1215,14 +1215,14 @@ class LocalMusicService: NSObject, ObservableObject {
                 if let player = self?.avPlayer {
                     print("🎵 本地音乐播放器状态变化: \(player.timeControlStatus.rawValue)")
                     if player.timeControlStatus == .playing {
-                        self?.updateNowPlayingInfo()
+                        NowPlayingManager.shared.updateNowPlayingInfo()
                     }
                 }
             case "status":
                 if let status = self?.avPlayer?.currentItem?.status {
                     print("🎵 本地音乐播放项状态变化: \(status.rawValue)")
                     if status == .readyToPlay {
-                        self?.updateNowPlayingInfo()
+                        NowPlayingManager.shared.updateNowPlayingInfo()
                     }
                 }
             default:
@@ -1237,7 +1237,8 @@ class LocalMusicService: NSObject, ObservableObject {
         await MainActor.run {
             isPlaying = true
             // 更新锁屏播放状态
-            updatePlaybackProgress()
+            // 🔑 使用统一管理器更新播放状态
+            NowPlayingManager.shared.updatePlaybackProgress()
         }
     }
     
@@ -1247,7 +1248,7 @@ class LocalMusicService: NSObject, ObservableObject {
         await MainActor.run {
             isPlaying = false
             // 更新锁屏播放状态
-            updatePlaybackProgress()
+            NowPlayingManager.shared.updatePlaybackProgress()
         }
     }
     
@@ -1296,7 +1297,7 @@ class LocalMusicService: NSObject, ObservableObject {
             avPlayer?.seek(to: CMTime(seconds: time, preferredTimescale: 1))
             currentTime = time
             // 更新锁屏播放进度
-            updatePlaybackProgress()
+            NowPlayingManager.shared.updatePlaybackProgress()
         }
     }
     
@@ -1310,11 +1311,14 @@ class LocalMusicService: NSObject, ObservableObject {
         currentTime = 0
         duration = 0
         
+        // 🔑 清除锁屏控制器代理
+        NowPlayingManager.shared.setDelegate(nil)
+
         // 释放音频会话控制权
         AudioSessionManager.shared.releaseAudioSession(for: .local)
         
-        // 清除锁屏播放信息
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        // 🔑 使用统一管理器清除锁屏播放信息
+        NowPlayingManager.shared.clearNowPlayingInfo()
     }
     
     // MARK: - 获取当前播放信息
@@ -1441,6 +1445,12 @@ class LocalMusicService: NSObject, ObservableObject {
         elapsedDuration += currentTime
         
         return elapsedDuration
+    }
+    
+    // 🔑 新增：强制更新锁屏播放信息的公共方法
+    func forceUpdateNowPlayingInfo() {
+        // 🔑 使用统一管理器强制更新
+        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
     }
     
     // MARK: - 私有方法

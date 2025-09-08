@@ -123,7 +123,7 @@ class NowPlayingManager {
     func forceUpdateNowPlayingInfo() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
-                  let delegate = self.currentDelegate else {
+                  let _ = self.currentDelegate else {
                 print("⚠️ 强制更新锁屏信息时无有效代理")
                 return
             }
@@ -287,13 +287,23 @@ class NowPlayingManager {
                 return MPMediaItemArtwork(boundsSize: size) { _ in image }
             }
             
-        case .subsonic, .audioStation:
-            // 在线音乐封面处理 - 优先使用缓存
+        case .subsonic:
+            // Subsonic音乐封面处理 - 优先使用缓存
             if let artworkURL = song.artworkURL,
                let cachedImage = ImageCacheManager.shared.getCachedImage(for: artworkURL) {
-                print("🎨 使用缓存的在线音乐封面")
+                print("🎨 使用缓存的Subsonic音乐封面")
                 return MPMediaItemArtwork(boundsSize: size) { _ in cachedImage }
             }
+            
+        case .audioStation:
+            // 🔑 AudioStation音乐封面处理 - 需要特殊处理
+            // 首先尝试使用歌曲自带的封面URL
+            if let artworkURL = song.artworkURL,
+               let cachedImage = ImageCacheManager.shared.getCachedImage(for: artworkURL) {
+                print("🎨 使用缓存的AudioStation音乐封面（歌曲URL）")
+                return MPMediaItemArtwork(boundsSize: size) { _ in cachedImage }
+            }
+            
         case .musicKit:
             break
         }
@@ -303,6 +313,35 @@ class NowPlayingManager {
             print("🎨 使用默认音乐图标作为封面")
             return MPMediaItemArtwork(boundsSize: size) { _ in defaultImage }
         }
+        
+        // 使用自定义默认封面
+//        let defaultImage = createDefaultArtwork(size: size)
+//        print("🎨 使用自定义默认音乐图标作为封面")
+//        return MPMediaItemArtwork(boundsSize: size) { _ in defaultImage }
+//    }
+//    
+//    /// 创建自定义默认封面
+//    private func createDefaultArtwork(size: CGSize) -> UIImage {
+//        // 创建一个带背景的自定义图像
+//        let renderer = UIGraphicsImageRenderer(size: size)
+//        let image = renderer.image { context in
+//            // 设置背景色
+//            UIColor.systemBlue.setFill()
+//            context.fill(CGRect(origin: .zero, size: size))
+//            
+//            // 绘制音乐符号
+//            let symbolConfig = UIImage.SymbolConfiguration(pointSize: size.width * 0.5, weight: .bold)
+//            if let symbolImage = UIImage(systemName: "music.note", withConfiguration: symbolConfig)?.withTintColor(.white, renderingMode: .alwaysOriginal) {
+//                let symbolSize = symbolImage.size
+//                let symbolRect = CGRect(
+//                    x: (size.width - symbolSize.width) / 2,
+//                    y: (size.height - symbolSize.height) / 2,
+//                    width: symbolSize.width,
+//                    height: symbolSize.height
+//                )
+//                symbolImage.draw(in: symbolRect)
+//            }
+//        }
         
         return nil
     }
@@ -337,6 +376,7 @@ class NowPlayingManager {
         // 开始下载
         await imageCache.preloadImage(from: url)
         await waitForImageDownload(url: url, targetSongId: song.id)
+        
     }
     
     /// 等待图片下载完成

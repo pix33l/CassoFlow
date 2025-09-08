@@ -27,23 +27,23 @@ struct LocalQueueView: View {
             .navigationTitle("播放队列")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if !queueSongs.isEmpty {
-                        Menu {
-                            Button {
-                                Task {
-                                    await clearQueue()
-                                }
-                            } label: {
-                                Label("清空队列", systemImage: "trash")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .font(.body)
-                                .foregroundColor(.primary)
-                        }
-                    }
-                }
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    if !queueSongs.isEmpty {
+//                        Menu {
+//                            Button {
+//                                Task {
+//                                    await clearQueue()
+//                                }
+//                            } label: {
+//                                Label("清空队列", systemImage: "trash")
+//                            }
+//                        } label: {
+//                            Image(systemName: "ellipsis")
+//                                .font(.body)
+//                                .foregroundColor(.primary)
+//                        }
+//                    }
+//                }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -152,15 +152,15 @@ struct LocalQueueView: View {
         }
     }
     
-    private func clearQueue() async {
-        let localService = musicService.getLocalService()
-        localService.stop()
-        
-        await MainActor.run {
-            queueSongs.removeAll()
-            currentIndex = 0
-        }
-        
-        print("🎵 本地音乐队列已清空")
-    }
+//    private func clearQueue() async {
+//        let localService = musicService.getLocalService()
+//        localService.stop()
+//        
+//        await MainActor.run {
+//            queueSongs.removeAll()
+//            currentIndex = 0
+//        }
+//        
+//        print("🎵 本地音乐队列已清空")
+//    }
 }

@@ -4,20 +4,19 @@ import Combine
 import MediaPlayer
 
 /// Audio Station 音乐服务
-class AudioStationMusicService: ObservableObject {
+class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     static let shared = AudioStationMusicService()
     
     @Published var isConnected: Bool = false
     
-    private let apiClient = AudioStationAPIClient
-.shared
+    private let apiClient = AudioStationAPIClient.shared
     private var currentQueue: [UniversalSong] = []
     private var currentIndex: Int = 0
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
     
     @Published private var playbackTime: TimeInterval = 0
-    @Published private var isPlaying: Bool = false
+    @Published internal var isPlaying: Bool = false
     
     private var timeObserver: Any?
     private var statusObserver: AnyCancellable?
@@ -34,8 +33,37 @@ class AudioStationMusicService: ObservableObject {
     deinit {
         removeTimeObserver()
         statusObserver?.cancel()
-        // 🔑 清理锁屏播放信息
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        // 🔑 清除锁屏控制器代理
+        NowPlayingManager.shared.setDelegate(nil)
+    }
+    
+    // MARK: - NowPlayingDelegate 协议实现
+    
+    /// 当前播放的歌曲
+    var currentSong: UniversalSong? {
+        guard currentIndex < currentQueue.count else { return nil }
+        return currentQueue[currentIndex]
+    }
+    
+    // MARK: - 状态获取
+    
+    func getCurrentSong() -> UniversalSong? {
+        guard currentIndex < currentQueue.count else { return nil }
+        return currentQueue[currentIndex]
+    }
+    
+    // 🔑 添加缺失的详细队列信息方法
+    func getDetailedQueueInfo() -> (queue: [UniversalSong], currentIndex: Int, totalCount: Int) {
+        return (currentQueue, currentIndex, currentQueue.count)
+    }
+    
+    // 🔑 保留NowPlayingDelegate协议要求的方法
+    func getQueueInfo() -> (queue: [UniversalSong], currentIndex: Int) {
+        return (currentQueue, currentIndex)
+    }
+    
+    func getPlaybackInfo() -> (current: TimeInterval, total: TimeInterval, isPlaying: Bool) {
+        return (playbackTime, getCurrentDuration(), isPlaying)
     }
     
     private func setupPlayer() {
@@ -45,190 +73,171 @@ class AudioStationMusicService: ObservableObject {
     
     // 🔑 新增：音频会话配置
     private func setupAudioSession() {
-        // 🔑 只在初始化时设置一次，不重复激活
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            // 🔑 修复：移除 .defaultToSpeaker 选项
-            try audioSession.setCategory(.playback, mode: .default, options: [.allowAirPlay, .allowBluetooth])
-            print("✅ Audio Station 音频会话类别配置成功")
-        } catch {
-            print("❌ Audio Station 音频会话设置失败: \(error)")
+        // 🔑 使用统一音频会话管理器，确保与其他服务一致
+        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+        if success {
+            print("✅ Audio Station 音频会话设置成功")
+        } else {
+            print("❌ Audio Station 音频会话设置失败")
         }
     }
     
     /// 激活音频会话（在播放前调用）
     private func activateAudioSession() {
-        // 🔑 只在真正需要播放时才激活，避免冲突
-        guard !isPlaying else { 
-            print("🔄 Audio Station 音频会话已经激活，跳过重复激活")
-            return 
-        }
-        
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            
-            // 🔑 检查当前会话状态
-            if audioSession.category != .playback {
-                try audioSession.setCategory(.playback, mode: .default, options: [.allowAirPlay, .allowBluetooth])
-            }
-            
-            // 🔑 只在非活动状态时才激活
-            if !audioSession.isOtherAudioPlaying {
-                try audioSession.setActive(true)
-                print("✅ Audio Station 音频会话已激活")
-            } else {
-                print("🔄 其他音频正在播放，使用现有会话")
-            }
-        } catch {
-            print("⚠️ Audio Station 音频会话激活失败: \(error)")
-            // 不抛出错误，继续播放
+        // 🔑 每次播放前都重新请求音频会话，确保获得控制权
+        print("🎵 激活Audio Station音频会话")
+        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+        if success {
+            print("✅ Audio Station 音频会话激活成功")
+        } else {
+            print("⚠️ Audio Station 音频会话激活失败")
         }
     }
     
-    // 🔑 新增：远程控制命令中心配置
-    private func setupRemoteCommandCenter() {
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        // 播放命令
-        commandCenter.playCommand.addTarget { [weak self] _ in
-            Task {
-                await self?.play()
-            }
-            return .success
-        }
-        
-        // 暂停命令
-        commandCenter.pauseCommand.addTarget { [weak self] _ in
-            Task {
-                await self?.pause()
-            }
-            return .success
-        }
-        
-        // 下一首命令
-        commandCenter.nextTrackCommand.addTarget { [weak self] _ in
-            Task {
-                try? await self?.skipToNext()
-            }
-            return .success
-        }
-        
-        // 上一首命令
-        commandCenter.previousTrackCommand.addTarget { [weak self] _ in
-            Task {
-                try? await self?.skipToPrevious()
-            }
-            return .success
-        }
-        
-        // 跳转命令
-        commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
-            if let event = event as? MPChangePlaybackPositionCommandEvent {
-                let time = event.positionTime
-                Task {
-                    await self?.seek(to: time)
-                }
-                return .success
-            }
-            return .commandFailed
-        }
-    }
-    
-    // 🔑 新增：更新锁屏播放信息
-    private func updateNowPlayingInfo() {
-        guard currentIndex < currentQueue.count else {
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
-            return
-        }
-        
-        let song = currentQueue[currentIndex]
-        var nowPlayingInfo = [String: Any]()
-        
-        // 基本信息
-        nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
-        nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
-        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumName ?? ""
-        
-        // 播放时长和当前进度
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = getCurrentDuration()
-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playbackTime
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
-        
-        // 队列信息
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = currentIndex
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = currentQueue.count
-        
-        // 🔧 专辑封面（使用智能封面获取）
-        Task {
-            await loadAndSetArtwork(for: song, info: &nowPlayingInfo)
-        }
-        
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-    }
-    
-    // 🔧 改进：异步加载专辑封面
-    private func loadAndSetArtwork(for song: UniversalSong, info: inout [String: Any]) async {
-        // 优先使用歌曲的artworkURL
-        var coverURL: URL? = song.artworkURL
-        
-        // 如果没有，尝试获取智能封面
-        if coverURL == nil, let originalSong = song.originalData as? AudioStationSong {
-            coverURL = apiClient.getCoverArtURL(for: originalSong)
-        }
-        
-        guard let url = coverURL else {
-            // 使用默认封面
-            if let defaultImage = UIImage(systemName: "music.note") {
-                await MainActor.run {
-                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-                    updatedInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
-                        return defaultImage
-                    }
-                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
-                }
-            }
-            return
-        }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let image = UIImage(data: data) {
-                let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in
-                    return image
-                }
-                
-                await MainActor.run {
-                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-                    updatedInfo[MPMediaItemPropertyArtwork] = artwork
-                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
-                }
-                
-                print("✅ 锁屏封面加载成功")
-            }
-        } catch {
-            print("❌ 锁屏封面加载失败: \(error)")
-            
-            // 使用默认封面
-            if let defaultImage = UIImage(systemName: "music.note") {
-                await MainActor.run {
-                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-                    updatedInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
-                        return defaultImage
-                    }
-                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
-                }
-            }
-        }
-    }
-    
-    // 🔑 新增：更新播放进度信息
-    private func updatePlaybackProgress() {
-        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playbackTime
-        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
-    }
-    
+//    // 🔑 新增：远程控制命令中心配置
+//    private func setupRemoteCommandCenter() {
+//        let commandCenter = MPRemoteCommandCenter.shared()
+//        
+//        // 播放命令
+//        commandCenter.playCommand.addTarget { [weak self] _ in
+//            Task {
+//                await self?.play()
+//            }
+//            return .success
+//        }
+//        
+//        // 暂停命令
+//        commandCenter.pauseCommand.addTarget { [weak self] _ in
+//            Task {
+//                await self?.pause()
+//            }
+//            return .success
+//        }
+//        
+//        // 下一首命令
+//        commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+//            Task {
+//                try? await self?.skipToNext()
+//            }
+//            return .success
+//        }
+//        
+//        // 上一首命令
+//        commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+//            Task {
+//                try? await self?.skipToPrevious()
+//            }
+//            return .success
+//        }
+//        
+//        // 跳转命令
+//        commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+//            if let event = event as? MPChangePlaybackPositionCommandEvent {
+//                let time = event.positionTime
+//                Task {
+//                    await self?.seek(to: time)
+//                }
+//                return .success
+//            }
+//            return .commandFailed
+//        }
+//    }
+//    
+//    // 🔑 新增：更新锁屏播放信息
+//    private func updateNowPlayingInfo() {
+//        guard currentIndex < currentQueue.count else {
+//            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+//            return
+//        }
+//        
+//        let song = currentQueue[currentIndex]
+//        var nowPlayingInfo = [String: Any]()
+//        
+//        // 基本信息
+//        nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
+//        nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
+//        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumName ?? ""
+//        
+//        // 播放时长和当前进度
+//        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = getCurrentDuration()
+//        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playbackTime
+//        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
+//        
+//        // 队列信息
+//        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = currentIndex
+//        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = currentQueue.count
+//        
+//        // 🔧 专辑封面（使用智能封面获取）
+//        Task {
+//            await loadAndSetArtwork(for: song, info: &nowPlayingInfo)
+//        }
+//        
+//        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+//    }
+//    
+//    // 🔧 改进：异步加载专辑封面
+//    private func loadAndSetArtwork(for song: UniversalSong, info: inout [String: Any]) async {
+//        // 优先使用歌曲的artworkURL
+//        var coverURL: URL? = song.artworkURL
+//        
+//        // 如果没有，尝试获取智能封面
+//        if coverURL == nil, let originalSong = song.originalData as? AudioStationSong {
+//            coverURL = apiClient.getCoverArtURL(for: originalSong)
+//        }
+//        
+//        guard let url = coverURL else {
+//            // 使用默认封面
+//            if let defaultImage = UIImage(systemName: "music.note") {
+//                await MainActor.run {
+//                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+//                    updatedInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
+//                        return defaultImage
+//                    }
+//                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
+//                }
+//            }
+//            return
+//        }
+//        
+//        do {
+//            let (data, _) = try await URLSession.shared.data(from: url)
+//            if let image = UIImage(data: data) {
+//                let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in
+//                    return image
+//                }
+//                
+//                await MainActor.run {
+//                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+//                    updatedInfo[MPMediaItemPropertyArtwork] = artwork
+//                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
+//                }
+//                
+//                print("✅ 锁屏封面加载成功")
+//            }
+//        } catch {
+//            print("❌ 锁屏封面加载失败: \(error)")
+//            
+//            // 使用默认封面
+//            if let defaultImage = UIImage(systemName: "music.note") {
+//                await MainActor.run {
+//                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+//                    updatedInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: defaultImage.size) { _ in
+//                        return defaultImage
+//                    }
+//                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
+//                }
+//            }
+//        }
+//    }
+//    
+//    // 🔑 新增：更新播放进度信息
+//    private func updatePlaybackProgress() {
+//        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
+//        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playbackTime
+//        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
+//        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+//    }
+//    
     private func addTimeObserver() {
         // 🔑 修复：确保时间间隔有效
         let timeInterval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
@@ -240,7 +249,7 @@ class AudioStationMusicService: ObservableObject {
                 if seconds.isFinite && !seconds.isNaN {
                     self?.playbackTime = seconds
                     // 🔑 定期更新锁屏播放进度
-                    self?.updatePlaybackProgress()
+                    NowPlayingManager.shared.updatePlaybackProgress()
                 }
             }
         } else {
@@ -566,18 +575,15 @@ class AudioStationMusicService: ObservableObject {
             if !connected {
                 throw AudioStationError.authenticationFailed("连接失败")
             }
-            // 🔑 只在连接成功后设置音频会话和远程控制
+            // 🔑 只在连接成功后设置音频会话
             setupAudioSession()
-            setupRemoteCommandCenter()
-            // 🔑 开始接收远程控制事件
-            DispatchQueue.main.async {
-                UIApplication.shared.beginReceivingRemoteControlEvents()
-                print("✅ Audio Station 开始接收远程控制事件")
-            }
         }
         
         currentQueue = songs
         currentIndex = max(0, min(index, songs.count - 1))
+        
+        // 🔑 注册为锁屏控制器代理
+        NowPlayingManager.shared.setDelegate(self)
         
         if !songs.isEmpty {
             try await playSongAtCurrentIndex()
@@ -593,6 +599,19 @@ class AudioStationMusicService: ObservableObject {
         }
         
         print("🎵 准备播放: \(song.title) - URL: \(streamURL)")
+        
+        // 🔑 添加封面URL调试信息
+        if let artworkURL = song.artworkURL {
+            print("🖼️ AudioStation歌曲封面URL: \(artworkURL)")
+        } else {
+            print("⚠️ AudioStation歌曲没有封面URL")
+        }
+        
+        // 🔑 尝试通过API获取封面URL
+        if let audioStationSong = song.originalData as? AudioStationSong {
+            let coverURL = apiClient.getCoverArtURL(for: audioStationSong)
+            print("🖼️ AudioStation API封面URL: \(coverURL?.absoluteString ?? "nil")")
+        }
         
         // 🔑 激活音频会话
         activateAudioSession()
@@ -610,8 +629,8 @@ class AudioStationMusicService: ObservableObject {
                         print("✅ 歌曲准备就绪，开始播放")
                         self?.player?.play()
                         self?.isPlaying = true
-                        // 🔑 更新锁屏播放信息
-                        self?.updateNowPlayingInfo()
+                        // 🔑 使用统一管理器更新锁屏播放信息
+                        NowPlayingManager.shared.updateNowPlayingInfo()
                     case .failed:
                         let error = self?.playerItem?.error?.localizedDescription ?? "未知错误"
                         print("❌ 播放失败: \(error)")
@@ -619,8 +638,8 @@ class AudioStationMusicService: ObservableObject {
                             print("❌ 详细错误: \(playerError)")
                         }
                         self?.isPlaying = false
-                        // 🔑 清除锁屏播放信息
-                        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+                        // 🔑 使用统一管理器清除锁屏播放信息
+                        NowPlayingManager.shared.clearNowPlayingInfo()
                         
                         // 🔧 尝试使用转码后的格式重新播放
                         Task {
@@ -658,12 +677,12 @@ class AudioStationMusicService: ObservableObject {
                             print("✅ 转码格式播放成功")
                             self?.player?.play()
                             self?.isPlaying = true
-                            self?.updateNowPlayingInfo()
+                            NowPlayingManager.shared.updateNowPlayingInfo()
                         } else if status == .failed {
                             let error = newPlayerItem.error?.localizedDescription ?? "未知错误"
                             print("❌ 转码格式也播放失败: \(error)")
                             self?.isPlaying = false
-                            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+                            NowPlayingManager.shared.clearNowPlayingInfo()
                         }
                     }
             }
@@ -678,7 +697,8 @@ class AudioStationMusicService: ObservableObject {
             player?.play()
             isPlaying = true
             // 🔑 更新锁屏播放状态
-            updatePlaybackProgress()
+            // 🔑 使用统一管理器更新锁屏播放状态
+            NowPlayingManager.shared.updatePlaybackProgress()
         }
     }
     
@@ -687,7 +707,8 @@ class AudioStationMusicService: ObservableObject {
             player?.pause()
             isPlaying = false
             // 🔑 更新锁屏播放状态
-            updatePlaybackProgress()
+            // 🔑 使用统一管理器更新锁屏播放状态
+            NowPlayingManager.shared.updatePlaybackProgress()
         }
     }
     
@@ -697,9 +718,13 @@ class AudioStationMusicService: ObservableObject {
             player?.replaceCurrentItem(with: nil)
             isPlaying = false
             playbackTime = 0
-            // 🔑 清除锁屏播放信息
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         }
+        
+        // 🔑 清除锁屏控制器代理
+        NowPlayingManager.shared.setDelegate(nil)
+        
+        // 🔑 使用统一管理器清除锁屏播放信息
+        NowPlayingManager.shared.clearNowPlayingInfo()
     }
     
     func skipToNext() async throws {
@@ -721,8 +746,8 @@ class AudioStationMusicService: ObservableObject {
         await MainActor.run {
             player?.seek(to: cmTime)
             playbackTime = time
-            // 🔑 更新锁屏播放进度
-            updatePlaybackProgress()
+            // 🔑 使用统一管理器更新锁屏播放进度
+            NowPlayingManager.shared.updatePlaybackProgress()
         }
     }
     
@@ -771,18 +796,18 @@ class AudioStationMusicService: ObservableObject {
     
     // MARK: - 状态获取
     
-    func getCurrentSong() -> UniversalSong? {
-        guard currentIndex < currentQueue.count else { return nil }
-        return currentQueue[currentIndex]
-    }
-    
-    func getQueueInfo() -> (queue: [UniversalSong], currentIndex: Int, totalCount: Int) {
-        return (currentQueue, currentIndex, currentQueue.count)
-    }
-    
-    func getPlaybackInfo() -> (current: TimeInterval, total: TimeInterval, isPlaying: Bool) {
-        return (playbackTime, getCurrentDuration(), isPlaying)
-    }
+//    func getCurrentSong() -> UniversalSong? {
+//        guard currentIndex < currentQueue.count else { return nil }
+//        return currentQueue[currentIndex]
+//    }
+//    
+//    func getQueueInfo() -> (queue: [UniversalSong], currentIndex: Int, totalCount: Int) {
+//        return (currentQueue, currentIndex, currentQueue.count)
+//    }
+//    
+//    func getPlaybackInfo() -> (current: TimeInterval, total: TimeInterval, isPlaying: Bool) {
+//        return (playbackTime, getCurrentDuration(), isPlaying)
+//    }
     
     private func getCurrentDuration() -> TimeInterval {
         guard let duration = playerItem?.duration, duration.isValid else { return 0 }
@@ -796,7 +821,22 @@ class AudioStationMusicService: ObservableObject {
         currentIndex = 0
         isPlaying = false
         playbackTime = 0
-        // 🔑 清除锁屏播放信息
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        
+        // 🔑 清除锁屏控制器代理
+        NowPlayingManager.shared.setDelegate(nil)
+        
+        // 🔑 释放音频会话控制权
+        AudioSessionManager.shared.releaseAudioSession(for: .audioStation)
+        
+        // 🔑 使用统一管理器清除锁屏播放信息
+        NowPlayingManager.shared.clearNowPlayingInfo()
+        
+        print("⏹️ AudioStation停止播放，释放音频会话控制权")
+    }
+    
+    // 🔑 新增：强制更新锁屏播放信息的公共方法
+    func forceUpdateNowPlayingInfo() {
+        // 🔑 使用统一管理器强制更新
+        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
     }
 }
