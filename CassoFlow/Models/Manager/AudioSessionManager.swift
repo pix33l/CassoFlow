@@ -66,15 +66,35 @@ class AudioSessionManager {
         do {
             let session = AVAudioSession.sharedInstance()
             
-            // 🔑 步骤1：配置独占播放类别，关键是不使用任何混音选项
-            print("   步骤1: 设置独占播放类别")
+            // 🔑 步骤1：先尝试停用当前会话，通知其他应用
+            print("   步骤1: 先停用当前音频会话")
+            try? session.setActive(false, options: [.notifyOthersOnDeactivation])
+            
+            // 🔑 步骤2：配置独占播放类别，关键是不使用任何混音选项
+            print("   步骤2: 设置独占播放类别")
             try session.setCategory(.playback, mode: .default, options: [])
             
-            // 🔑 步骤2：激活会话，这会自动中断其他音乐应用
-            print("   步骤2: 激活音频会话（将中断其他音乐应用）")
-            try session.setActive(true)
+            // 🔑 步骤3：强制激活会话，这会自动中断其他音乐应用
+            print("   步骤3: 强制激活音频会话（将中断其他音乐应用）")
+            try session.setActive(true, options: [])
             
-            // 🔑 步骤3：启用远程控制
+            // 🔑 步骤4：验证其他音频是否已停止
+            if session.isOtherAudioPlaying {
+                print("⚠️ 仍有其他音频在播放，尝试更强力的中断...")
+                
+                // 再次尝试停用并激活
+                try? session.setActive(false, options: [.notifyOthersOnDeactivation])
+                Thread.sleep(forTimeInterval: 0.1) // 使用同步延迟
+                try session.setActive(true, options: [])
+                
+                if session.isOtherAudioPlaying {
+                    print("⚠️ 警告：无法完全停止其他音频播放")
+                } else {
+                    print("✅ 成功中断其他音频播放")
+                }
+            }
+            
+            // 🔑 步骤5：启用远程控制
             DispatchQueue.main.async {
                 UIApplication.shared.beginReceivingRemoteControlEvents()
             }
@@ -85,12 +105,6 @@ class AudioSessionManager {
             print("   模式: \(session.mode.rawValue)")
             print("   选项: \(session.categoryOptions)")
             print("   其他音频播放状态: \(session.isOtherAudioPlaying)")
-            
-            if session.isOtherAudioPlaying {
-                print("⚠️ 警告：仍有其他音频在播放，可能需要额外处理")
-            } else {
-                print("✅ 成功获得独占音频控制权")
-            }
             
             return true
             

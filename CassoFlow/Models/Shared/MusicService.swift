@@ -50,6 +50,9 @@ class MusicService: ObservableObject {
     private let audioEffectsManager = AudioEffectsManager.shared
     private let storeManager = StoreManager.shared
     
+    // 🔑 新增：音频会话管理器
+    private let audioSessionManager = AudioSessionManager.shared
+    
     // MARK: - 播放状态
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
@@ -241,11 +244,71 @@ class MusicService: ObservableObject {
         
         // 监听应用状态变化
         setupAppStateNotifications()
+        
+        // 🔑 新增：监听音频会话管理器的通知
+        setupAudioSessionNotifications()
     }
     
-    deinit {
-        stopAllTimers()
-        NotificationCenter.default.removeObserver(self)
+    // 🔑 新增：设置音频会话通知监听
+    private func setupAudioSessionNotifications() {
+        // 监听各个服务的停止播放通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldStopPlaying),
+            name: .subsonicShouldStopPlaying,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldStopPlaying),
+            name: .audioStationShouldStopPlaying,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldStopPlaying),
+            name: .localMusicShouldStopPlaying,
+            object: nil
+        )
+        
+        // 监听各个服务的恢复播放通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldResumePlaying),
+            name: .subsonicShouldResumePlaying,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldResumePlaying),
+            name: .audioStationShouldResumePlaying,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldResumePlaying),
+            name: .localMusicShouldResumePlaying,
+            object: nil
+        )
+    }
+    
+    // 🔑 新增：处理停止播放通知
+    @objc private func handleShouldStopPlaying() {
+        print("🔔 收到音频会话管理器的停止播放通知")
+        Task {
+            await pause()
+        }
+    }
+    
+    // 🔑 新增：处理恢复播放通知
+    @objc private func handleShouldResumePlaying() {
+        print("🔔 收到音频会话管理器的恢复播放通知")
+        // 这里可以选择是否自动恢复播放
+        // 通常不自动恢复，让用户手动控制
     }
     
     // MARK: - 设置加载
@@ -333,6 +396,9 @@ class MusicService: ObservableObject {
         
         // 🔑 修复：回到前台时立即同步并强制更新锁屏信息
         updateCurrentSongInfo()
+        
+        // 🔑 重要：重新激活NowPlayingManager以确保锁屏控制器正常工作
+        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
         
         // 延迟再次确保锁屏信息正确
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -798,6 +864,14 @@ class MusicService: ObservableObject {
     
     /// 播放通用歌曲队列
     func playUniversalSongs(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
+        // 🔑 重要：在开始播放队列前请求音频会话控制权
+        let audioService = mapCurrentDataSourceToAudioService()
+        let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
+        
+        if !sessionRequested {
+            print("❌ 无法获取音频会话控制权，播放可能会被其他应用干扰")
+        }
+        
         switch currentDataSource {
         case .musicKit:
             fallthrough
@@ -842,6 +916,14 @@ class MusicService: ObservableObject {
 
     /// 播放
     func play() async throws {
+        // 🔑 重要：在开始播放前请求音频会话控制权
+        let audioService = mapCurrentDataSourceToAudioService()
+        let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
+        
+        if !sessionRequested {
+            print("❌ 无法获取音频会话控制权，播放可能会被其他应用干扰")
+        }
+        
         switch currentDataSource {
             case .musicKit:
                 try await musicKitService.play()
@@ -876,12 +958,31 @@ class MusicService: ObservableObject {
             case .local:
                 await localService.pause()
         }
+        
+        // 🔑 重要：暂停时释放音频会话控制权
+        let audioService = mapCurrentDataSourceToAudioService()
+        audioSessionManager.releaseAudioSession(for: audioService)
+        
         await MainActor.run {
             isPlaying = false
             // 同步播放状态到音频效果管理器
             audioEffectsManager.setMusicPlayingState(false)
             // 🔑 暂停时直接停止Timer，不重新启动
             stopUpdateTimer()
+        }
+    }
+    
+    // 🔑 新增：将数据源类型映射到音频服务类型
+    private func mapCurrentDataSourceToAudioService() -> AudioSessionManager.ActiveMusicService {
+        switch currentDataSource {
+        case .musicKit:
+            return .musicKit
+        case .subsonic:
+            return .subsonic
+        case .audioStation:
+            return .audioStation
+        case .local:
+            return .local
         }
     }
 
@@ -1073,6 +1174,12 @@ class MusicService: ObservableObject {
     private func stopAllDataSourcesPlayback() async {
         print("🛑 停止所有数据源的播放")
         
+        // 🔑 释放所有可能的音频会话控制权
+        audioSessionManager.releaseAudioSession(for: .musicKit)
+        audioSessionManager.releaseAudioSession(for: .subsonic)
+        audioSessionManager.releaseAudioSession(for: .audioStation)
+        audioSessionManager.releaseAudioSession(for: .local)
+        
         // 停止MusicKit播放
         await MainActor.run {
             musicKitService.stop()
@@ -1090,8 +1197,13 @@ class MusicService: ObservableObject {
             print("🛑 已停止 Audio Station 播放")
         }()
         
+        async let localStop: Void = {
+            await localService.pause()
+            print("🛑 已停止 Local 播放")
+        }()
+        
         // 等待所有停止操作完成
-        let _ = await (subsonicStop, audioStationStop)
+        let _ = await (subsonicStop, audioStationStop, localStop)
         
         // 🔑 清除锁屏播放信息
         await MainActor.run {

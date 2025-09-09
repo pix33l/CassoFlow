@@ -12,13 +12,56 @@ class NowPlayingManager {
     // MARK: - 属性
     private var currentDelegate: NowPlayingDelegate?
     private var hasSetupRemoteCommands = false
-    
+
+    // MARK: - 初始化
     private init() {
         setupRemoteCommandCenter()
+        setupAppStateNotifications()
     }
-    
+
     deinit {
         clearRemoteCommandCenter()
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // 设置应用状态通知监听
+    private func setupAppStateNotifications() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppDidBecomeActive()
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willResignActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppWillResignActive()
+        }
+    }
+    
+    // 处理应用变为活跃状态
+    private func handleAppDidBecomeActive() {
+        // 重新设置远程控制命令中心
+        setupRemoteCommandCenter()
+        
+        // 如果有代理且正在播放，立即更新锁屏信息
+        if let delegate = currentDelegate, delegate.isPlaying {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.updateNowPlayingInfo()
+            }
+        }
+    }
+    
+    // 处理应用即将失去活跃状态
+    private func handleAppWillResignActive() {
+        // 确保锁屏信息被正确设置
+        if currentDelegate != nil {
+            updateNowPlayingInfo()
+        }
     }
     
     // MARK: - 公共方法
@@ -28,6 +71,16 @@ class NowPlayingManager {
         currentDelegate = delegate
         print("🎵 设置锁屏控制器代理: \(delegate != nil ? String(describing: type(of: delegate!)) : "nil")")
         
+        // 🔑 当设置新的代理时，确保对应的音频会话处于活跃状态
+        if let delegate = delegate {
+            // 根据代理类型请求相应的音频会话
+            let serviceType = mapDelegateToAudioService(delegate)
+            let _ = AudioSessionManager.shared.requestAudioSession(for: serviceType)
+        }
+        
+        // 重新设置远程控制命令中心以确保激活
+        setupRemoteCommandCenter()
+        
         // 如果有代理且正在播放，立即更新锁屏信息
         if let delegate = delegate, delegate.isPlaying {
             updateNowPlayingInfo()
@@ -35,6 +88,22 @@ class NowPlayingManager {
             // 清除锁屏信息
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
             print("🔄 清除锁屏播放信息（无代理）")
+        }
+    }
+    
+    // 🔑 新增：将代理映射到音频服务类型
+    private func mapDelegateToAudioService(_ delegate: NowPlayingDelegate) -> AudioSessionManager.ActiveMusicService {
+        // 根据代理的类型名称判断服务类型
+        let delegateTypeName = String(describing: type(of: delegate))
+        
+        if delegateTypeName.contains("Subsonic") {
+            return .subsonic
+        } else if delegateTypeName.contains("AudioStation") {
+            return .audioStation
+        } else if delegateTypeName.contains("Local") {
+            return .local
+        } else {
+            return .musicKit // 默认
         }
     }
     
@@ -122,13 +191,12 @@ class NowPlayingManager {
     /// 强制更新锁屏播放信息
     func forceUpdateNowPlayingInfo() {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self,
-                  let _ = self.currentDelegate else {
-                print("⚠️ 强制更新锁屏信息时无有效代理")
-                return
-            }
+            guard let self = self else { return }
             
             print("🔧 强制更新锁屏播放信息")
+            
+            // 重新设置远程控制命令中心
+            self.setupRemoteCommandCenter()
             
             // 先清除现有信息
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
@@ -150,8 +218,6 @@ class NowPlayingManager {
     
     /// 设置远程控制命令中心
     private func setupRemoteCommandCenter() {
-        guard !hasSetupRemoteCommands else { return }
-        
         let commandCenter = MPRemoteCommandCenter.shared()
         
         // 清除所有现有目标
@@ -296,7 +362,7 @@ class NowPlayingManager {
             }
             
         case .audioStation:
-            // 🔑 AudioStation音乐封面处理 - 需要特殊处理
+            // AudioStation音乐封面处理 - 需要特殊处理
             // 首先尝试使用歌曲自带的封面URL
             if let artworkURL = song.artworkURL,
                let cachedImage = ImageCacheManager.shared.getCachedImage(for: artworkURL) {
@@ -308,42 +374,36 @@ class NowPlayingManager {
             break
         }
         
-        // 使用默认封面
-        if let defaultImage = UIImage(systemName: "music.note") {
-            print("🎨 使用默认音乐图标作为封面")
-            return MPMediaItemArtwork(boundsSize: size) { _ in defaultImage }
+        // 使用自定义默认封面作为兜底方案
+        let defaultImage = createDefaultArtwork(size: size)
+        print("🎨 使用自定义默认音乐图标作为封面")
+        return MPMediaItemArtwork(boundsSize: size) { _ in defaultImage }
+    }
+    
+    /// 创建自定义默认封面
+    private func createDefaultArtwork(size: CGSize) -> UIImage {
+            // 创建一个带背景的自定义图像
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { context in
+            // 设置背景色
+            UIColor.systemYellow.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+            
+            // 绘制音乐符号
+            let symbolConfig = UIImage.SymbolConfiguration(pointSize: size.width * 0.5, weight: .bold)
+            if let symbolImage = UIImage(systemName: "music.note", withConfiguration: symbolConfig)?.withTintColor(.black, renderingMode: .alwaysOriginal) {
+                let symbolSize = symbolImage.size
+                let symbolRect = CGRect(
+                    x: (size.width - symbolSize.width) / 2,
+                    y: (size.height - symbolSize.height) / 2,
+                    width: symbolSize.width,
+                    height: symbolSize.height
+                )
+                symbolImage.draw(in: symbolRect)
+            }
         }
         
-        // 使用自定义默认封面
-//        let defaultImage = createDefaultArtwork(size: size)
-//        print("🎨 使用自定义默认音乐图标作为封面")
-//        return MPMediaItemArtwork(boundsSize: size) { _ in defaultImage }
-//    }
-//    
-//    /// 创建自定义默认封面
-//    private func createDefaultArtwork(size: CGSize) -> UIImage {
-//        // 创建一个带背景的自定义图像
-//        let renderer = UIGraphicsImageRenderer(size: size)
-//        let image = renderer.image { context in
-//            // 设置背景色
-//            UIColor.systemBlue.setFill()
-//            context.fill(CGRect(origin: .zero, size: size))
-//            
-//            // 绘制音乐符号
-//            let symbolConfig = UIImage.SymbolConfiguration(pointSize: size.width * 0.5, weight: .bold)
-//            if let symbolImage = UIImage(systemName: "music.note", withConfiguration: symbolConfig)?.withTintColor(.white, renderingMode: .alwaysOriginal) {
-//                let symbolSize = symbolImage.size
-//                let symbolRect = CGRect(
-//                    x: (size.width - symbolSize.width) / 2,
-//                    y: (size.height - symbolSize.height) / 2,
-//                    width: symbolSize.width,
-//                    height: symbolSize.height
-//                )
-//                symbolImage.draw(in: symbolRect)
-//            }
-//        }
-        
-        return nil
+        return image
     }
     
     /// 异步加载并更新专辑封面
