@@ -12,6 +12,11 @@ class NowPlayingManager {
     // MARK: - 属性
     private var currentDelegate: NowPlayingDelegate?
     private var hasSetupRemoteCommands = false
+    // 🔑 910新增
+    private var isAppInBackground = false
+    private var backgroundUpdateTimer: Timer?
+    private var lastBackgroundUpdateTime: Date?
+    private var hasConfiguredForBackground = false
 
     // MARK: - 初始化
     private init() {
@@ -26,6 +31,7 @@ class NowPlayingManager {
     
     // 设置应用状态通知监听
     private func setupAppStateNotifications() {
+        // 应用变为活跃
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
@@ -34,12 +40,40 @@ class NowPlayingManager {
             self?.handleAppDidBecomeActive()
         }
         
+        // 应用即将失去活跃
         NotificationCenter.default.addObserver(
             forName: UIApplication.willResignActiveNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
             self?.handleAppWillResignActive()
+        }
+        
+        // 🔑 910新增：应用进入后台
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppEnterBackground()
+        }
+        
+        // 🔑 910新增：应用回到前台
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppWillEnterForeground()
+        }
+        
+        // 🔑 910新增：应用即将终止
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppWillTerminate()
         }
     }
     
@@ -485,6 +519,96 @@ class NowPlayingManager {
             
             print("🖼️ 专辑封面已更新到锁屏控制中心")
         }
+    }
+    
+    // 🔑 910新增：处理应用进入后台
+    private func handleAppEnterBackground() {
+        isAppInBackground = true
+        hasConfiguredForBackground = true
+        print("📱 NowPlayingManager: 应用进入后台")
+        
+        // 🔑 确保在后台时锁屏信息仍然有效
+        if let delegate = currentDelegate, delegate.isPlaying {
+            // 立即更新一次锁屏信息
+            updateNowPlayingInfo()
+            
+            // 🔑 启动后台定时器，定期更新锁屏信息
+            startBackgroundUpdateTimer()
+            
+            // 延迟再次更新，确保稳定性
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.updateNowPlayingInfo()
+            }
+            
+            // 额外延迟确保完全稳定
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                self.updateNowPlayingInfo()
+            }
+        }
+    }
+    
+    // 🔑 新增：处理应用回到前台
+    private func handleAppWillEnterForeground() {
+        isAppInBackground = false
+        print("📱 NowPlayingManager: 应用回到前台")
+        
+        // 🔑 停止后台定时器
+        stopBackgroundUpdateTimer()
+        
+        // 🔑 重新激活并更新锁屏信息
+        if currentDelegate != nil {
+            setupRemoteCommandCenter()
+            updateNowPlayingInfo()
+            
+            // 延迟再次更新确保正确显示
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.updateNowPlayingInfo()
+            }
+            
+            // 额外延迟确保完全稳定
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.updateNowPlayingInfo()
+            }
+        }
+    }
+    
+    // 🔑 新增：处理应用即将终止
+    private func handleAppWillTerminate() {
+        print("📱 NowPlayingManager: 应用即将终止")
+        // 保持锁屏信息直到应用完全终止
+        if currentDelegate != nil {
+            updateNowPlayingInfo()
+        }
+    }
+    
+    // 🔑 新增：启动后台更新定时器
+    private func startBackgroundUpdateTimer() {
+        guard currentDelegate?.isPlaying == true else { return }
+        
+        stopBackgroundUpdateTimer() // 确保没有重复的定时器
+        
+        // 每3秒更新一次锁屏信息，保持活跃状态
+        backgroundUpdateTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            
+            // 检查是否仍在后台
+            if self.isAppInBackground {
+                // 更新锁屏信息
+                self.updateNowPlayingInfo()
+                
+                // 记录最后一次更新时间
+                self.lastBackgroundUpdateTime = Date()
+            } else {
+                // 如果已经回到前台，停止定时器
+                self.stopBackgroundUpdateTimer()
+            }
+        }
+    }
+    
+    // 🔑 新增：停止后台更新定时器
+    private func stopBackgroundUpdateTimer() {
+        backgroundUpdateTimer?.invalidate()
+        backgroundUpdateTimer = nil
     }
 }
 

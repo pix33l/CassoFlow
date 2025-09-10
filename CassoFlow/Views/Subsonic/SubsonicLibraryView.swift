@@ -582,12 +582,12 @@ struct SubsonicLibraryCacheData: Codable {
     let timestamp: Date
     
     var isExpired: Bool {
-        let cacheValidityDuration: TimeInterval = 30 * 60 // 30分钟缓存有效期
+        let cacheValidityDuration: TimeInterval = 1440 * 60 // 24小时缓存有效期
         return Date().timeIntervalSince(timestamp) > cacheValidityDuration
     }
     
     var isStale: Bool {
-        let staleThreshold: TimeInterval = 10 * 60 // 10分钟后开始后台更新
+        let staleThreshold: TimeInterval = 60 * 60 // 1小时后开始后台更新
         return Date().timeIntervalSince(timestamp) > staleThreshold
     }
 }

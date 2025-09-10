@@ -131,9 +131,10 @@ struct AudioStationLibraryView: View {
     
     private var connectionErrorView: some View {
         VStack(spacing: 20) {
-            Image(systemName: "network")
-                .font(.system(size: 48))
-                .foregroundColor(.yellow)
+            Image("Audio-Station")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 48, height: 48)
             
             Text("Audio Station 服务器未连接")
                 .font(.title2)

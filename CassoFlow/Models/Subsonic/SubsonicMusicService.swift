@@ -125,264 +125,6 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         return apiClient
     }
     
-    // MARK: - 🔑 新增：音频会话和锁屏播放器配置
-    
-    /// 设置音频会话
-    private func setupAudioSession() {
-        // 🔑 使用统一音频会话管理器，确保中断其他音乐应用
-        let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
-        if success {
-            print("✅ Subsonic音频会话设置成功 - 其他音乐应用将被中断")
-        } else {
-            print("❌ Subsonic音频会话设置失败")
-        }
-    }
-    
-    /// 激活音频会话（在播放前调用）
-    private func activateAudioSession() {
-        // 🔑 每次播放前都重新请求音频会话，确保中断其他应用
-        print("🎵 激活Subsonic音频会话，将中断其他音乐应用")
-        let success = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
-        if success {
-            print("✅ Subsonic音频会话激活成功 - 其他音乐应用已被中断")
-        } else {
-            print("⚠️ Subsonic音频会话激活失败")
-        }
-    }
-    
-    // MARK: - 🔑 新增：强制更新锁屏播放信息的公共方法
-    
-    /// 强制更新锁屏播放信息（用于前台/后台切换时）
-    func forceUpdateNowPlayingInfo() {
-        // 🔑 使用统一管理器强制更新
-        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
-    }
-
-//    /// 更新锁屏播放信息（iOS 18 优化版本）
-//    private func updateNowPlayingInfo() {
-//        // 🔑 确保在主线程上执行，并添加弱引用检查
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self = self, 
-//                  let song = self.currentSong,
-//                  let _ = self.avPlayer else {
-//                // 🔑 iOS 18：使用空字典而不是 nil
-//                MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-//                print("🔄 清除锁屏播放信息（对象状态无效）")
-//                return
-//            }
-//            
-//            var nowPlayingInfo = [String: Any]()
-//            
-//            // 🔑 基本信息（必需）
-//            nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
-//            nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
-//            nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumName ?? ""
-//            
-//            // 🔑 时间信息（关键）- iOS 18 对这些值更敏感
-//            let safeDuration = self.duration > 0 ? self.duration : song.duration
-//            let validDuration = max(1.0, safeDuration) // 确保时长至少为1秒
-//            let validCurrentTime = max(0.0, min(self.currentTime, validDuration)) // 确保当前时间不超过总时长
-//            
-//            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = validDuration
-//            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = validCurrentTime
-//            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? 1.0 : 0.0
-//            
-//            // 🔑 iOS 18 重要：明确设置所有相关属性
-//            nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.audio.rawValue
-//            nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = false
-//            nowPlayingInfo[MPNowPlayingInfoPropertyAvailableLanguageOptions] = []
-//            nowPlayingInfo[MPNowPlayingInfoPropertyCurrentLanguageOptions] = []
-//            
-//            // 🔑 队列信息（如果有的话）
-//            if !self.currentQueue.isEmpty {
-//                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueIndex] = self.currentIndex
-//                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackQueueCount] = self.currentQueue.count
-//            }
-//            
-//            // 🔑 封面艺术 - 优先使用缓存，先设置默认封面
-//            let artworkSize = CGSize(width: 600, height: 600)
-//            
-//            // 🔑 首先检查ImageCacheManager中是否有缓存的封面
-//            let imageCache = ImageCacheManager.shared
-//            if let artworkURL = song.artworkURL,
-//               let cachedImage = imageCache.getCachedImage(for: artworkURL) {
-//                print("🖼️ 使用缓存的封面设置锁屏信息")
-//                nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
-//                    return cachedImage
-//                }
-//            } else if let defaultImage = UIImage(systemName: "music.note") {
-//                // 使用默认图标
-//                nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artworkSize) { _ in
-//                    return defaultImage
-//                }
-//            }
-//            
-//            // 🔑 立即设置锁屏信息
-//            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-//            
-//            print("🔄 设置锁屏播放信息:")
-//            print("   标题: \(song.title)")
-//            print("   艺术家: \(song.artistName)")
-//            print("   时长: \(validDuration)秒")
-//            print("   当前时间: \(validCurrentTime)秒")
-//            print("   播放速率: \(self.isPlaying ? 1.0 : 0.0)")
-//            
-//            // 🔑 强制启用远程控制命令
-//            self.ensureRemoteCommandsEnabled()
-//            
-//            // 🔑 只有在没有缓存封面时才异步加载
-//            if let artworkURL = song.artworkURL {
-//                if imageCache.getCachedImage(for: artworkURL) == nil {
-//                    print("🖼️ 封面未缓存，开始异步加载: \(artworkURL)")
-//                    Task { [weak self] in
-//                        // 🔑 在异步任务中再次检查 self
-//                        guard let self = self else { return }
-//                        await self.loadAndSetArtwork(from: artworkURL)
-//                    }
-//                } else {
-//                    print("✅ 封面已缓存，直接使用")
-//                }
-//            } else {
-//                print("📷 歌曲没有专辑封面URL，使用默认图标")
-//            }
-//        }
-//    }
-//    
-//    /// 🔑 新增：确保远程控制命令启用
-//    private func ensureRemoteCommandsEnabled() {
-//        let commandCenter = MPRemoteCommandCenter.shared()
-//        
-//        // 强制启用所有需要的命令
-//        commandCenter.playCommand.isEnabled = true
-//        commandCenter.pauseCommand.isEnabled = true
-//        commandCenter.nextTrackCommand.isEnabled = true
-//        commandCenter.previousTrackCommand.isEnabled = true
-//        commandCenter.changePlaybackPositionCommand.isEnabled = true
-//        commandCenter.togglePlayPauseCommand.isEnabled = true
-//        
-//        print("🔧 强制启用所有远程控制命令")
-//    }
-//    
-//    /// 异步加载专辑封面
-//    private func loadAndSetArtwork(from url: URL) async {
-//        // 🔑 添加弱引用检查，防止对象被释放后继续执行
-//        guard let _ = self.currentSong else {
-//            print("⚠️ 当前歌曲为空，取消封面加载")
-//            return
-//        }
-//        
-//        print("🖼️ 检查封面缓存: \(url)")
-//        
-//        // 🔑 首先检查ImageCacheManager中是否有缓存的图片
-//        let imageCache = await ImageCacheManager.shared
-//        if let cachedImage = await imageCache.getCachedImage(for: url) {
-//            print("✅ 使用缓存的专辑封面，跳过下载")
-//            
-//            // 🔑 直接使用缓存的图片设置封面
-//            let targetSize = CGSize(width: 600, height: 600)
-//            let artwork = MPMediaItemArtwork(boundsSize: targetSize) { _ in
-//                return cachedImage
-//            }
-//            
-//            await MainActor.run { [weak self] in
-//                // 🔑 重要：再次检查 self 和当前状态
-//                guard let self = self, 
-//                      let _ = self.currentSong,
-//                      self.avPlayer != nil else {
-//                    print("⚠️ 设置缓存封面时对象状态已变化，取消设置")
-//                    return
-//                }
-//                
-//                // 🔑 安全地更新封面，保留其他信息
-//                var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-//                updatedInfo[MPMediaItemPropertyArtwork] = artwork
-//                MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
-//                
-//                print("🖼️ 缓存的专辑封面已更新到锁屏控制中心")
-//            }
-//            return
-//        }
-//        
-//        // 🔑 如果缓存中没有，检查是否正在下载
-//        if await imageCache.isDownloading(url) {
-//            print("🔄 封面正在下载中，等待下载完成...")
-//            // 等待下载完成
-//            await waitForImageDownload(url: url)
-//            return
-//        }
-//        
-//        // 🔑 使用ImageCacheManager下载，而不是直接用URLSession
-//        print("📥 通过ImageCacheManager下载封面: \(url)")
-//        await imageCache.preloadImage(from: url)
-//        
-//        // 等待下载完成
-//        await waitForImageDownload(url: url)
-//    }
-//    
-//    /// 等待ImageCacheManager完成图片下载
-//    private func waitForImageDownload(url: URL) async {
-//        let imageCache = await ImageCacheManager.shared
-//        let maxWaitTime = 10.0 // 减少等待时间到10秒
-//        let startTime = Date()
-//        let checkInterval: UInt64 = 200_000_000 // 0.2秒
-//        
-//        while Date().timeIntervalSince(startTime) < maxWaitTime {
-//            // 🔑 再次检查对象状态
-//            guard let _ = self.currentSong else {
-//                print("⚠️ 等待下载时当前歌曲为空，取消等待")
-//                return
-//            }
-//            
-//            // 检查是否下载完成并缓存
-//            if let cachedImage = await imageCache.getCachedImage(for: url) {
-//                print("✅ ImageCacheManager下载完成，设置封面")
-//                
-//                // 🔑 创建合适尺寸的封面
-//                let targetSize = CGSize(width: 600, height: 600)
-//                let artwork = MPMediaItemArtwork(boundsSize: targetSize) { _ in
-//                    return cachedImage
-//                }
-//                
-//                await MainActor.run { [weak self] in
-//                    // 🔑 重要：再次检查 self 和当前状态
-//                    guard let self = self, 
-//                          let _ = self.currentSong,
-//                          self.avPlayer != nil else {
-//                        print("⚠️ 设置下载封面时对象状态已变化，取消设置")
-//                        return
-//                    }
-//                    
-//                    // 🔑 安全地更新封面，保留其他信息
-//                    var updatedInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-//                    updatedInfo[MPMediaItemPropertyArtwork] = artwork
-//                    MPNowPlayingInfoCenter.default().nowPlayingInfo = updatedInfo
-//                    
-//                    print("🖼️ 下载的专辑封面已更新到锁屏控制中心")
-//                }
-//                return
-//            }
-//            
-//            // 如果不再下载中，说明下载失败或取消
-//            if await !imageCache.isDownloading(url) {
-//                print("❌ ImageCacheManager下载失败或取消")
-//                return
-//            }
-//            
-//            try? await Task.sleep(nanoseconds: checkInterval)
-//        }
-//        
-//        // 超时处理
-//        print("⏱️ ImageCacheManager下载超时: \(url)")
-//    }
-//    
-//    /// 更新播放进度信息（用于定期更新）
-//    private func updatePlaybackProgress() {
-//        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
-//        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-//        info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
-//        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
-//    }
-    
     // MARK: - 数据获取方法
     
     /// 获取最近专辑
@@ -774,51 +516,9 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         }
     }
     
-    /// 强制刷新当前播放信息
-    private func forceRefreshNowPlaying() {
-        // 🔑 强制刷新的方法：先清除再设置
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            NowPlayingManager.shared.updateNowPlayingInfo()
-            print("🔄 强制刷新锁屏播放信息")
-        }
-    }
-    
-    /// 刷新远程控制中心
-    private func refreshRemoteCommandCenter() {
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        // 强制刷新命令状态
-        commandCenter.playCommand.isEnabled = !isPlaying
-        commandCenter.pauseCommand.isEnabled = isPlaying
-        commandCenter.nextTrackCommand.isEnabled = currentIndex < currentQueue.count - 1
-        commandCenter.previousTrackCommand.isEnabled = currentIndex > 0
-        commandCenter.changePlaybackPositionCommand.isEnabled = true
-        
-        print("🔄 刷新远程控制中心状态")
-    }
-    
-    /// 监听播放器项目状态变化
-    @objc private func playerItemStatusChanged() {
-        guard let playerItem = avPlayer?.currentItem else { return }
-        
-        switch playerItem.status {
-        case .readyToPlay:
-            print("✅ 播放器准备就绪")
-            NowPlayingManager.shared.updateNowPlayingInfo()
-        case .failed:
-            print("❌ 播放器播放失败: \(playerItem.error?.localizedDescription ?? "未知错误")")
-        case .unknown:
-            print("⏳ 播放器状态未知")
-        @unknown default:
-            break
-        }
-    }
-    
     /// 播放
     func play() async {
-        // 🔑 播放前确保音频会话控制权
+        // 🔑 简化：播放前确保音频会话控制权
         let _ = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
         
         avPlayer?.play()
@@ -880,8 +580,8 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             await imageCache.preloadImage(from: artworkURL)
         }
         
-        // 预加载前后各2首歌的封面
-        let preloadRange = max(0, currentIndex - 2)..<min(currentQueue.count, currentIndex + 3)
+        // 预加载前后各1首歌的封面
+        let preloadRange = max(0, currentIndex - 1)..<min(currentQueue.count, currentIndex + 2)
         
         for i in preloadRange where i != currentIndex {
             if let artworkURL = currentQueue[i].artworkURL {
@@ -982,37 +682,7 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     // MARK: - 私有方法
     
-    /// 🔑 新增：清除远程控制命令中心
-    private func clearRemoteCommandCenter() {
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        // 移除所有目标
-        commandCenter.playCommand.removeTarget(nil)
-        commandCenter.pauseCommand.removeTarget(nil)
-        commandCenter.nextTrackCommand.removeTarget(nil)
-        commandCenter.previousTrackCommand.removeTarget(nil)
-        commandCenter.changePlaybackPositionCommand.removeTarget(nil)
-        commandCenter.togglePlayPauseCommand.removeTarget(nil)
-        
-        // 禁用命令
-        commandCenter.playCommand.isEnabled = false
-        commandCenter.pauseCommand.isEnabled = false
-        commandCenter.nextTrackCommand.isEnabled = false
-        commandCenter.previousTrackCommand.isEnabled = false
-        commandCenter.changePlaybackPositionCommand.isEnabled = false
-        commandCenter.togglePlayPauseCommand.isEnabled = false
-        
-        print("🧹 Subsonic远程控制命令中心已清除")
-    }
-    
     private func setupNotifications() {
-        // 音频会话中断处理
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleAudioSessionInterruption),
-            name: AVAudioSession.interruptionNotification,
-            object: nil
-        )
         
         // 🔑 新增：监听音频管理器的停止播放通知
         NotificationCenter.default.addObserver(
@@ -1152,18 +822,17 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     @objc private func handleStopPlayingNotification() {
         print("🛑 收到停止播放通知（其他音乐应用已启动）")
-        Task {
-            await self.pause()
-        }
+        // 🔑 简化：直接调用暂停，不使用Task包装
+        avPlayer?.pause()
+        isPlaying = false
+        NowPlayingManager.shared.updatePlaybackProgress()
     }
     
     @objc private func handleResumePlayingNotification() {
         print("🔄 收到恢复播放通知")
-        // 通常不自动恢复，让用户手动控制
-        // 如果需要自动恢复，可以取消注释下面的代码
-        // Task {
-        //     await self.play()
-        // }
+        avPlayer?.play()
+        isPlaying = true
+        NowPlayingManager.shared.updatePlaybackProgress()
     }
     
     private func cleanupPlayer() {
@@ -1213,22 +882,5 @@ enum SubsonicMusicServiceError: LocalizedError {
         case .audioSessionFailed:
             return "音频会话配置失败"
         }
-    }
-}
-
-// MARK: - Subsonic音乐服务错误
-
-extension SubsonicMusicServiceError {
-    static func clearRemoteCommandCenter() {
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        // 强制刷新命令状态
-        commandCenter.playCommand.isEnabled = false
-        commandCenter.pauseCommand.isEnabled = false
-        commandCenter.nextTrackCommand.isEnabled = false
-        commandCenter.previousTrackCommand.isEnabled = false
-        commandCenter.changePlaybackPositionCommand.isEnabled = false
-        
-        print("🔄 清除远程控制中心状态")
     }
 }

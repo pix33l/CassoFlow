@@ -17,15 +17,15 @@ class MusicKitService: ObservableObject {
         guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
         
         musicKitPlayer.queue = .init(for: songs, startingAt: songs[index])
-        try await musicKitPlayer.play()
+        try await MusicService.shared.play()
         
         await MainActor.run {
             MusicService.shared.shouldCloseLibrary = true
         }
         
-        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
-        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await MusicService.shared.forceSyncPlaybackStatus()
+//        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+//        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+//        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表中的特定歌曲
@@ -34,15 +34,15 @@ class MusicKitService: ObservableObject {
         guard let index = songs.firstIndex(where: { $0.id == track.id }) else { return }
         
         musicKitPlayer.queue = .init(for: songs, startingAt: songs[index])
-        try await musicKitPlayer.play()
+        try await MusicService.shared.play()
         
         await MainActor.run {
             MusicService.shared.shouldCloseLibrary = true
         }
         
-        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
-        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await MusicService.shared.forceSyncPlaybackStatus()
+//        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+//        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+//        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放专辑（可选择随机播放）
@@ -52,15 +52,15 @@ class MusicKitService: ObservableObject {
             musicKitPlayer.state.shuffleMode = .songs
         }
         musicKitPlayer.queue = .init(for: songs, startingAt: nil)
-        try await musicKitPlayer.play()
+        try await MusicService.shared.play()
         
         await MainActor.run {
             MusicService.shared.shouldCloseLibrary = true
         }
         
-        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
-        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await MusicService.shared.forceSyncPlaybackStatus()
+//        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+//        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+//        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表（可选择随机播放）
@@ -70,21 +70,21 @@ class MusicKitService: ObservableObject {
             musicKitPlayer.state.shuffleMode = .songs
         }
         musicKitPlayer.queue = .init(for: songs, startingAt: nil)
-        try await musicKitPlayer.play()
+        try await MusicService.shared.play()
         
         await MainActor.run {
             MusicService.shared.shouldCloseLibrary = true
         }
         
-        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
-        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await MusicService.shared.forceSyncPlaybackStatus()
+//        // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
+//        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+//        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放
     func play() async throws {
         try await musicKitPlayer.play()
-        }
+    }
     
     /// 暂停
     func pause() {

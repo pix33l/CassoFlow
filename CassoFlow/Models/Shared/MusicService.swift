@@ -137,51 +137,6 @@ class MusicService: ObservableObject {
     private var lastTrackIndex: Int? = nil
     private var lastTotalTracks: Int = 0
     
-    // 循环播放
-//    var repeatMode: MusicKit.MusicPlayer.RepeatMode {
-//        get { 
-//            switch currentDataSource {
-//            case .musicKit:
-//                return musicKitService.repeatMode
-//            default:
-//                return .none
-//            }
-//        }
-//        set { 
-//            switch currentDataSource {
-//            case .musicKit:
-//                musicKitService.repeatMode = newValue
-//            default:
-//                break
-//            }
-//        }
-//    }
-    
-    // 随机播放
-//    var shuffleMode: MusicKit.MusicPlayer.ShuffleMode {
-//        get { 
-//            switch currentDataSource {
-//            case .musicKit:
-//                return musicKitService.shuffleMode
-//            default:
-//                return .off
-//            }
-//        }
-//        set { 
-//            switch currentDataSource {
-//            case .musicKit:
-//                musicKitService.shuffleMode = newValue
-//            default:
-//                break
-//            }
-//        }
-//    }
-    
-    /// 请求音乐授权
-//    func requestMusicAuthorization() async {
-//        await musicKitService.requestMusicAuthorization()
-//    }
-    
     /// 重置库视图关闭状态
     func resetLibraryCloseState() {
         shouldCloseLibrary = false
@@ -273,27 +228,27 @@ class MusicService: ObservableObject {
             object: nil
         )
         
-        // 监听各个服务的恢复播放通知
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleShouldResumePlaying),
-            name: .subsonicShouldResumePlaying,
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleShouldResumePlaying),
-            name: .audioStationShouldResumePlaying,
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleShouldResumePlaying),
-            name: .localMusicShouldResumePlaying,
-            object: nil
-        )
+//        // 监听各个服务的恢复播放通知
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(handleShouldResumePlaying),
+//            name: .subsonicShouldResumePlaying,
+//            object: nil
+//        )
+//        
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(handleShouldResumePlaying),
+//            name: .audioStationShouldResumePlaying,
+//            object: nil
+//        )
+//        
+//        NotificationCenter.default.addObserver(
+//            self,
+//            selector: #selector(handleShouldResumePlaying),
+//            name: .localMusicShouldResumePlaying,
+//            object: nil
+//        )
     }
     
     // 🔑 新增：处理停止播放通知
@@ -304,12 +259,12 @@ class MusicService: ObservableObject {
         }
     }
     
-    // 🔑 新增：处理恢复播放通知
-    @objc private func handleShouldResumePlaying() {
-        print("🔔 收到音频会话管理器的恢复播放通知")
-        // 这里可以选择是否自动恢复播放
-        // 通常不自动恢复，让用户手动控制
-    }
+//    // 🔑 新增：处理恢复播放通知
+//    @objc private func handleShouldResumePlaying() {
+//        print("🔔 收到音频会话管理器的恢复播放通知")
+//        // 这里可以选择是否自动恢复播放
+//        // 通常不自动恢复，让用户手动控制
+//    }
     
     // MARK: - 设置加载
     private func loadSettings() {
@@ -369,11 +324,11 @@ class MusicService: ObservableObject {
             UIApplication.shared.isIdleTimerDisabled = false
         }
         
-        // 🔑 修复：确保锁屏播放信息在后台保持
-        if isPlaying && currentTrackID != nil {
-            // 强制保持锁屏播放信息
-            forceUpdateNowPlayingInfo()
-        }
+//        // 🔑 修复：确保锁屏播放信息在后台保持
+//        if isPlaying && currentTrackID != nil {
+//            // 强制保持锁屏播放信息
+//            NowPlayingManager.shared.forceUpdateNowPlayingInfo()
+//        }
         
         // 智能管理后台Timer：只在播放音乐时启动
         if isPlaying {
@@ -397,15 +352,15 @@ class MusicService: ObservableObject {
         // 🔑 修复：回到前台时立即同步并强制更新锁屏信息
         updateCurrentSongInfo()
         
-        // 🔑 重要：重新激活NowPlayingManager以确保锁屏控制器正常工作
-        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
+//        // 🔑 重要：重新激活NowPlayingManager以确保锁屏控制器正常工作
+//        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
         
-        // 延迟再次确保锁屏信息正确
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if self.isPlaying && self.currentTrackID != nil {
-                self.forceUpdateNowPlayingInfo()
-            }
-        }
+//        // 延迟再次确保锁屏信息正确
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//            if self.isPlaying && self.currentTrackID != nil {
+//                self.forceUpdateNowPlayingInfo()
+//            }
+//        }
     }
     
     // 新增：启动后台状态监听Timer
@@ -416,7 +371,7 @@ class MusicService: ObservableObject {
             return
         }
         
-        stopBackgroundStatusTimer() // 确保没有重复的定时器
+//        stopBackgroundStatusTimer() // 确保没有重复的定时器
         
         backgroundStatusTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             self?.updateBackgroundMusicStatus()
@@ -453,6 +408,14 @@ class MusicService: ObservableObject {
             
             lastPlayingState = currentPlayingState
         }
+        
+//        // 🔑 新增：持续更新锁屏播放信息以保持活跃状态
+//        if currentPlayingState && currentTrackID != nil {
+//            DispatchQueue.main.async {
+//                self.NowPlayingManager.shared.forceUpdateNowPlayingInfo()
+//            }
+//        }
+        
     }
     
     // 新增：停止所有Timer
@@ -537,6 +500,11 @@ class MusicService: ObservableObject {
         // 快进/快退时必须运行Timer
         if isFastForwarding || isFastRewinding {
             return true
+        }
+        
+        // 🔑 对MusicKit特殊处理：如果有当前条目且状态可能正在变化，需要持续监听
+        if currentDataSource == .musicKit {
+            return true // MusicKit有播放条目时始终监听状态变化
         }
         
         // 正在播放且有有效的歌曲时需要更新进度
@@ -1232,21 +1200,6 @@ class MusicService: ObservableObject {
                 updateCurrentSongInfo()
                 startUpdateTimer()
             }
-        }
-    }
-    
-    // 🔑 新增：强制更新锁屏播放信息的方法
-    private func forceUpdateNowPlayingInfo() {
-        switch currentDataSource {
-        case .subsonic:
-            subsonicService.forceUpdateNowPlayingInfo()
-        case .audioStation:
-            audioStationService.forceUpdateNowPlayingInfo()
-        case .local:
-            localService.forceUpdateNowPlayingInfo()
-        case .musicKit:
-            // MusicKit自动处理锁屏信息
-            break
         }
     }
 }

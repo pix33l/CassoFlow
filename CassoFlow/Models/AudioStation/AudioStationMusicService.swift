@@ -28,6 +28,10 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
             .assign(to: &$isConnected)
         
         setupPlayer()
+        
+        // 🔑 新增：监听音频管理器的通知
+        setupAudioSessionNotifications()
+
     }
     
     deinit {
@@ -35,6 +39,9 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         statusObserver?.cancel()
         // 🔑 清除锁屏控制器代理
         NowPlayingManager.shared.setDelegate(nil)
+        
+        // 🔑 移除通知监听
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - NowPlayingDelegate 协议实现
@@ -71,28 +78,28 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         addTimeObserver()
     }
     
-    // 🔑 新增：音频会话配置
-    private func setupAudioSession() {
-        // 🔑 使用统一音频会话管理器，确保与其他服务一致
-        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
-        if success {
-            print("✅ Audio Station 音频会话设置成功")
-        } else {
-            print("❌ Audio Station 音频会话设置失败")
-        }
-    }
-    
-    /// 激活音频会话（在播放前调用）
-    private func activateAudioSession() {
-        // 🔑 每次播放前都重新请求音频会话，确保获得控制权
-        print("🎵 激活Audio Station音频会话")
-        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
-        if success {
-            print("✅ Audio Station 音频会话激活成功")
-        } else {
-            print("⚠️ Audio Station 音频会话激活失败")
-        }
-    }
+//    // 🔑 新增：音频会话配置
+//    private func setupAudioSession() {
+//        // 🔑 使用统一音频会话管理器，确保与其他服务一致
+//        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+//        if success {
+//            print("✅ Audio Station 音频会话设置成功")
+//        } else {
+//            print("❌ Audio Station 音频会话设置失败")
+//        }
+//    }
+//    
+//    /// 激活音频会话（在播放前调用）
+//    private func activateAudioSession() {
+//        // 🔑 每次播放前都重新请求音频会话，确保获得控制权
+//        print("🎵 激活Audio Station音频会话")
+//        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+//        if success {
+//            print("✅ Audio Station 音频会话激活成功")
+//        } else {
+//            print("⚠️ Audio Station 音频会话激活失败")
+//        }
+//    }
     
 //    // 🔑 新增：远程控制命令中心配置
 //    private func setupRemoteCommandCenter() {
@@ -569,14 +576,12 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     // MARK: - 播放队列管理
     
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
-        // 🔑 在首次播放时才初始化连接和音频会话
+        // 🔑 在首次播放时才初始化连接
         if !isConnected {
             let connected = try await connect()
             if !connected {
                 throw AudioStationError.authenticationFailed("连接失败")
             }
-            // 🔑 只在连接成功后设置音频会话
-            setupAudioSession()
         }
         
         currentQueue = songs
@@ -613,8 +618,14 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
             print("🖼️ AudioStation API封面URL: \(coverURL?.absoluteString ?? "nil")")
         }
         
-        // 🔑 激活音频会话
-        activateAudioSession()
+        // 🔑 关键修改：使用统一音频会话管理器获取控制权
+        print("🎯 请求Audio Station音频会话控制权")
+        let success = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+        if !success {
+            print("❌ Audio Station音频会话请求失败")
+        } else {
+            print("✅ Audio Station获得音频会话控制权")
+        }
         
         await MainActor.run {
             playerItem = AVPlayerItem(url: streamURL)
@@ -690,13 +701,12 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     }
     
     func play() async {
-        // 🔑 激活音频会话
-        activateAudioSession()
+        // 🔑 关键修改：使用统一音频会话管理器获取控制权
+        let _ = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
         
         await MainActor.run {
             player?.play()
             isPlaying = true
-            // 🔑 更新锁屏播放状态
             // 🔑 使用统一管理器更新锁屏播放状态
             NowPlayingManager.shared.updatePlaybackProgress()
         }
@@ -706,7 +716,6 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         await MainActor.run {
             player?.pause()
             isPlaying = false
-            // 🔑 更新锁屏播放状态
             // 🔑 使用统一管理器更新锁屏播放状态
             NowPlayingManager.shared.updatePlaybackProgress()
         }
@@ -722,6 +731,9 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         
         // 🔑 清除锁屏控制器代理
         NowPlayingManager.shared.setDelegate(nil)
+        
+        // 🔑 释放音频会话控制权
+        AudioSessionManager.shared.releaseAudioSession(for: .audioStation)
         
         // 🔑 使用统一管理器清除锁屏播放信息
         NowPlayingManager.shared.clearNowPlayingInfo()
@@ -834,9 +846,40 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         print("⏹️ AudioStation停止播放，释放音频会话控制权")
     }
     
-    // 🔑 新增：强制更新锁屏播放信息的公共方法
-    func forceUpdateNowPlayingInfo() {
-        // 🔑 使用统一管理器强制更新
-        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
+    // 🔑 新增：设置音频会话通知监听
+    private func setupAudioSessionNotifications() {
+        // 🔑 监听音频管理器的停止播放通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleStopPlayingNotification),
+            name: .audioStationShouldStopPlaying,
+            object: nil
+        )
+        
+        // 🔑 监听音频管理器的恢复播放通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleResumePlayingNotification),
+            name: .audioStationShouldResumePlaying,
+            object: nil
+        )
+    }
+    
+    // 🔑 新增：处理停止播放通知
+    @objc private func handleStopPlayingNotification() {
+        print("🛑 Audio Station收到停止播放通知（其他音乐应用已启动）")
+        Task {
+            await self.pause()
+        }
+    }
+    
+    // 🔑 新增：处理恢复播放通知
+    @objc private func handleResumePlayingNotification() {
+        print("🔄 Audio Station收到恢复播放通知")
+        // 通常不自动恢复，让用户手动控制
+        // 如果需要自动恢复，可以取消注释下面的代码
+        // Task {
+        //     await self.play()
+        // }
     }
 }
