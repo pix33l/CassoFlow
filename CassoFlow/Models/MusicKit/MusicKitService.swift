@@ -7,7 +7,7 @@ class MusicKitService: ObservableObject {
     static let shared = MusicKitService()
     
     private let musicKitPlayer = ApplicationMusicPlayer.shared
-    private lazy var musicService = MusicService.shared
+//    private lazy var musicService = MusicService.shared
     
     // MARK: - 播放控制方法
     
@@ -20,12 +20,12 @@ class MusicKitService: ObservableObject {
         try await musicKitPlayer.play()
         
         await MainActor.run {
-            musicService.shouldCloseLibrary = true
+            MusicService.shared.shouldCloseLibrary = true
         }
         
         // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
         try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await musicService.forceSyncPlaybackStatus()
+        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表中的特定歌曲
@@ -37,12 +37,12 @@ class MusicKitService: ObservableObject {
         try await musicKitPlayer.play()
         
         await MainActor.run {
-            musicService.shouldCloseLibrary = true
+            MusicService.shared.shouldCloseLibrary = true
         }
         
         // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
         try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await musicService.forceSyncPlaybackStatus()
+        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放专辑（可选择随机播放）
@@ -55,12 +55,12 @@ class MusicKitService: ObservableObject {
         try await musicKitPlayer.play()
         
         await MainActor.run {
-            musicService.shouldCloseLibrary = true
+            MusicService.shared.shouldCloseLibrary = true
         }
         
         // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
         try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await musicService.forceSyncPlaybackStatus()
+        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放播放列表（可选择随机播放）
@@ -73,18 +73,18 @@ class MusicKitService: ObservableObject {
         try await musicKitPlayer.play()
         
         await MainActor.run {
-            musicService.shouldCloseLibrary = true
+            MusicService.shared.shouldCloseLibrary = true
         }
         
         // 🔑 增加延迟时间，确保MusicKit播放器完全初始化
         try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
-        await musicService.forceSyncPlaybackStatus()
+        await MusicService.shared.forceSyncPlaybackStatus()
     }
     
     /// 播放
     func play() async throws {
         try await musicKitPlayer.play()
-    }
+        }
     
     /// 暂停
     func pause() {

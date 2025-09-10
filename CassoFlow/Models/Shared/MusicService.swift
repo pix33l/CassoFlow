@@ -508,7 +508,7 @@ class MusicService: ObservableObject {
     
     // MARK: - 定时器管理（优化后台耗电）
     
-    private func startUpdateTimer() {
+    func startUpdateTimer() {
         // 🔑 优化Timer启动逻辑，确保在播放状态下才启动
         guard shouldRunDynamicUpdates() else {
             stopUpdateTimer()
@@ -874,7 +874,7 @@ class MusicService: ObservableObject {
         
         switch currentDataSource {
         case .musicKit:
-            fallthrough
+            break
         case .subsonic:
             try await subsonicService.playQueue(songs, startingAt: index)
         case .audioStation:
@@ -1241,11 +1241,9 @@ class MusicService: ObservableObject {
         case .subsonic:
             subsonicService.forceUpdateNowPlayingInfo()
         case .audioStation:
-            audioStationService.forceUpdateNowPlayingInfo() // 如需要可添加
-            break
+            audioStationService.forceUpdateNowPlayingInfo()
         case .local:
-            localService.forceUpdateNowPlayingInfo() // 如需要可添加
-            break
+            localService.forceUpdateNowPlayingInfo()
         case .musicKit:
             // MusicKit自动处理锁屏信息
             break
