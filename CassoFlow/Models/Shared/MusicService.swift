@@ -235,6 +235,7 @@ class MusicService: ObservableObject {
     
     // 处理应用进入后台
     private func handleAppEnterBackground() {
+        print("🔍 MusicService: 应用进入后台，播放状态: \(isPlaying)")
         isAppInBackground = true
         lastPlayingState = isPlaying
         
@@ -253,6 +254,7 @@ class MusicService: ObservableObject {
     
     // 处理应用回到前台
     private func handleAppEnterForeground() {
+        print("🔍 MusicService: 应用回到前台")
         isAppInBackground = false
             
         // 恢复屏幕常亮设置
@@ -334,7 +336,7 @@ class MusicService: ObservableObject {
     
     // 🔑 新增：处理停止播放通知
     @objc private func handleShouldStopPlaying() {
-        print("🔔 收到音频会话管理器的停止播放通知")
+        print("🔍 MusicService: 收到停止播放通知")
         Task {
             await pause()
         }
@@ -850,7 +852,7 @@ class MusicService: ObservableObject {
         let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
         
         if !sessionRequested {
-            print("❌ 无法获取音频会话控制权，播放可能会被其他应用干扰")
+            print("🔍 MusicService: 音频会话请求失败")
         }
         
         switch currentDataSource {
@@ -902,7 +904,7 @@ class MusicService: ObservableObject {
         let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
         
         if !sessionRequested {
-            print("❌ 无法获取音频会话控制权，播放可能会被其他应用干扰")
+            print("🔍 MusicService: 音频会话请求失败")
         }
         
         switch currentDataSource {
@@ -1153,7 +1155,7 @@ class MusicService: ObservableObject {
     
     // 🔑 修改：停止所有数据源的音乐播放（异步版本）
     private func stopAllDataSourcesPlayback() async {
-        print("🛑 停止所有数据源的播放")
+        print("🔍 MusicService: 停止所有数据源播放")
         
         // 🔑 释放所有可能的音频会话控制权
         audioSessionManager.releaseAudioSession(for: .musicKit)
@@ -1164,23 +1166,19 @@ class MusicService: ObservableObject {
         // 停止MusicKit播放
         await MainActor.run {
             musicKitService.stop()
-            print("🛑 已停止 MusicKit 播放")
         }
         
         // 并行停止其他服务的播放
         async let subsonicStop: Void = {
             await subsonicService.pause()
-            print("🛑 已停止 Subsonic 播放")
         }()
         
         async let audioStationStop: Void = {
             await audioStationService.pause()
-            print("🛑 已停止 Audio Station 播放")
         }()
         
         async let localStop: Void = {
             await localService.pause()
-            print("🛑 已停止 Local 播放")
         }()
         
         // 等待所有停止操作完成
@@ -1189,7 +1187,6 @@ class MusicService: ObservableObject {
         // 🔑 清除锁屏播放信息
         await MainActor.run {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
-            print("🛑 已清除锁屏播放信息")
         }
     }
     

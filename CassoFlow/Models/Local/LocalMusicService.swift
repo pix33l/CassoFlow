@@ -30,7 +30,7 @@ struct LocalMusicItem: Identifiable, Hashable {
         var year: Int?
         var genre: String?
         
-        // 🔑 修复：改进时长获取方法，特别针对FLAC文件
+        // 获取音频时长
         do {
             let durationValue = try await asset.load(.duration)
             if CMTIME_IS_VALID(durationValue) && !CMTIME_IS_INDEFINITE(durationValue) {
@@ -38,17 +38,13 @@ struct LocalMusicItem: Identifiable, Hashable {
                 if durationSeconds.isFinite && !durationSeconds.isNaN && durationSeconds > 0 {
                     duration = durationSeconds
                 } else {
-                    print("⚠️ 无效的时长值: \(durationSeconds)，文件: \(url.lastPathComponent)")
-                    // 🔑 尝试通过文件大小估算时长（仅用于FLAC等特殊格式）
-                    duration = await LocalMusicItem.estimateDurationFromFileSize(url: url)
+                    duration = 180.0 // 默认3分钟
                 }
             } else {
-                print("⚠️ 时长不可用，文件: \(url.lastPathComponent)")
-                duration = await LocalMusicItem.estimateDurationFromFileSize(url: url)
+                duration = 180.0 // 默认3分钟
             }
         } catch {
-            print("❌ 获取音频时长失败: \(error) - 文件: \(url.lastPathComponent)")
-            duration = await LocalMusicItem.estimateDurationFromFileSize(url: url)
+            duration = 180.0 // 默认3分钟
         }
         
         // 🔑 修复：改进元数据获取，支持FLAC的Vorbis Comments
@@ -63,7 +59,6 @@ struct LocalMusicItem: Identifiable, Hashable {
                 do {
                     value = try await item.load(.value)
                 } catch {
-                    print("⚠️ 加载元数据项值失败: \(error) - 键: \(key)")
                     continue
                 }
                 
@@ -103,13 +98,12 @@ struct LocalMusicItem: Identifiable, Hashable {
                 }
             }
             
-            // 🔑 新增：如果commonKey没有获取到信息，尝试使用format-specific keys（特别适用于FLAC）
+            // 如果commonKey没有获取到完整信息，尝试获取所有元数据
             if artist == "未知艺术家" || album == "未知专辑" || title == url.deletingPathExtension().lastPathComponent || trackNumber == nil {
-                await LocalMusicItem.tryFormatSpecificMetadata(asset: asset, url: url, title: &title, artist: &artist, album: &album, trackNumber: &trackNumber, year: &year, genre: &genre, artwork: &artwork)
+                await LocalMusicItem.tryAdditionalMetadata(asset: asset, title: &title, artist: &artist, album: &album, trackNumber: &trackNumber, year: &year, genre: &genre, artwork: &artwork)
             }
             
         } catch {
-            print("❌ 获取元数据失败: \(error) - 文件: \(url.lastPathComponent)")
             // 即使获取元数据失败，也使用默认值
         }
         
@@ -121,74 +115,17 @@ struct LocalMusicItem: Identifiable, Hashable {
         self.trackNumber = trackNumber
         self.year = year
         self.genre = genre
-        
-        // 🔑 添加调试信息
-        print("🎵 解析音乐文件: \(url.lastPathComponent)")
-        print("   标题: \(title)")
-        print("   艺术家: \(artist)")
-        print("   专辑: \(album)")
-        print("   时长: \(duration)秒")
-        print("   音轨号: \(trackNumber ?? 0)")
-        print("   年份: \(year ?? 0)")
-        print("   风格: \(genre ?? "无")")
-        print("   封面: \(artwork != nil ? "有" : "无")")
     }
     
-    // 🔑 新增：通过文件大小估算时长的方法
-    private static func estimateDurationFromFileSize(url: URL) async -> TimeInterval {
-        do {
-            let fileAttributes = try FileManager.default.attributesOfItem(atPath: url.path)
-            if let fileSize = fileAttributes[FileAttributeKey.size] as? Int64 {
-                // 根据文件格式和大小粗略估算时长
-                let fileExtension = url.pathExtension.lowercased()
-                let estimatedBitrate: Double
-                
-                switch fileExtension {
-                case "flac":
-                    estimatedBitrate = 1000 * 1024 // FLAC约1000 kbps
-                case "wav", "aiff":
-                    estimatedBitrate = 1411 * 1024 // 无损CD质量
-                case "mp3":
-                    estimatedBitrate = 320 * 1024  // 高质量MP3
-                case "m4a", "aac":
-                    estimatedBitrate = 256 * 1024  // 高质量AAC
-                default:
-                    estimatedBitrate = 320 * 1024  // 默认值
-                }
-                
-                let estimatedDuration = Double(fileSize * 8) / estimatedBitrate // 转换为秒
-                print("⚠️ 通过文件大小估算时长: \(estimatedDuration)秒，文件: \(url.lastPathComponent)")
-                return max(1.0, estimatedDuration) // 至少1秒
-            }
-        } catch {
-            print("❌ 获取文件大小失败: \(error)")
-        }
-        
-        // 如果无法估算，返回默认值3分钟
-        return 180.0
-    }
     
-    // 🔑 新增：尝试使用format-specific metadata keys
-    private static func tryFormatSpecificMetadata(asset: AVAsset, url: URL, title: inout String, artist: inout String, album: inout String, trackNumber: inout Int?, year: inout Int?, genre: inout String?, artwork: inout Data?) async {
+    // 尝试获取额外的元数据信息
+    private static func tryAdditionalMetadata(asset: AVAsset, title: inout String, artist: inout String, album: inout String, trackNumber: inout Int?, year: inout Int?, genre: inout String?, artwork: inout Data?) async {
         do {
             // 获取所有可用的metadata
             let allMetadata = try await asset.load(.metadata)
             
             for item in allMetadata {
-                // 尝试获取key标识符
-                let key: String?
-                if let commonKey = item.commonKey?.rawValue {
-                    key = commonKey
-                } else if let identifierKey = item.identifier?.rawValue {
-                    key = identifierKey
-                } else if let keySpace = item.keySpace?.rawValue,
-                          let keyString = item.key as? String {
-                    key = "\(keySpace)/\(keyString)"
-                } else {
-                    continue
-                }
-                
-                guard let metadataKey = key else { continue }
+                guard let key = item.commonKey?.rawValue else { continue }
                 
                 // 加载值
                 let value: Any?
@@ -200,76 +137,54 @@ struct LocalMusicItem: Identifiable, Hashable {
                 
                 guard let metadataValue = value else { continue }
                 
-                // 🔑 扩展的key匹配（支持FLAC/Vorbis Comments的常见字段）
-                let lowercaseKey = metadataKey.lowercased()
-                
-                if (lowercaseKey.contains("title") || lowercaseKey.contains("tit2")) && title == url.deletingPathExtension().lastPathComponent {
+                // 简化的key匹配
+                switch key {
+                case "title" where title == URL(fileURLWithPath: title).deletingPathExtension().lastPathComponent:
                     if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         title = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
-                }
-                
-                if (lowercaseKey.contains("artist") || lowercaseKey.contains("tpe1") || lowercaseKey.contains("albumartist") || lowercaseKey.contains("tpe2")) && artist == "未知艺术家" {
+                    
+                case "artist" where artist == "未知艺术家":
                     if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         artist = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
-                }
-                
-                if (lowercaseKey.contains("album") || lowercaseKey.contains("talb")) && album == "未知专辑" {
+                    
+                case "albumName" where album == "未知专辑":
                     if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         album = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
-                }
-                
-                // 🔑 增强音轨号识别 - 支持更多格式
-                if (lowercaseKey.contains("track") || lowercaseKey.contains("trck") || lowercaseKey.contains("tracknumber") || lowercaseKey == "trkn") && trackNumber == nil {
                     
+                case "trackNumber" where trackNumber == nil:
                     if let numberValue = metadataValue as? NSNumber {
                         trackNumber = numberValue.intValue
-                        print("🎵 找到音轨号 (NSNumber): \(trackNumber!) - key: \(metadataKey)")
                     } else if let stringValue = metadataValue as? String {
                         // 处理"3/12"这样的格式
                         let components = stringValue.components(separatedBy: "/")
                         if let number = Int(components.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "") {
                             trackNumber = number
-                            print("🎵 找到音轨号 (String): \(trackNumber!) - key: \(metadataKey)")
-                        }
-                    } else if let dataValue = metadataValue as? Data {
-                        // 有些格式可能将音轨号存储为二进制数据
-                        if dataValue.count == 4 {
-                            let trackNum = dataValue.withUnsafeBytes { bytes in
-                                return bytes.load(as: UInt32.self).bigEndian
-                            }
-                            if trackNum > 0 && trackNum < 1000 { // 合理范围内的音轨号
-                                trackNumber = Int(trackNum)
-                                print("🎵 找到音轨号 (Data): \(trackNumber!) - key: \(metadataKey)")
-                            }
                         }
                     }
-                }
-                
-                if (lowercaseKey.contains("date") || lowercaseKey.contains("year") || lowercaseKey.contains("tyer")) && year == nil {
+                    
+                case "creationDate" where year == nil:
                     year = parseYearFromDate(metadataValue)
-                }
-                
-                if (lowercaseKey.contains("genre") || lowercaseKey.contains("tcon")) && genre == nil {
+                    
+                case "genre" where genre == nil:
                     if let stringValue = metadataValue as? String, !stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         genre = stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
-                }
-                
-                if (lowercaseKey.contains("artwork") || lowercaseKey.contains("apic") || lowercaseKey.contains("covr")) && artwork == nil {
+                    
+                case "artwork" where artwork == nil:
                     if let imageData = metadataValue as? Data, !imageData.isEmpty {
                         artwork = imageData
                     }
+                    
+                default:
+                    break
                 }
-                
-                // 打印调试信息
-                print("📋 发现元数据: \(metadataKey) = \(String(describing: metadataValue).prefix(100))")
             }
             
         } catch {
-            print("❌ 尝试格式特定元数据失败: \(error)")
+            // 获取额外元数据失败
         }
     }
     
@@ -478,7 +393,6 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         let musicDir = docDir.appendingPathComponent("Music")
         if !FileManager.default.fileExists(atPath: musicDir.path) {
             try FileManager.default.createDirectory(at: musicDir, withIntermediateDirectories: true)
-            print("📁 创建Music根目录: \(musicDir.path)")
         }
         
         for sourceURL in urls {
@@ -491,18 +405,16 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 let artistDir = musicDir.appendingPathComponent(artistName)
                 if !FileManager.default.fileExists(atPath: artistDir.path) {
                     try FileManager.default.createDirectory(at: artistDir, withIntermediateDirectories: true)
-                    print("📁 创建艺术家目录: \(artistDir.path)")
                 }
                 
-                // 🔑 创建专辑文件夹
+                // 创建专辑文件夹
                 let albumName = sanitizeFileName(tempMusicItem.album)
                 let albumDir = artistDir.appendingPathComponent(albumName)
                 if !FileManager.default.fileExists(atPath: albumDir.path) {
                     try FileManager.default.createDirectory(at: albumDir, withIntermediateDirectories: true)
-                    print("📁 创建专辑目录: \(albumDir.path)")
                 }
                 
-                // 🔑 生成目标文件名（包含音轨号）
+                // 生成目标文件名（包含音轨号）
                 let fileName = generateFileName(for: tempMusicItem, originalURL: sourceURL)
                 let destinationURL = albumDir.appendingPathComponent(fileName)
                 
@@ -512,22 +424,17 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 // 复制文件到分层目录结构
                 try FileManager.default.copyItem(at: sourceURL, to: finalDestinationURL)
                 
-                print("📁 文件已导入到: \(finalDestinationURL.path)")
-                
             } catch {
                 // 记录单个文件的错误但继续处理其他文件
-                print("❌ 导入文件失败 \(sourceURL.lastPathComponent): \(error.localizedDescription)")
                 
-                // 🔑 如果元数据读取失败，使用默认位置
+                // 如果元数据读取失败，使用默认位置
                 let fallbackDir = musicDir.appendingPathComponent("未知艺术家").appendingPathComponent("未知专辑")
                 try? FileManager.default.createDirectory(at: fallbackDir, withIntermediateDirectories: true)
                 let fallbackDestination = fallbackDir.appendingPathComponent(sourceURL.lastPathComponent)
                 
                 do {
                     try FileManager.default.copyItem(at: sourceURL, to: handleDuplicateFile(fallbackDestination))
-                    print("📁 文件导入到默认位置: \(fallbackDestination.path)")
                 } catch {
-                    print("❌ 无法导入到默认位置: \(error.localizedDescription)")
                     continue
                 }
             }
@@ -565,7 +472,6 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         let musicDir = docDir.appendingPathComponent("Music")
         if !FileManager.default.fileExists(atPath: musicDir.path) {
             try FileManager.default.createDirectory(at: musicDir, withIntermediateDirectories: true)
-            print("📁 创建Music根目录: \(musicDir.path)")
         }
         
         do {
@@ -577,18 +483,16 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             let artistDir = musicDir.appendingPathComponent(artistName)
             if !FileManager.default.fileExists(atPath: artistDir.path) {
                 try FileManager.default.createDirectory(at: artistDir, withIntermediateDirectories: true)
-                print("📁 创建艺术家目录: \(artistDir.path)")
             }
             
-            // 🔑 创建专辑文件夹
+            // 创建专辑文件夹
             let albumName = sanitizeFileName(tempMusicItem.album)
             let albumDir = artistDir.appendingPathComponent(albumName)
             if !FileManager.default.fileExists(atPath: albumDir.path) {
                 try FileManager.default.createDirectory(at: albumDir, withIntermediateDirectories: true)
-                print("📁 创建专辑目录: \(albumDir.path)")
             }
             
-            // 🔑 生成目标文件名（包含音轨号）
+            // 生成目标文件名（包含音轨号）
             let fileName = generateFileName(for: tempMusicItem, originalURL: url)
             let destinationURL = albumDir.appendingPathComponent(fileName)
             
@@ -598,22 +502,17 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             // 复制文件到分层目录结构
             try FileManager.default.copyItem(at: url, to: finalDestinationURL)
             
-            print("📁 文件已导入到: \(finalDestinationURL.path)")
-            
         } catch {
             // 记录单个文件的错误
-            print("❌ 导入文件失败 \(url.lastPathComponent): \(error.localizedDescription)")
             
-            // 🔑 如果元数据读取失败，使用默认位置
+            // 如果元数据读取失败，使用默认位置
             let fallbackDir = musicDir.appendingPathComponent("未知艺术家").appendingPathComponent("未知专辑")
             try? FileManager.default.createDirectory(at: fallbackDir, withIntermediateDirectories: true)
             let fallbackDestination = fallbackDir.appendingPathComponent(url.lastPathComponent)
             
             do {
                 try FileManager.default.copyItem(at: url, to: handleDuplicateFile(fallbackDestination))
-                print("📁 文件导入到默认位置: \(fallbackDestination.path)")
             } catch {
-                print("❌ 无法导入到默认位置: \(error.localizedDescription)")
                 throw error
             }
         }
@@ -629,7 +528,6 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         
         // 扫描文档目录中的音乐文件
         guard let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            print("❌ 无法访问文档目录")
             await MainActor.run {
                 self.isLoadingLocalMusic = false
             }
@@ -645,29 +543,23 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 ? [musicDir] 
                 : [documentsPath]
             
-            print("🎵 扫描目录: \(scanDirectories.map { $0.path })")
-            
             var allMusicURLs: [URL] = []
             
-            // 🔑 递归扫描所有目录
+            // 递归扫描所有目录
             for directory in scanDirectories {
                 let musicURLs = try await scanDirectoryRecursively(directory: directory, supportedFormats: musicFormats)
                 allMusicURLs.append(contentsOf: musicURLs)
             }
             
-            print("🎵 发现 \(allMusicURLs.count) 个音乐文件")
-            
-            // 🔑 修复：并行创建LocalMusicItem对象，但添加播放能力检查
+            // 并行创建LocalMusicItem对象，但添加播放能力检查
             let foundSongs = await allMusicURLs.concurrentMap { url -> LocalMusicItem? in
                 // 检查文件是否可播放
                 let isPlayable = await self.checkFilePlayability(url: url)
                 if !isPlayable {
-                    print("⚠️ 文件不可播放，跳过: \(url.lastPathComponent)")
                     return nil
                 }
                 
                 let musicItem = await LocalMusicItem(url: url)
-                print("🎵 成功解析本地音乐: \(musicItem.title) - \(musicItem.artist)")
                 return musicItem
             }
             
@@ -708,14 +600,12 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 }
                 self.localAlbums = albums
                 self.isLoadingLocalMusic = false
-                print("🎵 扫描完成: 找到 \(validSongs.count) 首可播放歌曲, \(albums.count) 个专辑")
             }
             
         } catch {
             await MainActor.run {
                 self.isLoadingLocalMusic = false
             }
-            print("🎵 扫描本地音乐失败: \(error)")
         }
     }
     
@@ -745,7 +635,6 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                     }
                 }
             } catch {
-                print("⚠️ 扫描文件/目录失败: \(url.lastPathComponent) - \(error)")
                 continue
             }
         }
@@ -977,10 +866,11 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 播放歌曲队列
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
-        print("🎵 开始播放本地音乐队列，共\(songs.count)首歌，从第\(index + 1)首开始")
+        print("🔍 LocalMusic: 播放队列，数量: \(songs.count)，索引: \(index)")
         
-        // 🔑 修改：只在开始播放时请求一次音频会话控制权
-        _ = AudioSessionManager.shared.requestAudioSession(for: .local)
+        // 只在开始播放时请求一次音频会话控制权
+        let sessionResult = AudioSessionManager.shared.requestAudioSession(for: .local)
+        print("🔍 LocalMusic: 音频会话结果: \(sessionResult)")
         
         await MainActor.run {
             currentQueue = songs
@@ -1004,15 +894,18 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 播放当前歌曲
     private func playCurrentSong() async throws {
-        guard currentIndex < currentQueue.count else { return }
-        
-        let song = currentQueue[currentIndex]
-        guard let streamURL = song.streamURL else {
-            throw LocalMusicServiceError.noStreamURL
+        print("🔍 LocalMusic: 播放歌曲，索引: \(currentIndex)")
+        guard currentIndex < currentQueue.count else {
+            print("🔍 LocalMusic: 播放索引超出范围")
+            return
         }
         
-        print("🎵 播放本地音乐: \(song.title) - \(song.artistName)")
-        print("   文件路径: \(streamURL)")
+        let song = currentQueue[currentIndex]
+        print("🔍 LocalMusic: 歌曲: \(song.title)")
+        guard let streamURL = song.streamURL else {
+            print("🔍 LocalMusic: 无法获取流URL")
+            throw LocalMusicServiceError.noStreamURL
+        }
         
         await MainActor.run {
             currentSong = song
@@ -1022,11 +915,15 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 设置AVPlayer
     private func setupAVPlayer(with url: URL) {
+        print("🔍 LocalMusic: 设置播放器")
         cleanupPlayer()
         
         // 确保在主线程上执行
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self = self else {
+                print("🔍 LocalMusic: self已释放")
+                return
+            }
             
             self.avPlayer = AVPlayer(url: url)
             
@@ -1074,13 +971,11 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             }
             
             // 🔑 修改：移除重复的音频会话请求，因为在playQueue中已经请求过了
-             let _ = AudioSessionManager.shared.requestAudioSession(for: .local)
+            let _ = AudioSessionManager.shared.requestAudioSession(for: .local)
             
             // 开始播放
             self.avPlayer?.play()
             self.isPlaying = true
-            
-            print("✅ 本地音乐AVPlayer 设置完成，开始播放")
             
             // 🔑 使用统一管理器更新锁屏信息
             NowPlayingManager.shared.updateNowPlayingInfo()
@@ -1097,18 +992,16 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             switch keyPath {
             case "timeControlStatus":
                 if let player = self.avPlayer {
-                    print("🎵 本地音乐播放器状态变化: \(player.timeControlStatus.rawValue)")
-                    
-                    // 🔑 修复：处理所有状态变化，确保播放状态同步
+                    // 处理所有状态变化，确保播放状态同步
                     switch player.timeControlStatus {
                     case .playing:
+                        print("🔍 LocalMusic: 播放器开始播放")
                         self.isPlaying = true
                         NowPlayingManager.shared.updateNowPlayingInfo()
                     case .paused:
                         self.isPlaying = false
                         NowPlayingManager.shared.updateNowPlayingInfo()
-                    case .waitingToPlayAtSpecifiedRate:
-                        print("🎵 本地音乐：等待播放")
+                    case .waitingToPlayAtSpecifiedRate: break
                         // 不改变播放状态，等待系统处理
                     @unknown default:
                         break
@@ -1116,27 +1009,23 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 }
             case "status":
                 if let status = self.avPlayer?.currentItem?.status {
-                    print("🎵 本地音乐播放项状态变化: \(status.rawValue)")
-                    
-                    // 🔑 修复：处理所有状态变化，特别是失败状态
+                    // 处理所有状态变化，特别是失败状态
                     switch status {
                     case .readyToPlay:
-                        print("🎵 本地音乐：播放项准备就绪")
                         NowPlayingManager.shared.updateNowPlayingInfo()
                     case .failed:
-                        print("❌ 本地音乐：播放项失败")
+                        print("🔍 LocalMusic: 播放器项目失败")
                         self.isPlaying = false
                         NowPlayingManager.shared.updateNowPlayingInfo()
                         
-                        // 🔑 新增：尝试重新播放
-                        if let song = self.currentSong {
-                            print("🔄 尝试重新播放失败的歌曲: \(song.title)")
+                        // 尝试重新播放
+                        if self.currentSong != nil {
                             Task {
                                 try? await self.playCurrentSong()
                             }
                         }
                     case .unknown:
-                        print("🎵 本地音乐：播放项状态未知")
+                        break
                     @unknown default:
                         break
                     }
@@ -1170,12 +1059,15 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 下一首
     func skipToNext() async throws {
+        print("🔍 DEBUG: LocalMusicService - 跳转到下一首，当前索引: \(currentIndex)，队列长度: \(currentQueue.count)")
         if currentIndex < currentQueue.count - 1 {
             await MainActor.run {
                 currentIndex += 1
+                print("🔍 DEBUG: LocalMusicService - 更新索引为: \(currentIndex)")
             }
             try await playCurrentSong()
         } else {
+            print("🔍 DEBUG: LocalMusicService - 已到达队列末尾，处理队列结束")
             // 队列播放完毕，根据重复模式处理
             try await handleQueueEnd()
         }
@@ -1183,11 +1075,15 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 上一首
     func skipToPrevious() async throws {
+        print("🔍 DEBUG: LocalMusicService - 跳转到上一首，当前索引: \(currentIndex)")
         if currentIndex > 0 {
             await MainActor.run {
                 currentIndex -= 1
+                print("🔍 DEBUG: LocalMusicService - 更新索引为: \(currentIndex)")
             }
             try await playCurrentSong()
+        } else {
+            print("🔍 DEBUG: LocalMusicService - 已到达队列开头，无法跳转到上一首")
         }
     }
     
@@ -1209,9 +1105,11 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 跳转到指定时间
     func seek(to time: TimeInterval) async {
+        print("🔍 DEBUG: LocalMusicService - 跳转到指定时间: \(time)秒")
         await MainActor.run {
             avPlayer?.seek(to: CMTime(seconds: time, preferredTimescale: 1))
             currentTime = time
+            print("🔍 DEBUG: LocalMusicService - 更新当前时间为: \(time)秒")
             // 更新锁屏播放进度
             NowPlayingManager.shared.updatePlaybackProgress()
         }
@@ -1219,6 +1117,7 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 停止播放
     func stop() {
+        print("🔍 DEBUG: LocalMusicService - 停止播放")
         avPlayer?.pause()
         cleanupPlayer()
         
@@ -1228,12 +1127,15 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         duration = 0
         
         // 🔑 清除锁屏控制器代理
+        print("🔍 DEBUG: LocalMusicService - 清除锁屏控制器代理")
         NowPlayingManager.shared.setDelegate(nil)
 
         // 释放音频会话控制权
+        print("🔍 DEBUG: LocalMusicService - 释放音频会话控制权")
         AudioSessionManager.shared.releaseAudioSession(for: .local)
         
         // 🔑 使用统一管理器清除锁屏播放信息
+        print("🔍 DEBUG: LocalMusicService - 清除锁屏播放信息")
         NowPlayingManager.shared.clearNowPlayingInfo()
     }
     
@@ -1402,33 +1304,36 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     }
     
     @objc private func playerDidFinishPlaying() {
-        print("🎵 本地音乐：播放完成")
+        print("🔍 DEBUG: LocalMusicService - 播放完成")
         Task {
             // 根据重复模式处理播放完成
             switch repeatMode {
             case .one:
+                print("🔍 DEBUG: LocalMusicService - 重复模式：单曲循环")
                 // 重复当前歌曲
                 try await playCurrentSong()
                 
             case .all, .none:
+                print("🔍 DEBUG: LocalMusicService - 重复模式：列表循环或不重复")
                 // 播放下一首或处理队列结束
                 try await skipToNext()
             }
         }
     }
     
-    // 🔑 新增：处理播放失败
+    // 处理播放失败
     @objc private func playerDidFailToPlay() {
-        print("❌ 本地音乐：播放失败")
+        print("🔍 DEBUG: LocalMusicService - 播放失败")
         Task {
             await MainActor.run {
                 self.isPlaying = false
                 self.currentTime = 0
+                print("🔍 DEBUG: LocalMusicService - 重置播放状态")
             }
             
             // 尝试重新播放
-            if let song = self.currentSong {
-                print("🔄 尝试重新播放失败的歌曲: \(song.title)")
+            if self.currentSong != nil {
+                print("🔍 DEBUG: LocalMusicService - 尝试重新播放")
                 try? await self.playCurrentSong()
             }
         }
@@ -1440,6 +1345,7 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     // 🔑 新增：处理来自AudioSessionManager的停止播放通知
     @objc private func handleShouldStopPlaying() {
         print("🎵 本地音乐：收到停止播放通知")
+        print("🔍 DEBUG: LocalMusicService - 处理停止播放通知")
         Task {
             await pause()
         }
@@ -1447,40 +1353,41 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     // 🔑 新增：处理来自AudioSessionManager的恢复播放通知
     @objc private func handleShouldResumePlaying() {
-        print("🎵 本地音乐：收到恢复播放通知")
+        print("🔍 DEBUG: LocalMusicService - 处理恢复播放通知")
         Task {
             // 重新激活音频会话
+            print("🔍 DEBUG: LocalMusicService - 请求音频会话")
             let sessionSuccess = AudioSessionManager.shared.requestAudioSession(for: .local)
+            print("🔍 DEBUG: LocalMusicService - 音频会话请求结果: \(sessionSuccess)")
             if sessionSuccess {
-                print("✅ 本地音乐：音频会话重新激活成功")
+                print("🔍 DEBUG: LocalMusicService - 音频会话成功，开始播放")
                 await play()
             } else {
-                print("❌ 本地音乐：音频会话重新激活失败")
+                print("🔍 DEBUG: LocalMusicService - 音频会话失败，仍尝试播放")
                 // 即使音频会话失败，也尝试播放，让系统处理
                 await play()
             }
         }
     }
     
-    // 🔑 新增：处理应用进入后台
+    // 处理应用进入后台
     @objc private func handleAppDidEnterBackground() {
-        print("🎵 本地音乐：应用进入后台")
-            // 🔑 修改：移除重复的音频会话请求，因为AudioSessionManager已经统一处理
+            // 移除重复的音频会话请求，因为AudioSessionManager已经统一处理
             // if isPlaying {
             //     _ = AudioSessionManager.shared.requestAudioSession(for: .local)
             // }
     }
     
-    // 🔑 新增：处理应用回到前台
+    // 处理应用回到前台
     @objc private func handleAppWillEnterForeground() {
-        print("🎵 本地音乐：应用回到前台")
-            // 🔑 修改：移除重复的音频会话请求，因为AudioSessionManager已经统一处理
+            // 移除重复的音频会话请求，因为AudioSessionManager已经统一处理
             // if isPlaying {
             //     _ = AudioSessionManager.shared.requestAudioSession(for: .local)
             // }
     }
     
     private func cleanupPlayer() {
+        print("🔍 DEBUG: LocalMusicService - 清理播放器")
         // 移除观察者
         avPlayer?.removeObserver(self, forKeyPath: "timeControlStatus")
         avPlayer?.currentItem?.removeObserver(self, forKeyPath: "status")
@@ -1496,7 +1403,14 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             object: avPlayer?.currentItem
         )
         
+        NotificationCenter.default.removeObserver(
+            self,
+            name: AVPlayerItem.failedToPlayToEndTimeNotification,
+            object: avPlayer?.currentItem
+        )
+        
         avPlayer = nil
+        print("🔍 DEBUG: LocalMusicService - 播放器清理完成")
     }
     
     private func cleanup() {
@@ -1506,17 +1420,11 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 删除本地音乐文件
     func deleteSong(_ song: UniversalSong) async throws {
-        print("🗑️ 开始删除歌曲: \(song.title)")
-        print("🗑️ originalData类型: \(type(of: song.originalData))")
-
         guard let localSong = song.originalData as? LocalSongItem else {
-            print("❌ 无效的song.originalData类型，期望LocalSongItem，实际: \(type(of: song.originalData))")
             throw LocalMusicServiceError.invalidFileURL
         }
         
-        print("🗑️ LocalSongItem filePath: \(localSong.filePath)")
-
-        // 🔑 修复：正确处理URL编码的文件路径
+        // 正确处理URL编码的文件路径
         let fileURL: URL
         if localSong.filePath.hasPrefix("file://") {
             // 如果是完整的file URL字符串
@@ -1529,26 +1437,20 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             fileURL = URL(fileURLWithPath: localSong.filePath)
         }
         
-        print("🗑️ 尝试删除文件: \(fileURL.path)")
-        print("🗑️ 文件URL: \(fileURL)")
-        
         // 检查文件是否存在
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            print("❌ 文件不存在: \(fileURL.path)")
             throw LocalMusicServiceError.fileNotFound
         }
         
         do {
             // 删除文件
             try FileManager.default.removeItem(at: fileURL)
-            print("✅ 成功删除文件: \(fileURL.lastPathComponent)")
             
             // 从内存中移除
             await MainActor.run {
                 // 从localSongs列表中移除
                 if let localIndex = self.localSongs.firstIndex(where: { $0.id.uuidString == song.id }) {
                     self.localSongs.remove(at: localIndex)
-                    print("✅ 从localSongs中移除: \(song.title)")
                 }
                 
                 // 更新专辑信息
@@ -1558,31 +1460,21 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 self.updateArtistsAfterSongDeletion(deletedSong: song)
             }
             
-            print("🗑️ 已删除本地歌曲: \(song.title)")
-            
         } catch {
-            print("❌ 删除文件时发生错误: \(error)")
             throw LocalMusicServiceError.deletionFailed(error.localizedDescription)
         }
     }
     
     /// 删除整张专辑
     func deleteAlbum(_ album: UniversalAlbum) async throws {
-        // 🔑 修复：检查专辑的originalData类型
-        print("🗑️ 开始删除专辑: \(album.title)")
-        print("🗑️ 专辑数据类型: \(type(of: album.originalData))")
-        
-        // 🔑 根据专辑中的歌曲来删除，而不是依赖originalData
+        // 根据专辑中的歌曲来删除，而不是依赖originalData
         let albumSongs = album.songs.filter { song in
             song.source == .local
         }
         
         guard !albumSongs.isEmpty else {
-            print("❌ 专辑中没有本地歌曲")
             throw LocalMusicServiceError.invalidAlbumData
         }
-        
-        print("🗑️ 专辑包含 \(albumSongs.count) 首歌曲")
         
         var deletionErrors: [String] = []
         
@@ -1590,11 +1482,9 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         for song in albumSongs {
             do {
                 try await deleteSong(song)
-                print("✅ 成功删除歌曲: \(song.title)")
             } catch {
                 let errorMsg = "\(song.title): \(error.localizedDescription)"
                 deletionErrors.append(errorMsg)
-                print("❌ 删除歌曲失败: \(errorMsg)")
             }
         }
         
@@ -1603,8 +1493,6 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             let errorMessage = deletionErrors.joined(separator: ", ")
             throw LocalMusicServiceError.partialDeletionFailed(errorMessage)
         }
-        
-        print("🗑️ 已删除本地专辑: \(album.title)")
     }
     
 //    /// 删除艺术家的所有音乐
@@ -1791,11 +1679,10 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         return finalURL
     }
     
-    // 🔑 新增：检查文件是否可播放
+    // 检查文件是否可播放
     private func checkFilePlayability(url: URL) async -> Bool {
         // 检查文件是否存在
         guard FileManager.default.fileExists(atPath: url.path) else {
-            print("❌ 文件不存在: \(url.lastPathComponent)")
             return false
         }
         
@@ -1804,12 +1691,10 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             let fileAttributes = try FileManager.default.attributesOfItem(atPath: url.path)
             if let fileSize = fileAttributes[FileAttributeKey.size] as? Int64 {
                 if fileSize < 1024 { // 小于1KB可能是损坏文件
-                    print("⚠️ 文件过小，可能损坏: \(url.lastPathComponent) (\(fileSize) bytes)")
                     return false
                 }
             }
         } catch {
-            print("❌ 无法获取文件属性: \(url.lastPathComponent)")
             return false
         }
         
@@ -1818,7 +1703,6 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         do {
             let isReadable = try await asset.load(.isReadable)
             if !isReadable {
-                print("⚠️ 文件不可读: \(url.lastPathComponent)")
                 return false
             }
             
@@ -1829,32 +1713,12 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
             }
             
             if audioTracks.isEmpty {
-                print("⚠️ 文件没有音频轨道: \(url.lastPathComponent)")
                 return false
-            }
-            
-            // 对于FLAC文件，做额外检查
-            let fileExtension = url.pathExtension.lowercased()
-            if fileExtension == "flac" {
-                // 检查AVPlayer是否支持播放这个FLAC文件
-                let playerItem = AVPlayerItem(url: url)
-                
-                // 等待一小段时间让播放项准备
-                try await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
-                
-                if playerItem.status == .failed {
-                    print("⚠️ FLAC文件不被AVPlayer支持: \(url.lastPathComponent)")
-                    if let error = playerItem.error {
-                        print("   错误: \(error.localizedDescription)")
-                    }
-                    return false
-                }
             }
             
             return true
             
         } catch {
-            print("❌ 检查文件播放能力失败: \(url.lastPathComponent) - \(error)")
             return false
         }
     }

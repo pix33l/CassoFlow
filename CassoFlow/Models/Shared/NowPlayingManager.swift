@@ -64,9 +64,8 @@ class NowPlayingManager {
             if currentDelegate != nil {
                 updateNowPlayingInfo()
             }
-        case .didBecomeActive:
+        case .didBecomeActive: break
             // 🔑 修改：不再在这里处理前台逻辑，避免重复
-            print("📱 NowPlayingManager: 应用变为活跃（等待前台完成）")
         case .willResignActive:
             handleAppWillResignActive()
 //        default:
@@ -76,7 +75,7 @@ class NowPlayingManager {
     
     // 🔑 新增：处理应用进入前台完成状态
     private func handleAppDidEnterForegroundComplete() {
-        print("📱 NowPlayingManager: 应用进入前台完成")
+        print("🔍 NowPlayingManager: 前台完成")
         
         // 重新设置远程控制命令中心（只设置一次）
         setupRemoteCommandCenter()
@@ -84,6 +83,7 @@ class NowPlayingManager {
         // 🔑 修改：延迟更新锁屏信息，确保歌曲信息状态已完全同步
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let delegate = self.currentDelegate, delegate.isPlaying {
+                print("🔍 NowPlayingManager: 前台更新锁屏")
                 // 确保歌曲信息状态已完全同步后再更新锁屏信息
                 self.updateNowPlayingInfo()
                 
@@ -107,14 +107,16 @@ class NowPlayingManager {
     
     /// 设置当前的播放代理
     func setDelegate(_ delegate: NowPlayingDelegate?) {
+        let oldDelegate = currentDelegate
         currentDelegate = delegate
-        print("🎵 设置锁屏控制器代理: \(delegate != nil ? String(describing: type(of: delegate!)) : "nil")")
+        print("🔍 NowPlayingManager: 设置代理 - 旧: \(oldDelegate != nil), 新: \(delegate != nil)")
         
         // 🔑 当设置新的代理时，确保对应的音频会话处于活跃状态
         if let delegate = delegate {
             // 根据代理类型请求相应的音频会话
             let serviceType = mapDelegateToAudioService(delegate)
-            let _ = AudioSessionManager.shared.requestAudioSession(for: serviceType)
+            let sessionResult = AudioSessionManager.shared.requestAudioSession(for: serviceType)
+            print("🔍 NowPlayingManager: 音频会话请求结果: \(sessionResult)")
         }
         
         // 重新设置远程控制命令中心以确保激活
@@ -122,11 +124,12 @@ class NowPlayingManager {
         
         // 如果有代理且正在播放，立即更新锁屏信息
         if let delegate = delegate, delegate.isPlaying {
+            print("🔍 NowPlayingManager: 设置代理后更新锁屏信息")
             updateNowPlayingInfo()
         } else if delegate == nil {
             // 清除锁屏信息
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-            print("🔄 清除锁屏播放信息（无代理）")
+            print("🔍 NowPlayingManager: 清除锁屏信息（无代理）")
         }
     }
     
@@ -149,12 +152,15 @@ class NowPlayingManager {
     /// 更新锁屏播放信息
     func updateNowPlayingInfo() {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self,
-                  let delegate = self.currentDelegate,
+            guard let self = self else {
+                return
+            }
+            
+            guard let delegate = self.currentDelegate,
                   let song = delegate.currentSong else {
                 // 使用空字典而不是 nil
                 MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-                print("🔄 清除锁屏播放信息（无有效状态）")
+                print("🔍 NowPlayingManager: 清除锁屏信息")
                 return
             }
             
@@ -196,18 +202,31 @@ class NowPlayingManager {
             
             // 🔑 新增：验证播放信息的有效性
             if validDuration > 0 && validCurrentTime >= 0 && !song.title.isEmpty {
+                // 🔑 关键修复：先确保远程控制命令启用，再设置播放信息
+                self.ensureRemoteCommandsEnabled()
+                
                 // 设置播放信息
                 MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
                 
-                // 确保远程控制命令启用
-                self.ensureRemoteCommandsEnabled()
+                // 🔑 关键修复：设置后立即验证，确保锁屏信息有效
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    if let currentInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo {
+                        if currentInfo.count < 10 {
+                            print("🔍 NowPlayingManager: 警告 - 锁屏信息字段数不足: \(currentInfo.count)")
+                            // 🔑 关键修复：如果字段数不足，重新设置一次
+                            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+                        }
+                    } else {
+                        print("🔍 NowPlayingManager: 警告 - 锁屏信息设置后为空，重新设置")
+                        // 🔑 关键修复：如果设置为空，重新设置一次
+                        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+                    }
+                }
                 
-                print("🔄 设置锁屏播放信息:")
-                print("   标题: \(song.title)")
-                print("   艺术家: \(song.artistName)")
-                print("   时长: \(validDuration)秒")
-                print("   当前时间: \(validCurrentTime)秒")
-                print("   播放速率: \(delegate.isPlaying ? 1.0 : 0.0)")
+                // 只在关键时间点打印日志
+                if validCurrentTime.truncatingRemainder(dividingBy: 10.0) < 0.5 || !delegate.isPlaying {
+                    print("🔍 NowPlayingManager: 设置锁屏 - \(song.title), 播放: \(delegate.isPlaying), 时间: \(validCurrentTime)/\(validDuration)")
+                }
                 
                 // 如果没有封面，尝试异步加载
                 if artwork == nil, let artworkURL = song.artworkURL {
@@ -216,23 +235,28 @@ class NowPlayingManager {
                     }
                 }
             } else {
-                print("⚠️ 播放信息无效，跳过设置锁屏信息")
-                print("   标题: \(song.title)")
-                print("   时长: \(validDuration)")
-                print("   当前时间: \(validCurrentTime)")
+                print("🔍 NowPlayingManager: 播放信息无效")
             }
         }
     }
     
     /// 更新播放进度信息
     func updatePlaybackProgress() {
-        guard let delegate = currentDelegate else { return }
+        guard let delegate = currentDelegate else {
+            print("🔍 NowPlayingManager: 更新进度 - 无代理")
+            return
+        }
         
         let playbackInfo = delegate.getPlaybackInfo()
         var info = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playbackInfo.current
         info[MPNowPlayingInfoPropertyPlaybackRate] = delegate.isPlaying ? 1.0 : 0.0
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        
+        // 只在关键时间点打印日志
+        if playbackInfo.current.truncatingRemainder(dividingBy: 10.0) < 0.5 {
+            print("🔍 NowPlayingManager: 更新进度 - \(playbackInfo.current)s, 播放: \(delegate.isPlaying)")
+        }
     }
     
     /// 强制更新锁屏播放信息
@@ -240,7 +264,7 @@ class NowPlayingManager {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            print("🔧 强制更新锁屏播放信息")
+            print("🔍 NowPlayingManager: 强制更新锁屏信息")
             
             // 重新设置远程控制命令中心
             self.setupRemoteCommandCenter()
@@ -258,7 +282,7 @@ class NowPlayingManager {
     /// 清除锁屏播放信息
     func clearNowPlayingInfo() {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-        print("🔄 清除锁屏播放信息")
+        print("🔍 NowPlayingManager: 清除锁屏信息")
     }
     
     // MARK: - 私有方法
@@ -285,7 +309,7 @@ class NowPlayingManager {
         
         // 播放命令
         commandCenter.playCommand.addTarget { [weak self] _ in
-            print("🎵 锁屏播放命令")
+            print("🔍 NowPlayingManager: 锁屏播放命令")
             Task {
                 await self?.currentDelegate?.play()
             }
@@ -294,7 +318,7 @@ class NowPlayingManager {
         
         // 暂停命令
         commandCenter.pauseCommand.addTarget { [weak self] _ in
-            print("⏸️ 锁屏暂停命令")
+            print("🔍 NowPlayingManager: 锁屏暂停命令")
             Task {
                 await self?.currentDelegate?.pause()
             }
@@ -303,7 +327,7 @@ class NowPlayingManager {
         
         // 播放/暂停切换命令
         commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-            print("⏯️ 锁屏播放/暂停切换命令")
+            print("🔍 NowPlayingManager: 锁屏播放/暂停切换命令")
             Task {
                 guard let delegate = self?.currentDelegate else { return }
                 if delegate.isPlaying {
@@ -317,7 +341,7 @@ class NowPlayingManager {
         
         // 下一首命令
         commandCenter.nextTrackCommand.addTarget { [weak self] _ in
-            print("⏭️ 锁屏下一首命令")
+            print("🔍 NowPlayingManager: 锁屏下一首命令")
             Task {
                 try? await self?.currentDelegate?.skipToNext()
             }
@@ -326,7 +350,7 @@ class NowPlayingManager {
         
         // 上一首命令
         commandCenter.previousTrackCommand.addTarget { [weak self] _ in
-            print("⏮️ 锁屏上一首命令")
+            print("🔍 NowPlayingManager: 锁屏上一首命令")
             Task {
                 try? await self?.currentDelegate?.skipToPrevious()
             }
@@ -337,7 +361,7 @@ class NowPlayingManager {
         commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
             if let event = event as? MPChangePlaybackPositionCommandEvent {
                 let time = event.positionTime
-                print("⏩ 锁屏跳转命令: \(time)秒")
+                print("🔍 NowPlayingManager: 锁屏跳转命令: \(time)秒")
                 Task {
                     await self?.currentDelegate?.seek(to: time)
                 }
@@ -347,7 +371,7 @@ class NowPlayingManager {
         }
         
         hasSetupRemoteCommands = true
-        print("✅ 统一远程控制命令中心配置完成")
+        print("🔍 NowPlayingManager: 远程控制命令中心配置完成")
     }
     
     /// 确保远程控制命令启用
@@ -384,7 +408,7 @@ class NowPlayingManager {
         commandCenter.togglePlayPauseCommand.isEnabled = false
         
         hasSetupRemoteCommands = false
-        print("🧹 统一远程控制命令中心已清除")
+        print("🔍 NowPlayingManager: 远程控制命令中心已清除")
     }
     
     /// 创建专辑封面
@@ -396,7 +420,6 @@ class NowPlayingManager {
             if let localSongItem = song.originalData as? LocalSongItem,
                let artworkData = localSongItem.artworkData,
                let image = UIImage(data: artworkData) {
-                print("🎨 使用本地音乐封面")
                 return MPMediaItemArtwork(boundsSize: size) { _ in image }
             }
             
@@ -404,7 +427,6 @@ class NowPlayingManager {
             // Subsonic音乐封面处理 - 优先使用缓存
             if let artworkURL = song.artworkURL,
                let cachedImage = ImageCacheManager.shared.getCachedImage(for: artworkURL) {
-                print("🎨 使用缓存的Subsonic音乐封面")
                 return MPMediaItemArtwork(boundsSize: size) { _ in cachedImage }
             }
             
@@ -413,7 +435,6 @@ class NowPlayingManager {
             // 首先尝试使用歌曲自带的封面URL
             if let artworkURL = song.artworkURL,
                let cachedImage = ImageCacheManager.shared.getCachedImage(for: artworkURL) {
-                print("🎨 使用缓存的AudioStation音乐封面（歌曲URL）")
                 return MPMediaItemArtwork(boundsSize: size) { _ in cachedImage }
             }
             
@@ -423,7 +444,6 @@ class NowPlayingManager {
         
         // 使用自定义默认封面作为兜底方案
         let defaultImage = createDefaultArtwork(size: size)
-        print("🎨 使用自定义默认音乐图标作为封面")
         return MPMediaItemArtwork(boundsSize: size) { _ in defaultImage }
     }
     
@@ -538,12 +558,14 @@ class NowPlayingManager {
     private func handleAppEnterBackground() {
         isAppInBackground = true
         hasConfiguredForBackground = true
-        print("📱 NowPlayingManager: 应用进入后台")
+        print("🔍 NowPlayingManager: 应用进入后台，代理: \(currentDelegate != nil), 播放: \(currentDelegate?.isPlaying ?? false)")
         
         // 🔑 确保在后台时锁屏信息仍然有效
         if let delegate = currentDelegate, delegate.isPlaying {
+            print("🔍 NowPlayingManager: 启动后台锁屏信息更新流程")
             // 🔑 修改：延迟更新锁屏信息，确保歌曲信息状态已完全同步
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                print("🔍 NowPlayingManager: 后台第一次更新锁屏信息")
                 self.updateNowPlayingInfo()
                 
                 // 再次延迟更新，确保稳定性
@@ -551,25 +573,29 @@ class NowPlayingManager {
                     self.updateNowPlayingInfo()
                 }
             }
+            
+            // 🔑 新增：启动后台更新定时器
+            startBackgroundUpdateTimer()
+        } else {
+            print("🔍 NowPlayingManager: 后台无播放，不启动更新")
         }
     }
     
     // 🔑 新增：处理应用回到前台
     private func handleAppWillEnterForeground() {
         isAppInBackground = false
-        print("📱 NowPlayingManager: 应用回到前台")
+        print("🔍 NowPlayingManager: 应用回到前台")
         
         // 🔑 停止后台定时器
         stopBackgroundUpdateTimer()
         
         // 🔑 修改：不再在这里处理锁屏信息更新，避免重复操作
         // 锁屏信息的更新将在 didEnterForegroundComplete 状态中统一处理
-        print("📱 NowPlayingManager: 等待前台完成状态再更新锁屏信息")
     }
     
     // 🔑 新增：处理应用即将终止
     private func handleAppWillTerminate() {
-        print("📱 NowPlayingManager: 应用即将终止")
+        print("🔍 NowPlayingManager: 应用即将终止")
         // 保持锁屏信息直到应用完全终止
         if currentDelegate != nil {
             updateNowPlayingInfo()
@@ -578,13 +604,20 @@ class NowPlayingManager {
     
     // 🔑 新增：启动后台更新定时器
     private func startBackgroundUpdateTimer() {
-        guard currentDelegate?.isPlaying == true else { return }
+        guard currentDelegate?.isPlaying == true else {
+            print("🔍 NowPlayingManager: 后台定时器未启动 - 无播放")
+            return
+        }
         
+        print("🔍 NowPlayingManager: 启动后台更新定时器")
         stopBackgroundUpdateTimer() // 确保没有重复的定时器
         
         // 每3秒更新一次锁屏信息，保持活跃状态
         backgroundUpdateTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self = self else {
+                print("🔍 NowPlayingManager: 后台定时器执行时 self已释放")
+                return
+            }
             
             // 检查是否仍在后台
             if self.isAppInBackground {
@@ -594,16 +627,22 @@ class NowPlayingManager {
                 // 记录最后一次更新时间
                 self.lastBackgroundUpdateTime = Date()
             } else {
+                print("🔍 NowPlayingManager: 已回到前台，停止后台定时器")
                 // 如果已经回到前台，停止定时器
                 self.stopBackgroundUpdateTimer()
             }
         }
+        
+        print("🔍 NowPlayingManager: 后台更新定时器已启动")
     }
     
     // 🔑 新增：停止后台更新定时器
     private func stopBackgroundUpdateTimer() {
-        backgroundUpdateTimer?.invalidate()
-        backgroundUpdateTimer = nil
+        if backgroundUpdateTimer != nil {
+            print("🔍 NowPlayingManager: 停止后台更新定时器")
+            backgroundUpdateTimer?.invalidate()
+            backgroundUpdateTimer = nil
+        }
     }
 }
 
