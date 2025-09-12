@@ -18,62 +18,55 @@ class NowPlayingManager {
     private var lastBackgroundUpdateTime: Date?
     private var hasConfiguredForBackground = false
 
+    // 应用状态管理器注册ID
+    private var appStateHandlerID: UUID?
+
     // MARK: - 初始化
     private init() {
         setupRemoteCommandCenter()
-        setupAppStateNotifications()
+        // 🔑 修改：使用 AppStateManager 统一管理应用状态
+        setupAppStateManager()
     }
 
     deinit {
         clearRemoteCommandCenter()
+        // 🔑 新增：注销应用状态处理器
+        if let handlerID = appStateHandlerID {
+            AppStateManager.shared.unregisterStateChangeHandler(handlerID)
+        }
         NotificationCenter.default.removeObserver(self)
     }
     
-    // 设置应用状态通知监听
-    private func setupAppStateNotifications() {
-        // 应用变为活跃
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.didBecomeActiveNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppDidBecomeActive()
+    // 🔑 新增：设置应用状态管理器监听
+    private func setupAppStateManager() {
+        appStateHandlerID = AppStateManager.shared.registerStateChangeHandler { [weak self] state in
+            self?.handleAppStateChange(state)
         }
-        
-        // 应用即将失去活跃
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.willResignActiveNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppWillResignActive()
-        }
-        
-        // 🔑 910新增：应用进入后台
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.didEnterBackgroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppEnterBackground()
-        }
-        
-        // 🔑 910新增：应用回到前台
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.willEnterForegroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppWillEnterForeground()
-        }
-        
-        // 🔑 910新增：应用即将终止
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.willTerminateNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppWillTerminate()
+    }
+    
+    // 🔑 新增：处理应用状态变化
+    private func handleAppStateChange(_ state: AppState) {
+        switch state {
+        case .didEnterBackground:
+            handleAppEnterBackground()
+        case .willEnterForeground:
+            handleAppWillEnterForeground()
+        case .backgroundUpdate:
+            // 在后台定期更新锁屏信息
+            if isAppInBackground && currentDelegate?.isPlaying == true {
+                updateNowPlayingInfo()
+            }
+        case .willTerminate:
+            // 保持锁屏信息直到应用完全终止
+            if currentDelegate != nil {
+                updateNowPlayingInfo()
+            }
+        case .didBecomeActive:
+            handleAppDidBecomeActive()
+        case .willResignActive:
+            handleAppWillResignActive()
+        default:
+            break
         }
     }
     
@@ -554,6 +547,9 @@ class NowPlayingManager {
         
         // 🔑 停止后台定时器
         stopBackgroundUpdateTimer()
+        
+        // 🔑 修改：不再重新请求音频会话控制权，避免中断当前播放状态
+        // 音频会话的维护由 AppStateManager.handleAppDidBecomeActive() 统一处理
         
         // 🔑 重新激活并更新锁屏信息
         if currentDelegate != nil {

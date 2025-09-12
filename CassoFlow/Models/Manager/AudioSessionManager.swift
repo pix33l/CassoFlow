@@ -294,6 +294,52 @@ class AudioSessionManager {
         }
     }
     
+    // MARK: - 🔑 新增：前台音频会话维护
+    
+    /// 确保音频会话在前台时保持活跃状态
+    func ensureForegroundAudioSession() -> Bool {
+        guard let service = activeService else {
+            print("⚠️ 没有活跃的音频服务，无法确保前台音频会话")
+            return false
+        }
+        
+        print("🔧 确保前台音频会话活跃状态: \(service)")
+        
+        do {
+            let session = AVAudioSession.sharedInstance()
+            
+            // 🔑 修改：更加温和地处理音频会话，避免不必要的中断
+            // 首先检查会话是否已经处于正确状态
+            if session.category == .playback {
+                print("✅ 音频会话类别正确，无需重新配置")
+                // 只需确保远程控制启用
+                DispatchQueue.main.async {
+                    UIApplication.shared.beginReceivingRemoteControlEvents()
+                }
+                return true
+            }
+            
+            // 如果会话类别不正确，温和地重新配置
+            if session.category != .playback {
+                print("⚠️ 音频会话类别不正确，温和重新配置")
+                try session.setCategory(.playback, mode: .default, options: [])
+                // 不需要立即重新激活，避免中断
+            }
+            
+            // 确保远程控制启用
+            DispatchQueue.main.async {
+                UIApplication.shared.beginReceivingRemoteControlEvents()
+            }
+            
+            print("✅ 前台音频会话状态确认完成")
+            return true
+            
+        } catch let error {
+            print("❌ 确保前台音频会话失败: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

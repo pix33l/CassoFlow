@@ -52,6 +52,7 @@ class MusicService: ObservableObject {
     
     // 🔑 新增：音频会话管理器
     private let audioSessionManager = AudioSessionManager.shared
+    private let appStateManager = AppStateManager.shared
     
     // MARK: - 播放状态
     @Published var currentTitle: String = ""
@@ -128,7 +129,7 @@ class MusicService: ObservableObject {
     private var isAppInBackground = false
     
     // 缓存上次的播放状态，用于后台状态检测
-    private var lastPlayingState: Bool = false
+    private var lastPlayingState = false
     
     // 缓存上一次的关键值，只对不需要频繁更新的属性使用
     private var lastTitle: String = ""
@@ -142,6 +143,9 @@ class MusicService: ObservableObject {
         shouldCloseLibrary = false
     }
     
+    // 应用状态管理器注册ID
+    private var appStateHandlerID: UUID?
+
     // MARK: - 初始化
     
     init() {
@@ -197,14 +201,91 @@ class MusicService: ObservableObject {
             object: nil
         )
         
-        // 监听应用状态变化
-        setupAppStateNotifications()
+        // 🔑 修改：使用 AppStateManager 统一管理应用状态
+        setupAppStateManager()
         
         // 🔑 新增：监听音频会话管理器的通知
         setupAudioSessionNotifications()
     }
     
-    // 🔑 新增：设置音频会话通知监听
+    // 🔑 新增：设置应用状态管理器监听
+    private func setupAppStateManager() {
+        appStateHandlerID = AppStateManager.shared.registerStateChangeHandler { [weak self] state in
+            self?.handleAppStateChange(state)
+        }
+    }
+    
+    // 🔑 新增：处理应用状态变化
+    private func handleAppStateChange(_ state: AppState) {
+        switch state {
+        case .didEnterBackground:
+            handleAppEnterBackground()
+        case .willEnterForeground:
+            handleAppEnterForeground()
+        case .backgroundUpdate:
+            updateBackgroundMusicStatus()
+        case .willTerminate:
+            stopAllTimers()
+        default:
+            break
+        }
+    }
+    
+    // 移除原有的通知监听设置
+    
+    // 处理应用进入后台
+    private func handleAppEnterBackground() {
+        isAppInBackground = true
+        lastPlayingState = isPlaying
+        
+        // 临时关闭屏幕常亮以节省电量
+        if isScreenAlwaysOn {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+        
+        // 智能管理后台Timer：只在播放音乐时启动
+        if isPlaying {
+            startBackgroundStatusTimer()
+        } else {
+            stopBackgroundStatusTimer()
+        }
+    }
+    
+    // 处理应用回到前台
+    private func handleAppEnterForeground() {
+        isAppInBackground = false
+            
+        // 恢复屏幕常亮设置
+        UIApplication.shared.isIdleTimerDisabled = isScreenAlwaysOn
+
+        // 停止后台状态监听Timer，恢复前台更新Timer
+        stopBackgroundStatusTimer()
+        startUpdateTimer()
+        
+        // 🔑 修复：回到前台时立即同步并强制更新锁屏信息
+        updateCurrentSongInfo()
+        
+        // 🔑 新增：确保音频会话在前台时保持活跃
+        _ = mapCurrentDataSourceToAudioService()
+        let _ = audioSessionManager.ensureForegroundAudioSession()
+    }
+    
+    // 新增：停止所有Timer
+    private func stopAllTimers() {
+        stopUpdateTimer()
+        stopBackgroundStatusTimer()
+    }
+    
+    deinit {
+        // 🔑 新增：注销应用状态处理器
+        if let handlerID = appStateHandlerID {
+            AppStateManager.shared.unregisterStateChangeHandler(handlerID)
+        }
+        NotificationCenter.default.removeObserver(self)
+        stopAllTimers()
+    }
+    
+    // 🔑 新增：监听音频会话管理器的通知
     private func setupAudioSessionNotifications() {
         // 监听各个服务的停止播放通知
         NotificationCenter.default.addObserver(
@@ -295,74 +376,6 @@ class MusicService: ObservableObject {
         }
     }
     
-    // 设置应用状态通知监听
-    private func setupAppStateNotifications() {
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.didEnterBackgroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppEnterBackground()
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.willEnterForegroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.handleAppEnterForeground()
-        }
-    }
-    
-    // 处理应用进入后台
-    private func handleAppEnterBackground() {
-        isAppInBackground = true
-        lastPlayingState = isPlaying
-        
-        // 临时关闭屏幕常亮以节省电量
-        if isScreenAlwaysOn {
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-        
-//        // 🔑 修复：确保锁屏播放信息在后台保持
-//        if isPlaying && currentTrackID != nil {
-//            // 强制保持锁屏播放信息
-//            NowPlayingManager.shared.forceUpdateNowPlayingInfo()
-//        }
-        
-        // 智能管理后台Timer：只在播放音乐时启动
-        if isPlaying {
-            startBackgroundStatusTimer()
-        } else {
-            stopBackgroundStatusTimer()
-        }
-    }
-    
-    // 处理应用回到前台
-    private func handleAppEnterForeground() {
-        isAppInBackground = false
-        
-        // 恢复屏幕常亮设置
-        UIApplication.shared.isIdleTimerDisabled = isScreenAlwaysOn
-
-        // 停止后台状态监听Timer，恢复前台更新Timer
-        stopBackgroundStatusTimer()
-        startUpdateTimer()
-        
-        // 🔑 修复：回到前台时立即同步并强制更新锁屏信息
-        updateCurrentSongInfo()
-        
-//        // 🔑 重要：重新激活NowPlayingManager以确保锁屏控制器正常工作
-//        NowPlayingManager.shared.forceUpdateNowPlayingInfo()
-        
-//        // 延迟再次确保锁屏信息正确
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//            if self.isPlaying && self.currentTrackID != nil {
-//                self.forceUpdateNowPlayingInfo()
-//            }
-//        }
-    }
-    
     // 新增：启动后台状态监听Timer
     private func startBackgroundStatusTimer() {
         
@@ -418,11 +431,11 @@ class MusicService: ObservableObject {
         
     }
     
-    // 新增：停止所有Timer
-    private func stopAllTimers() {
-        stopUpdateTimer()
-        stopBackgroundStatusTimer()
-    }
+//    // 新增：停止所有Timer
+//    private func stopAllTimers() {
+//        stopUpdateTimer()
+//        stopBackgroundStatusTimer()
+//    }
     
     // MARK: - 数据获取方法（委托给协调器）
     
