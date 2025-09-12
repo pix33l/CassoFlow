@@ -627,6 +627,12 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
             print("✅ Audio Station获得音频会话控制权")
         }
         
+//        // 🔑 新增：检查是否为FLAC格式
+//        let isFLAC = streamURL.pathExtension.lowercased() == "flac"
+//        if isFLAC {
+//            print("🎵 检测到FLAC格式文件，使用AVPlayer直接播放")
+//        }
+        
         await MainActor.run {
             playerItem = AVPlayerItem(url: streamURL)
             player?.replaceCurrentItem(with: playerItem)
@@ -652,10 +658,8 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
                         // 🔑 使用统一管理器清除锁屏播放信息
                         NowPlayingManager.shared.clearNowPlayingInfo()
                         
-                        // 🔧 尝试使用转码后的格式重新播放
-                        Task {
-                            await self?.retryWithTranscodedFormat()
-                        }
+                        // 🔑 修改：不再尝试使用转码格式，直接报告播放失败
+                        print("❌ 播放失败，不再尝试转码格式")
                     case .unknown:
                         print("🔄 播放状态未知")
                     @unknown default:
@@ -665,44 +669,19 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         }
     }
     
-    // 🔧 新增：使用转码格式重试播放
-    private func retryWithTranscodedFormat() async {
-        guard currentIndex < currentQueue.count else { return }
-        
-        let song = currentQueue[currentIndex]
-        
-        // 🔧 尝试使用转码的MP3格式
-        if let transcodedURL = apiClient.getTranscodedStreamURL(id: song.id) {
-            print("🔄 尝试使用转码格式播放: \(transcodedURL)")
-            
-            await MainActor.run {
-                let newPlayerItem = AVPlayerItem(url: transcodedURL)
-                player?.replaceCurrentItem(with: newPlayerItem)
-                playerItem = newPlayerItem
-                
-                // 重新监听状态
-                statusObserver?.cancel()
-                statusObserver = newPlayerItem.publisher(for: \.status)
-                    .sink { [weak self] status in
-                        if status == .readyToPlay {
-                            print("✅ 转码格式播放成功")
-                            self?.player?.play()
-                            self?.isPlaying = true
-                            NowPlayingManager.shared.updateNowPlayingInfo()
-                        } else if status == .failed {
-                            let error = newPlayerItem.error?.localizedDescription ?? "未知错误"
-                            print("❌ 转码格式也播放失败: \(error)")
-                            self?.isPlaying = false
-                            NowPlayingManager.shared.clearNowPlayingInfo()
-                        }
-                    }
-            }
-        }
-    }
+    
     
     func play() async {
-        // 🔑 关键修改：使用统一音频会话管理器获取控制权
-        let _ = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+        // 🔑 修改：移除重复的音频会话请求，因为在playSongAtCurrentIndex中已经请求过了
+         let _ = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
+        
+//        // 🔑 新增：检查当前歌曲是否为FLAC格式
+//        if let song = currentSong, let streamURL = song.streamURL {
+//            let isFLAC = streamURL.pathExtension.lowercased() == "flac"
+//            if isFLAC {
+//                print("🎵 恢复播放FLAC格式歌曲: \(song.title)")
+//            }
+//        }
         
         await MainActor.run {
             player?.play()
@@ -877,7 +856,7 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     @objc private func handleResumePlayingNotification() {
         print("🔄 Audio Station收到恢复播放通知")
         // 通常不自动恢复，让用户手动控制
-        // 如果需要自动恢复，可以取消注释下面的代码
+        // 如果需要自动恢复，可以取消注释下面的代码 
         // Task {
         //     await self.play()
         // }

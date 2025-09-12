@@ -23,9 +23,9 @@ struct LocalMusicLibraryView: View {
     
     // 添加导入状态变量
     @State private var showDocumentPicker = false
-    @State private var isImporting = false // 🔑 新增：导入状态
-    @State private var importMessage: String? // 🔑 新增：导入消息
-    @State private var showImportAlert = false // 🔑 新增：显示导入结果
+    @State private var isImporting = false // 导入状态
+    @State private var importMessage: String? // 导入消息
+    @State private var showImportAlert = false // 显示导入结果
     
     // 过滤后的数据
     private var filteredAlbums: [UniversalAlbum] {
@@ -453,6 +453,7 @@ struct LocalMusicLibraryView: View {
         .padding(.horizontal)
     }
     
+    
     // MARK: - 处理导入的文件
     private func handleImportedFiles(urls: [URL]) async {
         print("🎵 开始处理导入文件，共 \(urls.count) 个")
@@ -469,21 +470,24 @@ struct LocalMusicLibraryView: View {
         }
         
         do {
-            // 将文件导入到应用文档目录
+            // 使用LocalMusicService的importFiles方法批量导入文件
             try await localService.importFiles(from: urls)
             
             // 重新加载库数据
             await libraryData.reloadLibrary(localService: localService)
             
+            // 发送本地音乐库变化通知，确保UI更新
             await MainActor.run {
+                NotificationCenter.default.post(name: .localMusicLibraryDidChange, object: nil)
+                
                 isImporting = false
                 libraryData.isLoading = false
                 
-                // 🔑 新增：显示成功消息
+                // 显示成功消息
                 importMessage = "成功导入 \(urls.count) 个音乐文件"
                 showImportAlert = true
                 
-                // 🔑 触觉反馈
+                // 触觉反馈
                 if musicService.isHapticFeedbackEnabled {
                     let notificationFeedback = UINotificationFeedbackGenerator()
                     notificationFeedback.notificationOccurred(.success)
@@ -499,11 +503,11 @@ struct LocalMusicLibraryView: View {
                 isImporting = false
                 libraryData.isLoading = false
                 
-                // 🔑 新增：显示错误消息
+                // 显示错误消息
                 importMessage = "导入失败: \(error.localizedDescription)"
                 showImportAlert = true
                 
-                // 🔑 触觉反馈
+                // 触觉反馈
                 if musicService.isHapticFeedbackEnabled {
                     let notificationFeedback = UINotificationFeedbackGenerator()
                     notificationFeedback.notificationOccurred(.error)

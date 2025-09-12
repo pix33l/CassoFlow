@@ -746,6 +746,7 @@ struct LocalArtistDetailView: View {
   @State private var detailedArtist: UniversalArtist?
   @State private var isLoading = false
   @State private var errorMessage: String?
+  @StateObject private var preferences = LocalLibraryPreferences() // 添加偏好设置
   
   var body: some View {
       ScrollView {
@@ -806,15 +807,28 @@ struct LocalArtistDetailView: View {
                           .padding(.horizontal)
                           .padding(.bottom, 8)
                       
-                      LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 10)], spacing: 20) {
-                          ForEach(detailed.albums, id: \.id) { album in
-                              NavigationLink(destination: LocalMusicDetailView(album: album).environmentObject(musicService)) {
-                                  LocalGridAlbumCell(album: album)
+                      // 专辑内容
+                      if preferences.isGridMode {
+                          LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 10)], spacing: 20) {
+                              ForEach(detailed.albums, id: \.id) { album in
+                                  NavigationLink(destination: LocalMusicDetailView(album: album).environmentObject(musicService)) {
+                                      LocalGridAlbumCell(album: album)
+                                  }
+                                  .buttonStyle(PlainButtonStyle())
                               }
-                              .buttonStyle(PlainButtonStyle())
                           }
+                          .padding(.horizontal)
+                      } else {
+                          LazyVGrid(columns: [GridItem(.adaptive(minimum: 360))], spacing: 12) {
+                              ForEach(detailed.albums, id: \.id) { album in
+                                  NavigationLink(destination: LocalMusicDetailView(album: album).environmentObject(musicService)) {
+                                      LocalListAlbumCell(album: album)
+                                  }
+                                  .buttonStyle(PlainButtonStyle())
+                              }
+                          }
+                          .padding(.horizontal)
                       }
-                      .padding(.horizontal)
                   } else {
                       VStack(spacing: 12) {
                           Image(systemName: "opticaldisc")

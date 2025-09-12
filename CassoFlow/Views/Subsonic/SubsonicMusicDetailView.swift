@@ -767,6 +767,7 @@ struct SubsonicArtistDetailView: View {
     @State private var detailedArtist: UniversalArtist?
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @StateObject private var preferences = SubsonicLibraryPreferences() // 添加偏好设置
     
     // 使用统一的缓存管理器
     private let cacheManager = MusicDetailCacheManager.shared
@@ -830,15 +831,28 @@ struct SubsonicArtistDetailView: View {
                             .padding(.horizontal)
                             .padding(.bottom, 8)
                         
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 10)], spacing: 20) {
-                            ForEach(detailed.albums, id: \.id) { album in
-                                NavigationLink(destination: UniversalMusicDetailView(album: album).environmentObject(musicService)) {
-                                    SubsonicGridAlbumCell(album: album)
+                        // 专辑内容
+                        if preferences.isGridMode {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), spacing: 10)], spacing: 20) {
+                                ForEach(detailed.albums, id: \.id) { album in
+                                    NavigationLink(destination: UniversalMusicDetailView(album: album).environmentObject(musicService)) {
+                                        SubsonicGridAlbumCell(album: album)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .buttonStyle(PlainButtonStyle())
                             }
+                            .padding(.horizontal)
+                        } else {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 360))], spacing: 12) {
+                                ForEach(detailed.albums, id: \.id) { album in
+                                    NavigationLink(destination: UniversalMusicDetailView(album: album).environmentObject(musicService)) {
+                                        SubsonicListAlbumCell(album: album)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     } else {
                         VStack(spacing: 12) {
                             Image(systemName: "opticaldisc")

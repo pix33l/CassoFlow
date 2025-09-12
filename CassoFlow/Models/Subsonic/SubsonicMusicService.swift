@@ -518,8 +518,8 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 播放
     func play() async {
-        // 🔑 简化：播放前确保音频会话控制权
-        let _ = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
+        // 🔑 修改：移除重复的音频会话请求，因为在playQueue中已经请求过了
+         let _ = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
         
         avPlayer?.play()
         await MainActor.run {
@@ -794,31 +794,32 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         }
     }
     
-    @objc private func handleAudioSessionInterruption(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-            return
-        }
-        
-        switch type {
-        case .began:
-            Task {
-                await pause()
-            }
-        case .ended:
-            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) {
-                    Task {
-                        await play()
-                    }
-                }
-            }
-        @unknown default:
-            break
-        }
-    }
+    // 🔑 修改：移除重复的音频会话中断处理，统一由AudioSessionManager管理
+    // @objc private func handleAudioSessionInterruption(notification: Notification) {
+    //     guard let userInfo = notification.userInfo,
+    //           let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+    //           let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+    //         return
+    //     }
+    //
+    //     switch type {
+    //     case .began:
+    //         Task {
+    //             await pause()
+    //         }
+    //     case .ended:
+    //         if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+    //             let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+    //             if options.contains(.shouldResume) {
+    //                 Task {
+    //                     await play()
+    //                 }
+    //             }
+    //         }
+    //     @unknown default:
+    //         break
+    //     }
+    // }
     
     @objc private func handleStopPlayingNotification() {
         print("🛑 收到停止播放通知（其他音乐应用已启动）")

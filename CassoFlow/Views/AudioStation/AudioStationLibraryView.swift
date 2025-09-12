@@ -568,8 +568,8 @@ class AudioStationLibraryDataManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var hasLoaded = false
     
-    // 添加静态缓存，在整个应用生命周期中保持
-    private static var sharedLibraryData: (albums: [UniversalAlbum], playlists: [UniversalPlaylist], artists: [UniversalArtist])?
+    // 使用新的音乐库缓存管理器
+    @MainActor private let libraryCache = MusicLibraryCacheManager.shared
     
     // 保存原始未排序的数据
     private var originalAlbums: [UniversalAlbum] = []
@@ -577,13 +577,13 @@ class AudioStationLibraryDataManager: ObservableObject {
     private var originalArtists: [UniversalArtist] = []
     
     func loadLibraryIfNeeded(audioStationService: AudioStationMusicService) async {
-        // 如果已经加载过或有静态缓存，直接使用缓存数据
+        // 如果已经加载过，直接返回
         if hasLoaded {
             return
         }
         
-        // 检查静态缓存
-        if let cachedData = Self.sharedLibraryData {
+        // 检查新的缓存系统
+        if let cachedData = await libraryCache.getCachedLibraryData(for: "AudioStation") {
             await MainActor.run {
                 self.albums = cachedData.albums
                 self.playlists = cachedData.playlists
@@ -595,10 +595,16 @@ class AudioStationLibraryDataManager: ObservableObject {
                 self.isLoading = false
                 self.errorMessage = nil
                 
-                // 预加载封面
-                self.preloadAlbumCovers(audioStationService: audioStationService)
-                self.preloadPlaylistCovers()
+                print("📚 使用缓存的AudioStation库数据")
             }
+            
+            // 后台检查是否需要刷新
+            if await libraryCache.shouldRefreshLibraryCache(for: "AudioStation") {
+                await libraryCache.backgroundRefreshLibraryData(for: "AudioStation") {
+                    try await self.loadFreshLibraryData(audioStationService: audioStationService)
+                }
+            }
+            
             return
         }
         
@@ -640,19 +646,26 @@ class AudioStationLibraryDataManager: ObservableObject {
                 self.isLoading = false
                 self.hasLoaded = true
                 
-                // 缓存到静态变量
-                Self.sharedLibraryData = (albumsResult, playlistsResult, artistsResult)
+                // 使用新的缓存系统
+                libraryCache.cacheLibraryData(
+                    albums: albumsResult,
+                    playlists: playlistsResult,
+                    artists: artistsResult,
+                    for: "AudioStation"
+                )
                 
                 if albumsResult.isEmpty && playlistsResult.isEmpty && artistsResult.isEmpty {
                     self.errorMessage = "Audio Station服务器上没有找到音乐内容"
                 }
-                
-                // 预加载专辑封面
-                self.preloadAlbumCovers(audioStationService: audioStationService)
-                
-                // 预加载播放列表封面
-                self.preloadPlaylistCovers()
             }
+            
+            // 使用新的预加载系统
+            await libraryCache.preloadLibraryData(
+                albums: albumsResult,
+                playlists: playlistsResult,
+                artists: artistsResult,
+                audioStationService: audioStationService
+            )
         } catch {
             // 添加更详细的错误信息
             print("Library loading error: \(error)")
@@ -696,42 +709,25 @@ class AudioStationLibraryDataManager: ObservableObject {
         }
     }
     
-    /// 预加载专辑封面
-    @MainActor private func preloadAlbumCovers(audioStationService: AudioStationMusicService) {
-        let imageCache = ImageCacheManager.shared
+    /// 加载新鲜的库数据（用于后台刷新）
+    private func loadFreshLibraryData(audioStationService: AudioStationMusicService) async throws -> (albums: [UniversalAlbum], playlists: [UniversalPlaylist], artists: [UniversalArtist]) {
+        // 并行加载数据
+        async let albumsTask = audioStationService.getRecentAlbums()
+        async let playlistsTask = audioStationService.getPlaylists()
+        async let artistsTask = audioStationService.getArtists()
         
-        // 🔧 为前10个专辑异步获取并预加载封面
-        Task {
-            for album in albums.prefix(10) {
-                do {
-                    let detailedAlbum = try await audioStationService.getAlbum(id: album.id)
-                    if let artworkURL = detailedAlbum.artworkURL {
-                        imageCache.preloadImage(from: artworkURL)
-                    }
-                } catch {
-                    print("❌ 预加载专辑封面失败: \(album.title) - \(error)")
-                }
-            }
-        }
-    }
-    
-    /// 预加载播放列表封面
-    @MainActor private func preloadPlaylistCovers() {
-        let imageCache = ImageCacheManager.shared
+        let (albumsResult, playlistsResult, artistsResult) = try await (albumsTask, playlistsTask, artistsTask)
         
-        // 预加载前20个播放列表的封面
-        for playlist in playlists.prefix(20) {
-            if let artworkURL = playlist.artworkURL {
-                imageCache.preloadImage(from: artworkURL)
-            }
-        }
+        print("🔄 后台刷新数据 - Albums: \(albumsResult.count), Playlists: \(playlistsResult.count), Artists: \(artistsResult.count)")
+        
+        return (albumsResult, playlistsResult, artistsResult)
     }
     
     func reloadLibrary(audioStationService: AudioStationMusicService) async {
         await MainActor.run {
             hasLoaded = false
-            // 清除静态缓存，强制重新加载
-            Self.sharedLibraryData = nil
+            // 清除缓存，强制重新加载
+            libraryCache.clearLibraryCache(for: "AudioStation")
         }
         await loadLibraryIfNeeded(audioStationService: audioStationService)
     }
@@ -748,7 +744,7 @@ class AudioStationLibraryDataManager: ObservableObject {
             if isConnected {
                 hasLoaded = false
                 // 连接测试成功后清除缓存
-                Self.sharedLibraryData = nil
+                libraryCache.clearLibraryCache(for: "AudioStation")
             }
         }
         
@@ -758,8 +754,8 @@ class AudioStationLibraryDataManager: ObservableObject {
     }
     
     /// 清除缓存的类方法
-    static func clearSharedCache() {
-        sharedLibraryData = nil
+    @MainActor static func clearSharedCache() {
+        MusicLibraryCacheManager.shared.clearLibraryCache(for: "AudioStation")
     }
 }
 

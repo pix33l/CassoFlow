@@ -51,6 +51,9 @@ class NowPlayingManager {
             handleAppEnterBackground()
         case .willEnterForeground:
             handleAppWillEnterForeground()
+        case .didEnterForegroundComplete:
+            // 🔑 修改：使用完成状态来处理前台逻辑，避免重复处理
+            handleAppDidEnterForegroundComplete()
         case .backgroundUpdate:
             // 在后台定期更新锁屏信息
             if isAppInBackground && currentDelegate?.isPlaying == true {
@@ -62,23 +65,32 @@ class NowPlayingManager {
                 updateNowPlayingInfo()
             }
         case .didBecomeActive:
-            handleAppDidBecomeActive()
+            // 🔑 修改：不再在这里处理前台逻辑，避免重复
+            print("📱 NowPlayingManager: 应用变为活跃（等待前台完成）")
         case .willResignActive:
             handleAppWillResignActive()
-        default:
-            break
+//        default:
+//            break
         }
     }
     
-    // 处理应用变为活跃状态
-    private func handleAppDidBecomeActive() {
-        // 重新设置远程控制命令中心
+    // 🔑 新增：处理应用进入前台完成状态
+    private func handleAppDidEnterForegroundComplete() {
+        print("📱 NowPlayingManager: 应用进入前台完成")
+        
+        // 重新设置远程控制命令中心（只设置一次）
         setupRemoteCommandCenter()
         
-        // 如果有代理且正在播放，立即更新锁屏信息
-        if let delegate = currentDelegate, delegate.isPlaying {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        // 🔑 修改：延迟更新锁屏信息，确保歌曲信息状态已完全同步
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let delegate = self.currentDelegate, delegate.isPlaying {
+                // 确保歌曲信息状态已完全同步后再更新锁屏信息
                 self.updateNowPlayingInfo()
+                
+                // 再次延迟更新，确保稳定性
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.updateNowPlayingInfo()
+                }
             }
         }
     }
@@ -182,24 +194,32 @@ class NowPlayingManager {
                 nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
             }
             
-            // 设置播放信息
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-            
-            // 确保远程控制命令启用
-            self.ensureRemoteCommandsEnabled()
-            
-            print("🔄 设置锁屏播放信息:")
-            print("   标题: \(song.title)")
-            print("   艺术家: \(song.artistName)")
-            print("   时长: \(validDuration)秒")
-            print("   当前时间: \(validCurrentTime)秒")
-            print("   播放速率: \(delegate.isPlaying ? 1.0 : 0.0)")
-            
-            // 如果没有封面，尝试异步加载
-            if artwork == nil, let artworkURL = song.artworkURL {
-                Task {
-                    await self.loadAndUpdateArtwork(from: artworkURL, for: song)
+            // 🔑 新增：验证播放信息的有效性
+            if validDuration > 0 && validCurrentTime >= 0 && !song.title.isEmpty {
+                // 设置播放信息
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+                
+                // 确保远程控制命令启用
+                self.ensureRemoteCommandsEnabled()
+                
+                print("🔄 设置锁屏播放信息:")
+                print("   标题: \(song.title)")
+                print("   艺术家: \(song.artistName)")
+                print("   时长: \(validDuration)秒")
+                print("   当前时间: \(validCurrentTime)秒")
+                print("   播放速率: \(delegate.isPlaying ? 1.0 : 0.0)")
+                
+                // 如果没有封面，尝试异步加载
+                if artwork == nil, let artworkURL = song.artworkURL {
+                    Task {
+                        await self.loadAndUpdateArtwork(from: artworkURL, for: song)
+                    }
                 }
+            } else {
+                print("⚠️ 播放信息无效，跳过设置锁屏信息")
+                print("   标题: \(song.title)")
+                print("   时长: \(validDuration)")
+                print("   当前时间: \(validCurrentTime)")
             }
         }
     }
@@ -413,12 +433,12 @@ class NowPlayingManager {
         let renderer = UIGraphicsImageRenderer(size: size)
         let image = renderer.image { context in
             // 设置背景色
-            UIColor.systemYellow.setFill()
+            UIColor.black.setFill()
             context.fill(CGRect(origin: .zero, size: size))
             
             // 绘制音乐符号
             let symbolConfig = UIImage.SymbolConfiguration(pointSize: size.width * 0.5, weight: .bold)
-            if let symbolImage = UIImage(systemName: "music.note", withConfiguration: symbolConfig)?.withTintColor(.black, renderingMode: .alwaysOriginal) {
+            if let symbolImage = UIImage(systemName: "music.note", withConfiguration: symbolConfig)?.withTintColor(.yellow, renderingMode: .alwaysOriginal) {
                 let symbolSize = symbolImage.size
                 let symbolRect = CGRect(
                     x: (size.width - symbolSize.width) / 2,
@@ -522,20 +542,14 @@ class NowPlayingManager {
         
         // 🔑 确保在后台时锁屏信息仍然有效
         if let delegate = currentDelegate, delegate.isPlaying {
-            // 立即更新一次锁屏信息
-            updateNowPlayingInfo()
-            
-            // 🔑 启动后台定时器，定期更新锁屏信息
-            startBackgroundUpdateTimer()
-            
-            // 延迟再次更新，确保稳定性
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            // 🔑 修改：延迟更新锁屏信息，确保歌曲信息状态已完全同步
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 self.updateNowPlayingInfo()
-            }
-            
-            // 额外延迟确保完全稳定
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                self.updateNowPlayingInfo()
+                
+                // 再次延迟更新，确保稳定性
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.updateNowPlayingInfo()
+                }
             }
         }
     }
@@ -548,24 +562,9 @@ class NowPlayingManager {
         // 🔑 停止后台定时器
         stopBackgroundUpdateTimer()
         
-        // 🔑 修改：不再重新请求音频会话控制权，避免中断当前播放状态
-        // 音频会话的维护由 AppStateManager.handleAppDidBecomeActive() 统一处理
-        
-        // 🔑 重新激活并更新锁屏信息
-        if currentDelegate != nil {
-            setupRemoteCommandCenter()
-            updateNowPlayingInfo()
-            
-            // 延迟再次更新确保正确显示
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.updateNowPlayingInfo()
-            }
-            
-            // 额外延迟确保完全稳定
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.updateNowPlayingInfo()
-            }
-        }
+        // 🔑 修改：不再在这里处理锁屏信息更新，避免重复操作
+        // 锁屏信息的更新将在 didEnterForegroundComplete 状态中统一处理
+        print("📱 NowPlayingManager: 等待前台完成状态再更新锁屏信息")
     }
     
     // 🔑 新增：处理应用即将终止

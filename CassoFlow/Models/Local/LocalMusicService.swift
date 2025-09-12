@@ -439,10 +439,7 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         super.init()
         setupNotifications()
         
-        // 延迟设置音频会话，移除锁屏控制器设置（交给统一管理器）
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.setupAudioSession()
-        }
+        // 音频会话管理已统一移到AudioSessionManager，无需在此设置
     }
     
     deinit {
@@ -544,17 +541,85 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
 //            // 检查本地音乐服务是否可用
 //            return true
 //        }
-//        
+//
 //        func getRecentAlbums() async throws -> [UniversalAlbum] {
 //            // 获取本地音乐专辑
 //            return []
 //        }
-//        
+//
 //        func getArtists() async throws -> [UniversalArtist] {
 //            // 获取本地艺术家
 //            return []
 //        }
         // 🔑 新增：导入完成后立即扫描本地音乐
+        await scanLocalMusic()
+    }
+    
+    /// 🔑 新增：导入单个文件
+    func importFile(url: URL) async throws {
+        guard let docDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw NSError(domain: "LocalMusicService", code: 1001, userInfo: [NSLocalizedDescriptionKey: "无法访问文档目录"])
+        }
+        
+        // 🔑 创建Music根目录
+        let musicDir = docDir.appendingPathComponent("Music")
+        if !FileManager.default.fileExists(atPath: musicDir.path) {
+            try FileManager.default.createDirectory(at: musicDir, withIntermediateDirectories: true)
+            print("📁 创建Music根目录: \(musicDir.path)")
+        }
+        
+        do {
+            // 🔑 首先读取文件元数据来确定存放位置
+            let tempMusicItem = await LocalMusicItem(url: url)
+            
+            // 🔑 创建艺术家文件夹
+            let artistName = sanitizeFileName(tempMusicItem.artist)
+            let artistDir = musicDir.appendingPathComponent(artistName)
+            if !FileManager.default.fileExists(atPath: artistDir.path) {
+                try FileManager.default.createDirectory(at: artistDir, withIntermediateDirectories: true)
+                print("📁 创建艺术家目录: \(artistDir.path)")
+            }
+            
+            // 🔑 创建专辑文件夹
+            let albumName = sanitizeFileName(tempMusicItem.album)
+            let albumDir = artistDir.appendingPathComponent(albumName)
+            if !FileManager.default.fileExists(atPath: albumDir.path) {
+                try FileManager.default.createDirectory(at: albumDir, withIntermediateDirectories: true)
+                print("📁 创建专辑目录: \(albumDir.path)")
+            }
+            
+            // 🔑 生成目标文件名（包含音轨号）
+            let fileName = generateFileName(for: tempMusicItem, originalURL: url)
+            let destinationURL = albumDir.appendingPathComponent(fileName)
+            
+            // 如果目标文件已存在，处理重复文件
+            let finalDestinationURL = handleDuplicateFile(destinationURL)
+            
+            // 复制文件到分层目录结构
+            try FileManager.default.copyItem(at: url, to: finalDestinationURL)
+            
+            print("📁 文件已导入到: \(finalDestinationURL.path)")
+            
+        } catch {
+            // 记录单个文件的错误
+            print("❌ 导入文件失败 \(url.lastPathComponent): \(error.localizedDescription)")
+            
+            // 🔑 如果元数据读取失败，使用默认位置
+            let fallbackDir = musicDir.appendingPathComponent("未知艺术家").appendingPathComponent("未知专辑")
+            try? FileManager.default.createDirectory(at: fallbackDir, withIntermediateDirectories: true)
+            let fallbackDestination = fallbackDir.appendingPathComponent(url.lastPathComponent)
+            
+            do {
+                try FileManager.default.copyItem(at: url, to: handleDuplicateFile(fallbackDestination))
+                print("📁 文件导入到默认位置: \(fallbackDestination.path)")
+            } catch {
+                print("❌ 无法导入到默认位置: \(error.localizedDescription)")
+                throw error
+            }
+        }
+        
+        // 🔑 新增：导入完成后清除缓存并重新扫描本地音乐
+        LocalLibraryDataManager.clearSharedCache()
         await scanLocalMusic()
     }
     
@@ -688,27 +753,8 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         return musicURLs
     }
     
-    /// 打开音频会话
-    private func setupAudioSession() {
-        // 使用统一音频会话管理器
-        let success = AudioSessionManager.shared.requestAudioSession(for: .local)
-        if success {
-            print("✅ 本地音乐音频会话设置成功")
-        } else {
-            print("❌ 本地音乐音频会话设置失败")
-        }
-    }
-    
-    /// 激活音频会话
-    private func activateAudioSession() {
-        // 通过统一管理器激活
-        let success = AudioSessionManager.shared.requestAudioSession(for: .local)
-        if success {
-            print("✅ 本地音乐音频会话激活成功")
-        } else {
-            print("⚠️ 本地音乐音频会话激活失败")
-        }
-    }
+    /// 🔑 移除：音频会话管理已统一移到AudioSessionManager
+    /// 现在所有音频会话操作都通过AudioSessionManager进行
     
     
     // MARK: - 数据获取方法
@@ -933,8 +979,8 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     func playQueue(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
         print("🎵 开始播放本地音乐队列，共\(songs.count)首歌，从第\(index + 1)首开始")
         
-        // 激活音频会话
-        activateAudioSession()
+        // 🔑 修改：只在开始播放时请求一次音频会话控制权
+        _ = AudioSessionManager.shared.requestAudioSession(for: .local)
         
         await MainActor.run {
             currentQueue = songs
@@ -997,6 +1043,14 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 object: self.avPlayer?.currentItem
             )
             
+            // 🔑 新增：注册播放失败通知
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(self.playerDidFailToPlay),
+                name: AVPlayerItem.failedToPlayToEndTimeNotification,
+                object: self.avPlayer?.currentItem
+            )
+            
             // 监听播放器状态变化
             self.avPlayer?.addObserver(self, forKeyPath: "timeControlStatus", options: [.new], context: nil)
             self.avPlayer?.currentItem?.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
@@ -1019,8 +1073,8 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 }
             }
             
-            // 重要：先激活音频会话
-            self.activateAudioSession()
+            // 🔑 修改：移除重复的音频会话请求，因为在playQueue中已经请求过了
+             let _ = AudioSessionManager.shared.requestAudioSession(for: .local)
             
             // 开始播放
             self.avPlayer?.play()
@@ -1038,19 +1092,53 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         guard let keyPath = keyPath else { return }
         
         DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
             switch keyPath {
             case "timeControlStatus":
-                if let player = self?.avPlayer {
+                if let player = self.avPlayer {
                     print("🎵 本地音乐播放器状态变化: \(player.timeControlStatus.rawValue)")
-                    if player.timeControlStatus == .playing {
+                    
+                    // 🔑 修复：处理所有状态变化，确保播放状态同步
+                    switch player.timeControlStatus {
+                    case .playing:
+                        self.isPlaying = true
                         NowPlayingManager.shared.updateNowPlayingInfo()
+                    case .paused:
+                        self.isPlaying = false
+                        NowPlayingManager.shared.updateNowPlayingInfo()
+                    case .waitingToPlayAtSpecifiedRate:
+                        print("🎵 本地音乐：等待播放")
+                        // 不改变播放状态，等待系统处理
+                    @unknown default:
+                        break
                     }
                 }
             case "status":
-                if let status = self?.avPlayer?.currentItem?.status {
+                if let status = self.avPlayer?.currentItem?.status {
                     print("🎵 本地音乐播放项状态变化: \(status.rawValue)")
-                    if status == .readyToPlay {
+                    
+                    // 🔑 修复：处理所有状态变化，特别是失败状态
+                    switch status {
+                    case .readyToPlay:
+                        print("🎵 本地音乐：播放项准备就绪")
                         NowPlayingManager.shared.updateNowPlayingInfo()
+                    case .failed:
+                        print("❌ 本地音乐：播放项失败")
+                        self.isPlaying = false
+                        NowPlayingManager.shared.updateNowPlayingInfo()
+                        
+                        // 🔑 新增：尝试重新播放
+                        if let song = self.currentSong {
+                            print("🔄 尝试重新播放失败的歌曲: \(song.title)")
+                            Task {
+                                try? await self.playCurrentSong()
+                            }
+                        }
+                    case .unknown:
+                        print("🎵 本地音乐：播放项状态未知")
+                    @unknown default:
+                        break
                     }
                 }
             default:
@@ -1278,16 +1366,43 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     // MARK: - 私有方法
     
     private func setupNotifications() {
-        // 音频会话中断处理
+        // 🔑 修复：移除重复的音频会话中断处理，统一由AudioSessionManager管理
+        // 现在只监听来自AudioSessionManager的统一通知
+        
+        // 监听来自AudioSessionManager的停止播放通知
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleAudioSessionInterruption),
-            name: AVAudioSession.interruptionNotification,
+            selector: #selector(handleShouldStopPlaying),
+            name: .localMusicShouldStopPlaying,
             object: nil
         )
+        
+        // 监听来自AudioSessionManager的恢复播放通知
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShouldResumePlaying),
+            name: .localMusicShouldResumePlaying,
+            object: nil
+        )
+        
+        // 🔑 修改：移除重复的应用状态变化监听，因为AudioSessionManager已经统一处理
+        // NotificationCenter.default.addObserver(
+        //     self,
+        //     selector: #selector(handleAppDidEnterBackground),
+        //     name: UIApplication.didEnterBackgroundNotification,
+        //     object: nil
+        // )
+        //
+        // NotificationCenter.default.addObserver(
+        //     self,
+        //     selector: #selector(handleAppWillEnterForeground),
+        //     name: UIApplication.willEnterForegroundNotification,
+        //     object: nil
+        // )
     }
     
     @objc private func playerDidFinishPlaying() {
+        print("🎵 本地音乐：播放完成")
         Task {
             // 根据重复模式处理播放完成
             switch repeatMode {
@@ -1302,30 +1417,67 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
         }
     }
     
-    @objc private func handleAudioSessionInterruption(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-            return
-        }
-        
-        switch type {
-        case .began:
-            Task {
-                await pause()
+    // 🔑 新增：处理播放失败
+    @objc private func playerDidFailToPlay() {
+        print("❌ 本地音乐：播放失败")
+        Task {
+            await MainActor.run {
+                self.isPlaying = false
+                self.currentTime = 0
             }
-        case .ended:
-            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
-                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-                if options.contains(.shouldResume) {
-                    Task {
-                        await play()
-                    }
-                }
+            
+            // 尝试重新播放
+            if let song = self.currentSong {
+                print("🔄 尝试重新播放失败的歌曲: \(song.title)")
+                try? await self.playCurrentSong()
             }
-        @unknown default:
-            break
         }
+    }
+    
+    // 🔑 修复：移除重复的音频会话中断处理方法，统一由AudioSessionManager管理
+    // 现在通过 handleShouldStopPlaying 和 handleShouldResumePlaying 方法处理中断
+    
+    // 🔑 新增：处理来自AudioSessionManager的停止播放通知
+    @objc private func handleShouldStopPlaying() {
+        print("🎵 本地音乐：收到停止播放通知")
+        Task {
+            await pause()
+        }
+    }
+    
+    // 🔑 新增：处理来自AudioSessionManager的恢复播放通知
+    @objc private func handleShouldResumePlaying() {
+        print("🎵 本地音乐：收到恢复播放通知")
+        Task {
+            // 重新激活音频会话
+            let sessionSuccess = AudioSessionManager.shared.requestAudioSession(for: .local)
+            if sessionSuccess {
+                print("✅ 本地音乐：音频会话重新激活成功")
+                await play()
+            } else {
+                print("❌ 本地音乐：音频会话重新激活失败")
+                // 即使音频会话失败，也尝试播放，让系统处理
+                await play()
+            }
+        }
+    }
+    
+    // 🔑 新增：处理应用进入后台
+    @objc private func handleAppDidEnterBackground() {
+        print("🎵 本地音乐：应用进入后台")
+            // 🔑 修改：移除重复的音频会话请求，因为AudioSessionManager已经统一处理
+            // if isPlaying {
+            //     _ = AudioSessionManager.shared.requestAudioSession(for: .local)
+            // }
+    }
+    
+    // 🔑 新增：处理应用回到前台
+    @objc private func handleAppWillEnterForeground() {
+        print("🎵 本地音乐：应用回到前台")
+            // 🔑 修改：移除重复的音频会话请求，因为AudioSessionManager已经统一处理
+            // if isPlaying {
+            //     _ = AudioSessionManager.shared.requestAudioSession(for: .local)
+            // }
     }
     
     private func cleanupPlayer() {
