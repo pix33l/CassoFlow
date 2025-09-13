@@ -105,6 +105,16 @@ class NowPlayingManager {
     
     // MARK: - 公共方法
     
+    /// 检查是否有活跃的代理
+    var hasActiveDelegate: Bool {
+        return currentDelegate != nil
+    }
+    
+    /// 检查是否正在播放
+    var isPlaying: Bool {
+        return currentDelegate?.isPlaying ?? false
+    }
+    
     /// 设置当前的播放代理
     func setDelegate(_ delegate: NowPlayingDelegate?) {
         let oldDelegate = currentDelegate
@@ -223,8 +233,8 @@ class NowPlayingManager {
                     }
                 }
                 
-                // 只在关键时间点打印日志
-                if validCurrentTime.truncatingRemainder(dividingBy: 10.0) < 0.5 || !delegate.isPlaying {
+                // 🔑 关键修复：只在播放状态为true或者关键时间点才打印日志，避免日志过多
+                if delegate.isPlaying || validCurrentTime.truncatingRemainder(dividingBy: 10.0) < 0.5 {
                     print("🔍 NowPlayingManager: 设置锁屏 - \(song.title), 播放: \(delegate.isPlaying), 时间: \(validCurrentTime)/\(validDuration)")
                 }
                 
@@ -244,6 +254,11 @@ class NowPlayingManager {
     func updatePlaybackProgress() {
         guard let delegate = currentDelegate else {
             print("🔍 NowPlayingManager: 更新进度 - 无代理")
+            return
+        }
+        
+        // 🔑 关键修复：只在播放状态为true时才更新播放进度，避免在暂停状态下频繁更新
+        guard delegate.isPlaying else {
             return
         }
         

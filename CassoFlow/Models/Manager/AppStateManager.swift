@@ -168,10 +168,24 @@ class AppStateManager {
     private func handleBackgroundUpdate() {
         lastBackgroundUpdateTime = Date()
         
+        // 🔑 关键修复：在后台状态更新前，先确保锁屏信息有效
+        if NowPlayingManager.shared.hasActiveDelegate && NowPlayingManager.shared.isPlaying {
+            print("🔄 AppStateManager: 后台状态更新前刷新锁屏信息")
+            NowPlayingManager.shared.updateNowPlayingInfo()
+        }
+        
         // 通知相关服务进行后台更新
         notifyStateChange(.backgroundUpdate)
         
         print("🔄 AppStateManager: 后台状态更新")
+        
+        // 🔑 关键修复：在后台状态更新后，再次确保锁屏信息有效
+        if NowPlayingManager.shared.hasActiveDelegate && NowPlayingManager.shared.isPlaying {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                print("🔄 AppStateManager: 后台状态更新后刷新锁屏信息")
+                NowPlayingManager.shared.updateNowPlayingInfo()
+            }
+        }
     }
     
     // MARK: - 状态通知

@@ -970,15 +970,31 @@ class LocalMusicService: NSObject, ObservableObject, NowPlayingDelegate {
                 }
             }
             
-            // 🔑 修改：移除重复的音频会话请求，因为在playQueue中已经请求过了
-            let _ = AudioSessionManager.shared.requestAudioSession(for: .local)
+            // 🔑 关键修复：在设置播放器时，确保音频会话有效
+            let sessionSuccess = AudioSessionManager.shared.requestAudioSession(for: .local)
+            print("🔍 LocalMusic: 设置播放器时音频会话结果: \(sessionSuccess)")
             
-            // 开始播放
-            self.avPlayer?.play()
-            self.isPlaying = true
-            
-            // 🔑 使用统一管理器更新锁屏信息
-            NowPlayingManager.shared.updateNowPlayingInfo()
+            // 如果音频会话失败，等待一段时间再重试
+            if !sessionSuccess {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    let retrySuccess = AudioSessionManager.shared.requestAudioSession(for: .local)
+                    print("🔍 LocalMusic: 设置播放器时音频会话重试结果: \(retrySuccess)")
+                    
+                    // 如果重试成功，开始播放
+                    if retrySuccess {
+                        self.avPlayer?.play()
+                        self.isPlaying = true
+                        NowPlayingManager.shared.updateNowPlayingInfo()
+                    }
+                }
+            } else {
+                // 开始播放
+                self.avPlayer?.play()
+                self.isPlaying = true
+                
+                // 🔑 使用统一管理器更新锁屏信息
+                NowPlayingManager.shared.updateNowPlayingInfo()
+            }
         }
     }
     

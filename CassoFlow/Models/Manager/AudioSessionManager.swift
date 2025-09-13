@@ -33,8 +33,26 @@ class AudioSessionManager {
             print("🔍 AudioSession: 切换服务 \(previous) -> \(service)")
         }
         
-        // 🔑 使用2024年最佳实践配置
-        return setupExclusiveAudioSession(for: service)
+        // 🔑 关键修复：添加重试机制，确保音频会话配置成功
+        var retryCount = 0
+        let maxRetries = 3
+        
+        while retryCount < maxRetries {
+            let success = setupExclusiveAudioSession(for: service)
+            if success {
+                print("🔍 AudioSession: 音频会话配置成功，重试次数: \(retryCount)")
+                return true
+            } else {
+                retryCount += 1
+                print("🔍 AudioSession: 音频会话配置失败，重试 \(retryCount)/\(maxRetries)")
+                
+                // 等待一段时间再重试
+                Thread.sleep(forTimeInterval: 0.1)
+            }
+        }
+        
+        print("🔍 AudioSession: 音频会话配置最终失败")
+        return false
     }
     
     /// 释放音频会话控制权
