@@ -121,25 +121,40 @@ class NowPlayingManager {
         currentDelegate = delegate
         print("🔍 NowPlayingManager: 设置代理 - 旧: \(oldDelegate != nil), 新: \(delegate != nil)")
         
-        // 🔑 当设置新的代理时，确保对应的音频会话处于活跃状态
+        // 🔑 当设置新的代理时，确保对应的音频会话处于活跃状态（MusicKit除外）
         if let delegate = delegate {
-            // 根据代理类型请求相应的音频会话
-            let serviceType = mapDelegateToAudioService(delegate)
-            let sessionResult = AudioSessionManager.shared.requestAudioSession(for: serviceType)
-            print("🔍 NowPlayingManager: 音频会话请求结果: \(sessionResult)")
+            // 检查是否为MusicKit服务
+            let delegateTypeName = String(describing: type(of: delegate))
+            let isMusicKit = delegateTypeName.contains("MusicKit") || delegateTypeName.contains("musicKit")
+            
+            if !isMusicKit {
+                // 根据代理类型请求相应的音频会话
+                let serviceType = mapDelegateToAudioService(delegate)
+                let sessionResult = AudioSessionManager.shared.requestAudioSession(for: serviceType)
+                print("🔍 NowPlayingManager: 音频会话请求结果: \(sessionResult)")
+            } else {
+                print("🔍 NowPlayingManager: MusicKit服务，不请求音频会话")
+            }
         }
         
-        // 重新设置远程控制命令中心以确保激活
-        setupRemoteCommandCenter()
+        // 重新设置远程控制命令中心以确保激活（MusicKit除外）
+        let delegateTypeName = String(describing: type(of: delegate))
+        let isMusicKit = delegateTypeName.contains("MusicKit") || delegateTypeName.contains("musicKit")
         
-        // 如果有代理且正在播放，立即更新锁屏信息
-        if let delegate = delegate, delegate.isPlaying {
-            print("🔍 NowPlayingManager: 设置代理后更新锁屏信息")
-            updateNowPlayingInfo()
-        } else if delegate == nil {
-            // 清除锁屏信息
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
-            print("🔍 NowPlayingManager: 清除锁屏信息（无代理）")
+        if !isMusicKit {
+            setupRemoteCommandCenter()
+            
+            // 如果有代理且正在播放，立即更新锁屏信息
+            if let delegate = delegate, delegate.isPlaying {
+                print("🔍 NowPlayingManager: 设置代理后更新锁屏信息")
+                updateNowPlayingInfo()
+            } else if delegate == nil {
+                // 清除锁屏信息
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+                print("🔍 NowPlayingManager: 清除锁屏信息（无代理）")
+            }
+        } else {
+            print("🔍 NowPlayingManager: MusicKit服务，不设置远程控制命令中心和锁屏信息")
         }
     }
     
@@ -155,7 +170,9 @@ class NowPlayingManager {
         } else if delegateTypeName.contains("Local") {
             return .local
         } else {
-            return .musicKit // 默认
+            // MusicKit 不使用 AudioSessionManager，这里返回一个默认值
+            // 实际上这个方法在 MusicKit 情况下不会被调用
+            return .local
         }
     }
     
@@ -163,6 +180,16 @@ class NowPlayingManager {
     func updateNowPlayingInfo() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
+                return
+            }
+            
+            // 检查是否为MusicKit服务
+            let delegateTypeName = String(describing: type(of: self.currentDelegate))
+            let isMusicKit = delegateTypeName.contains("MusicKit") || delegateTypeName.contains("musicKit")
+            
+            // 如果是MusicKit服务，不处理锁屏信息
+            if isMusicKit {
+                print("🔍 NowPlayingManager: MusicKit服务，不处理锁屏信息")
                 return
             }
             
@@ -257,6 +284,16 @@ class NowPlayingManager {
             return
         }
         
+        // 检查是否为MusicKit服务
+        let delegateTypeName = String(describing: type(of: delegate))
+        let isMusicKit = delegateTypeName.contains("MusicKit") || delegateTypeName.contains("musicKit")
+        
+        // 如果是MusicKit服务，不处理播放进度
+        if isMusicKit {
+            print("🔍 NowPlayingManager: MusicKit服务，不处理播放进度")
+            return
+        }
+        
         // 🔑 关键修复：只在播放状态为true时才更新播放进度，避免在暂停状态下频繁更新
         guard delegate.isPlaying else {
             return
@@ -279,6 +316,16 @@ class NowPlayingManager {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            // 检查是否为MusicKit服务
+            let delegateTypeName = String(describing: type(of: self.currentDelegate))
+            let isMusicKit = delegateTypeName.contains("MusicKit") || delegateTypeName.contains("musicKit")
+            
+            // 如果是MusicKit服务，不处理锁屏信息
+            if isMusicKit {
+                print("🔍 NowPlayingManager: MusicKit服务，不强制更新锁屏信息")
+                return
+            }
+            
             print("🔍 NowPlayingManager: 强制更新锁屏信息")
             
             // 重新设置远程控制命令中心
@@ -296,6 +343,16 @@ class NowPlayingManager {
     
     /// 清除锁屏播放信息
     func clearNowPlayingInfo() {
+        // 检查是否为MusicKit服务
+        let delegateTypeName = String(describing: type(of: currentDelegate))
+        let isMusicKit = delegateTypeName.contains("MusicKit") || delegateTypeName.contains("musicKit")
+        
+        // 如果是MusicKit服务，不处理锁屏信息
+        if isMusicKit {
+            print("🔍 NowPlayingManager: MusicKit服务，不清除锁屏信息")
+            return
+        }
+        
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
         print("🔍 NowPlayingManager: 清除锁屏信息")
     }
@@ -454,7 +511,8 @@ class NowPlayingManager {
             }
             
         case .musicKit:
-            break
+            // MusicKit 处理自己的封面，不在这里处理
+            return nil
         }
         
         // 使用自定义默认封面作为兜底方案

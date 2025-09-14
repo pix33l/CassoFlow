@@ -847,12 +847,14 @@ class MusicService: ObservableObject {
     
     /// 播放通用歌曲队列
     func playUniversalSongs(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
-        // 🔑 重要：在开始播放队列前请求音频会话控制权
-        let audioService = mapCurrentDataSourceToAudioService()
-        let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
-        
-        if !sessionRequested {
-            print("🔍 MusicService: 音频会话请求失败")
+        // 🔑 重要：在开始播放队列前请求音频会话控制权（MusicKit除外）
+        if currentDataSource != .musicKit {
+            let audioService = mapCurrentDataSourceToAudioService()
+            let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
+            
+            if !sessionRequested {
+                print("🔍 MusicService: 音频会话请求失败")
+            }
         }
         
         switch currentDataSource {
@@ -899,12 +901,14 @@ class MusicService: ObservableObject {
 
     /// 播放
     func play() async throws {
-        // 🔑 重要：在开始播放前请求音频会话控制权
-        let audioService = mapCurrentDataSourceToAudioService()
-        let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
-        
-        if !sessionRequested {
-            print("🔍 MusicService: 音频会话请求失败")
+        // 🔑 重要：在开始播放前请求音频会话控制权（MusicKit除外）
+        if currentDataSource != .musicKit {
+            let audioService = mapCurrentDataSourceToAudioService()
+            let sessionRequested = audioSessionManager.requestAudioSession(for: audioService)
+            
+            if !sessionRequested {
+                print("🔍 MusicService: 音频会话请求失败")
+            }
         }
         
         switch currentDataSource {
@@ -942,9 +946,11 @@ class MusicService: ObservableObject {
                 await localService.pause()
         }
         
-        // 🔑 重要：暂停时释放音频会话控制权
-        let audioService = mapCurrentDataSourceToAudioService()
-        audioSessionManager.releaseAudioSession(for: audioService)
+        // 🔑 重要：暂停时释放音频会话控制权（MusicKit除外）
+        if currentDataSource != .musicKit {
+            let audioService = mapCurrentDataSourceToAudioService()
+            audioSessionManager.releaseAudioSession(for: audioService)
+        }
         
         await MainActor.run {
             isPlaying = false
@@ -958,13 +964,15 @@ class MusicService: ObservableObject {
     // 🔑 新增：将数据源类型映射到音频服务类型
     private func mapCurrentDataSourceToAudioService() -> AudioSessionManager.ActiveMusicService {
         switch currentDataSource {
-        case .musicKit:
-            return .musicKit
         case .subsonic:
             return .subsonic
         case .audioStation:
             return .audioStation
         case .local:
+            return .local
+        case .musicKit:
+            // MusicKit 不使用 AudioSessionManager，这里返回一个默认值
+            // 实际上这个方法在 MusicKit 情况下不会被调用
             return .local
         }
     }
@@ -1157,8 +1165,7 @@ class MusicService: ObservableObject {
     private func stopAllDataSourcesPlayback() async {
         print("🔍 MusicService: 停止所有数据源播放")
         
-        // 🔑 释放所有可能的音频会话控制权
-        audioSessionManager.releaseAudioSession(for: .musicKit)
+        // 🔑 释放所有可能的音频会话控制权（MusicKit除外）
         audioSessionManager.releaseAudioSession(for: .subsonic)
         audioSessionManager.releaseAudioSession(for: .audioStation)
         audioSessionManager.releaseAudioSession(for: .local)

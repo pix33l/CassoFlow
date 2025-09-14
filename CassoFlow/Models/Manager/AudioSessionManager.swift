@@ -13,7 +13,6 @@ class AudioSessionManager {
     enum ActiveMusicService {
         case subsonic
         case audioStation
-        case musicKit
         case local
     }
     
@@ -227,8 +226,6 @@ class AudioSessionManager {
             notificationName = .subsonicShouldStopPlaying
         case .audioStation:
             notificationName = .audioStationShouldStopPlaying
-        case .musicKit:
-            notificationName = .musicKitShouldStopPlaying
         case .local:
             notificationName = .localMusicShouldStopPlaying
         }
@@ -249,8 +246,6 @@ class AudioSessionManager {
             notificationName = .subsonicShouldResumePlaying
         case .audioStation:
             notificationName = .audioStationShouldResumePlaying
-        case .musicKit:
-            notificationName = .musicKitShouldResumePlaying
         case .local:
             notificationName = .localMusicShouldResumePlaying
         }
@@ -356,8 +351,6 @@ extension AudioSessionManager.ActiveMusicService {
             return "Subsonic"
         case .audioStation:
             return "AudioStation"
-        case .musicKit:
-            return "MusicKit"
         case .local:
             return "本地音乐"
         }
@@ -372,9 +365,6 @@ extension Notification.Name {
     
     static let audioStationShouldStopPlaying = Notification.Name("AudioStationShouldStopPlaying")
     static let audioStationShouldResumePlaying = Notification.Name("AudioStationShouldResumePlaying")
-    
-    static let musicKitShouldStopPlaying = Notification.Name("MusicKitShouldStopPlaying")
-    static let musicKitShouldResumePlaying = Notification.Name("MusicKitShouldResumePlaying")
     
     static let localMusicShouldStopPlaying = Notification.Name("LocalMusicShouldStopPlaying")
     static let localMusicShouldResumePlaying = Notification.Name("LocalMusicShouldResumePlaying")
