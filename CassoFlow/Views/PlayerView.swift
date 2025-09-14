@@ -679,8 +679,9 @@ struct RepeatAndShuffleView: View {
     @State private var repeatTapped = false
     @State private var shuffleTapped = false
     
-    // 🔑 新增：Subsonic 播放模式状态
+    // 🔑 新增：Subsonic 和 AudioStation 播放模式状态
     @State private var subsonicModes: (shuffle: Bool, repeat: SubsonicMusicService.SubsonicRepeatMode) = (false, .none)
+    @State private var audioStationModes: (shuffle: Bool, repeat: AudioStationMusicService.AudioStationRepeatMode) = (false, .none)
     
     var isShuffleEnabled: Bool {
         switch musicService.currentDataSource {
@@ -689,8 +690,8 @@ struct RepeatAndShuffleView: View {
         case .subsonic:
             return subsonicModes.shuffle
         case .audioStation:
-            // Audio Station 暂时不支持随机播放状态获取，默认为false
-            return false
+            // Audio Station 现在支持随机播放状态获取
+            return audioStationModes.shuffle
         case .local:
             // 本地音乐支持随机播放状态获取
             return musicService.getLocalService().isShuffleEnabled
@@ -709,8 +710,12 @@ struct RepeatAndShuffleView: View {
         case .subsonic:
             return subsonicModes.repeat
         case .audioStation:
-            // Audio Station 暂时不支持重复播放模式获取，默认为none
-            return .none
+            // Audio Station 现在支持重复播放模式获取，转换为Subsonic模式
+            switch audioStationModes.repeat {
+            case .none: return .none
+            case .all: return .all
+            case .one: return .one
+            }
         case .local:
             // 本地音乐支持重复播放模式获取
             switch musicService.getLocalService().repeatMode {
@@ -753,8 +758,16 @@ struct RepeatAndShuffleView: View {
                     updateSubsonicModes()
                     
                 case .audioStation:
-                    // Audio Station 暂时不支持重复播放模式切换
-                    print("Audio Station 不支持重复播放模式切换")
+                    // Audio Station 现在支持重复播放模式切换
+                    let currentMode = audioStationModes.repeat
+                    let newMode: AudioStationMusicService.AudioStationRepeatMode
+                    switch currentMode {
+                    case .none: newMode = .all
+                    case .all: newMode = .one
+                    case .one: newMode = .none
+                    }
+                    musicService.getAudioStationService().setRepeatMode(newMode)
+                    updateAudioStationModes()
                     
                 case .local:
                     // 本地音乐支持重复播放模式切换
@@ -811,8 +824,10 @@ struct RepeatAndShuffleView: View {
                     updateSubsonicModes()
                     
                 case .audioStation:
-                    // Audio Station 暂时不支持随机播放切换
-                    print("Audio Station 不支持随机播放切换")
+                    // Audio Station 现在支持随机播放切换
+                    let newShuffleState = !audioStationModes.shuffle
+                    musicService.getAudioStationService().setShuffleEnabled(newShuffleState)
+                    updateAudioStationModes()
                     
                 case .local:
                     // 本地音乐支持随机播放切换
@@ -833,9 +848,11 @@ struct RepeatAndShuffleView: View {
         }
         .onAppear {
             updateSubsonicModes()
+            updateAudioStationModes()
         }
         .onChange(of: musicService.currentDataSource) { _, _ in
             updateSubsonicModes()
+            updateAudioStationModes()
         }
     }
     
@@ -843,6 +860,13 @@ struct RepeatAndShuffleView: View {
     private func updateSubsonicModes() {
         if musicService.currentDataSource == .subsonic {
             subsonicModes = musicService.getSubsonicService().getPlaybackModes()
+        }
+    }
+    
+    // 🔑 新增：更新 AudioStation 播放模式状态
+    private func updateAudioStationModes() {
+        if musicService.currentDataSource == .audioStation {
+            audioStationModes = musicService.getAudioStationService().getPlaybackModes()
         }
     }
 }

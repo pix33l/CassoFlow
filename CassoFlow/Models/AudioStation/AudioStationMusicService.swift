@@ -18,6 +18,33 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     @Published private var playbackTime: TimeInterval = 0
     @Published internal var isPlaying: Bool = false
     
+    // MARK: - 播放模式管理（参考Subsonic实现）
+    @Published var isShuffleEnabled: Bool = false {
+        didSet {
+            if isShuffleEnabled && !oldValue {
+                // 启用随机播放时，保存原始队列并打乱当前队列
+                saveOriginalQueue()
+                shuffleCurrentQueue()
+            } else if !isShuffleEnabled && oldValue {
+                // 禁用随机播放时，恢复原始队列
+                restoreOriginalQueue()
+            }
+        }
+    }
+    
+    @Published var repeatMode: AudioStationRepeatMode = .none
+    
+    // MARK: - 队列管理相关属性
+    private var originalQueue: [UniversalSong] = []  // 保存原始队列顺序
+    private var originalIndex: Int = 0              // 保存原始播放位置
+    
+    // MARK: - 重复播放模式枚举
+    enum AudioStationRepeatMode {
+        case none    // 不重复
+        case all     // 重复整个队列
+        case one     // 重复当前歌曲
+    }
+    
     private var timeObserver: Any?
     private var statusObserver: AnyCancellable?
     
@@ -42,6 +69,11 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         
         // 🔑 移除通知监听
         NotificationCenter.default.removeObserver(self)
+        
+        // 🔑 移除播放完成通知监听
+        if let playerItem = playerItem {
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: playerItem)
+        }
     }
     
     // MARK: - NowPlayingDelegate 协议实现
@@ -584,8 +616,19 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
             }
         }
         
-        currentQueue = songs
-        currentIndex = max(0, min(index, songs.count - 1))
+        await MainActor.run {
+            currentQueue = songs
+            currentIndex = max(0, min(index, songs.count - 1))
+            
+            // 重置播放模式相关状态
+            originalQueue = songs
+            originalIndex = currentIndex
+            
+            // 如果随机播放已启用，打乱队列
+            if isShuffleEnabled {
+                shuffleCurrentQueue()
+            }
+        }
         
         // 🔑 注册为锁屏控制器代理
         NowPlayingManager.shared.setDelegate(self)
@@ -636,6 +679,14 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
         await MainActor.run {
             playerItem = AVPlayerItem(url: streamURL)
             player?.replaceCurrentItem(with: playerItem)
+            
+            // 注册播放完成通知
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(playerDidFinishPlaying),
+                name: .AVPlayerItemDidPlayToEndTime,
+                object: playerItem
+            )
             
             // 监听播放状态
             statusObserver?.cancel()
@@ -719,15 +770,20 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     }
     
     func skipToNext() async throws {
-        guard currentIndex < currentQueue.count - 1 else { return }
-        currentIndex += 1
-        try await playSongAtCurrentIndex()
+        if currentIndex < currentQueue.count - 1 {
+            currentIndex += 1
+            try await playSongAtCurrentIndex()
+        } else {
+            // 队列播放完毕，根据重复模式处理
+            try await handleQueueEnd()
+        }
     }
     
     func skipToPrevious() async throws {
-        guard currentIndex > 0 else { return }
-        currentIndex -= 1
-        try await playSongAtCurrentIndex()
+        if currentIndex > 0 {
+            currentIndex -= 1
+            try await playSongAtCurrentIndex()
+        }
     }
     
     // MARK: - 播放进度控制
@@ -856,9 +912,105 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     @objc private func handleResumePlayingNotification() {
         print("🔄 Audio Station收到恢复播放通知")
         // 通常不自动恢复，让用户手动控制
-        // 如果需要自动恢复，可以取消注释下面的代码 
+        // 如果需要自动恢复，可以取消注释下面的代码
         // Task {
         //     await self.play()
         // }
+    }
+    
+    // MARK: - 播放模式管理方法（参考Subsonic实现）
+    
+    /// 保存原始队列
+    private func saveOriginalQueue() {
+        originalQueue = currentQueue
+        originalIndex = currentIndex
+    }
+    
+    /// 打乱当前队列
+    private func shuffleCurrentQueue() {
+        guard !currentQueue.isEmpty else { return }
+        
+        // 保存当前正在播放的歌曲
+        let currentSong = currentQueue[currentIndex]
+        
+        // 打乱队列
+        var shuffledQueue = currentQueue
+        shuffledQueue.shuffle()
+        
+        // 确保当前歌曲在第一位
+        if let newIndex = shuffledQueue.firstIndex(where: { $0.id == currentSong.id }) {
+            shuffledQueue.swapAt(0, newIndex)
+            currentQueue = shuffledQueue
+            currentIndex = 0
+        }
+    }
+    
+    /// 恢复原始队列
+    private func restoreOriginalQueue() {
+        guard !originalQueue.isEmpty else { return }
+        
+        // 找到当前播放歌曲在原始队列中的位置
+        let currentSong = currentQueue[currentIndex]
+        if let originalIndex = originalQueue.firstIndex(where: { $0.id == currentSong.id }) {
+            currentQueue = originalQueue
+            currentIndex = originalIndex
+        } else {
+            // 如果找不到，使用保存的原始索引
+            currentQueue = originalQueue
+            currentIndex = min(self.originalIndex, originalQueue.count - 1)
+        }
+    }
+    
+    /// 设置随机播放
+    func setShuffleEnabled(_ enabled: Bool) {
+        isShuffleEnabled = enabled
+    }
+    
+    /// 设置重复播放模式
+    func setRepeatMode(_ mode: AudioStationRepeatMode) {
+        repeatMode = mode
+    }
+    
+    /// 获取播放模式状态
+    func getPlaybackModes() -> (shuffle: Bool, repeat: AudioStationRepeatMode) {
+        return (isShuffleEnabled, repeatMode)
+    }
+    
+    /// 处理队列播放完毕
+    private func handleQueueEnd() async throws {
+        switch repeatMode {
+        case .none:
+            // 不重复，停止播放
+            await MainActor.run {
+                isPlaying = false
+            }
+            
+        case .all:
+            // 重复整个队列，从头开始
+            await MainActor.run {
+                currentIndex = 0
+            }
+            try await playSongAtCurrentIndex()
+            
+        case .one:
+            // 重复当前歌曲（这种情况不应该到达这里）
+            break
+        }
+    }
+    
+    /// 播放完成处理
+    @objc private func playerDidFinishPlaying() {
+        Task {
+            // 根据重复模式处理播放完成
+            switch repeatMode {
+            case .one:
+                // 重复当前歌曲
+                try await playSongAtCurrentIndex()
+                
+            case .all, .none:
+                // 播放下一首或处理队列结束
+                try await skipToNext()
+            }
+        }
     }
 }
