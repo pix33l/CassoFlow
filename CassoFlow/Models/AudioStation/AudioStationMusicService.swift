@@ -723,8 +723,6 @@ class AudioStationMusicService: ObservableObject, NowPlayingDelegate {
     
     
     func play() async {
-        // 🔑 修改：移除重复的音频会话请求，因为在playSongAtCurrentIndex中已经请求过了
-         let _ = AudioSessionManager.shared.requestAudioSession(for: .audioStation)
         
 //        // 🔑 新增：检查当前歌曲是否为FLAC格式
 //        if let song = currentSong, let streamURL = song.streamURL {

@@ -628,7 +628,7 @@ class NowPlayingManager {
         stopBackgroundUpdateTimer() // 确保没有重复的定时器
         
         // 每3秒更新一次锁屏信息，保持活跃状态
-        backgroundUpdateTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+        backgroundUpdateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             guard let self = self else {
                 print("🔍 NowPlayingManager: 后台定时器执行时 self已释放")
                 return

@@ -518,8 +518,6 @@ class SubsonicMusicService: NSObject, ObservableObject, NowPlayingDelegate {
     
     /// 播放
     func play() async {
-        // 🔑 修改：移除重复的音频会话请求，因为在playQueue中已经请求过了
-         let _ = AudioSessionManager.shared.requestAudioSession(for: .subsonic)
         
         avPlayer?.play()
         await MainActor.run {
