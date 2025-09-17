@@ -263,6 +263,25 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("通用")) {
+                    
+                    // 音乐服务商设置选项
+                    NavigationLink(destination: MusicSourceSettingsView().environmentObject(musicService)) {
+                        HStack {
+                            Image(systemName: "music.note")
+                                .font(.body)
+                                .frame(width: 20)
+                            
+                            Text("音乐提供商")
+                            
+                            Spacer()
+                            
+                            // 显示当前选择的数据源
+                            Text(musicService.currentDataSource.displayName)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
                     // 语言设置选项
                     Button {
                         // 打开应用的语言设置

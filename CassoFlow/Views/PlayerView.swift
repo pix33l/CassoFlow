@@ -77,7 +77,7 @@ struct PlayerView: View {
             // 合并所有播放状态相关的逻辑
             handlePlayingStateChange(isPlaying)
         }
-        .onChange(of: [musicService.isFastForwarding, musicService.isFastRewinding]) { 
+        .onChange(of: [musicService.isFastForwarding, musicService.isFastRewinding]) {
             // 快进/快退状态变化时，重新评估旋转需求
             startRotation()
         }
@@ -97,10 +97,10 @@ struct PlayerView: View {
             stopRotation()
             stopPlaybackTracking()
         }
-        .sheet(isPresented: $showLibraryView) { LibraryView() }
+        .sheet(isPresented: $showLibraryView) { UniversalLibraryView() }
         .sheet(isPresented: $showSettingsView) { SettingsView() }
         .sheet(isPresented: $showStoreView) { StoreView() }
-        .sheet(isPresented: $showQueueView) { QueueView() }
+        .sheet(isPresented: $showQueueView) { UniversalQueueView() }
         .fullScreenCover(isPresented: $showPaywallForLimit) {
             PaywallView()
                 .environmentObject(storeManager)
@@ -392,6 +392,11 @@ struct HolesView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 400, height:400)
         }
+        // 添加对数据源切换的响应
+        .onChange(of: musicService.currentDataSource) { _, newDataSource in
+            // 当数据源切换时，确保磁带孔状态正确同步
+            // 这里不需要特殊处理，因为MusicService会自动更新相关属性
+        }
     }
 }
 
@@ -654,6 +659,11 @@ struct TrackInfoHeader: View {
         }
         .fontWeight(.bold)
         .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+        // 🔑 监听数据源切换，确保信息更新
+        .onChange(of: musicService.currentDataSource) { _, newDataSource in
+            // 数据源切换时，TrackInfoHeader会自动重新渲染
+            // 因为它依赖的musicService.currentTrackIndex和musicService.totalTracksInQueue会更新
+        }
     }
 }
 
@@ -661,6 +671,7 @@ struct TrackInfoHeader: View {
 
 struct RepeatAndShuffleView: View {
     @EnvironmentObject private var musicService: MusicService
+    @StateObject private var musicKitService = MusicKitService.shared
     @Binding var repeatMode: MusicPlayer.RepeatMode
     @Binding var isShuffled: MusicPlayer.ShuffleMode
     @Binding var showLibraryView: Bool
@@ -669,7 +680,33 @@ struct RepeatAndShuffleView: View {
     @State private var shuffleTapped = false
     
     var isShuffleEnabled: Bool {
-        return isShuffled != .off
+        switch musicService.currentDataSource {
+        case .musicKit:
+            return isShuffled != .off
+        case .local:
+            // 本地音乐支持随机播放状态获取
+            return musicService.getLocalService().isShuffleEnabled
+        }
+    }
+    
+    var currentRepeatMode: LocalMusicService.LocalRepeatMode {
+        switch musicService.currentDataSource {
+        case .musicKit:
+            switch repeatMode {
+            case .none: return .none
+            case .all: return .all
+            case .one: return .one
+            @unknown default: return .none
+            }
+
+        case .local:
+            // 本地音乐支持重复播放模式获取
+            switch musicService.getLocalService().repeatMode {
+            case .none: return .none
+            case .all: return .all
+            case .one: return .one
+            }
+        }
     }
     
     var body: some View {
@@ -680,16 +717,34 @@ struct RepeatAndShuffleView: View {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
                     impactFeedback.impactOccurred()
                 }
-                switch repeatMode {
-                case .none: repeatMode = .all
-                case .all: repeatMode = .one
-                case .one: repeatMode = .none
-                @unknown default: repeatMode = .none
+                
+                // 🔑 根据数据源处理重复播放
+                switch musicService.currentDataSource {
+                case .musicKit:
+                    switch repeatMode {
+                    case .none: repeatMode = .all
+                    case .all: repeatMode = .one
+                    case .one: repeatMode = .none
+                    @unknown default: repeatMode = .none
+                    }
+                    musicKitService.repeatMode = repeatMode
+                    
+                case .local:
+                    // 本地音乐支持重复播放模式切换
+                    let localService = musicService.getLocalService()
+                    let currentMode = localService.repeatMode
+                    let newMode: LocalMusicService.LocalRepeatMode
+                    switch currentMode {
+                    case .none: newMode = .all
+                    case .all: newMode = .one
+                    case .one: newMode = .none
+                    }
+                    localService.setRepeatMode(newMode)
+
                 }
-                musicService.repeatMode = repeatMode
             } label: {
                 Group {
-                    if repeatMode == .one {
+                    if currentRepeatMode == .one {
                         Image(systemName: "repeat.1")
                     } else {
                         Image(systemName: "repeat")
@@ -697,14 +752,11 @@ struct RepeatAndShuffleView: View {
                 }
                 .font(.system(size: 18))
                 .foregroundColor(
-                    repeatMode == .none ?
+                    currentRepeatMode == .none ?
                     Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3) :
                     Color(musicService.currentPlayerSkin.screenTextColor)
                 )
                 .padding(4)
-                /*
-                .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)))
-                 */
             }
             
             Spacer()
@@ -719,8 +771,19 @@ struct RepeatAndShuffleView: View {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
                     impactFeedback.impactOccurred()
                 }
-                musicService.shuffleMode = isShuffleEnabled ? .off : .songs
-                isShuffled = musicService.shuffleMode
+                
+                // 🔑 根据数据源处理随机播放
+                switch musicService.currentDataSource {
+                case .musicKit:
+                    musicKitService.shuffleMode = isShuffleEnabled ? .off : .songs
+                    isShuffled = musicKitService.shuffleMode
+                    
+                case .local:
+                    // 本地音乐支持随机播放切换
+                    let localService = musicService.getLocalService()
+                    localService.setShuffleEnabled(!localService.isShuffleEnabled)
+
+                }
             } label: {
                 Image(systemName: "shuffle")
                     .font(.system(size: 18))
@@ -730,9 +793,6 @@ struct RepeatAndShuffleView: View {
                         Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3)
                     )
                     .padding(4)
-                    /*
-                    .background(RoundedRectangle(cornerRadius: 4).fill(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)))
-                     */
             }
         }
     }
@@ -764,6 +824,10 @@ struct SongTitleView: View {
             }
             .frame(height: 35.0)
             .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
+        }
+        // 🔑 监听数据源切换，确保歌曲信息更新
+        .onChange(of: musicService.currentDataSource) { _, _ in
+            // SongTitleView会自动更新，因为它绑定了musicService的属性
         }
     }
 }
@@ -900,10 +964,13 @@ struct CassetteHole: View {
     @State private var animationStarted = false
     @State private var currentRotationAngle: Double = 0
     
+    // 新增：用于检测歌曲切换
+    @State private var lastTrackID: String? = nil
+    @State private var isTrackChanging = false
+    
     // 使用播放队列的总时长
     private var queueTotalDuration: TimeInterval {
         let duration = musicService.queueTotalDuration > 0 ? musicService.queueTotalDuration : 180.0
-//        print("CassetteHole - shouldGrow: \(shouldGrow), queueTotalDuration: \(duration)秒")
         return duration
     }
     
@@ -911,11 +978,14 @@ struct CassetteHole: View {
     private var currentProgressSize: CGFloat {
         guard queueTotalDuration > 0 else { return shouldGrow ? 100 : 200 }
         
+        // 🔑 切歌时保持当前尺寸，避免突然跳变
+        if isTrackChanging {
+            return circleSize
+        }
+        
         // 使用队列累计播放时长计算整体进度
         let progress = musicService.queueElapsedDuration / queueTotalDuration
         let clampedProgress = min(max(progress, 0.0), 1.0) // 确保进度在0-1之间
-        
-//        print("播放进度计算 - shouldGrow: \(shouldGrow), 状态: \(rotationState), 累计时长: \(musicService.queueElapsedDuration)秒, 总时长: \(queueTotalDuration)秒, 进度: \(clampedProgress)")
         
         if shouldGrow {
             // 从200变到100
@@ -968,9 +1038,16 @@ struct CassetteHole: View {
                 startSizeAnimation()
             }
         }
+        // 🔑 监听歌曲切换
+        .onChange(of: musicService.currentTrackID?.rawValue) { _, newTrackID in
+            handleTrackChange(newTrackID: newTrackID)
+        }
         // 监听队列累计播放时长变化
         .onChange(of: musicService.queueElapsedDuration) { oldValue, newValue in
-            // 只有当变化超过阈值时才更新和输出日志
+            // 🔑 如果正在切歌，暂时忽略这个变化
+            guard !isTrackChanging else { return }
+            
+            // 只有当变化超过阈值时才更新
             guard abs(oldValue - newValue) > 1.0 else { return }
             
             let newSize = currentProgressSize
@@ -995,13 +1072,48 @@ struct CassetteHole: View {
                 }
             }
         }
+        // 添加对数据源切换的响应
+        .onChange(of: musicService.currentDataSource) { _, newDataSource in
+            // 当数据源切换时，重新设置磁带孔尺寸和动画状态
+            setupInitialSize()
+            animationStarted = false
+            if isRotating && musicService.isPlaying {
+                startSizeAnimation()
+            }
+        }
         .onAppear {
             setupInitialSize()
             currentRotationAngle = rotationAngle
+            lastTrackID = musicService.currentTrackID?.rawValue
             if isRotating && musicService.isPlaying && !animationStarted {
                 startSizeAnimation()
             }
         }
+    }
+    
+    // 🔑 新增：处理歌曲切换
+    private func handleTrackChange(newTrackID: String?) {
+        let hasTrackChanged = newTrackID != lastTrackID && lastTrackID != nil
+        
+        if hasTrackChanged {
+            // 标记正在切歌
+            isTrackChanging = true
+            
+            // 短暂延迟后重新计算尺寸，给MusicService时间更新数据
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                isTrackChanging = false
+                
+                // 重新设置尺寸和动画
+                setupInitialSize()
+                animationStarted = false
+                
+                if isRotating && musicService.isPlaying {
+                    startSizeAnimation()
+                }
+            }
+        }
+        
+        lastTrackID = newTrackID
     }
     
     // 设置初始尺寸的方法
@@ -1026,24 +1138,28 @@ struct CassetteHole: View {
         
         circleSize = startSize
         
+        // 确保剩余时长为正数，避免负数或零值导致的问题
         if remainingDuration > 0 {
             withAnimation(.linear(duration: remainingDuration)) {
                 circleSize = endSize
             }
+        } else {
+            // 如果没有剩余时长，直接设置为结束尺寸
+            circleSize = endSize
         }
     }
 }
 
 //#Preview {
 //    let musicService = MusicService.shared
-//    
+//
 //    return PlayerView()
 //        .environmentObject(musicService)
 //}
 //
 //#Preview("正在播放") {
 //    let musicService = MusicService.shared
-//    
+//
 //    // 简单的静态预览视图，显示磁带和磁带孔
 //    ZStack {
 //        GeometryReader { geometry in
@@ -1054,7 +1170,7 @@ struct CassetteHole: View {
 //                .frame(width: geometry.size.width, height: geometry.size.height)
 //                .clipped()
 //                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-//            
+//
 //            // 磁带孔区域
 //            ZStack {
 //                VStack(spacing: 15) {
@@ -1068,7 +1184,7 @@ struct CassetteHole: View {
 //                            .frame(width: 70, height: 70)
 //                    }
 //                    .frame(width: 200, height: 200)
-//                    
+//
 //                    // 下磁带孔
 //                    ZStack {
 //                        Circle()
@@ -1081,13 +1197,13 @@ struct CassetteHole: View {
 //                    .frame(width: 200, height: 200)
 //                }
 //                .padding(.leading, 25.0)
-//                
+//
 //                // 磁带图片
 //                Image(musicService.currentCassetteSkin.cassetteImage)
 //                    .resizable()
 //                    .aspectRatio(contentMode: .fill)
 //                    .frame(width: 400, height:400)
-//                    
+//
 //            }
 //            .padding(.bottom, 270.0)
 //            .padding(.leading, 25.0)
@@ -1104,15 +1220,15 @@ struct CassetteHole: View {
 //
 //        }
 //        .edgesIgnoringSafeArea(.all)
-//        
+//
 //        VStack {
 //            Spacer()
-//            
+//
 //            // 控制面板
 //            VStack(spacing: 0) {
 //                let baseButtonHeight = musicService.currentPlayerSkin.buttonHeight
 //                let buttonHeight = UIScreen.isCompactDevice ? baseButtonHeight - 10 : baseButtonHeight
-//                
+//
 //                HStack(spacing: 5) {
 //                    // 磁带按钮
 //                    Button(action: {}) {
@@ -1121,7 +1237,7 @@ struct CassetteHole: View {
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
 //                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
-//                    
+//
 //                    // 上一首按钮
 //                    Button(action: {}) {
 //                        Image(systemName: "backward.fill")
@@ -1129,35 +1245,35 @@ struct CassetteHole: View {
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
 //                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
-//                    
+//
 //                    // 播放按钮
 //                    Button(action: {}) {
 //                        Image(systemName: "play.fill")
 //                            .font(.title3)
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
-//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
-//                    
+//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false));
+//
 //                    // 下一首按钮
 //                    Button(action: {}) {
 //                        Image(systemName: "forward.fill")
 //                            .font(.title3)
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
-//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
-//                    
+//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false));
+//
 //                    // 设置按钮
 //                    Button(action: {}) {
 //                        Image(systemName: "gearshape")
 //                            .font(.title3)
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.buttonTextColor))
 //                    }
-//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false))
+//                    .buttonStyle(ThreeDButtonStyleWithExternalPress(externalIsPressed: false));
 //                }
 //                .frame(height: buttonHeight)
 //                .padding(.horizontal, 10.0)
 //                .padding(.vertical, 5.0)
-//                
+//
 //                VStack(spacing: UIScreen.isCompactDevice ? 8 : 5) {
 //                    if !UIScreen.isCompactDevice {
 //                        Group {
@@ -1177,9 +1293,9 @@ struct CassetteHole: View {
 //                                    .foregroundColor(.secondary)
 //                            }
 //                        }
-//                        
+//
 //                        Spacer()
-//                        
+//
 //                        Text("SOUND EFFECT")
 //                            .font(.caption)
 //                            .padding(4)
@@ -1189,16 +1305,16 @@ struct CassetteHole: View {
 //                                    .strokeBorder(Color(musicService.currentPlayerSkin.screenTextColor), lineWidth: 1)
 //                            )
 //                    }
-//                    
+//
 //                    // 播放控制和歌曲信息
 //                    HStack {
 //                        Image(systemName: "repeat")
 //                            .font(.system(size: 18))
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3))
 //                            .padding(4)
-//                        
+//
 //                        Spacer()
-//                        
+//
 //                        VStack {
 //                            Text("Love Story")
 //                                .font(.body)
@@ -1210,21 +1326,21 @@ struct CassetteHole: View {
 //                        }
 //                        .frame(height: 35.0)
 //                        .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
-//                        
+//
 //                        Spacer()
-//                        
+//
 //                        Image(systemName: "shuffle")
 //                            .font(.system(size: 18))
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.3))
 //                            .padding(4)
 //                    }
-//                    
+//
 //                    // 进度条
 //                    HStack {
 //                        Text("02:00")
 //                            .font(.caption.monospacedDigit())
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))
-//                        
+//
 //                        ProgressView(value: 0.5)
 //                            .progressViewStyle(
 //                                CustomProgressViewStyle(
@@ -1232,7 +1348,7 @@ struct CassetteHole: View {
 //                                    background: Color(musicService.currentPlayerSkin.screenTextColor).opacity(0.1)
 //                                )
 //                            )
-//                        
+//
 //                        Text("-01:55")
 //                            .font(.caption.monospacedDigit())
 //                            .foregroundColor(Color(musicService.currentPlayerSkin.screenTextColor))

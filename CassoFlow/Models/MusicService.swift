@@ -41,6 +41,8 @@ class MusicService: ObservableObject {
     static let shared = MusicService()
     
     private let player = ApplicationMusicPlayer.shared
+    private let localService = LocalMusicService.shared
+    private let coordinator = MusicServiceCoordinator()
     private let audioEffectsManager = AudioEffectsManager.shared
     private let storeManager = StoreManager.shared
     
@@ -50,8 +52,6 @@ class MusicService: ObservableObject {
     @Published var totalDuration: TimeInterval = 0
     @Published var isPlaying: Bool = false
     @Published var currentTrackID: MusicItemID?
-    @Published var currentPlayerSkin: PlayerSkin
-    @Published var currentCassetteSkin: CassetteSkin
     @Published var currentTrackIndex: Int? = nil
     @Published var totalTracksInQueue: Int = 0
     
@@ -62,6 +62,25 @@ class MusicService: ObservableObject {
     @Published var isFastRewinding: Bool = false
     private var seekTimer: Timer?
     private var updateTimer: Timer?
+    
+    // MARK: - 皮肤和设置
+    @Published var currentPlayerSkin: PlayerSkin
+    @Published var currentCassetteSkin: CassetteSkin
+    @Published var currentCoverStyle: CoverStyle = .rectangle
+    
+    // MARK: - 数据源管理
+    
+    @Published var currentDataSource: MusicDataSourceType = .musicKit {
+        didSet {
+            UserDefaults.standard.set(currentDataSource.rawValue, forKey: "SelectedDataSource")
+            coordinator.currentDataSource = currentDataSource
+            
+            // 🔑 切换数据源时重置播放状态
+            Task { @MainActor in
+                await resetPlaybackStateForDataSourceChange()
+            }
+        }
+    }
     
     // 新增：后台状态监听Timer
     private var backgroundStatusTimer: Timer?
@@ -79,6 +98,7 @@ class MusicService: ObservableObject {
         }
     }
     
+    // MARK: - 触觉反馈属性
     @Published var isHapticFeedbackEnabled: Bool = false
 
     // MARK: - 屏幕常亮属性
@@ -90,9 +110,6 @@ class MusicService: ObservableObject {
             }
         }
     }
-    
-    // MARK: - 磁带封面样式属性
-    @Published var currentCoverStyle: CoverStyle = .rectangle
     
     // MARK: - 库视图控制
     @Published var shouldCloseLibrary: Bool = false
@@ -237,6 +254,13 @@ class MusicService: ObservableObject {
         self.totalTracksInQueue = 0
         self.queueTotalDuration = 0
         self.queueElapsedDuration = 0
+        
+        // 🔑 从 UserDefaults 加载保存的数据源设置
+        let savedDataSource = UserDefaults.standard.string(forKey: "SelectedDataSource")
+        if let sourceString = savedDataSource,
+           let source = MusicDataSourceType(rawValue: sourceString) {
+            _currentDataSource = Published(initialValue: source)
+        }
         
         // 从 UserDefaults 加载保存的皮肤，如果没有则使用默认值
         let savedPlayerSkinName = UserDefaults.standard.string(forKey: Self.playerSkinKey)
@@ -414,6 +438,16 @@ class MusicService: ObservableObject {
                 startUpdateTimer()
             }
         }
+    }
+    
+    /// 获取本地音乐服务（用于配置）
+    func getLocalService() -> LocalMusicService {
+        return localService
+    }
+    
+    /// 获取音乐服务协调器
+    func getCoordinator() -> MusicServiceCoordinator {
+        return coordinator
     }
     
     // MARK: - 会员状态变化处理
@@ -663,7 +697,51 @@ class MusicService: ObservableObject {
         
         return elapsedDuration
     }
+    
+    // MARK: - 播放播放控制方法
+    
+    /// 播放通用歌曲队列
+    func playUniversalSongs(_ songs: [UniversalSong], startingAt index: Int = 0) async throws {
+        
+        switch currentDataSource {
+        case .musicKit:
+            break
+        case .local:
+            try await localService.playQueue(songs, startingAt: index)
+        }
+        
+        await MainActor.run {
+            shouldCloseLibrary = true
+        }
+        
+        // 🔑 增加延迟时间，确保播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+        await forceSyncPlaybackStatus()
+    }
+    
+    /// 播放通用专辑
+    func playUniversalAlbum(_ album: UniversalAlbum, shuffled: Bool = false) async throws {
+        let detailedAlbum = try await coordinator.getAlbum(id: album.id)
+        let finalSongs = shuffled ? detailedAlbum.songs.shuffled() : detailedAlbum.songs
+        try await playUniversalSongs(finalSongs)
+        
+        // 🔑 增加延迟时间，确保播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+        await forceSyncPlaybackStatus()
+    }
+    
+    /// 播放通用播放列表
+    func playUniversalPlaylist(_ playlist: UniversalPlaylist, shuffled: Bool = false) async throws {
+        let detailedPlaylist = try await coordinator.getPlaylist(id: playlist.id)
+        let finalSongs = shuffled ? detailedPlaylist.songs.shuffled() : detailedPlaylist.songs
+        try await playUniversalSongs(finalSongs)
+        
+        // 🔑 增加延迟时间，确保播放器完全初始化
+        try await Task.sleep(nanoseconds: 500_000_000) // 延迟0.5秒
+        await forceSyncPlaybackStatus()
+    }
 
+    // MARK: - Musickit播放控制方法
     /// 播放
     func play() async throws {
         try await player.play()
@@ -796,5 +874,39 @@ class MusicService: ObservableObject {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    // 🔑 修改：切换数据源时重置播放状态（异步版本）
+    private func resetPlaybackStateForDataSourceChange() async {
+//        // 🔑 首先停止所有数据源的音乐播放
+//        await stopAllDataSourcesPlayback()
+        
+        // 🔑 确保在主线程上更新 @Published 属性
+        await MainActor.run {
+            // 重置播放信息显示
+            currentTitle = String(localized: "未播放歌曲")
+            currentArtist = String(localized: "点此选择音乐")
+            currentDuration = 0
+            totalDuration = 0
+            isPlaying = false
+            currentTrackID = nil
+            currentTrackIndex = nil
+            totalTracksInQueue = 0
+            queueTotalDuration = 0
+            queueElapsedDuration = 0
+            
+            // 重置缓存值
+            lastTitle = ""
+            lastArtist = ""
+            lastTrackID = nil
+            lastTrackIndex = nil
+            lastTotalTracks = 0
+            
+            // 停止相关Timer
+            stopUpdateTimer()
+            
+            // 通知音频效果管理器停止播放
+            audioEffectsManager.setMusicPlayingState(false)
+        }
     }
 }
