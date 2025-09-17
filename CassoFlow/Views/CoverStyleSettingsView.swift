@@ -7,26 +7,22 @@ struct CoverStyleSettingsView: View {
     var body: some View {
         List {
             Section {
-                ForEach(CoverStyle.allCases, id: \.self) { style in
-                    CoverStyleRow(
-                        style: style,
-                        isSelected: musicService.currentCoverStyle == style
-                    ) {
-                        // 触觉反馈
-                        if musicService.isHapticFeedbackEnabled {
-                            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                            impactFeedback.impactOccurred()
-                        }
-                        
-                        // 设置新的封面样式
-                        musicService.setCoverStyle(style)
-                    }
+                // 方形比例选项
+                CoverStyleOptionView(
+                    style: .square,
+                    isSelected: musicService.currentCoverStyle == .square
+                ) {
+                    selectStyle(.square)
                 }
-            }
-//            header: {
-//                Text("选择磁带封面样式")
-//            }
-            footer: {
+                
+                // 矩形比例选项
+                CoverStyleOptionView(
+                    style: .rectangle,
+                    isSelected: musicService.currentCoverStyle == .rectangle
+                ) {
+                    selectStyle(.rectangle)
+                }
+            } footer: {
                 Text("更改封面样式会影响专辑和歌单的封面展示方式")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -35,9 +31,22 @@ struct CoverStyleSettingsView: View {
         .navigationTitle("封面样式")
         .navigationBarTitleDisplayMode(.inline)
     }
+    
+    // 选择样式的统一处理方法
+    private func selectStyle(_ style: CoverStyle) {
+        // 触觉反馈
+        if musicService.isHapticFeedbackEnabled {
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+        }
+        
+        // 设置新的封面样式
+        musicService.setCoverStyle(style)
+    }
 }
 
-struct CoverStyleRow: View {
+// 简化的选项视图
+struct CoverStyleOptionView: View {
     let style: CoverStyle
     let isSelected: Bool
     let onTap: () -> Void
@@ -78,9 +87,4 @@ struct CoverStyleRow: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
-}
-
-#Preview {
-    CoverStyleSettingsView()
-        .environmentObject(MusicService.shared)
 }

@@ -40,7 +40,7 @@ struct QueueView: View {
                     VStack(spacing: 10) {
                         Image(systemName: "music.note.list")
                             .font(.system(size: 48))
-                            .foregroundColor(.red)
+                            .foregroundColor(.yellow)
                             .padding(.bottom, 10)
                         
                         Text("播放队列为空")

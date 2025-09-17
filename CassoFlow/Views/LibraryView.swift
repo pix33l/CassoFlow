@@ -425,7 +425,7 @@ struct LibraryView: View {
         VStack(spacing: 10) {
             Image(systemName: getErrorIcon(for: message))
                 .font(.system(size: 48))
-                .foregroundColor(.red)
+                .foregroundColor(.yellow)
                 .padding(.bottom, 10)
             
             Text(message)
@@ -451,7 +451,7 @@ struct LibraryView: View {
                     .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 25)
-                            .fill(Color.red)
+                            .fill(Color.yellow)
                     )
             }
             .padding(.top, 20)
@@ -589,7 +589,7 @@ struct LibraryView: View {
                             VStack(spacing: 16) {
                                 Image(systemName: "magnifyingglass")
                                     .font(.system(size: 48))
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.yellow)
                                 
                                 Text("未找到匹配的专辑或艺术家")
                                     .font(.title3)
@@ -688,7 +688,7 @@ struct LibraryView: View {
                             VStack(spacing: 16) {
                                 Image(systemName: "magnifyingglass")
                                     .font(.system(size: 48))
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.yellow)
                                 
                                 Text("未找到匹配的歌单")
                                     .font(.title3)
@@ -1305,7 +1305,7 @@ struct ListPlaylistCell: View {
             VStack(spacing: 20) {
                 Image(systemName: "music.note.list")
                     .font(.system(size: 48))
-                    .foregroundColor(.red)
+                    .foregroundColor(.yellow)
                 
                 Text(String(localized: "需要 Apple Music 订阅才能使用"))
                     .font(.title2)
@@ -1330,7 +1330,7 @@ struct ListPlaylistCell: View {
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .fill(Color.red)
+                                    .fill(Color.yellow)
                             )
                     }
                 }
@@ -1366,7 +1366,7 @@ struct ListPlaylistCell: View {
             VStack(spacing: 20) {
                 Image(systemName: "music.note.list")
                     .font(.system(size: 48))
-                    .foregroundColor(.red)
+                    .foregroundColor(.yellow)
                 
                 Text(String(localized: "需要授权才能访问您的音乐库"))
                     .font(.title2)
@@ -1391,7 +1391,7 @@ struct ListPlaylistCell: View {
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 25)
-                                    .fill(Color.red)
+                                    .fill(Color.yellow)
                             )
                     }
                 }
@@ -1420,63 +1420,63 @@ struct ListPlaylistCell: View {
     .environmentObject(musicService)
 }
 
-#Preview("媒体库为空状态") {
-    let musicService = MusicService.shared
-    NavigationStack {
-        VStack(spacing: 0) {
-            VStack(spacing: 20) {
-                Image(systemName: "music.note.list")
-                    .font(.system(size: 48))
-                    .foregroundColor(.red)
-                
-                Text(String(localized: "您的媒体库是空的\n请先在 Apple Music 中添加一些音乐"))
-                    .font(.title2)
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-                
-                VStack(spacing: 40) {
-                    
-                    Text(String(localized: "在 Apple Music 中添加专辑和播放列表以开始使用"))
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                    
-                    Button {
-                        // 预览中的空操作
-                    } label: {
-                        Text(String(localized: "打开 Apple Music"))
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 25)
-                                    .fill(Color.red)
-                            )
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .navigationTitle("媒体库")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    // 预览中的空操作
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.caption)
-                        .foregroundColor(.primary)
-                        .padding(8)
-                        .background(
-                            Circle()
-                                .fill(Color.gray.opacity(0.15))
-                        )
-                }
-            }
-        }
-    }
-    .environmentObject(musicService)
-}
+//#Preview("媒体库为空状态") {
+//    let musicService = MusicService.shared
+//    NavigationStack {
+//        VStack(spacing: 0) {
+//            VStack(spacing: 20) {
+//                Image(systemName: "music.note.list")
+//                    .font(.system(size: 48))
+//                    .foregroundColor(.red)
+//                
+//                Text(String(localized: "您的媒体库是空的\n请先在 Apple Music 中添加一些音乐"))
+//                    .font(.title2)
+//                    .foregroundColor(.primary)
+//                    .multilineTextAlignment(.center)
+//                    .padding(.horizontal, 32)
+//                
+//                VStack(spacing: 40) {
+//                    
+//                    Text(String(localized: "在 Apple Music 中添加专辑和播放列表以开始使用"))
+//                        .font(.subheadline)
+//                        .foregroundColor(.secondary)
+//                        .multilineTextAlignment(.center)
+//                    
+//                    Button {
+//                        // 预览中的空操作
+//                    } label: {
+//                        Text(String(localized: "打开 Apple Music"))
+//                            .font(.headline)
+//                            .foregroundColor(.white)
+//                            .padding(.horizontal, 24)
+//                            .padding(.vertical, 12)
+//                            .background(
+//                                RoundedRectangle(cornerRadius: 25)
+//                                    .fill(Color.red)
+//                            )
+//                    }
+//                }
+//            }
+//            .frame(maxWidth: .infinity, maxHeight: .infinity)
+//        }
+//        .navigationTitle("媒体库")
+//        .navigationBarTitleDisplayMode(.inline)
+//        .toolbar {
+//            ToolbarItem(placement: .navigationBarTrailing) {
+//                Button {
+//                    // 预览中的空操作
+//                } label: {
+//                    Image(systemName: "xmark")
+//                        .font(.caption)
+//                        .foregroundColor(.primary)
+//                        .padding(8)
+//                        .background(
+//                            Circle()
+//                                .fill(Color.gray.opacity(0.15))
+//                        )
+//                }
+//            }
+//        }
+//    }
+//    .environmentObject(musicService)
+//}
