@@ -6,8 +6,42 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		62DE4ECF2E7AAAD60095661F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62DE4ECE2E7AAAD60095661F /* WidgetKit.framework */; };
+		62DE4ED12E7AAAD60095661F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62DE4ED02E7AAAD60095661F /* SwiftUI.framework */; };
+		62DE4EDC2E7AAAD80095661F /* CassFlowWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 62DE4ECC2E7AAAD60095661F /* CassFlowWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		62DE4EDA2E7AAAD80095661F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6276D7602DD1E6F900ACA539 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 62DE4ECB2E7AAAD60095661F;
+			remoteInfo = CassFlowWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		62DE4EDD2E7AAAD80095661F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				62DE4EDC2E7AAAD80095661F /* CassFlowWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		6276D7682DD1E6F900ACA539 /* CassoFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CassoFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		62CB6C142E7ADB2A007ED1E9 /* CassFlowWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CassFlowWidgetExtension.entitlements; sourceTree = "<group>"; };
+		62DE4ECC2E7AAAD60095661F /* CassFlowWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CassFlowWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		62DE4ECE2E7AAAD60095661F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		62DE4ED02E7AAAD60095661F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -18,6 +52,27 @@
 			);
 			target = 6276D7672DD1E6F900ACA539 /* CassoFlow */;
 		};
+		62C45C812E7AC03F006C5642 /* Exceptions for "CassFlowWidget" folder in "CassoFlow" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SharedMusicData.swift,
+			);
+			target = 6276D7672DD1E6F900ACA539 /* CassoFlow */;
+		};
+		62C45CCC2E7AD68B006C5642 /* Exceptions for "CassoFlow" folder in "CassFlowWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+			);
+			target = 62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */;
+		};
+		62DE4EE12E7AAAD80095661F /* Exceptions for "CassFlowWidget" folder in "CassFlowWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -25,8 +80,18 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				6255CB7B2E0555D600F23075 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */,
+				62C45CCC2E7AD68B006C5642 /* Exceptions for "CassoFlow" folder in "CassFlowWidgetExtension" target */,
 			);
 			path = CassoFlow;
+			sourceTree = "<group>";
+		};
+		62DE4ED22E7AAAD60095661F /* CassFlowWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				62C45C812E7AC03F006C5642 /* Exceptions for "CassFlowWidget" folder in "CassoFlow" target */,
+				62DE4EE12E7AAAD80095661F /* Exceptions for "CassFlowWidget" folder in "CassFlowWidgetExtension" target */,
+			);
+			path = CassFlowWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -39,13 +104,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		62DE4EC92E7AAAD60095661F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62DE4ED12E7AAAD60095661F /* SwiftUI.framework in Frameworks */,
+				62DE4ECF2E7AAAD60095661F /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		6276D75F2DD1E6F900ACA539 = {
 			isa = PBXGroup;
 			children = (
+				62CB6C142E7ADB2A007ED1E9 /* CassFlowWidgetExtension.entitlements */,
 				6276D76A2DD1E6F900ACA539 /* CassoFlow */,
+				62DE4ED22E7AAAD60095661F /* CassFlowWidget */,
+				62DE4ECD2E7AAAD60095661F /* Frameworks */,
 				6276D7692DD1E6F900ACA539 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,8 +131,18 @@
 			isa = PBXGroup;
 			children = (
 				6276D7682DD1E6F900ACA539 /* CassoFlow.app */,
+				62DE4ECC2E7AAAD60095661F /* CassFlowWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		62DE4ECD2E7AAAD60095661F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				62DE4ECE2E7AAAD60095661F /* WidgetKit.framework */,
+				62DE4ED02E7AAAD60095661F /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -68,10 +155,12 @@
 				6276D7642DD1E6F900ACA539 /* Sources */,
 				6276D7652DD1E6F900ACA539 /* Frameworks */,
 				6276D7662DD1E6F900ACA539 /* Resources */,
+				62DE4EDD2E7AAAD80095661F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				62DE4EDB2E7AAAD80095661F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				6276D76A2DD1E6F900ACA539 /* CassoFlow */,
@@ -83,6 +172,28 @@
 			productReference = 6276D7682DD1E6F900ACA539 /* CassoFlow.app */;
 			productType = "com.apple.product-type.application";
 		};
+		62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 62DE4EE02E7AAAD80095661F /* Build configuration list for PBXNativeTarget "CassFlowWidgetExtension" */;
+			buildPhases = (
+				62DE4EC82E7AAAD60095661F /* Sources */,
+				62DE4EC92E7AAAD60095661F /* Frameworks */,
+				62DE4ECA2E7AAAD60095661F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				62DE4ED22E7AAAD60095661F /* CassFlowWidget */,
+			);
+			name = CassFlowWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = CassFlowWidgetExtension;
+			productReference = 62DE4ECC2E7AAAD60095661F /* CassFlowWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -90,12 +201,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					6276D7672DD1E6F900ACA539 = {
 						CreatedOnToolsVersion = 16.3;
 						LastSwiftMigration = 1630;
+					};
+					62DE4ECB2E7AAAD60095661F = {
+						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
@@ -124,12 +238,20 @@
 			projectRoot = "";
 			targets = (
 				6276D7672DD1E6F900ACA539 /* CassoFlow */,
+				62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		6276D7662DD1E6F900ACA539 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		62DE4ECA2E7AAAD60095661F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -146,7 +268,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		62DE4EC82E7AAAD60095661F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		62DE4EDB2E7AAAD80095661F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */;
+			targetProxy = 62DE4EDA2E7AAAD80095661F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		6276D7732DD1E6FD00ACA539 /* Debug */ = {
@@ -280,6 +417,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CassoFlow/CassoFlow.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 4U3CXVZX7T;
@@ -305,6 +444,7 @@
 				MARKETING_VERSION = 1.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = me.pix3l.CassoFlow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -322,6 +462,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CassoFlow/CassoFlowRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 4U3CXVZX7T;
@@ -357,6 +498,72 @@
 			};
 			name = Release;
 		};
+		62DE4EDE2E7AAAD80095661F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CassFlowWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 4U3CXVZX7T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CassFlowWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CassFlowWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = me.pix3l.CassoFlow.CassFlowWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		62DE4EDF2E7AAAD80095661F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CassFlowWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 4U3CXVZX7T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CassFlowWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CassFlowWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = me.pix3l.CassoFlow.CassFlowWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -374,6 +581,15 @@
 			buildConfigurations = (
 				6276D7762DD1E6FD00ACA539 /* Debug */,
 				6276D7772DD1E6FD00ACA539 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		62DE4EE02E7AAAD80095661F /* Build configuration list for PBXNativeTarget "CassFlowWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				62DE4EDE2E7AAAD80095661F /* Debug */,
+				62DE4EDF2E7AAAD80095661F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

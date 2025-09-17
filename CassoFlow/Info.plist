@@ -13,5 +13,20 @@
 		<key>UIImageName</key>
 		<string>LaunchScreenLogo</string>
 	</dict>
+	<key>AppGroupIdentifiers</key>
+	<array>
+		<string>group.me.pix3l.CassoFlow</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>me.pix3l.CassoFlow</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>cassoflow</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

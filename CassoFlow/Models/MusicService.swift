@@ -296,6 +296,9 @@ class MusicService: ObservableObject {
         
         // 监听应用状态变化
         setupAppStateNotifications()
+        
+        // 监听widget控制操作
+        setupWidgetControlNotifications()
     }
     
     deinit {
@@ -353,6 +356,45 @@ class MusicService: ObservableObject {
         
         // 回到前台时立即同步一次播放进度
         syncPlaybackProgress()
+        
+        // 检查是否有来自widget的控制操作
+        checkWidgetControlActions()
+    }
+    
+    // 设置widget控制通知监听
+    private func setupWidgetControlNotifications() {
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("WidgetMusicControl"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.checkWidgetControlActions()
+        }
+    }
+    
+    // 检查并处理widget控制操作
+    private func checkWidgetControlActions() {
+        if let action = UserDefaults.getAndClearMusicControlAction() {
+            handleWidgetControlAction(action)
+        }
+    }
+    
+    // 处理widget控制操作
+    private func handleWidgetControlAction(_ action: MusicControlAction) {
+        Task {
+            switch action {
+            case .playPause:
+                if isPlaying {
+                    await pause()
+                } else {
+                    try? await play()
+                }
+            case .nextTrack:
+                try? await skipToNext()
+            case .previousTrack:
+                try? await skipToPrevious()
+            }
+        }
     }
     
     // 新增：启动后台状态监听Timer
@@ -414,6 +456,11 @@ class MusicService: ObservableObject {
                 startUpdateTimer()
             }
         }
+    }
+    
+    // 新增：公共方法用于外部强制更新widget数据
+    func updateWidgetData() {
+        updateCurrentSongInfo()
     }
     
     // MARK: - 会员状态变化处理
@@ -543,6 +590,16 @@ class MusicService: ObservableObject {
                 self.lastTrackID = nil
                 self.lastTrackIndex = nil
                 self.lastTotalTracks = 0
+                
+                // 保存到共享存储供widget使用
+                let musicData = SharedMusicData(
+                    title: self.currentTitle,
+                    artist: self.currentArtist,
+                    isPlaying: self.isPlaying,
+                    currentDuration: self.currentDuration,
+                    totalDuration: self.totalDuration
+                )
+                UserDefaults.saveMusicData(musicData)
             }
             return
         }
@@ -600,6 +657,16 @@ class MusicService: ObservableObject {
                 self.currentTrackIndex = newTrackIndex
                 self.totalTracksInQueue = newTotalTracks
                 self.queueTotalDuration = totalQueueDuration
+                
+                // 保存到共享存储供widget使用
+                let musicData = SharedMusicData(
+                    title: self.currentTitle,
+                    artist: self.currentArtist,
+                    isPlaying: self.isPlaying,
+                    currentDuration: self.currentDuration,
+                    totalDuration: self.totalDuration
+                )
+                UserDefaults.saveMusicData(musicData)
             }
         }
         
@@ -615,6 +682,16 @@ class MusicService: ObservableObject {
             
             // 同步播放状态到音频效果管理器
             self.audioEffectsManager.setMusicPlayingState(playbackStatus)
+            
+            // 保存到共享存储供widget使用
+            let musicData = SharedMusicData(
+                title: self.currentTitle,
+                artist: self.currentArtist,
+                isPlaying: self.isPlaying,
+                currentDuration: self.currentDuration,
+                totalDuration: self.totalDuration
+            )
+            UserDefaults.saveMusicData(musicData)
         }
     }
 /// 计算队列中所有歌曲的总时长
