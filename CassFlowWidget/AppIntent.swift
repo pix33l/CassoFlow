@@ -32,6 +32,9 @@ struct PlayPauseMusicIntent: AppIntent {
         // 立即唤醒主应用执行操作
         await wakeUpMainApp(action: "playPause")
         
+        // 立即刷新Widget显示
+        WidgetUpdateManager.shared.reloadAllWidgets()
+        
         return .result()
     }
 }
@@ -47,6 +50,9 @@ struct NextTrackIntent: AppIntent {
         // 立即唤醒主应用执行操作
         await wakeUpMainApp(action: "nextTrack")
         
+        // 立即刷新Widget显示
+        WidgetUpdateManager.shared.reloadAllWidgets()
+        
         return .result()
     }
 }
@@ -61,6 +67,9 @@ struct PreviousTrackIntent: AppIntent {
         
         // 立即唤醒主应用执行操作
         await wakeUpMainApp(action: "previousTrack")
+        
+        // 立即刷新Widget显示
+        WidgetUpdateManager.shared.reloadAllWidgets()
         
         return .result()
     }

@@ -29,8 +29,27 @@ struct Provider: TimelineProvider {
         // 创建时间线条目
         let entry = MusicEntry(date: currentDate, musicData: musicData)
         
-        // 如果正在播放，设置更频繁的刷新策略
-        let refreshPolicy: TimelineReloadPolicy = musicData.isPlaying ? .after(Calendar.current.date(byAdding: .second, value: 5, to: currentDate)!) : .atEnd
+        // 智能刷新策略
+        let refreshPolicy: TimelineReloadPolicy
+        
+        if musicData.isPlaying {
+            // 如果正在播放，根据播放进度动态调整刷新频率
+            let remainingTime = musicData.totalDuration - musicData.currentDuration
+            
+            if remainingTime <= 10 {
+                // 剩余时间少于10秒时，更频繁地刷新（准备下一首）
+                refreshPolicy = .after(Calendar.current.date(byAdding: .second, value: 2, to: currentDate)!)
+            } else if remainingTime <= 30 {
+                // 剩余时间少于30秒时，中等频率刷新
+                refreshPolicy = .after(Calendar.current.date(byAdding: .second, value: 5, to: currentDate)!)
+            } else {
+                // 正常播放状态，较低频率刷新（因为主应用会主动更新）
+                refreshPolicy = .after(Calendar.current.date(byAdding: .second, value: 15, to: currentDate)!)
+            }
+        } else {
+            // 如果暂停或停止，使用较长的刷新间隔
+            refreshPolicy = .after(Calendar.current.date(byAdding: .minute, value: 5, to: currentDate)!)
+        }
         
         let timeline = Timeline(entries: [entry], policy: refreshPolicy)
         completion(timeline)
@@ -48,99 +67,310 @@ struct CassFlowWidgetEntryView: View {
     @Environment(\.widgetFamily) var widgetFamily
 
     var body: some View {
-        VStack(spacing: 8) {
-            // 歌曲信息显示
-            VStack(spacing: 4) {
-                Text(entry.musicData.title)
-                    .font(.system(size: widgetFamily == .systemSmall ? 16 : 18, weight: .semibold))
-                    .foregroundColor(Color("text-screen-blue"))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                
-                Text(entry.musicData.artist)
-                    .font(.system(size: widgetFamily == .systemSmall ? 14 : 16))
-                    .foregroundColor(Color("text-screen-blue"))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .inset(by: 4)
-                    .fill(Color("bg-screen-blue"))
-
-                    .overlay(
+        Group {
+            if widgetFamily == .systemSmall {
+                // 小尺寸Widget布局
+                VStack(spacing: 8) {
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 4) {
+                            Text(entry.musicData.title)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(Color("text-screen-blue"))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                            
+                            Text(entry.musicData.artist)
+                                .font(.system(size: 14))
+                                .foregroundColor(Color("text-screen-blue"))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
+                        Spacer()
+                    }
+                    .padding()
+                    .background(
                         RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(.white.opacity(0.1), lineWidth: 8))
-                
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.black.opacity(0.4), lineWidth: 8)
-                            .blur(radius: 12)
-                            .offset(x: 0, y: 0)
-                            .mask(RoundedRectangle(cornerRadius: 8))
+                            .inset(by: 4)
+                            .fill(Color("bg-screen-blue"))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .strokeBorder(.white.opacity(0.1), lineWidth: 8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.black.opacity(0.4), lineWidth: 8)
+                                    .blur(radius: 12)
+                                    .offset(x: 0, y: 0)
+                                    .mask(RoundedRectangle(cornerRadius: 8))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .strokeBorder(Color(.black), lineWidth: 4))
                     )
-
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(Color(.black), lineWidth: 4))
-            )
-//            .padding(10)
-            
-//            // 进度条（仅在中型和大尺寸widget中显示）
-//            if widgetFamily != .systemSmall {
-//                ProgressView(value: entry.musicData.currentDuration, total: max(entry.musicData.totalDuration, 1))
-//                    .progressViewStyle(LinearProgressViewStyle())
-//                    .tint(.blue)
-//                
-//                HStack {
-//                    Text(formatTime(entry.musicData.currentDuration))
-//                        .font(.caption2)
-//                        .foregroundColor(.secondary)
-//                    
-//                    Spacer()
-//                    
-//                    Text(formatTime(entry.musicData.totalDuration))
-//                        .font(.caption2)
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-            
-            // 控制按钮
-            HStack(spacing: widgetFamily == .systemSmall ? 0 : 4) {
-                // 上一首按钮
-                Button(intent: PreviousTrackIntent()) {
-                    Image(systemName: "backward.fill")
-                        .font(.system(size: widgetFamily == .systemSmall ? 12 : 20))
-                        .frame(width: widgetFamily == .systemSmall ? 12 : 32, height: widgetFamily == .systemSmall ? 12 : 32)
+                    
+                    // 控制按钮
+                    HStack(spacing: 0) {
+                        // 上一首按钮
+//                        Button(intent: PreviousTrackIntent()) {
+//                            Image(systemName: "backward.fill")
+//                                .font(.system(size: 12))
+//                                .frame(width: 12, height: 12)
+//                        }
+                        
+                        // 播放/暂停按钮
+                        Button(intent: PlayPauseMusicIntent()) {
+                            Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
+                                .font(.system(size: 16))
+//                                .frame(width: 12, height: 12)
+                        }
+                        
+//                        // 下一首按钮
+//                        Button(intent: NextTrackIntent()) {
+//                            Image(systemName: "forward.fill")
+//                                .font(.system(size: 12))
+//                                .frame(width: 12, height: 12)
+//                        }
+                    }
+                    .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
                 }
-                
-                // 播放/暂停按钮
-                Button(intent: PlayPauseMusicIntent()) {
-                    Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.system(size: widgetFamily == .systemSmall ? 12 : 20))
-                        .frame(width: widgetFamily == .systemSmall ? 12 : 32, height: widgetFamily == .systemSmall ? 12 : 32)
+            } else if widgetFamily == .systemMedium {
+                // 中等尺寸Widget布局
+                HStack(spacing: 16) {
+                    ZStack {
+                        if let artworkURL = entry.musicData.artworkURL,
+                           let url = URL(string: artworkURL) {
+                            // 背景层：模糊的专辑封面
+                            AsyncImage(url: url)
+                            .frame(width: 80, height: 124)
+                            .blur(radius: 8)
+                            .overlay(
+                                Color.black.opacity(0.3)
+                            )
+                            .clipShape(Rectangle())
+                            
+                            // 前景层：清晰的专辑封面
+                            AsyncImage(url: url)
+                            .frame(width: 80, height: 80)
+                            .clipShape(Rectangle())
+                        } else {
+                            // 默认封面
+                            ZStack {
+                                Color.black
+                                Image("CASSOFLOW")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 55)
+                            }
+                            .frame(width: 80, height: 124)
+                            .clipShape(Rectangle())
+                        }
+                        
+                        // 使用随机磁带图片
+                        Image(getRandomCassetteImage(for: entry.musicData.title))
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 80, height: 124)
+                    }
+                    
+                    // 右侧内容：歌曲信息和控制按钮
+                    VStack(spacing: 8) {
+                        // 歌曲信息显示
+                        HStack{
+                            Spacer()
+                            VStack(spacing: 4) {
+                                Text(entry.musicData.title)
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundColor(Color("text-screen-blue"))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                                
+                                Text(entry.musicData.artist)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(Color("text-screen-blue"))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            Spacer()
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .inset(by: 4)
+                                .fill(Color("bg-screen-blue"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(.white.opacity(0.1), lineWidth: 8))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.black.opacity(0.4), lineWidth: 8)
+                                        .blur(radius: 12)
+                                        .offset(x: 0, y: 0)
+                                        .mask(RoundedRectangle(cornerRadius: 8))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(Color(.black), lineWidth: 4))
+                        )
+                        
+                        // 控制按钮
+                        HStack(spacing: 4) {
+                            // 上一首按钮
+                            Button(intent: PreviousTrackIntent()) {
+                                Image(systemName: "backward.fill")
+                                    .font(.system(size: 16))
+//                                    .frame(width: 32, height: 16)
+                            }
+                            
+                            // 播放/暂停按钮
+                            Button(intent: PlayPauseMusicIntent()) {
+                                Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 16))
+//                                    .frame(width: 32, height: 16)
+                            }
+                            
+                            // 下一首按钮
+                            Button(intent: NextTrackIntent()) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 16))
+//                                    .frame(width: 32, height: 16)
+                            }
+                        }
+                        .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
+                    }
                 }
-                
-                // 下一首按钮
-                Button(intent: NextTrackIntent()) {
-                    Image(systemName: "forward.fill")
-                        .font(.system(size: widgetFamily == .systemSmall ? 12 : 20))
-                        .frame(width: widgetFamily == .systemSmall ? 12 : 32, height: widgetFamily == .systemSmall ? 12 : 32)
+            } else if widgetFamily == .systemLarge {
+                // 大尺寸Widget布局 - 特殊磁带样式
+                VStack(spacing: 0) {
+                    ZStack {
+                        // 磁带背景
+                        Image("artwork-cassette")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 320, height: 230)
+                        
+                        // 磁带封面
+                        if let artworkURL = entry.musicData.artworkURL,
+                           let url = URL(string: artworkURL) {
+                            ZStack{
+                                AsyncImage(url: url)
+                                    .frame(width: 225, height: 100)
+                                    .blur(radius: 8)
+                                    .overlay(
+                                        // 半透明遮罩确保文字清晰
+                                        Color.black.opacity(0.3)
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .padding(.bottom, 30)
+                            }
+                        } else {
+                            ZStack{
+                                Color.black
+                                    .frame(width: 225, height: 100)
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .padding(.bottom, 30)
+                            }
+                        }
+                        
+                        // CASSOFLOW Logo
+                        Image("CASSOFLOW")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 84)
+                            .padding(.bottom, 92)
+                        
+                        // 磁带孔
+                        Image("artwork-cassette-hole")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 300)
+                        
+                        // 歌曲信息
+                        HStack{
+                            // 专辑封面
+                            if let artworkURL = entry.musicData.artworkURL,
+                               let url = URL(string: artworkURL) {
+                                AsyncImage(url: url)
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                            } else {
+                                ZStack{
+                                    Color.black
+                                        .frame(width: 50, height: 50)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    
+                                    Image("CASSOFLOW")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 42)
+                                }
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(entry.musicData.title)
+                                    .font(.headline.bold())
+                                    .lineLimit(1)
+                                
+                                Text(entry.musicData.artist)
+                                    .font(.footnote)
+                                    .lineLimit(1)
+                                    .padding(.top, 4)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.top, 100)
+                        .frame(width: 250)
+                    }
+                    
+                    // 控制按钮
+                    HStack(spacing: 12) {
+                        // 上一首按钮
+                        Button(intent: PreviousTrackIntent()) {
+                            Image(systemName: "backward.fill")
+                                .font(.system(size: 24))
+                        }
+                        
+                        // 播放/暂停按钮
+                        Button(intent: PlayPauseMusicIntent()) {
+                            Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
+                                .font(.system(size: 24))
+                        }
+                        
+                        // 下一首按钮
+                        Button(intent: NextTrackIntent()) {
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 24))
+                        }
+                    }
+                    .padding()
+                    .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
                 }
-
             }
-            .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
         }
-//        .padding()
         .widgetURL(URL(string: "cassoflow://music-control")) // 深度链接到应用
     }
     
-//    private func formatTime(_ time: TimeInterval) -> String {
-//        let minutes = Int(time) / 60
-//        let seconds = Int(time) % 60
-//        return String(format: "%d:%02d", minutes, seconds)
-//    }
+    // 获取随机磁带图片的辅助函数
+    private func getRandomCassetteImage(for id: String) -> String {
+        // 可用的磁带图片名称数组
+        let cassetteImages = [
+            "package-cassette-01",
+            "package-cassette-02",
+            "package-cassette-03",
+            "package-cassette-04",
+            "package-cassette-05",
+            "package-cassette-06",
+            "package-cassette-07",
+            "package-cassette-08",
+            "package-cassette-09",
+            "package-cassette-10"
+        ]
+        
+        // 使用ID的哈希值作为随机数种子，确保每个ID都有固定的图片选择
+        let hash = abs(id.hashValue)
+        let index = hash % cassetteImages.count
+        return cassetteImages[index]
+    }
 }
 
 struct CassFlowWidget: Widget {
@@ -151,9 +381,9 @@ struct CassFlowWidget: Widget {
             CassFlowWidgetEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("CassFlow音乐播放器")
-        .description("显示当前播放的歌曲信息和控制按钮")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .configurationDisplayName("磁带播放器")
+        .description("最爱复古磁带沙沙声")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
 
@@ -177,6 +407,18 @@ struct CassFlowWidget: Widget {
 }
 
 #Preview(as: .systemMedium) {
+    CassFlowWidget()
+} timeline: {
+    MusicEntry(date: .now, musicData: SharedMusicData(
+        title: "这是一首很长的歌曲名称测试文字",
+        artist: "这是一个很长的歌手名称测试",
+        isPlaying: true,
+        currentDuration: 150,
+        totalDuration: 300
+    ))
+}
+
+#Preview(as: .systemLarge) {
     CassFlowWidget()
 } timeline: {
     MusicEntry(date: .now, musicData: SharedMusicData(

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import MusicKit
 
 /// 共享音乐数据结构，用于widget和主应用之间的数据传递
 struct SharedMusicData: Codable, CustomStringConvertible {
@@ -8,13 +9,15 @@ struct SharedMusicData: Codable, CustomStringConvertible {
     var isPlaying: Bool
     var currentDuration: TimeInterval
     var totalDuration: TimeInterval
+    var artworkURL: String? // 专辑封面URL
     
     static let `default` = SharedMusicData(
         title: "未播放歌曲",
         artist: "点此选择音乐",
         isPlaying: false,
         currentDuration: 0,
-        totalDuration: 0
+        totalDuration: 0,
+        artworkURL: nil
     )
     
     var description: String {

@@ -56,6 +56,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				SharedMusicData.swift,
+				WidgetUpdateManager.swift,
 			);
 			target = 6276D7672DD1E6F900ACA539 /* CassoFlow */;
 		};

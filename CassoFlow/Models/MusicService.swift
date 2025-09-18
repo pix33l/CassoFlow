@@ -2,6 +2,7 @@ import MusicKit
 import Combine
 import Foundation
 import UIKit
+import WidgetKit
 
 // MARK: - 磁带封面样式枚举
 enum CoverStyle: String, CaseIterable {
@@ -43,6 +44,9 @@ class MusicService: ObservableObject {
     private let player = ApplicationMusicPlayer.shared
     private let audioEffectsManager = AudioEffectsManager.shared
     private let storeManager = StoreManager.shared
+    
+    // Widget更新管理器
+    private let widgetUpdateManager = WidgetUpdateManager.shared
     
     @Published var currentTitle: String = ""
     @Published var currentArtist: String = ""
@@ -461,6 +465,8 @@ class MusicService: ObservableObject {
     // 新增：公共方法用于外部强制更新widget数据
     func updateWidgetData() {
         updateCurrentSongInfo()
+        // 主动刷新Widget
+        widgetUpdateManager.reloadAllWidgets()
     }
     
     // MARK: - 会员状态变化处理
@@ -597,7 +603,8 @@ class MusicService: ObservableObject {
                     artist: self.currentArtist,
                     isPlaying: self.isPlaying,
                     currentDuration: self.currentDuration,
-                    totalDuration: self.totalDuration
+                    totalDuration: self.totalDuration,
+                    artworkURL: nil
                 )
                 UserDefaults.saveMusicData(musicData)
             }
@@ -608,19 +615,28 @@ class MusicService: ObservableObject {
         var trackID: MusicItemID? = nil
         
         // 更精确的类型处理
+        var artwork: Artwork? = nil
         switch entry.item {
         case .song(let song):
             duration = song.duration ?? 0
             trackID = song.id
+            artwork = song.artwork
         case .musicVideo(let musicVideo):
             duration = musicVideo.duration ?? 0
             trackID = musicVideo.id
+            artwork = musicVideo.artwork
         case .none:
             duration = 0
             trackID = nil
         @unknown default:
             duration = 0
             trackID = nil
+        }
+        
+        // 获取专辑封面URL
+        var artworkURL: String? = nil
+        if let artwork = artwork {
+            artworkURL = artwork.url(width: 200, height: 200)?.absoluteString
         }
         
         let entries = player.queue.entries
@@ -638,6 +654,9 @@ class MusicService: ObservableObject {
                              trackID != lastTrackID ||
                              newTrackIndex != lastTrackIndex ||
                              newTotalTracks != lastTotalTracks
+                             
+        // 检查播放状态是否变化
+        let playbackStateChanged = playbackStatus != isPlaying
         
         if songInfoChanged {
             let totalQueueDuration = calculateQueueTotalDuration(entries: entries)
@@ -664,15 +683,20 @@ class MusicService: ObservableObject {
                     artist: self.currentArtist,
                     isPlaying: self.isPlaying,
                     currentDuration: self.currentDuration,
-                    totalDuration: self.totalDuration
+                    totalDuration: self.totalDuration,
+                    artworkURL: artwork?.url(width: 200, height: 200)?.absoluteString
                 )
                 UserDefaults.saveMusicData(musicData)
+                
+                // 通知Widget更新（歌曲信息变化）
+                self.widgetUpdateManager.musicInfoChanged()
             }
         }
         
         // 这些需要持续更新以保证磁带转动和快进/快退功能正常
         DispatchQueue.main.async {
             // 播放状态和时间需要实时更新
+            let previousPlayingState = self.isPlaying
             self.isPlaying = playbackStatus
             self.currentDuration = self.player.playbackTime
             
@@ -689,9 +713,19 @@ class MusicService: ObservableObject {
                 artist: self.currentArtist,
                 isPlaying: self.isPlaying,
                 currentDuration: self.currentDuration,
-                totalDuration: self.totalDuration
+                totalDuration: self.totalDuration,
+                artworkURL: artworkURL
             )
             UserDefaults.saveMusicData(musicData)
+            
+            // 通知Widget更新
+            if playbackStateChanged {
+                // 播放状态变化
+                self.widgetUpdateManager.musicPlaybackStateChanged(isPlaying: playbackStatus)
+            } else if previousPlayingState && playbackStatus {
+                // 播放进度变化（仅在播放状态下）
+                self.widgetUpdateManager.playbackProgressChanged()
+            }
         }
     }
 /// 计算队列中所有歌曲的总时长
@@ -750,6 +784,9 @@ class MusicService: ObservableObject {
             audioEffectsManager.setMusicPlayingState(true)
             // 🔑 开始播放时启动Timer
             startUpdateTimer()
+            
+            // 通知Widget更新（播放状态变化）
+            self.widgetUpdateManager.musicPlaybackStateChanged(isPlaying: true)
         }
         
         // 🔑 新增：延迟同步播放状态，解决首次播放显示问题
@@ -766,6 +803,9 @@ class MusicService: ObservableObject {
             audioEffectsManager.setMusicPlayingState(false)
             // 🔑 暂停时直接停止Timer，不重新启动
             stopUpdateTimer()
+            
+            // 通知Widget更新（播放状态变化）
+            self.widgetUpdateManager.musicPlaybackStateChanged(isPlaying: false)
         }
     }
 
@@ -777,6 +817,8 @@ class MusicService: ObservableObject {
             try await Task.sleep(nanoseconds: 300_000_000) // 0.3秒延迟
             await MainActor.run {
                 self.updateCurrentSongInfo()
+                // 通知Widget更新（歌曲信息变化）
+                self.widgetUpdateManager.musicInfoChanged()
             }
         }
     }
@@ -789,6 +831,8 @@ class MusicService: ObservableObject {
             try await Task.sleep(nanoseconds: 300_000_000) // 0.3秒延迟
             await MainActor.run {
                 self.updateCurrentSongInfo()
+                // 通知Widget更新（歌曲信息变化）
+                self.widgetUpdateManager.musicInfoChanged()
             }
         }
     }
