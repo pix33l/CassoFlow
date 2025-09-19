@@ -88,7 +88,7 @@ struct CassFlowWidgetEntryView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.black.opacity(0.4), lineWidth: 8)
                                 .blur(radius: 12)
-                                .offset(x: 0, y: 0)
+//                                .offset(x: 0, y: 0)
                                 .mask(RoundedRectangle(cornerRadius: 8))
                         )
                         .overlay(
@@ -98,16 +98,30 @@ struct CassFlowWidgetEntryView: View {
                 
                 // 控制按钮
                 HStack {
+                    ZStack {
+                        if let artworkData = entry.musicData.artworkData {
+                            // 背景层：模糊的专辑封面
+                            Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            // 默认封面
+                            defaultAlbumCoverView()                        }
+                    }
+                    .frame(width: 50, height: 50)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color(.black), lineWidth: 2))
                     
                     // 播放/暂停按钮
                     Button(intent: PlayPauseMusicIntent()) {
                         Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 16))
                     }
+                    .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
+                    .padding(.bottom, 8)
                 }
-                .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
-                .padding(.bottom, 8)
-                .padding(.horizontal)
             }
             .containerBackground(for: .widget) {
                 Image("bg-systemSmall")
@@ -137,15 +151,8 @@ struct CassFlowWidgetEntryView: View {
                                 .clipShape(Rectangle())
                         } else {
                             // 默认封面
-                            ZStack {
-                                Color.black
-                                Image("CASSOFLOW")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 55)
-                            }
-                            .frame(width: 80, height: 124)
-                            .clipShape(Rectangle())
+                            defaultAlbumCoverView()
+                                .frame(width: 80, height: 124)
                         }
                         
                         // 使用随机磁带图片
@@ -154,6 +161,8 @@ struct CassFlowWidgetEntryView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 80, height: 124)
                     }
+                    .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
+                    .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
                     
                     // 右侧内容：歌曲信息和控制按钮
                     VStack(spacing: 8) {
@@ -227,118 +236,156 @@ struct CassFlowWidgetEntryView: View {
                         .resizable()
                         .scaledToFill()
                 }
+//        case .systemLarge:
+//                // 大尺寸Widget布局 - 特殊磁带样式
+//                VStack {
+//                    ZStack {
+//                        // 磁带背景
+//                        Image("artwork-cassette")
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fit)
+//                            .frame(width: 320, height: 230)
+//                        
+//                        // 磁带封面
+//                        if let artworkData = entry.musicData.artworkData {
+//                            Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+//                                .resizable()
+//                                .aspectRatio(contentMode: .fill)
+//                                .frame(width: 225, height: 100)
+//                                .blur(radius: 8)
+//                                .overlay(
+//                                    // 半透明遮罩确保文字清晰
+//                                    Color.black.opacity(0.3)
+//                                )
+//                                .clipShape(RoundedRectangle(cornerRadius: 4))
+//                                .padding(.bottom, 30)
+//                        } else {
+//                            ZStack{
+//                                Color.black
+//                                    .frame(width: 225, height: 100)
+//                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+//                                    .padding(.bottom, 30)
+//                            }
+//                        }
+//                        
+//                        // CASSOFLOW Logo
+//                        Image("CASSOFLOW")
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fit)
+//                            .frame(width: 84)
+//                            .padding(.bottom, 92)
+//                        
+//                        // 磁带孔
+//                        Image("artwork-cassette-hole")
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fit)
+//                            .frame(width: 300)
+//                        
+//                        // 歌曲信息
+//                        HStack{
+//                            // 专辑封面
+//                            if let artworkData = entry.musicData.artworkData {
+//                                Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+//                                    .resizable()
+//                                    .aspectRatio(contentMode: .fill)
+//                                    .frame(width: 50, height: 50)
+//                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+//                            } else {
+//                                ZStack{
+//                                    Color.black
+//                                        .frame(width: 50, height: 50)
+//                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+//                                    
+//                                    Image("CASSOFLOW")
+//                                        .resizable()
+//                                        .aspectRatio(contentMode: .fit)
+//                                        .frame(width: 42)
+//                                }
+//                            }
+//                            
+//                            VStack(alignment: .leading, spacing: 0) {
+//                                Text(entry.musicData.title)
+//                                    .font(.headline.bold())
+//                                    .lineLimit(1)
+//                                
+//                                Text(entry.musicData.artist)
+//                                    .font(.footnote)
+//                                    .lineLimit(1)
+//                                    .padding(.top, 4)
+//                            }
+//                            
+//                            Spacer()
+//                        }
+//                        .padding(.top, 100)
+//                        .frame(width: 250)
+//                    }
+//                    
+//                    // 控制按钮
+//                    HStack(spacing: 12) {
+//                        // 上一首按钮
+//                        Button(intent: PreviousTrackIntent()) {
+//                            Image(systemName: "backward.fill")
+//                                .font(.system(size: 24))
+//                        }
+//                        
+//                        // 播放/暂停按钮
+//                        Button(intent: PlayPauseMusicIntent()) {
+//                            Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
+//                                .font(.system(size: 24))
+//                        }
+//                        
+//                        // 下一首按钮
+//                        Button(intent: NextTrackIntent()) {
+//                            Image(systemName: "forward.fill")
+//                                .font(.system(size: 24))
+//                        }
+//                    }
+//                    .padding()
+//                    .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
+//                }
+//                .containerBackground(for: .widget) {
+//                    Image("bg-systemLarge")
+//                        .resizable()
+//                        .scaledToFill()
+//                }
         case .systemLarge:
-                // 大尺寸Widget布局 - 特殊磁带样式
-                VStack {
-                    ZStack {
-                        // 磁带背景
-                        Image("artwork-cassette")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 320, height: 230)
-                        
-                        // 磁带封面
-                        if let artworkData = entry.musicData.artworkData {
-                            Image(uiImage: UIImage(data: artworkData) ?? UIImage())
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 225, height: 100)
-                                .blur(radius: 8)
-                                .overlay(
-                                    // 半透明遮罩确保文字清晰
-                                    Color.black.opacity(0.3)
-                                )
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                .padding(.bottom, 30)
-                        } else {
-                            ZStack{
-                                Color.black
-                                    .frame(width: 225, height: 100)
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    .padding(.bottom, 30)
-                            }
-                        }
-                        
-                        // CASSOFLOW Logo
-                        Image("CASSOFLOW")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 84)
-                            .padding(.bottom, 92)
-                        
-                        // 磁带孔
-                        Image("artwork-cassette-hole")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 300)
-                        
-                        // 歌曲信息
-                        HStack{
-                            // 专辑封面
-                            if let artworkData = entry.musicData.artworkData {
-                                Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+            // 大尺寸Widget布局 - 显示最近添加的6张音乐专辑封面
+            VStack {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 24) {
+                    // 显示专辑封面，如果有数据则显示真实封面，否则显示默认封面
+                    ForEach(0..<6, id: \.self) { index in
+                        ZStack {
+                            // 专辑封面显示逻辑
+                            if let albumCovers = entry.musicData.recentAlbumCovers,
+                               index < albumCovers.count,
+                               let uiImage = UIImage(data: albumCovers[index]) {
+                                Image(uiImage: uiImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    .frame(width: 80, height: 124)
+                                    .clipShape(Rectangle())
                             } else {
-                                ZStack{
-                                    Color.black
-                                        .frame(width: 50, height: 50)
-                                        .clipShape(RoundedRectangle(cornerRadius: 2))
-                                    
-                                    Image("CASSOFLOW")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 42)
-                                }
+                                defaultAlbumCoverView()
+                                    .frame(width: 80, height: 124)
                             }
                             
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text(entry.musicData.title)
-                                    .font(.headline.bold())
-                                    .lineLimit(1)
-                                
-                                Text(entry.musicData.artist)
-                                    .font(.footnote)
-                                    .lineLimit(1)
-                                    .padding(.top, 4)
-                            }
-                            
-                            Spacer()
+                            // 磁带图片覆盖层 - 每个封面使用不同的随机磁带图片
+                            Image(getRandomCassetteImage(for: "album_\(index)_\(entry.musicData.title)"))
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 80, height: 124)
                         }
-                        .padding(.top, 100)
-                        .frame(width: 250)
+                        .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
+                        .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
                     }
-                    
-                    // 控制按钮
-                    HStack(spacing: 12) {
-                        // 上一首按钮
-                        Button(intent: PreviousTrackIntent()) {
-                            Image(systemName: "backward.fill")
-                                .font(.system(size: 24))
-                        }
-                        
-                        // 播放/暂停按钮
-                        Button(intent: PlayPauseMusicIntent()) {
-                            Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
-                                .font(.system(size: 24))
-                        }
-                        
-                        // 下一首按钮
-                        Button(intent: NextTrackIntent()) {
-                            Image(systemName: "forward.fill")
-                                .font(.system(size: 24))
-                        }
-                    }
-                    .padding()
-                    .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
                 }
-                .containerBackground(for: .widget) {
-                    Image("bg-systemLarge")
-                        .resizable()
-                        .scaledToFill()
-                }
+            }
+            .containerBackground(for: .widget) {
+                Image("bg-systemLarge")
+                    .resizable()
+                    .scaledToFill()
+            }
+            
         default:
                 Text("Some other WidgetFamily in the future.")
             }
@@ -365,6 +412,19 @@ struct CassFlowWidgetEntryView: View {
         let hash = abs(id.hashValue)
         let index = hash % cassetteImages.count
         return cassetteImages[index]
+    }
+    
+    // 默认专辑封面视图
+    private func defaultAlbumCoverView() -> some View {
+        ZStack {
+            // 背景模糊效果
+            Color.black
+            Image("CASSOFLOW")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 55)
+//                .clipShape(Rectangle())
+        }
     }
 }
 

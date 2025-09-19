@@ -66,8 +66,8 @@ class WidgetUpdateManager {
         // 取消之前的定时器
         cancelPeriodicUpdates()
         
-        // 在播放期间每3秒更新一次Widget
-        periodicUpdateTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+        // 在播放期间每5秒更新一次Widget
+        periodicUpdateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
             self?.reloadAllWidgets()
         }
     }

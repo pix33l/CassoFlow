@@ -60,6 +60,9 @@ class LibraryDataManager: ObservableObject {
     // 添加对偏好设置的引用
     var preferences: LibraryPreferences?
     
+    // 音乐服务引用
+    private let musicService = MusicService.shared
+    
     func loadUserLibraryIfNeeded(with sortType: SortType = .recentlyAdded) async {
         guard !hasLoaded else { return }
         
@@ -107,6 +110,9 @@ class LibraryDataManager: ObservableObject {
                 isLoading = false
                 hasLoaded = true
             }
+            // 加载完成后更新Widget的最近专辑封面
+            await updateWidgetWithRecentAlbums()
+            
         } catch {
             await MainActor.run {
                 errorMessage = String(localized: "加载媒体库失败: \(error.localizedDescription)")
@@ -151,6 +157,9 @@ class LibraryDataManager: ObservableObject {
                 hasLoaded = false
             }
             await loadUserLibraryIfNeeded(with: preferences?.currentSortType ?? .recentlyAdded)
+            
+            // 添加专辑后立即更新Widget的最近专辑封面
+            await updateWidgetWithRecentAlbums()
         } catch {
             await MainActor.run {
                 errorMessage = String(localized: "添加专辑到媒体库失败: \(error.localizedDescription)")
@@ -209,6 +218,11 @@ class LibraryDataManager: ObservableObject {
 
     private func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
         return try await fetchUserLibraryPlaylistsWithSort(preferences?.currentSortType ?? .recentlyAdded)
+    }
+    
+    /// 更新Widget的最近专辑封面数据
+    private func updateWidgetWithRecentAlbums() async {
+        await musicService.updateWidgetWithRecentAlbums()
     }
 }
 

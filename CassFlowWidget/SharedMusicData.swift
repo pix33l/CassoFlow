@@ -9,11 +9,15 @@ struct SharedMusicData: Codable, CustomStringConvertible {
     var isPlaying: Bool
     var artworkData: Data?
     
+    // 最近专辑封面数据（最多6张）
+    var recentAlbumCovers: [Data]?
+    
     static let `default` = SharedMusicData(
         title: "未播放歌曲",
         artist: "点此选择音乐",
         isPlaying: false,
-        artworkData: nil
+        artworkData: nil,
+        recentAlbumCovers: nil
     )
     
     var description: String {

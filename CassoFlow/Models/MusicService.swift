@@ -432,6 +432,7 @@ class MusicService: ObservableObject {
                 self.isPlaying = currentPlayingState
                 // 立即通知AudioEffectsManager状态变化
                 self.audioEffectsManager.setMusicPlayingState(currentPlayingState)
+//                self.widgetUpdateManager.musicPlaybackStateChanged(isPlaying: currentPlayingState)
             }
             
             lastPlayingState = currentPlayingState
@@ -467,6 +468,11 @@ class MusicService: ObservableObject {
         updateCurrentSongInfo()
         // 主动刷新Widget
         widgetUpdateManager.reloadAllWidgets()
+    }
+    
+    /// 更新Widget数据并包含最近专辑封面
+    func updateWidgetWithRecentAlbums() async {
+        await updateWidgetDataWithRecentAlbums()
     }
     
     // MARK: - 会员状态变化处理
@@ -597,12 +603,14 @@ class MusicService: ObservableObject {
                 self.lastTrackIndex = nil
                 self.lastTotalTracks = 0
                 
-                // 保存到共享存储供widget使用
+                // 保存到共享存储供widget使用，保留现有的最近专辑封面数据
+                let existingMusicData = UserDefaults.getMusicData()
                 let musicData = SharedMusicData(
                     title: self.currentTitle,
                     artist: self.currentArtist,
                     isPlaying: self.isPlaying,
-                    artworkData: nil
+                    artworkData: nil,
+                    recentAlbumCovers: existingMusicData.recentAlbumCovers // 保留现有的专辑封面数据
                 )
                 UserDefaults.saveMusicData(musicData)
             }
@@ -672,12 +680,14 @@ class MusicService: ObservableObject {
                 self.totalTracksInQueue = newTotalTracks
                 self.queueTotalDuration = totalQueueDuration
                 
-                // 保存到共享存储供widget使用
+                // 保存到共享存储供widget使用，保留现有的最近专辑封面数据
+                let existingMusicData = UserDefaults.getMusicData()
                 let musicData = SharedMusicData(
                     title: self.currentTitle,
                     artist: self.currentArtist,
                     isPlaying: self.isPlaying,
-                    artworkData: artworkData
+                    artworkData: artworkData,
+                    recentAlbumCovers: existingMusicData.recentAlbumCovers // 保留现有的专辑封面数据
                 )
                 UserDefaults.saveMusicData(musicData)
                 
@@ -689,7 +699,7 @@ class MusicService: ObservableObject {
         // 这些需要持续更新以保证磁带转动和快进/快退功能正常
         DispatchQueue.main.async {
             // 播放状态和时间需要实时更新
-            let previousPlayingState = self.isPlaying
+//            _ = self.isPlaying
             self.isPlaying = playbackStatus
             self.currentDuration = self.player.playbackTime
             
@@ -700,12 +710,14 @@ class MusicService: ObservableObject {
             // 同步播放状态到音频效果管理器
             self.audioEffectsManager.setMusicPlayingState(playbackStatus)
             
-            // 保存到共享存储供widget使用
+            // 保存到共享存储供widget使用，保留现有的最近专辑封面数据
+            let existingMusicData = UserDefaults.getMusicData()
             let musicData = SharedMusicData(
                 title: self.currentTitle,
                 artist: self.currentArtist,
                 isPlaying: self.isPlaying,
-                artworkData: artworkData
+                artworkData: artworkData,
+                recentAlbumCovers: existingMusicData.recentAlbumCovers // 保留现有的专辑封面数据
             )
             UserDefaults.saveMusicData(musicData)
             
@@ -713,9 +725,9 @@ class MusicService: ObservableObject {
             if playbackStateChanged {
                 // 播放状态变化
                 self.widgetUpdateManager.musicPlaybackStateChanged(isPlaying: playbackStatus)
-            } else if previousPlayingState && playbackStatus {
+//            } else if previousPlayingState && playbackStatus {
                 // 播放进度变化（仅在播放状态下）
-                self.widgetUpdateManager.playbackProgressChanged()
+//                self.widgetUpdateManager.playbackProgressChanged()
             }
         }
     }
@@ -725,7 +737,7 @@ class MusicService: ObservableObject {
         guard let artwork = artwork else { return nil }
         
         // 获取最高质量的专辑封面URL
-        guard let url = artwork.url(width: 500, height: 500) else { return nil }
+        guard let url = artwork.url(width: 300, height: 300) else { return nil }
         
         // 同步下载图片数据
         do {
@@ -925,5 +937,66 @@ class MusicService: ObservableObject {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    // MARK: - 最近专辑封面管理
+    
+    /// 获取用户媒体库中最近添加的专辑封面
+    func fetchRecentAlbumCovers() async -> [Data]? {
+        do {
+            let albums = try await fetchUserLibraryAlbums()
+            var covers: [Data] = []
+            
+            // 获取最近6张专辑的封面
+            for album in albums.prefix(6) {
+                if let artwork = album.artwork,
+                   let url = artwork.url(width: 300, height: 300),
+                   let data = try? Data(contentsOf: url) {
+                    covers.append(data)
+                }
+                
+                // 如果已经收集了6张封面，就停止
+                if covers.count >= 6 {
+                    break
+                }
+            }
+            
+            return covers.isEmpty ? nil : covers
+        } catch {
+            print("获取最近专辑封面失败: \(error)")
+            return nil
+        }
+    }
+    
+    /// 更新Widget数据（包含最近专辑封面）
+    func updateWidgetDataWithRecentAlbums() async {
+        let recentCovers = await fetchRecentAlbumCovers()
+        
+        await MainActor.run {
+            // 获取当前歌曲的封面数据
+            var currentArtworkData: Data? = nil
+            if let currentEntry = self.player.queue.currentEntry {
+                switch currentEntry.item {
+                case .song(let song):
+                    currentArtworkData = self.getArtworkData(from: song.artwork)
+                case .musicVideo(let musicVideo):
+                    currentArtworkData = self.getArtworkData(from: musicVideo.artwork)
+//                case .none, .some(.unknown):
+//                    currentArtworkData = nil
+                default:
+                    currentArtworkData = nil
+                }
+            }
+            
+            let musicData = SharedMusicData(
+                title: self.currentTitle,
+                artist: self.currentArtist,
+                isPlaying: self.isPlaying,
+                artworkData: currentArtworkData,
+                recentAlbumCovers: recentCovers
+            )
+            UserDefaults.saveMusicData(musicData)
+            widgetUpdateManager.reloadAllWidgets()
+        }
     }
 }
