@@ -7,21 +7,21 @@ struct SharedMusicData: Codable, CustomStringConvertible {
     var title: String
     var artist: String
     var isPlaying: Bool
-    var currentDuration: TimeInterval
-    var totalDuration: TimeInterval
-    var artworkURL: String? // 专辑封面URL
+    var artworkData: Data?
     
     static let `default` = SharedMusicData(
         title: "未播放歌曲",
         artist: "点此选择音乐",
         isPlaying: false,
-        currentDuration: 0,
-        totalDuration: 0,
-        artworkURL: nil
+        artworkData: nil
     )
     
     var description: String {
-        return "标题: '\(title)', 艺术家: '\(artist)', 播放中: \(isPlaying), 当前时长: \(currentDuration), 总时长: \(totalDuration)"
+        if let artworkData = artworkData {
+            return "标题: '\(title)', 艺术家: '\(artist)', 播放中: \(isPlaying), 封面数据大小: \(artworkData.count) bytes"
+        } else {
+            return "标题: '\(title)', 艺术家: '\(artist)', 播放中: \(isPlaying)"
+        }
     }
 }
 

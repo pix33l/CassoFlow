@@ -602,9 +602,7 @@ class MusicService: ObservableObject {
                     title: self.currentTitle,
                     artist: self.currentArtist,
                     isPlaying: self.isPlaying,
-                    currentDuration: self.currentDuration,
-                    totalDuration: self.totalDuration,
-                    artworkURL: nil
+                    artworkData: nil
                 )
                 UserDefaults.saveMusicData(musicData)
             }
@@ -613,30 +611,27 @@ class MusicService: ObservableObject {
         
         let duration: TimeInterval
         var trackID: MusicItemID? = nil
+        var artworkData: Data? = nil
         
         // 更精确的类型处理
-        var artwork: Artwork? = nil
+
         switch entry.item {
         case .song(let song):
             duration = song.duration ?? 0
             trackID = song.id
-            artwork = song.artwork
+            artworkData = getArtworkData(from: song.artwork)
         case .musicVideo(let musicVideo):
             duration = musicVideo.duration ?? 0
             trackID = musicVideo.id
-            artwork = musicVideo.artwork
+            artworkData = getArtworkData(from: musicVideo.artwork)
         case .none:
             duration = 0
             trackID = nil
+            artworkData = nil
         @unknown default:
             duration = 0
             trackID = nil
-        }
-        
-        // 获取专辑封面URL
-        var artworkURL: String? = nil
-        if let artwork = artwork {
-            artworkURL = artwork.url(width: 200, height: 200)?.absoluteString
+            artworkData = nil
         }
         
         let entries = player.queue.entries
@@ -654,7 +649,7 @@ class MusicService: ObservableObject {
                              trackID != lastTrackID ||
                              newTrackIndex != lastTrackIndex ||
                              newTotalTracks != lastTotalTracks
-                             
+                              
         // 检查播放状态是否变化
         let playbackStateChanged = playbackStatus != isPlaying
         
@@ -682,9 +677,7 @@ class MusicService: ObservableObject {
                     title: self.currentTitle,
                     artist: self.currentArtist,
                     isPlaying: self.isPlaying,
-                    currentDuration: self.currentDuration,
-                    totalDuration: self.totalDuration,
-                    artworkURL: artwork?.url(width: 200, height: 200)?.absoluteString
+                    artworkData: artworkData
                 )
                 UserDefaults.saveMusicData(musicData)
                 
@@ -712,9 +705,7 @@ class MusicService: ObservableObject {
                 title: self.currentTitle,
                 artist: self.currentArtist,
                 isPlaying: self.isPlaying,
-                currentDuration: self.currentDuration,
-                totalDuration: self.totalDuration,
-                artworkURL: artworkURL
+                artworkData: artworkData
             )
             UserDefaults.saveMusicData(musicData)
             
@@ -726,6 +717,23 @@ class MusicService: ObservableObject {
                 // 播放进度变化（仅在播放状态下）
                 self.widgetUpdateManager.playbackProgressChanged()
             }
+        }
+    }
+    
+    /// 从Artwork获取专辑封面数据
+    private func getArtworkData(from artwork: Artwork?) -> Data? {
+        guard let artwork = artwork else { return nil }
+        
+        // 获取最高质量的专辑封面URL
+        guard let url = artwork.url(width: 500, height: 500) else { return nil }
+        
+        // 同步下载图片数据
+        do {
+            let data = try Data(contentsOf: url)
+            return data
+        } catch {
+            print("下载专辑封面数据失败: \(error)")
+            return nil
         }
     }
 /// 计算队列中所有歌曲的总时长

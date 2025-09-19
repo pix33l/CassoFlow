@@ -39,6 +39,8 @@
 /* Begin PBXFileReference section */
 		6276D7682DD1E6F900ACA539 /* CassoFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CassoFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62CB6C142E7ADB2A007ED1E9 /* CassFlowWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CassFlowWidgetExtension.entitlements; sourceTree = "<group>"; };
+		62CE44E22E7BFD1B0069A7F6 /* CassFlowWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CassFlowWidgetExtension.entitlements; sourceTree = "<group>"; };
+		62CE44E32E7C10060069A7F6 /* CassFlowWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CassFlowWidgetExtension.entitlements; sourceTree = "<group>"; };
 		62DE4ECC2E7AAAD60095661F /* CassFlowWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CassFlowWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		62DE4ECE2E7AAAD60095661F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		62DE4ED02E7AAAD60095661F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -121,6 +123,8 @@
 			isa = PBXGroup;
 			children = (
 				62CB6C142E7ADB2A007ED1E9 /* CassFlowWidgetExtension.entitlements */,
+				62CE44E32E7C10060069A7F6 /* CassFlowWidgetExtension.entitlements */,
+				62CE44E22E7BFD1B0069A7F6 /* CassFlowWidgetExtension.entitlements */,
 				6276D76A2DD1E6F900ACA539 /* CassoFlow */,
 				62DE4ED22E7AAAD60095661F /* CassFlowWidget */,
 				62DE4ECD2E7AAAD60095661F /* Frameworks */,
