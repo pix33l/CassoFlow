@@ -51,11 +51,11 @@ class WidgetUpdateManager {
         reloadAllWidgets()
     }
     
-    /// 当播放进度变化时调用
-    func playbackProgressChanged() {
-        // 播放进度变化时刷新Widget
-        reloadAllWidgets()
-    }
+//    /// 当播放进度变化时调用
+//    func playbackProgressChanged() {
+//        // 播放进度变化时刷新Widget
+//        reloadAllWidgets()
+//    }
     
     // MARK: - 定期更新管理
     
@@ -66,8 +66,8 @@ class WidgetUpdateManager {
         // 取消之前的定时器
         cancelPeriodicUpdates()
         
-        // 在播放期间每5秒更新一次Widget
-        periodicUpdateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+        // 在播放期间每6秒更新一次Widget
+        periodicUpdateTimer = Timer.scheduledTimer(withTimeInterval: 6.0, repeats: true) { [weak self] _ in
             self?.reloadAllWidgets()
         }
     }

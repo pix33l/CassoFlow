@@ -12,11 +12,11 @@ import SwiftUI
 // 自定义3D按钮样式结构 - 支持外部控制按压状态
 struct ThreeDButtonStyle: ButtonStyle {
     
-    let externalIsPressed: Bool
+//    let externalIsPressed: Bool
     
     func makeBody(configuration: Configuration) -> some View {
         let offset: CGFloat = 8
-        let isPressed = configuration.isPressed || externalIsPressed // 使用外部状态或内部状态
+        let isPressed = configuration.isPressed/* || externalIsPressed // 使用外部状态或内部状态*/
         
         return ZStack{
             // 按钮的外框内凹

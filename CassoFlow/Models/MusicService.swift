@@ -386,17 +386,27 @@ class MusicService: ObservableObject {
     // 处理widget控制操作
     private func handleWidgetControlAction(_ action: MusicControlAction) {
         Task {
-            switch action {
-            case .playPause:
-                if isPlaying {
-                    await pause()
-                } else {
-                    try? await play()
+            // 确保音乐服务已经初始化并准备好
+            do {
+                switch action {
+                case .playPause:
+                    if isPlaying {
+                        await pause()
+                    } else {
+                        try await play()
+                    }
+                case .nextTrack:
+                    try await skipToNext()
+                case .previousTrack:
+                    try await skipToPrevious()
                 }
-            case .nextTrack:
-                try? await skipToNext()
-            case .previousTrack:
-                try? await skipToPrevious()
+                
+                // 操作完成后，立即更新Widget数据
+                await MainActor.run {
+                    updateWidgetData()
+                }
+            } catch {
+                print("处理Widget控制操作失败: \(error.localizedDescription)")
             }
         }
     }
@@ -411,8 +421,10 @@ class MusicService: ObservableObject {
         
         stopBackgroundStatusTimer() // 确保没有重复的定时器
         
-        backgroundStatusTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+        backgroundStatusTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
             self?.updateBackgroundMusicStatus()
+            // 检查Widget控制操作
+            self?.checkWidgetControlActions()
         }
     }
     
@@ -725,9 +737,6 @@ class MusicService: ObservableObject {
             if playbackStateChanged {
                 // 播放状态变化
                 self.widgetUpdateManager.musicPlaybackStateChanged(isPlaying: playbackStatus)
-//            } else if previousPlayingState && playbackStatus {
-                // 播放进度变化（仅在播放状态下）
-//                self.widgetUpdateManager.playbackProgressChanged()
             }
         }
     }
@@ -737,7 +746,7 @@ class MusicService: ObservableObject {
         guard let artwork = artwork else { return nil }
         
         // 获取最高质量的专辑封面URL
-        guard let url = artwork.url(width: 300, height: 300) else { return nil }
+        guard let url = artwork.url(width: 200, height: 200) else { return nil }
         
         // 同步下载图片数据
         do {
@@ -916,7 +925,7 @@ class MusicService: ObservableObject {
     func fetchUserLibraryAlbums() async throws -> MusicItemCollection<Album> {
         var request = MusicLibraryRequest<Album>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 50 // 设置合理的限制
+        request.limit = 200 // 设置合理的限制
         
         let response = try await request.response()
         return response.items
@@ -926,7 +935,7 @@ class MusicService: ObservableObject {
     func fetchUserLibraryPlaylists() async throws -> MusicItemCollection<Playlist> {
         var request = MusicLibraryRequest<Playlist>()
         request.sort(by: \.libraryAddedDate, ascending: false)
-        request.limit = 50
+        request.limit = 200
         
         let response = try await request.response()
         return response.items
@@ -950,7 +959,7 @@ class MusicService: ObservableObject {
             // 获取最近6张专辑的封面
             for album in albums.prefix(6) {
                 if let artwork = album.artwork,
-                   let url = artwork.url(width: 300, height: 300),
+                   let url = artwork.url(width: 200, height: 200),
                    let data = try? Data(contentsOf: url) {
                     covers.append(data)
                 }

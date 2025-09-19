@@ -57,22 +57,23 @@
 		62C45C812E7AC03F006C5642 /* Exceptions for "CassFlowWidget" folder in "CassoFlow" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppIntent.swift,
 				SharedMusicData.swift,
 				WidgetUpdateManager.swift,
 			);
 			target = 6276D7672DD1E6F900ACA539 /* CassoFlow */;
 		};
-		62C45CCC2E7AD68B006C5642 /* Exceptions for "CassoFlow" folder in "CassFlowWidgetExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Assets.xcassets,
-			);
-			target = 62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */;
-		};
 		62DE4EE12E7AAAD80095661F /* Exceptions for "CassFlowWidget" folder in "CassFlowWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+			);
+			target = 62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */;
+		};
+		62E0912C2E7DC706006E6A60 /* Exceptions for "CassoFlow" folder in "CassFlowWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
 			);
 			target = 62DE4ECB2E7AAAD60095661F /* CassFlowWidgetExtension */;
 		};
@@ -83,7 +84,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				6255CB7B2E0555D600F23075 /* Exceptions for "CassoFlow" folder in "CassoFlow" target */,
-				62C45CCC2E7AD68B006C5642 /* Exceptions for "CassoFlow" folder in "CassFlowWidgetExtension" target */,
+				62E0912C2E7DC706006E6A60 /* Exceptions for "CassoFlow" folder in "CassFlowWidgetExtension" target */,
 			);
 			path = CassoFlow;
 			sourceTree = "<group>";
@@ -441,7 +442,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -485,7 +486,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -33,10 +33,11 @@ struct Provider: TimelineProvider {
         let refreshPolicy: TimelineReloadPolicy
         
         if musicData.isPlaying {
-            refreshPolicy = .after(Calendar.current.date(byAdding: .second, value: 5, to: currentDate)!)
+            // 如果正在播放，使用较短的刷新间隔，确保播放状态及时更新
+            refreshPolicy = .after(Calendar.current.date(byAdding: .second, value: 3, to: currentDate)!)
         } else {
             // 如果暂停或停止，使用较长的刷新间隔
-            refreshPolicy = .after(Calendar.current.date(byAdding: .minute, value: 15, to: currentDate)!)
+            refreshPolicy = .after(Calendar.current.date(byAdding: .minute, value: 30, to: currentDate)!)
         }
         
         let timeline = Timeline(entries: [entry], policy: refreshPolicy)
@@ -116,10 +117,10 @@ struct CassFlowWidgetEntryView: View {
                     
                     // 播放/暂停按钮
                     Button(intent: PlayPauseMusicIntent()) {
-                        Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
+                        Image(systemName: "playpause.fill"/*entry.musicData.isPlaying ? "pause.fill" : "play.fill"*/)
                             .font(.system(size: 16))
                     }
-                    .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
+                    .buttonStyle(ThreeDButtonStyle())
                     .padding(.bottom, 8)
                 }
             }
@@ -134,21 +135,31 @@ struct CassFlowWidgetEntryView: View {
                 HStack(spacing: 16) {
                     ZStack {
                         if let artworkData = entry.musicData.artworkData {
-                            // 背景层：模糊的专辑封面
-                            Image(uiImage: UIImage(data: artworkData) ?? UIImage())
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 80, height: 124)
-                                .blur(radius: 8)
-                                .overlay(Color.black.opacity(0.3))
-                                .clipShape(Rectangle())
                             
-                            // 前景层：清晰的专辑封面
-                            Image(uiImage: UIImage(data: artworkData) ?? UIImage())
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 80, height: 80)
-                                .clipShape(Rectangle())
+//                            if musicService.currentCoverStyle == .rectangle {
+//                                Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+//                                    .resizable()
+//                                    .aspectRatio(contentMode: .fill)
+//                                    .frame(width: 80, height: 124)
+//                                    .clipShape(Rectangle())
+//                            } else {
+                            
+//                                // 背景层：模糊的专辑封面
+//                                Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+//                                    .resizable()
+//                                    .aspectRatio(contentMode: .fill)
+//                                    .frame(width: 80, height: 124)
+//                                    .blur(radius: 8)
+//                                    .overlay(Color.black.opacity(0.3))
+//                                    .clipShape(Rectangle())
+                                
+                                // 前景层：清晰的专辑封面
+                                Image(uiImage: UIImage(data: artworkData) ?? UIImage())
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 80, height: 124)
+                                    .clipShape(Rectangle())
+//                            }
                         } else {
                             // 默认封面
                             defaultAlbumCoverView()
@@ -161,8 +172,8 @@ struct CassFlowWidgetEntryView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 80, height: 124)
                     }
-                    .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
-                    .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
+                    .shadow(color: .black.opacity(0.4), radius: 6, y: 2)
+                    .shadow(color: .black.opacity(0.2), radius: 12, y: 4)
                     
                     // 右侧内容：歌曲信息和控制按钮
                     VStack(spacing: 8) {
@@ -215,7 +226,7 @@ struct CassFlowWidgetEntryView: View {
                             
                             // 播放/暂停按钮
                             Button(intent: PlayPauseMusicIntent()) {
-                                Image(systemName: entry.musicData.isPlaying ? "pause.fill" : "play.fill")
+                                Image(systemName: "playpause.fill"/*entry.musicData.isPlaying ? "pause.fill" : "play.fill"*/)
                                     .font(.system(size: 16))
 //                                    .frame(width: 32, height: 16)
                             }
@@ -227,7 +238,7 @@ struct CassFlowWidgetEntryView: View {
 //                                    .frame(width: 32, height: 16)
                             }
                         }
-                        .buttonStyle(ThreeDButtonStyle(externalIsPressed: false))
+                        .buttonStyle(ThreeDButtonStyle())
                         .padding(.bottom, 8)
                     }
                 }
@@ -375,8 +386,8 @@ struct CassFlowWidgetEntryView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 80, height: 124)
                         }
-                        .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
-                        .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
+                        .shadow(color: .black.opacity(0.4), radius: 6, y: -2)
+                        .shadow(color: .black.opacity(0.2), radius: 12, y: -4)
                     }
                 }
             }
